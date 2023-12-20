@@ -9,7 +9,6 @@
 
 using System;
 using System.IO;
-using System.Reflection.Metadata.Ecma335;
 using Aki.ByteBanger;
 using Aki.Launcher.Controllers;
 using Aki.Launcher.MiniCommon;
@@ -118,12 +117,11 @@ namespace Aki.Launcher.Helpers
                     // remove patched file
                     try
                     {
-
                         var patched = new FileInfo(target);
                         patched.IsReadOnly = false;
                         patched.Delete();
 
-                        // restore from backup
+                        // Restore from backup
                         File.Copy(file.FullName, target);
                         file.IsReadOnly = false;
                         file.Delete();
