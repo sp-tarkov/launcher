@@ -49,10 +49,10 @@ namespace Aki.Launcher
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return null;
 
-            var uninstallStringValue = Registry.LocalMachine.OpenSubKey(registryInstall, false)
-                ?.GetValue("UninstallString");
-            var info = (uninstallStringValue is string key) ? new FileInfo(key) : null;
-            return info?.DirectoryName;
+            var installLocation = Registry.LocalMachine.OpenSubKey(registryInstall, false)
+                ?.GetValue("InstallLocation");
+            var info = (installLocation is string key) ? new DirectoryInfo(key) : null;
+            return info?.FullName;
         }
 
         public async Task<GameStarterResult> LaunchGame(ServerInfo server, AccountInfo account, string gamePath)
