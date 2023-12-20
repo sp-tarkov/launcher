@@ -11,6 +11,7 @@ using System;
 using System.IO;
 using System.Reflection.Metadata.Ecma335;
 using Aki.ByteBanger;
+using Aki.Launcher.Controllers;
 using Aki.Launcher.MiniCommon;
 using Aki.Launcher.Models.Launcher;
 
@@ -115,14 +116,22 @@ namespace Aki.Launcher.Helpers
                     var target = Path.ChangeExtension(file.FullName, null);
 
                     // remove patched file
-                    var patched = new FileInfo(target);
-                    patched.IsReadOnly = false;
-                    patched.Delete();
+                    try
+                    {
 
-                    // restore from backup
-                    File.Copy(file.FullName, target);
-                    file.IsReadOnly = false;
-                    file.Delete();
+                        var patched = new FileInfo(target);
+                        patched.IsReadOnly = false;
+                        patched.Delete();
+
+                        // restore from backup
+                        File.Copy(file.FullName, target);
+                        file.IsReadOnly = false;
+                        file.Delete();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogManager.Instance.Exception(ex);
+                    }
                 }
             }
         }
