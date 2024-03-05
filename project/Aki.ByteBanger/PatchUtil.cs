@@ -24,7 +24,7 @@ namespace Aki.ByteBanger
                 PatchedLength = patched.Length
             };
 
-            using (SHA256CryptoServiceProvider sha256 = new SHA256CryptoServiceProvider())
+            using (SHA256 sha256 = SHA256.Create())
             {
                 pi.OriginalChecksum = sha256.ComputeHash(original);
                 pi.PatchedChecksum = sha256.ComputeHash(patched);
@@ -97,7 +97,7 @@ namespace Aki.ByteBanger
         public static PatchResult Patch(byte[] input, PatchInfo pi)
         {
             byte[] inputHash;
-            using (SHA256CryptoServiceProvider sha256 = new SHA256CryptoServiceProvider())
+            using (SHA256 sha256 = SHA256.Create())
             {
                 inputHash = sha256.ComputeHash(input);
             }
@@ -114,7 +114,7 @@ namespace Aki.ByteBanger
                 Array.Copy(itm.Data, 0, patchedData, itm.Offset, itm.Data.Length);
 
             byte[] patchedHash;
-            using (SHA256CryptoServiceProvider sha256 = new SHA256CryptoServiceProvider())
+            using (SHA256 sha256 = SHA256.Create())
             {
                 patchedHash = sha256.ComputeHash(patchedData);
             }
