@@ -94,8 +94,8 @@ namespace SPT.Launcher.Helpers
             englishLocale.native_name = "English";
             englishLocale.retry = "Retry";
             englishLocale.server_connecting = "Connecting";
-            englishLocale.server_unavailable_format_1 = "Default server '{0}' is not available.";
-            englishLocale.no_servers_available = "No Servers found. Check server list in settings.";
+            englishLocale.server_unavailable_format_1 = "No server available at: '{0}' to connect to\nEnsure you have run 'SPT.Server.exe' first.";
+            englishLocale.no_servers_available = "No SPT Servers found. Ensure your SPT sever is running and check the server URL is correct in the settings page.";
             englishLocale.settings_menu = "Settings";
             englishLocale.back = "Back";
             englishLocale.wipe_profile = "Wipe Profile";
@@ -119,8 +119,8 @@ namespace SPT.Launcher.Helpers
             englishLocale.edit_account = "Edit Account";
             englishLocale.start_game = "Start Game";
             englishLocale.installed_in_live_game_warning = "SPT shouldn't be installed into the live game directory. Please install SPT into a copy of the game directory elsewhere on your computer.";
-            englishLocale.no_official_game_warning = "Escape From Tarkov isn't installed on your computer. Please buy a copy of the game and support the developers!";
-            englishLocale.eft_exe_not_found_warning = "EscapeFromTarkov.exe not found at game path. Please check that the directory is correct.";
+            englishLocale.no_official_game_warning = "Escape From Tarkov isn't installed on your computer. Ensure your BSG launcher can start EFT before starting SPT.";
+            englishLocale.eft_exe_not_found_warning = "EscapeFromTarkov.exe not found at game path. Ensure the folder you installed SPT into has this file.";
             englishLocale.account_exist = "Account already exists";
             englishLocale.url = "URL";
             englishLocale.default_language = "Default Language";
