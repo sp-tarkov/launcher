@@ -1792,7 +1792,25 @@ namespace SPT.Launcher.Helpers
             }
         }
         #endregion
-        
+
+        #region core_dll_file_version_mismatch
+        private string _core_dll_file_version_mismatch;
+
+        public string core_dll_file_version_mismatch
+        {
+            get => _core_dll_file_version_mismatch;
+            set
+            {
+                if (_core_dll_file_version_mismatch != value)
+                {
+                    _core_dll_file_version_mismatch = value;
+                    RaisePropertyChanged(nameof(core_dll_file_version_mismatch));
+                }
+            }
+        }
+
+        #endregion
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;

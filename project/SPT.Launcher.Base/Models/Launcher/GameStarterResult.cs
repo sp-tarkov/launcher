@@ -47,7 +47,11 @@ namespace SPT.Launcher.Models.Launcher
                 case -7:
                     Message = ":(";
                     break;
-                    
+
+                case -8:
+                    Message = LocalizationProvider.Instance.core_dll_file_version_mismatch;
+                    break;
+
                 default:
                     Message = LocalizationProvider.Instance.login_failed;
                     break;

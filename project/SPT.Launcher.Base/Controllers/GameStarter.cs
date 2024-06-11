@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using SPT.Launcher.Controllers;
 using SPT.Launcher.Interfaces;
 using System.Runtime.InteropServices;
+using SPT.Launcher.Models.SPT;
 
 namespace SPT.Launcher
 {
@@ -64,6 +65,13 @@ namespace SPT.Launcher
             {
                 LogManager.Instance.Error("[LaunchGame] Installed in Live :: YES");
                 return GameStarterResult.FromError(-1);
+            }
+
+            // Confirm core.dll version matches version server is running
+            if (IsCoreDllVersionMismatched(gamePath))
+            {
+                LogManager.Instance.Error("[LaunchGame] Core dll mismatch :: FAILED");
+                return GameStarterResult.FromError(-8);
             }
             
             LogManager.Instance.Info("[LaunchGame] Installed in Live :: NO");
@@ -202,6 +210,39 @@ namespace SPT.Launcher
             }
 
             return isInstalledInLive;
+        }
+
+        static bool IsCoreDllVersionMismatched(string gamePath)
+        {
+            try
+            {
+                var serverVersion = new SPTVersion(ServerManager.GetVersion());
+
+                var coreDllVersionInfo = FileVersionInfo.GetVersionInfo(Path.Combine($"{gamePath}/BepinEx/plugins/spt", "spt-core.dll"));
+                var dllVersion = new SPTVersion(coreDllVersionInfo.FileVersion);
+
+                LogManager.Instance.Info($"[LaunchGame] spt-core.dll version: {dllVersion}");
+
+                // Edge case, running on locally built modules dlls, ignore check and return ok
+                if (dllVersion.Major == 0) return false;
+
+                // check 'X'.x.x
+                if (serverVersion.Major != dllVersion.Major) return true;
+
+                // check x.'X'.x
+                if (serverVersion.Minor != dllVersion.Minor) return true;
+
+                // check x.x.'X'
+                if (serverVersion.Tag != dllVersion.Tag) return true;
+
+                return false; // Versions match, hooray
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Exception(ex);
+            }
+
+            return true;
         }
 
         void SetupGameFiles(string gamePath)
