@@ -12,7 +12,7 @@
 
     <!-- Backdrop -->
     <Rectangle Fill="{StaticResource SPT_Background_Dark}"
-               Grid.RowSpan="7" Grid.ColumnSpan="5"
+               Grid.RowSpan="8" Grid.ColumnSpan="5"
                Opacity=".7"
                />
     <WrapPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
