@@ -8,9 +8,39 @@ namespace SPT.Launcher.CustomControls
 {
     public partial class TitleBar : UserControl
     {
+        private bool isPointerPressed = false;
+        private PixelPoint startPosition = new PixelPoint(0, 0);
+        private Point mouseOffsetToOrigin = new Point(0, 0);
+        
         public TitleBar()
         {
             InitializeComponent();
+
+            // handle window dragging. Not sure why that stopped working ... -waffle.lazy
+            this.PointerPressed += (sender, args) =>
+            {
+                startPosition = ((Window)this.VisualRoot).Position;
+                mouseOffsetToOrigin = args.GetPosition(this);
+                isPointerPressed = true;
+            };
+
+            this.PointerMoved += (sender, args) =>
+            {
+                if (isPointerPressed)
+                {
+                    var pos = args.GetPosition(this);
+                    startPosition = new PixelPoint((int)(startPosition.X + pos.X - mouseOffsetToOrigin.X), (int)(startPosition.Y + pos.Y - mouseOffsetToOrigin.Y));
+                    ((Window)this.VisualRoot).Position = startPosition;
+                }
+            };
+
+            this.PointerReleased += (sender, args) =>
+            {
+                var pos = args.GetPosition(this);
+                startPosition = new PixelPoint((int)(startPosition.X + pos.X - mouseOffsetToOrigin.X), (int)(startPosition.Y + pos.Y - mouseOffsetToOrigin.Y));
+                ((Window)this.VisualRoot).Position = startPosition;
+                isPointerPressed = false;
+            };
         }
 
         private void InitializeComponent()
