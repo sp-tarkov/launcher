@@ -9,7 +9,7 @@ using SPT.Launcher.Models.SPT;
 using SPT.Launcher.Helpers;
 using SPT.Launcher.ViewModels.Dialogs;
 using Avalonia.Threading;
-using dialogHost = DialogHost.DialogHost;
+using DialogHostAvalonia;
 
 
 namespace SPT.Launcher.ViewModels
@@ -48,7 +48,7 @@ namespace SPT.Launcher.ViewModels
                         LocalizationProvider.Instance.yes,
                         LocalizationProvider.Instance.no);
 
-                    var confirmCopySettings = await dialogHost.Show(viewModel);
+                    var confirmCopySettings = await DialogHost.Show(viewModel);
 
                     if (confirmCopySettings is bool and true)
                     {

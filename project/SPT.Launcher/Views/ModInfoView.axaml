@@ -44,7 +44,7 @@
         
         <!-- Active Mods List -->
         <ScrollViewer Grid.Row="5" Grid.Column="1">
-            <ItemsControl Items="{Binding ModsCollection.ActiveMods}">
+            <ItemsControl ItemsSource="{Binding ModsCollection.ActiveMods}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type launcher:SPTMod}">
                         <cc:ModInfoCard ModName="{Binding Name}"
@@ -86,7 +86,7 @@
         </Border>
         <!-- Inactive Mods List -->
         <ScrollViewer Grid.Row="5" Grid.Column="3" >
-            <ItemsControl Items="{Binding ModsCollection.InactiveMods}">
+            <ItemsControl ItemsSource="{Binding ModsCollection.InactiveMods}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type launcher:SPTMod}">
                         <cc:ModInfoCard ModName="{Binding Name}"

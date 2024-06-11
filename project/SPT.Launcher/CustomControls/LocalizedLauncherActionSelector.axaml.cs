@@ -61,7 +61,7 @@ namespace SPT.Launcher.CustomControls
                 }
             }
 
-            comboBox.Items = actionsList;
+            comboBox.ItemsSource = actionsList;
 
             foreach(var item in comboBox.Items)
             {

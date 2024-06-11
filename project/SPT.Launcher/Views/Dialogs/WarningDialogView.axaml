@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:helpers="using:SPT.Launcher.Helpers"
-             xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SPT.Launcher.Views.Dialogs.WarningDialogView"
 			 Background="{StaticResource SPT_Background_Dark}"
@@ -19,7 +19,7 @@
 		<Button Content="{Binding ButtonText}" Grid.Row="3" Grid.Column="1"
 				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
-				Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+				Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}"
 				Classes="yellow"
 				/>
 	</Grid>

@@ -10,6 +10,7 @@ using SPT.Launcher.ViewModels.Dialogs;
 using Avalonia.Threading;
 using System.Diagnostics;
 using System.IO;
+using Avalonia.Controls.ApplicationLifetimes;
 using SPT.Launcher.Models.SPT;
 
 namespace SPT.Launcher.ViewModels
@@ -221,11 +222,18 @@ namespace SPT.Launcher.ViewModels
 
         public async Task CopyCommand(object parameter)
         {
-            if (Application.Current.Clipboard != null && parameter != null && parameter is string text)
+            if (Application.Current.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
             {
-                await Application.Current.Clipboard.SetTextAsync(text);
-                SendNotification("", $"{text} {LocalizationProvider.Instance.copied}", Avalonia.Controls.Notifications.NotificationType.Success);
+                return;
             }
+
+            if (desktop.MainWindow?.Clipboard == null || parameter == null || parameter is not string text)
+            {
+                return;
+            }
+            
+            await desktop.MainWindow.Clipboard.SetTextAsync(text);
+            SendNotification("", $"{text} {LocalizationProvider.Instance.copied}", Avalonia.Controls.Notifications.NotificationType.Success);
         }
 
         public async Task RemoveProfileCommand()

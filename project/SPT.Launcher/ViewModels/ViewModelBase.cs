@@ -8,7 +8,7 @@ using ReactiveUI;
 using Splat;
 using System;
 using System.Threading.Tasks;
-using dialogHost = DialogHost.DialogHost;
+using DialogHostAvalonia;
 
 namespace SPT.Launcher.ViewModels
 {
@@ -162,7 +162,7 @@ namespace SPT.Launcher.ViewModels
         /// <returns></returns>
         public async Task<object?> ShowDialog(object ViewModel)
         {
-            return await dialogHost.Show(ViewModel);
+            return await DialogHost.Show(ViewModel);
         }
 
         public ViewModelBase(IScreen Host)

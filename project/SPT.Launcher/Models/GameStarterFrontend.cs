@@ -7,6 +7,7 @@ using Avalonia.Controls.Notifications;
 using Splat;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DialogHostAvalonia;
 
 namespace SPT.Launcher.Models
 {
@@ -30,7 +31,7 @@ namespace SPT.Launcher.Models
 
                         var localeText = string.Format(LocalizationProvider.Instance.file_mismatch_dialog_message, serverVersion);
                         
-                        var result = await DialogHost.DialogHost.Show(new ConfirmationDialogViewModel(null, localeText, null, null, LauncherSettingsProvider.Instance.IsDevMode));
+                        var result = await DialogHost.Show(new ConfirmationDialogViewModel(null, localeText, null, null, LauncherSettingsProvider.Instance.IsDevMode));
 
                         if(result != null && result is bool confirmation && !confirmation)
                         {

@@ -15,7 +15,7 @@
 	<Grid RowDefinitions="20,*,AUTO,*,20" ColumnDefinitions="20,4*,2*,20">
 
 		<ScrollViewer Grid.Row="1" Grid.RowSpan="3" Grid.Column="1">
-			<ItemsControl Items="{Binding ExistingProfiles}"
+			<ItemsControl ItemsSource="{Binding ExistingProfiles}"
 						  VerticalAlignment="Center" HorizontalAlignment="Stretch"
 					  >
 				<ItemsControl.ItemTemplate>

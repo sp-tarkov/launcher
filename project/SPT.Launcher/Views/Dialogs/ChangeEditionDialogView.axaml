@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:helpers="using:SPT.Launcher.Helpers"
-             xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:s="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SPT.Launcher.Views.Dialogs.ChangeEditionDialogView"
@@ -16,7 +16,7 @@
            Foreground="IndianRed"
            />
 	  <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-				Items="{Binding editions.AvailableEditions}"
+				ItemsSource="{Binding editions.AvailableEditions}"
 				SelectedItem="{Binding editions.SelectedEdition}"
 				PlaceholderText="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=select_edition}"
               >
@@ -29,12 +29,12 @@
 
     <StackPanel Spacing="10" Grid.Row="3" Grid.Column="2" Orientation="Horizontal">
       <Button Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=update}"
-              Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+              Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}"
               CommandParameter="{Binding editions.SelectedEdition}"
               Classes="yellow"
               />
       <Button Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=cancel}"
-              Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+              Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}"
               />
     </StackPanel>
     

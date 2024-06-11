@@ -50,7 +50,7 @@
       <Label Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=default_language}"
              />
       <!-- LocaleCollection reloads the locale from file when the selected loacle changes -->
-      <ComboBox Items="{Binding Locales.AvailableLocales}" MinWidth="200"
+      <ComboBox ItemsSource="{Binding Locales.AvailableLocales}" MinWidth="200"
                 SelectedItem="{Binding Locales.SelectedLocale, Mode=TwoWay}"
                 />
     </StackPanel>

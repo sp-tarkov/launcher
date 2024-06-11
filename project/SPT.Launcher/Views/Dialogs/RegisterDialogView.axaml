@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
 			 xmlns:helpers="using:SPT.Launcher.Helpers"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="SPT.Launcher.Views.Dialogs.RegisterDialogView"
@@ -19,7 +19,7 @@
                />
 
 	    <!-- Editions Combo Selection -->
-		<ComboBox Items="{Binding Editions.AvailableEditions}"
+		<ComboBox ItemsSource="{Binding Editions.AvailableEditions}"
 				  Margin="0 10"
 				  Grid.Row="1" Grid.ColumnSpan="2"
 				  HorizontalAlignment="Stretch"
@@ -58,14 +58,14 @@
 					Orientation="Horizontal" Spacing="10"
                 >
 			<Button Content="{Binding RegisterButtonText}"
-					Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+					Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}"
 					CommandParameter="{Binding Editions.SelectedEdition}"
 					IsEnabled="{Binding Editions.HasSelection}"
 					IsDefault="True"
 					Classes="yellow"
               />
 			<Button Content="{Binding CancelButtonText}"
-					Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=CloseDialogCommand}"
+					Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=CloseDialogCommand}"
               />
 		</StackPanel>
 
