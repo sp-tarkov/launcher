@@ -40,31 +40,36 @@
 				</LayoutTransformControl>
 			</ControlTemplate>
 		</Setter>
-
-		<Style.Animations>
-			<Animation Duration="0:0:0.45" Easing="SineEaseIn" FillMode="Forward">
-				<KeyFrame Cue="0%">
-					<Setter Property="Opacity" Value="0"/>
-					<Setter Property="ZIndex" Value="0"/>
-					<Setter Property="TranslateTransform.Y" Value="-100"/>
-					<Setter Property="ScaleTransform.ScaleX" Value="1"/>
-					<Setter Property="ScaleTransform.ScaleY" Value="1"/>
-				</KeyFrame>
-				<KeyFrame Cue="30%">
-					<Setter Property="Opacity" Value="0"/>
-				</KeyFrame>
-				<KeyFrame Cue="99%">
-					<Setter Property="ZIndex" Value="0"/>
-				</KeyFrame>
-				<KeyFrame Cue="100%">
-					<Setter Property="Opacity" Value="1"/>
-					<Setter Property="ZIndex" Value="1"/>
-					<Setter Property="TranslateTransform.Y" Value="0"/>
-					<Setter Property="ScaleTransform.ScaleX" Value="1"/>
-					<Setter Property="ScaleTransform.ScaleY" Value="1"/>
-				</KeyFrame>
-			</Animation>
-		</Style.Animations>
+		
+		<!-- issue ref: https://github.com/AvaloniaUI/Avalonia/issues/5574 -->
+		<!-- There is a bug in avalonia 11 that plays the theme animation even if you set your own. --> 
+		<!-- Which ends up looking jank because it plays both animations at the same time -->
+		<!-- commenting out the notification spawn animation for now, the remove one looks ok I guess --> 
+		
+		<!-- <Style.Animations> -->
+		<!-- 	<Animation Duration="0:0:0.45" Easing="SineEaseIn" FillMode="Forward"> -->
+		<!-- 		<KeyFrame Cue="0%"> -->
+		<!-- 			<Setter Property="Opacity" Value="0"/> -->
+		<!-- 			<Setter Property="ZIndex" Value="0"/> -->
+		<!-- 			<Setter Property="TranslateTransform.Y" Value="-100"/> -->
+		<!-- 			<Setter Property="ScaleTransform.ScaleX" Value="1"/> -->
+		<!-- 			<Setter Property="ScaleTransform.ScaleY" Value="1"/> -->
+		<!-- 		</KeyFrame> -->
+		<!-- 		<KeyFrame Cue="30%"> -->
+		<!-- 			<Setter Property="Opacity" Value="0"/> -->
+		<!-- 		</KeyFrame> -->
+		<!-- 		<KeyFrame Cue="99%"> -->
+		<!-- 			<Setter Property="ZIndex" Value="0"/> -->
+		<!-- 		</KeyFrame> -->
+		<!-- 		<KeyFrame Cue="100%"> -->
+		<!-- 			<Setter Property="Opacity" Value="1"/> -->
+		<!-- 			<Setter Property="ZIndex" Value="1"/> -->
+		<!-- 			<Setter Property="TranslateTransform.Y" Value="0"/> -->
+		<!-- 			<Setter Property="ScaleTransform.ScaleX" Value="1"/> -->
+		<!-- 			<Setter Property="ScaleTransform.ScaleY" Value="1"/> -->
+		<!-- 		</KeyFrame> -->
+		<!-- 	</Animation> -->
+		<!-- </Style.Animations> -->
 	</Style>
 
 	<Style Selector="NotificationCard[IsClosing=true] /template/ LayoutTransformControl#PART_LayoutTransformControl">
@@ -151,6 +156,11 @@
 
 	<Style Selector="Label.versionMismatch">
 		<Setter Property="Foreground" Value="OrangeRed"/>
+	</Style>
+	
+	<!-- TextBlock Styles -->
+	<Style Selector="TextBlock">
+		<Setter Property="Foreground" Value="{StaticResource SPT_Brush_Lighter}"/>
 	</Style>
 
 	<!-- ProgressBar Styles -->
@@ -296,10 +306,9 @@
 	<!-- SourceRef: https://github.com/AvaloniaUI/Avalonia/blob/master/src/Avalonia.Themes.Fluent/Controls/CheckBox.xaml -->
 	<Style Selector="CheckBox">
 		<Setter Property="Foreground" Value="{StaticResource SPT_Foreground_Light}"/>
-	</Style>
-
-	<Style Selector="CheckBox /template/ Border#NormalRectangle">
-		<Setter Property="BorderBrush" Value="{StaticResource SPT_Brush_DarkGrayBlue}"/>
+		<Style.Resources>
+			<SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="{StaticResource SPT_DarkGrayBlue}"/>
+		</Style.Resources>
 	</Style>
 
 	<Style Selector="CheckBox:pointerover /template/ Border#NormalRectangle">

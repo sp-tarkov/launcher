@@ -10,7 +10,7 @@
           BorderBrush="{Binding BarColor}"
           BorderThickness="3 0 0 0">
     <Grid>
-      <DockPanel Grid.Column="1">
+      <DockPanel>
         <TextBlock DockPanel.Dock="Top" Text="{Binding Title}" FontWeight="Medium" />
         <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Opacity=".8" Margin="0,8,0,0"/>
       </DockPanel>

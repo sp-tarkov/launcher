@@ -58,12 +58,12 @@
                         IsEnabled="{Binding Source={x:Static helpers:LauncherSettingsProvider.Instance}, Path=!GameRunning}" />
 
                 <!-- wipe profile checkbox -->
-                <CheckBox
-                    Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=wipe_on_start}"
-                    Grid.Row="4" Grid.Column="1"
+                <CheckBox Grid.Row="4" Grid.Column="1"
                     IsChecked="{Binding WipeProfileOnStart}"
                     IsEnabled="{Binding Source={x:Static helpers:LauncherSettingsProvider.Instance}, Path=!GameRunning}"
-                    IsVisible="{Binding !ProfileWipePending}" />
+                    IsVisible="{Binding !ProfileWipePending}">
+                    <TextBlock Text="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=wipe_on_start}"/>
+                </CheckBox>
             </Grid>
         </Border>
 
