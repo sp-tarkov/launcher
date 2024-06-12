@@ -36,6 +36,11 @@
 					  Margin="2"/>
 				<TextBlock Text="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=settings_menu}"/>
 			</StackPanel>
+			<Button.Styles>
+				<Style Selector="Button.link:pointerover">
+					<Setter Property="TextBlock.Foreground" Value="{StaticResource SPT_Brush_Yellow}"/>
+				</Style>
+			</Button.Styles>
 		</Button>
 
 		<!-- Minimize (-) Button -->
