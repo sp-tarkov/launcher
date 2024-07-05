@@ -49,6 +49,12 @@ namespace SPT.Launcher.ViewModels
                             // Create account if it doesn't exist
                             if (!string.IsNullOrWhiteSpace(Login.Username))
                             {
+                                if (Login.Username.Length > 15)
+                                {
+                                    SendNotification(LocalizationProvider.Instance.registration_failed, LocalizationProvider.Instance.register_failed_name_limit, NotificationType.Error);
+                                    return;
+                                }
+                                
                                 var result = await ShowDialog(new RegisterDialogViewModel(null, Login.Username));
 
                                 if (result != null && result is SPTEdition edition)
