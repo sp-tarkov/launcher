@@ -192,6 +192,7 @@ namespace SPT.Launcher.Helpers
             englishLocale.open_link = "Open Link";
             englishLocale.dev_mode = "Developer Mode";
             englishLocale.failed_to_save_settings = "Failed to save settings";
+            englishLocale.register_failed_name_limit = "name cannot exceed 15 characters";
             #endregion
 
             Directory.CreateDirectory(LocalizationProvider.DefaultLocaleFolderPath);
@@ -227,6 +228,24 @@ namespace SPT.Launcher.Helpers
         //this is going to be some pretty long boiler plate code. So I'm putting everything into regions.
 
         #region All Properties
+        
+        #region register_failed_name_limit
+
+        private string _register_failed_name_limit;
+
+        public string register_failed_name_limit
+        {
+            get => _register_failed_name_limit;
+            set
+            {
+                if (_register_failed_name_limit != value)
+                {
+                    _register_failed_name_limit = value;
+                    RaisePropertyChanged(nameof(register_failed_name_limit));
+                }
+            }
+        }
+        #endregion
         
         #region failed_to_save_settings
 

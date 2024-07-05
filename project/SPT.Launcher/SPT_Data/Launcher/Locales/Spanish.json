@@ -95,5 +95,6 @@
   "open_link_question_format_1": "Are you sure you want to open the following link: \n{0}",
   "open_link": "Open Link",
   "dev_mode": "Developer Mode",
-  "failed_to_save_settings": "Failed to save settings"
+  "failed_to_save_settings": "Failed to save settings",
+  "register_failed_name_limit": "name cannot exceed 15 characters"
 }

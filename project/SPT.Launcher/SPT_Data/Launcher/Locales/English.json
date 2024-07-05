@@ -96,5 +96,6 @@
   "open_link": "Open Link",
   "dev_mode": "Developer Mode",
   "failed_to_save_settings": "Failed to save settings",
-  "core_dll_file_version_mismatch": "Your BepinEx/plugins/spt/spt-core.dll file version doesn't match what was expected and is unable to start. Try reinstalling SPT"
+  "core_dll_file_version_mismatch": "Your BepinEx/plugins/spt/spt-core.dll file version doesn't match what was expected and is unable to start. Try reinstalling SPT",
+  "register_failed_name_limit": "name cannot exceed 15 characters"
 }
