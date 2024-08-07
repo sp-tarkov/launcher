@@ -2,9 +2,7 @@
 using SPT.Launcher.Helpers;
 using SPT.Launcher.Models;
 using SPT.Launcher.Models.Launcher;
-using SPT.Launcher.ViewModels.Dialogs;
 using Avalonia;
-using Avalonia.Controls;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -16,7 +14,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
-using DynamicData;
 
 namespace SPT.Launcher.ViewModels
 {
