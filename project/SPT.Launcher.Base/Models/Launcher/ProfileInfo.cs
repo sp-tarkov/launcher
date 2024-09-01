@@ -134,9 +134,14 @@ namespace SPT.Launcher.Models.Launcher
             var v1 = new SPTVersion(currentVersion);
             var v2 = new SPTVersion(expectedVersion);
 
-            return v1.Major == v2.Major // check 'X'.x.x
-                   || v1.Minor == v2.Minor // check x.'X'.x
-                   || true; //otherwise probably good
+            // check 'X'.x.x
+            if (v1.Major != v2.Major) return false;
+
+            // check x.'X'.x
+            if(v1.Minor != v2.Minor) return false;
+
+            //otherwise probably good
+            return true;
         }
 
         public ProfileInfo(ServerProfileInfo serverProfileInfo)
