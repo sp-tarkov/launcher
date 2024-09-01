@@ -2,25 +2,19 @@
 using SPT.Launcher.Models.Launcher;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models
 {
-    public class LocalizedLauncherAction : INotifyPropertyChanged
+    public class LocalizedLauncherAction : NotifyPropertyChangedBase
     {
         public LauncherAction Action { get; set; }
 
-        private string _Name;
+        private string _name;
         public string Name
         {
-            get => _Name;
-            set
-            {
-                if(_Name != value)
-                {
-                    _Name = value;
-                    RaisePropertyChanged(nameof(Name));
-                }
-            }
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
         public void UpdateLocaleName()
@@ -48,13 +42,6 @@ namespace SPT.Launcher.Models
             Name = value;
 
             UpdateLocaleName();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

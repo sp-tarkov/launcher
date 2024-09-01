@@ -2,55 +2,35 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class ModInfoCollection : INotifyPropertyChanged
+    public class ModInfoCollection : NotifyPropertyChangedBase
     {
         private int _serverModsCount;
         public int ServerModsCount
         {
             get => _serverModsCount;
-            set
-            {
-                if (_serverModsCount != value)
-                {
-                    _serverModsCount = value;
-                    RaisePropertyChanged(nameof(ServerModsCount));
-                }
-            }
+            set => SetProperty(ref _serverModsCount, value);
         }
         
         private int _profileModsCount;
         public int ProfileModsCount
         {
             get => _profileModsCount;
-            set
-            {
-                if (_profileModsCount != value)
-                {
-                    _profileModsCount = value;
-                    RaisePropertyChanged(nameof(ProfileModsCount));
-                }
-            }
+            set => SetProperty(ref _profileModsCount, value);
         }
 
         private bool _hasMods;
         public bool HasMods
         {
             get => _hasMods;
-            set
-            {
-                if (_hasMods != value)
-                {
-                    _hasMods = value;
-                    RaisePropertyChanged(nameof(HasMods));
-                }
-            }
+            set => SetProperty(ref _hasMods, value);
         }
 
-        public ObservableCollection<SPTMod> ActiveMods { get; private set; } = new ObservableCollection<SPTMod>();
-        public ObservableCollection<SPTMod> InactiveMods { get; private set; } = new ObservableCollection<SPTMod>();
+        public ObservableCollection<SPTMod> ActiveMods { get; private set; } = [];
+        public ObservableCollection<SPTMod> InactiveMods { get; private set; } = [];
 
         public ModInfoCollection()
         {
@@ -68,7 +48,7 @@ namespace SPT.Launcher.Models.Launcher
 
             foreach (var inactiveMod in profileMods)
             {
-                var existingMod = ActiveMods.Where(x => x.Name == inactiveMod.Name && x.Version == inactiveMod.Version && x.Author == inactiveMod.Author).FirstOrDefault();
+                var existingMod = ActiveMods.FirstOrDefault(x => x.Name == inactiveMod.Name && x.Version == inactiveMod.Version && x.Author == inactiveMod.Author);
 
                 if (existingMod != null)
                 {
@@ -81,12 +61,6 @@ namespace SPT.Launcher.Models.Launcher
             }
 
             HasMods = ActiveMods.Count > 0 || InactiveMods.Count > 0;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

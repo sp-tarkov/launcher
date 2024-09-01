@@ -1,42 +1,34 @@
-﻿using System.ComponentModel;
+﻿using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.SPT
 {
-    public class SPTVersion : INotifyPropertyChanged
+    public class SPTVersion : NotifyPropertyChangedBase
     {
         public int Major;
         public int Minor;
         public int Build;
 
-        public bool HasTag => Tag != null;
+        public bool HasTag => Tag != string.Empty;
 
-        private string _Tag = null;
+        private string _tag = string.Empty;
         public string Tag
         {
-            get => _Tag;
-            set
-            {
-                if(_Tag != value)
-                {
-                    _Tag = value;
-                    RaisePropertyChanged(nameof(Tag));
-                    RaisePropertyChanged(nameof(HasTag));
-                }
-            }
+            get => _tag;
+            set => SetProperty(ref _tag, value, () => RaisePropertyChanged(nameof(HasTag)));
         }
 
-        public void ParseVersionInfo(string SPTVersion)
+        public void ParseVersionInfo(string sptVersion)
         {
-            if (SPTVersion.Contains('-'))
+            if (sptVersion.Contains('-'))
             {
-                string[] versionInfo = SPTVersion.Split('-');
+                string[] versionInfo = sptVersion.Split('-');
 
-                SPTVersion = versionInfo[0];
+                sptVersion = versionInfo[0];
 
                 Tag = versionInfo[1];
             }
 
-            string[] splitVersion = SPTVersion.Split('.');
+            string[] splitVersion = sptVersion.Split('.');
 
             if (splitVersion.Length >= 3)
             {
@@ -48,16 +40,9 @@ namespace SPT.Launcher.Models.SPT
 
         public SPTVersion() { }
 
-        public SPTVersion(string SPTVersion)
+        public SPTVersion(string sptVersion)
         {
-            ParseVersionInfo(SPTVersion);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            ParseVersionInfo(sptVersion);
         }
 
         public override string ToString()

@@ -9,53 +9,32 @@
 using SPT.Launcher.Models.SPT;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class EditionCollection : INotifyPropertyChanged
+    public class EditionCollection : NotifyPropertyChangedBase
     {
-        private bool _HasSelection;
+        private bool _hasSelection;
         public bool HasSelection
         {
-            get => _HasSelection;
-            set
-            {
-                if(_HasSelection != value)
-                {
-                    _HasSelection = value;
-                    RaisePropertyChanged(nameof(HasSelection));
-                }
-            }
+            get => _hasSelection;
+            set => SetProperty(ref _hasSelection, value);
         }
-        private int _SelectedEditionIndex;
+        private int _selectedEditionIndex;
         public int SelectedEditionIndex
         {
-            get => _SelectedEditionIndex;
-            set
-            {
-                if (_SelectedEditionIndex != value)
-                {
-                    _SelectedEditionIndex = value;
-                    RaisePropertyChanged(nameof(SelectedEditionIndex));
-                }
-            }
+            get => _selectedEditionIndex;
+            set => SetProperty(ref _selectedEditionIndex, value);
         }
 
-        private SPTEdition _SelectedEdition;
+        private SPTEdition _selectedEdition;
         public SPTEdition SelectedEdition
         {
-            get => _SelectedEdition;
-            set
-            {
-                if (_SelectedEdition != value)
-                {
-                    _SelectedEdition = value;
-                    HasSelection = _SelectedEdition != null;
-                    RaisePropertyChanged(nameof(SelectedEdition));
-                }
-            }
+            get => _selectedEdition;
+            set => SetProperty(ref _selectedEdition, value, () => HasSelection = _selectedEdition != null);
         }
-        public ObservableCollection<SPTEdition> AvailableEditions { get; private set; } = new ObservableCollection<SPTEdition>();
+        public ObservableCollection<SPTEdition> AvailableEditions { get; private set; } = [];
 
         public EditionCollection()
         {
@@ -65,13 +44,6 @@ namespace SPT.Launcher.Models.Launcher
             {
                 AvailableEditions.Add(new SPTEdition(edition));
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

@@ -7,47 +7,26 @@
  */
 
 
-using System.ComponentModel;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class ServerSetting : INotifyPropertyChanged
+    public class ServerSetting : NotifyPropertyChangedBase
     {
         public LoginModel AutoLoginCreds { get; set; } = null;
 
-        private string _Name;
+        private string _name;
         public string Name
         {
-            get => _Name;
-            set
-            {
-                if (_Name != value)
-                {
-                    _Name = value;
-                    RaisePropertyChanged(nameof(Name));
-                }
-            }
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
-        private string _Url;
+        private string _url;
         public string Url
         {
-            get => _Url;
-            set
-            {
-                if (_Url != value)
-                {
-                    _Url = value;
-                    RaisePropertyChanged(nameof(Url));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            get => _url;
+            set => SetProperty(ref _url, value);
         }
     }
 }

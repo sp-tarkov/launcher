@@ -6,45 +6,24 @@
  */
 
 
-using System.ComponentModel;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class ConnectServerModel : INotifyPropertyChanged
+    public class ConnectServerModel : NotifyPropertyChangedBase
     {
-        private string _InfoText;
+        private string _infoText;
         public string InfoText
         {
-            get => _InfoText;
-            set
-            {
-                if (_InfoText != value)
-                {
-                    _InfoText = value;
-                    RaisePropertyChanged(nameof(InfoText));
-                }
-            }
+            get => _infoText;
+            set => SetProperty(ref _infoText, value);
         }
 
-        private bool _ConnectionFailed;
+        private bool _connectionFailed;
         public bool ConnectionFailed
         {
-            get => _ConnectionFailed;
-            set
-            {
-                if(_ConnectionFailed != value)
-                {
-                    _ConnectionFailed = value;
-                    RaisePropertyChanged(nameof(ConnectionFailed));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            get => _connectionFailed;
+            set => SetProperty(ref _connectionFailed, value);
         }
     }
 }

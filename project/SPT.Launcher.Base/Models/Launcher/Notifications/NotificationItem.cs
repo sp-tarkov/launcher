@@ -9,75 +9,48 @@
 
 using System;
 using System.ComponentModel;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher.Notifications
 {
-    public class NotificationItem : INotifyPropertyChanged
+    public class NotificationItem : NotifyPropertyChangedBase
     {
-        private string _Message;
+        private string _message;
         public string Message
         {
-            get => _Message;
-            set
-            {
-                if (_Message != value)
-                {
-                    _Message = value;
-                    RaisePropertyChanged(nameof(Message));
-                }
-            }
+            get => _message;
+            set => SetProperty(ref _message, value);
         }
 
-        private string _ButtonText;
+        private string _buttonText;
         public string ButtonText
         {
-            get => _ButtonText;
-            set
-            {
-                if (_ButtonText != value)
-                {
-                    _ButtonText = value;
-                    RaisePropertyChanged(nameof(ButtonText));
-                }
-            }
+            get => _buttonText;
+            set => SetProperty(ref _buttonText, value);
         }
 
-        private bool _HasButton;
+        private bool _hasButton;
         public bool HasButton
         {
-            get => _HasButton;
-            set
-            {
-                if (_HasButton != value)
-                {
-                    _HasButton = value;
-                    RaisePropertyChanged(nameof(HasButton));
-                }
-            }
+            get => _hasButton;
+            set => SetProperty(ref _hasButton, value);
         }
 
         public Action ItemAction = null;
 
-        public NotificationItem(string Message)
+        public NotificationItem(string message)
         {
-            this.Message = Message;
+            Message = message;
             ButtonText = string.Empty;
             HasButton = false;
         }
 
-        public NotificationItem(string Message, string ButtonText, Action ItemAction)
+        public NotificationItem(string message, string buttonText, Action itemAction)
         {
-            this.Message = Message;
-            this.ButtonText = ButtonText;
+            Message = message;
+            ButtonText = buttonText;
             HasButton = true;
-            this.ItemAction = ItemAction;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            ItemAction = itemAction;
         }
     }
 }

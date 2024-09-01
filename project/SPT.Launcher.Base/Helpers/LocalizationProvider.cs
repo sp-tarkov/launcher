@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using SPT.Launch.Utilities;
 using SPT.Launcher.Controllers;
 
 namespace SPT.Launcher.Helpers
@@ -225,7 +226,7 @@ namespace SPT.Launcher.Helpers
         public static LocaleData Instance { get; private set; } = Json.LoadClassWithoutSaving<LocaleData>(Path.Join(DefaultLocaleFolderPath, $"{LauncherSettingsProvider.Instance.DefaultLocale}.json")) ?? GenerateEnglishLocale();
     }
 
-    public class LocaleData : INotifyPropertyChanged
+    public class LocaleData : NotifyPropertyChangedBase
     {
         //this is going to be some pretty long boiler plate code. So I'm putting everything into regions.
 
@@ -236,14 +237,7 @@ namespace SPT.Launcher.Helpers
         public string copy_logs_to_clipboard
         {
             get => _copy_logs_to_clipboard;
-            set
-            {
-                if (_copy_logs_to_clipboard != value)
-                {
-                    _copy_logs_to_clipboard = value;
-                    RaisePropertyChanged(nameof(copy_logs_to_clipboard));
-                }
-            }
+            set => SetProperty(ref _copy_logs_to_clipboard, value);
         }
         
         #endregion
@@ -253,14 +247,7 @@ namespace SPT.Launcher.Helpers
         public string copy_failed
         {
             get => _copy_failed;
-            set
-            {
-                if (_copy_failed != value)
-                {
-                    _copy_failed = value;
-                    RaisePropertyChanged(nameof(copy_failed));
-                }
-            }
+            set => SetProperty(ref _copy_failed, value);
         }
         #endregion
         
@@ -271,14 +258,7 @@ namespace SPT.Launcher.Helpers
         public string register_failed_name_limit
         {
             get => _register_failed_name_limit;
-            set
-            {
-                if (_register_failed_name_limit != value)
-                {
-                    _register_failed_name_limit = value;
-                    RaisePropertyChanged(nameof(register_failed_name_limit));
-                }
-            }
+            set => SetProperty(ref _register_failed_name_limit, value);
         }
         #endregion
         
@@ -289,14 +269,7 @@ namespace SPT.Launcher.Helpers
         public string failed_to_save_settings
         {
             get => _failed_to_save_settings;
-            set
-            {
-                if (_failed_to_save_settings != value)
-                {
-                    _failed_to_save_settings = value;
-                    RaisePropertyChanged(nameof(failed_to_save_settings));
-                }
-            }
+            set => SetProperty(ref _failed_to_save_settings, value);
         }
         #endregion
         
@@ -305,14 +278,7 @@ namespace SPT.Launcher.Helpers
         public string dev_mode
         {
             get => _dev_mode;
-            set
-            {
-                if (_dev_mode != value)
-                {
-                    _dev_mode = value;
-                    RaisePropertyChanged(nameof(dev_mode));
-                }
-            }
+            set => SetProperty(ref _dev_mode, value);
         }
         #endregion
 
@@ -323,14 +289,7 @@ namespace SPT.Launcher.Helpers
         public string ietf_tag
         {
             get => _ietf_tag;
-            set
-            {
-                if (_ietf_tag != value)
-                {
-                    _ietf_tag = value;
-                    RaisePropertyChanged(nameof(ietf_tag));
-                }
-            }
+            set => SetProperty(ref _ietf_tag, value);
         }
         #endregion
         
@@ -339,14 +298,7 @@ namespace SPT.Launcher.Helpers
         public string native_name
         {
             get => _native_name;
-            set
-            {
-                if (_native_name != value)
-                {
-                    _native_name = value;
-                    RaisePropertyChanged(nameof(native_name));
-                }
-            }
+            set => SetProperty(ref _native_name, value);
         }
         #endregion
 
@@ -355,14 +307,7 @@ namespace SPT.Launcher.Helpers
         public string retry
         {
             get => _retry;
-            set
-            {
-                if (_retry != value)
-                {
-                    _retry = value;
-                    RaisePropertyChanged(nameof(retry));
-                }
-            }
+            set => SetProperty(ref _retry, value);
         }
         #endregion
 
@@ -371,14 +316,7 @@ namespace SPT.Launcher.Helpers
         public string server_connecting
         {
             get => _server_connecting;
-            set
-            {
-                if (_server_connecting != value)
-                {
-                    _server_connecting = value;
-                    RaisePropertyChanged(nameof(server_connecting));
-                }
-            }
+            set => SetProperty(ref _server_connecting, value);
         }
         #endregion
 
@@ -387,14 +325,7 @@ namespace SPT.Launcher.Helpers
         public string server_unavailable_format_1
         {
             get => _server_unavailable_format_1;
-            set
-            {
-                if (_server_unavailable_format_1 != value)
-                {
-                    _server_unavailable_format_1 = value;
-                    RaisePropertyChanged(nameof(server_unavailable_format_1));
-                }
-            }
+            set => SetProperty(ref _server_unavailable_format_1, value);
         }
         #endregion
 
@@ -403,14 +334,7 @@ namespace SPT.Launcher.Helpers
         public string no_servers_available
         {
             get => _no_servers_available;
-            set
-            {
-                if (_no_servers_available != value)
-                {
-                    _no_servers_available = value;
-                    RaisePropertyChanged(nameof(no_servers_available));
-                }
-            }
+            set => SetProperty(ref _no_servers_available, value);
         }
         #endregion
 
@@ -419,14 +343,7 @@ namespace SPT.Launcher.Helpers
         public string settings_menu
         {
             get => _settings_menu;
-            set
-            {
-                if (_settings_menu != value)
-                {
-                    _settings_menu = value;
-                    RaisePropertyChanged(nameof(settings_menu));
-                }
-            }
+            set => SetProperty(ref _settings_menu, value);
         }
         #endregion
 
@@ -435,14 +352,7 @@ namespace SPT.Launcher.Helpers
         public string back
         {
             get => _back;
-            set
-            {
-                if (_back != value)
-                {
-                    _back = value;
-                    RaisePropertyChanged(nameof(back));
-                }
-            }
+            set => SetProperty(ref _back, value);
         }
         #endregion
 
@@ -451,14 +361,7 @@ namespace SPT.Launcher.Helpers
         public string wipe_profile
         {
             get => _wipe_profile;
-            set
-            {
-                if (_wipe_profile != value)
-                {
-                    _wipe_profile = value;
-                    RaisePropertyChanged(nameof(wipe_profile));
-                }
-            }
+            set => SetProperty(ref _wipe_profile, value);
         }
         #endregion
 
@@ -467,14 +370,7 @@ namespace SPT.Launcher.Helpers
         public string username
         {
             get => _username;
-            set
-            {
-                if (_username != value)
-                {
-                    _username = value;
-                    RaisePropertyChanged(nameof(username));
-                }
-            }
+            set => SetProperty(ref _username, value);
         }
         #endregion
 
@@ -483,14 +379,7 @@ namespace SPT.Launcher.Helpers
         public string password
         {
             get => _password;
-            set
-            {
-                if (_password != value)
-                {
-                    _password = value;
-                    RaisePropertyChanged(nameof(password));
-                }
-            }
+            set => SetProperty(ref _password, value);
         }
         #endregion
 
@@ -499,14 +388,7 @@ namespace SPT.Launcher.Helpers
         public string update
         {
             get => _update;
-            set
-            {
-                if (_update != value)
-                {
-                    _update = value;
-                    RaisePropertyChanged(nameof(update));
-                }
-            }
+            set => SetProperty(ref _update, value);
         }
         #endregion
 
@@ -515,14 +397,7 @@ namespace SPT.Launcher.Helpers
         public string edit_account_update_error
         {
             get => _edit_account_update_error;
-            set
-            {
-                if (_edit_account_update_error != value)
-                {
-                    _edit_account_update_error = value;
-                    RaisePropertyChanged(nameof(edit_account_update_error));
-                }
-            }
+            set => SetProperty(ref _edit_account_update_error, value);
         }
         #endregion
 
@@ -531,14 +406,7 @@ namespace SPT.Launcher.Helpers
         public string register
         {
             get => _register;
-            set
-            {
-                if (_register != value)
-                {
-                    _register = value;
-                    RaisePropertyChanged(nameof(register));
-                }
-            }
+            set => SetProperty(ref _register, value);
         }
         #endregion
 
@@ -547,14 +415,7 @@ namespace SPT.Launcher.Helpers
         public string go_to_register
         {
             get => _go_to_register;
-            set
-            {
-                if (_go_to_register != value)
-                {
-                    _go_to_register = value;
-                    RaisePropertyChanged(nameof(_go_to_register));
-                }
-            }
+            set => SetProperty(ref _go_to_register, value);
         }
         #endregion
 
@@ -563,14 +424,7 @@ namespace SPT.Launcher.Helpers
         public string login_or_register
         {
             get => _login_or_register;
-            set
-            {
-                if (_login_or_register != value)
-                {
-                    _login_or_register = value;
-                    RaisePropertyChanged(nameof(login_or_register));
-                }
-            }
+            set => SetProperty(ref _login_or_register, value);
         }
         #endregion
 
@@ -579,14 +433,7 @@ namespace SPT.Launcher.Helpers
         public string go_to_login
         {
             get => _go_to_login;
-            set
-            {
-                if (_go_to_login != value)
-                {
-                    _go_to_login = value;
-                    RaisePropertyChanged(nameof(go_to_login));
-                }
-            }
+            set => SetProperty(ref _go_to_login, value);
         }
         #endregion
 
@@ -595,14 +442,7 @@ namespace SPT.Launcher.Helpers
         public string login_automatically
         {
             get => _login_automatically;
-            set
-            {
-                if (_login_automatically != value)
-                {
-                    _login_automatically = value;
-                    RaisePropertyChanged(nameof(login_automatically));
-                }
-            }
+            set => SetProperty(ref _login_automatically, value);
         }
         #endregion
 
@@ -611,14 +451,7 @@ namespace SPT.Launcher.Helpers
         public string incorrect_login
         {
             get => _incorrect_login;
-            set
-            {
-                if (_incorrect_login != value)
-                {
-                    _incorrect_login = value;
-                    RaisePropertyChanged(nameof(incorrect_login));
-                }
-            }
+            set => SetProperty(ref _incorrect_login, value);
         }
         #endregion
 
@@ -627,14 +460,7 @@ namespace SPT.Launcher.Helpers
         public string login_failed
         {
             get => _login_failed;
-            set
-            {
-                if (_login_failed != value)
-                {
-                    _login_failed = value;
-                    RaisePropertyChanged(nameof(login_failed));
-                }
-            }
+            set => SetProperty(ref _login_failed, value);
         }
         #endregion
 
@@ -643,14 +469,7 @@ namespace SPT.Launcher.Helpers
         public string edition
         {
             get => _edition;
-            set
-            {
-                if (_edition != value)
-                {
-                    _edition = value;
-                    RaisePropertyChanged(nameof(edition));
-                }
-            }
+            set => SetProperty(ref _edition, value);
         }
         #endregion
 
@@ -659,14 +478,7 @@ namespace SPT.Launcher.Helpers
         public string id
         {
             get => _id;
-            set
-            {
-                if (_id != value)
-                {
-                    _id = value;
-                    RaisePropertyChanged(nameof(id));
-                }
-            }
+            set => SetProperty(ref _id, value);
         }
         #endregion
 
@@ -675,14 +487,7 @@ namespace SPT.Launcher.Helpers
         public string logout
         {
             get => _logout;
-            set
-            {
-                if (_logout != value)
-                {
-                    _logout = value;
-                    RaisePropertyChanged(nameof(logout));
-                }
-            }
+            set => SetProperty(ref _logout, value);
         }
         #endregion
 
@@ -691,14 +496,7 @@ namespace SPT.Launcher.Helpers
         public string account
         {
             get => _account;
-            set
-            {
-                if (_account != value)
-                {
-                    _account = value;
-                    RaisePropertyChanged(nameof(account));
-                }
-            }
+            set => SetProperty(ref _account, value);
         }
         #endregion
 
@@ -707,14 +505,7 @@ namespace SPT.Launcher.Helpers
         public string edit_account
         {
             get => _edit_account;
-            set
-            {
-                if (_edit_account != value)
-                {
-                    _edit_account = value;
-                    RaisePropertyChanged(nameof(edit_account));
-                }
-            }
+            set => SetProperty(ref _edit_account, value);
         }
         #endregion
 
@@ -723,14 +514,7 @@ namespace SPT.Launcher.Helpers
         public string start_game
         {
             get => _start_game;
-            set
-            {
-                if (_start_game != value)
-                {
-                    _start_game = value;
-                    RaisePropertyChanged(nameof(start_game));
-                }
-            }
+            set => SetProperty(ref _start_game, value);
         }
         #endregion
 
@@ -739,14 +523,7 @@ namespace SPT.Launcher.Helpers
         public string installed_in_live_game_warning
         {
             get => _installed_in_live_game_warning;
-            set
-            {
-                if (_installed_in_live_game_warning != value)
-                {
-                    _installed_in_live_game_warning = value;
-                    RaisePropertyChanged(nameof(installed_in_live_game_warning));
-                }
-            }
+            set => SetProperty(ref _installed_in_live_game_warning, value);
         }
         #endregion
 
@@ -755,14 +532,7 @@ namespace SPT.Launcher.Helpers
         public string no_official_game_warning
         {
             get => _no_official_game_warning;
-            set
-            {
-                if (_no_official_game_warning != value)
-                {
-                    _no_official_game_warning = value;
-                    RaisePropertyChanged(nameof(no_official_game_warning));
-                }
-            }
+            set => SetProperty(ref _no_official_game_warning, value);
         }
         #endregion
 
@@ -771,14 +541,7 @@ namespace SPT.Launcher.Helpers
         public string eft_exe_not_found_warning
         {
             get => _eft_exe_not_found_warning;
-            set
-            {
-                if (_eft_exe_not_found_warning != value)
-                {
-                    _eft_exe_not_found_warning = value;
-                    RaisePropertyChanged(nameof(eft_exe_not_found_warning));
-                }
-            }
+            set => SetProperty(ref _eft_exe_not_found_warning, value);
         }
         #endregion
 
@@ -787,14 +550,7 @@ namespace SPT.Launcher.Helpers
         public string account_exist
         {
             get => _account_exist;
-            set
-            {
-                if (_account_exist != value)
-                {
-                    _account_exist = value;
-                    RaisePropertyChanged(nameof(account_exist));
-                }
-            }
+            set => SetProperty(ref _account_exist, value);
         }
         #endregion
 
@@ -803,14 +559,7 @@ namespace SPT.Launcher.Helpers
         public string url
         {
             get => _url;
-            set
-            {
-                if (_url != value)
-                {
-                    _url = value;
-                    RaisePropertyChanged(nameof(url));
-                }
-            }
+            set => SetProperty(ref _url, value);
         }
         #endregion
 
@@ -819,14 +568,7 @@ namespace SPT.Launcher.Helpers
         public string default_language
         {
             get => _default_language;
-            set
-            {
-                if (_default_language != value)
-                {
-                    _default_language = value;
-                    RaisePropertyChanged(nameof(default_language));
-                }
-            }
+            set => SetProperty(ref _default_language, value);
         }
         #endregion
 
@@ -835,14 +577,7 @@ namespace SPT.Launcher.Helpers
         public string game_path
         {
             get => _game_path;
-            set
-            {
-                if (_game_path != value)
-                {
-                    _game_path = value;
-                    RaisePropertyChanged(nameof(game_path));
-                }
-            }
+            set => SetProperty(ref _game_path, value);
         }
         #endregion
 
@@ -851,14 +586,7 @@ namespace SPT.Launcher.Helpers
         public string clear_game_settings
         {
             get => _clear_game_settings;
-            set
-            {
-                if (_clear_game_settings != value)
-                {
-                    _clear_game_settings = value;
-                    RaisePropertyChanged(nameof(clear_game_settings));
-                }
-            }
+            set => SetProperty(ref _clear_game_settings, value);
         }
         #endregion
 
@@ -867,14 +595,7 @@ namespace SPT.Launcher.Helpers
         public string clear_game_settings_succeeded
         {
             get => _clear_game_settings_succeeded;
-            set
-            {
-                if (_clear_game_settings_succeeded != value)
-                {
-                    _clear_game_settings_succeeded = value;
-                    RaisePropertyChanged(nameof(clear_game_settings_succeeded));
-                }
-            }
+            set => SetProperty(ref _clear_game_settings_succeeded, value);
         }
         #endregion
 
@@ -883,14 +604,7 @@ namespace SPT.Launcher.Helpers
         public string clear_game_settings_failed
         {
             get => _clear_game_settings_failed;
-            set
-            {
-                if (_clear_game_settings_failed != value)
-                {
-                    _clear_game_settings_failed = value;
-                    RaisePropertyChanged(nameof(clear_game_settings_failed));
-                }
-            }
+            set => SetProperty(ref _clear_game_settings_failed, value);
         }
         #endregion
 
@@ -899,14 +613,7 @@ namespace SPT.Launcher.Helpers
         public string load_live_settings
         {
             get => _load_live_settings;
-            set
-            {
-                if (_load_live_settings != value)
-                {
-                    _load_live_settings = value;
-                    RaisePropertyChanged(nameof(load_live_settings));
-                }
-            }
+            set => SetProperty(ref _load_live_settings, value);
         }
         #endregion
 
@@ -915,14 +622,7 @@ namespace SPT.Launcher.Helpers
         public string load_live_settings_failed
         {
             get => _load_live_settings_failed;
-            set
-            {
-                if (_load_live_settings_failed != value)
-                {
-                    _load_live_settings_failed = value;
-                    RaisePropertyChanged(nameof(load_live_settings_failed));
-                }
-            }
+            set => SetProperty(ref _load_live_settings_failed, value);
         }
         #endregion
 
@@ -931,14 +631,7 @@ namespace SPT.Launcher.Helpers
         public string load_live_settings_succeeded
         {
             get => _load_live_settings_succeeded;
-            set
-            {
-                if (_load_live_settings_succeeded != value)
-                {
-                    _load_live_settings_succeeded = value;
-                    RaisePropertyChanged(nameof(load_live_settings_succeeded));
-                }
-            }
+            set => SetProperty(ref _load_live_settings_succeeded, value);
         }
         #endregion
 
@@ -947,14 +640,7 @@ namespace SPT.Launcher.Helpers
         public string remove_registry_keys
         {
             get => _remove_registry_keys;
-            set
-            {
-                if (_remove_registry_keys != value)
-                {
-                    _remove_registry_keys = value;
-                    RaisePropertyChanged(nameof(remove_registry_keys));
-                }
-            }
+            set => SetProperty(ref _remove_registry_keys, value);
         }
         #endregion
 
@@ -963,14 +649,7 @@ namespace SPT.Launcher.Helpers
         public string remove_registry_keys_succeeded
         {
             get => _remove_registry_keys_succeeded;
-            set
-            {
-                if (_remove_registry_keys_succeeded != value)
-                {
-                    _remove_registry_keys_succeeded = value;
-                    RaisePropertyChanged(nameof(remove_registry_keys_succeeded));
-                }
-            }
+            set => SetProperty(ref _remove_registry_keys_succeeded, value);
         }
         #endregion
 
@@ -979,14 +658,7 @@ namespace SPT.Launcher.Helpers
         public string remove_registry_keys_failed
         {
             get => _remove_registry_keys_failed;
-            set
-            {
-                if (_remove_registry_keys_failed != value)
-                {
-                    _remove_registry_keys_failed = value;
-                    RaisePropertyChanged(nameof(remove_registry_keys_failed));
-                }
-            }
+            set => SetProperty(ref _remove_registry_keys_failed, value);
         }
         #endregion
 
@@ -995,14 +667,7 @@ namespace SPT.Launcher.Helpers
         public string clean_temp_files
         {
             get => _clean_temp_files;
-            set
-            {
-                if (_clean_temp_files != value)
-                {
-                    _clean_temp_files = value;
-                    RaisePropertyChanged(nameof(clean_temp_files));
-                }
-            }
+            set => SetProperty(ref _clean_temp_files, value);
         }
         #endregion
 
@@ -1011,14 +676,7 @@ namespace SPT.Launcher.Helpers
         public string clean_temp_files_succeeded
         {
             get => _clean_temp_files_succeeded;
-            set
-            {
-                if (_clean_temp_files_succeeded != value)
-                {
-                    _clean_temp_files_succeeded = value;
-                    RaisePropertyChanged(nameof(clean_temp_files_succeeded));
-                }
-            }
+            set => SetProperty(ref _clean_temp_files_succeeded, value);
         }
         #endregion
 
@@ -1027,14 +685,7 @@ namespace SPT.Launcher.Helpers
         public string clean_temp_files_failed
         {
             get => _clean_temp_files_failed;
-            set
-            {
-                if (_clean_temp_files_failed != value)
-                {
-                    _clean_temp_files_failed = value;
-                    RaisePropertyChanged(nameof(clean_temp_files_failed));
-                }
-            }
+            set => SetProperty(ref _clean_temp_files_failed, value);
         }
         #endregion
 
@@ -1043,14 +694,7 @@ namespace SPT.Launcher.Helpers
         public string select_folder
         {
             get => _select_folder;
-            set
-            {
-                if (_select_folder != value)
-                {
-                    _select_folder = value;
-                    RaisePropertyChanged(nameof(select_folder));
-                }
-            }
+            set => SetProperty(ref _select_folder, value);
         }
         #endregion
 
@@ -1059,14 +703,7 @@ namespace SPT.Launcher.Helpers
         public string registration_failed
         {
             get => _registration_failed;
-            set
-            {
-                if (_registration_failed != value)
-                {
-                    _registration_failed = value;
-                    RaisePropertyChanged(nameof(registration_failed));
-                }
-            }
+            set => SetProperty(ref _registration_failed, value);
         }
         #endregion
 
@@ -1075,14 +712,7 @@ namespace SPT.Launcher.Helpers
         public string registration_question_format_1
         {
             get => _registration_question_format_1;
-            set
-            {
-                if(_registration_question_format_1 != value)
-                {
-                    _registration_question_format_1 = value;
-                    RaisePropertyChanged(nameof(registration_question_format_1));
-                }
-            }
+            set => SetProperty(ref _registration_question_format_1, value);
         }
         #endregion
 
@@ -1091,14 +721,7 @@ namespace SPT.Launcher.Helpers
         public string minimize_action
         {
             get => _minimize_action;
-            set
-            {
-                if (_minimize_action != value)
-                {
-                    _minimize_action = value;
-                    RaisePropertyChanged(nameof(minimize_action));
-                }
-            }
+            set => SetProperty(ref _minimize_action, value);
         }
         #endregion
 
@@ -1107,14 +730,7 @@ namespace SPT.Launcher.Helpers
         public string do_nothing_action
         {
             get => _do_nothing_action;
-            set
-            {
-                if (_do_nothing_action != value)
-                {
-                    _do_nothing_action = value;
-                    RaisePropertyChanged(nameof(do_nothing_action));
-                }
-            }
+            set => SetProperty(ref _do_nothing_action, value);
         }
         #endregion
 
@@ -1123,14 +739,7 @@ namespace SPT.Launcher.Helpers
         public string exit_action
         {
             get => _exit_action;
-            set
-            {
-                if (_exit_action != value)
-                {
-                    _exit_action = value;
-                    RaisePropertyChanged(nameof(exit_action));
-                }
-            }
+            set => SetProperty(ref _exit_action, value);
         }
         #endregion
 
@@ -1139,14 +748,7 @@ namespace SPT.Launcher.Helpers
         public string on_game_start
         {
             get => _on_game_start;
-            set
-            {
-                if (_on_game_start != value)
-                {
-                    _on_game_start = value;
-                    RaisePropertyChanged(nameof(on_game_start));
-                }
-            }
+            set => SetProperty(ref _on_game_start, value);
         }
         #endregion
 
@@ -1155,14 +757,7 @@ namespace SPT.Launcher.Helpers
         public string game
         {
             get => _game;
-            set
-            {
-                if (_game != value)
-                {
-                    _game = value;
-                    RaisePropertyChanged(nameof(game));
-                }
-            }
+            set => SetProperty(ref _game, value);
         }
         #endregion
 
@@ -1171,14 +766,7 @@ namespace SPT.Launcher.Helpers
         public string new_password
         {
             get => _new_password;
-            set
-            {
-                if (_new_password != value)
-                {
-                    _new_password = value;
-                    RaisePropertyChanged(nameof(new_password));
-                }
-            }
+            set => SetProperty(ref _new_password, value);
         }
         #endregion
 
@@ -1187,14 +775,7 @@ namespace SPT.Launcher.Helpers
         public string wipe_warning
         {
             get => _wipe_warning;
-            set
-            {
-                if (_wipe_warning != value)
-                {
-                    _wipe_warning = value;
-                    RaisePropertyChanged(nameof(wipe_warning));
-                }
-            }
+            set => SetProperty(ref _wipe_warning, value);
         }
         #endregion
 
@@ -1203,14 +784,7 @@ namespace SPT.Launcher.Helpers
         public string cancel
         {
             get => _cancel;
-            set
-            {
-                if (_cancel != value)
-                {
-                    _cancel = value;
-                    RaisePropertyChanged(nameof(cancel));
-                }
-            }
+            set => SetProperty(ref _cancel, value);
         }
         #endregion
 
@@ -1219,14 +793,7 @@ namespace SPT.Launcher.Helpers
         public string need_an_account
         {
             get => _need_an_account;
-            set
-            {
-                if (_need_an_account != value)
-                {
-                    _need_an_account = value;
-                    RaisePropertyChanged(nameof(need_an_account));
-                }
-            }
+            set => SetProperty(ref _need_an_account, value);
         }
         #endregion
 
@@ -1235,14 +802,7 @@ namespace SPT.Launcher.Helpers
         public string have_an_account
         {
             get => _have_an_account;
-            set
-            {
-                if (_have_an_account != value)
-                {
-                    _have_an_account = value;
-                    RaisePropertyChanged(nameof(have_an_account));
-                }
-            }
+            set => SetProperty(ref _have_an_account, value);
         }
         #endregion
 
@@ -1251,14 +811,7 @@ namespace SPT.Launcher.Helpers
         public string reapply_patch
         {
             get => _reapply_patch;
-            set
-            {
-                if (_reapply_patch != value)
-                {
-                    _reapply_patch = value;
-                    RaisePropertyChanged(nameof(reapply_patch));
-                }
-            }
+            set => SetProperty(ref _reapply_patch, value);
         }
         #endregion
 
@@ -1267,14 +820,7 @@ namespace SPT.Launcher.Helpers
         public string failed_to_receive_patches
         {
             get => _failed_to_receive_patches;
-            set
-            {
-                if (_failed_to_receive_patches != value)
-                {
-                    _failed_to_receive_patches = value;
-                    RaisePropertyChanged(nameof(failed_to_receive_patches));
-                }
-            }
+            set => SetProperty(ref _failed_to_receive_patches, value);
         }
         #endregion
 
@@ -1283,14 +829,7 @@ namespace SPT.Launcher.Helpers
         public string failed_core_patch
         {
             get => _failed_core_patch;
-            set
-            {
-                if (_failed_core_patch != value)
-                {
-                    _failed_core_patch = value;
-                    RaisePropertyChanged(nameof(failed_core_patch));
-                }
-            }
+            set => SetProperty(ref _failed_core_patch, value);
         }
         #endregion
 
@@ -1299,14 +838,7 @@ namespace SPT.Launcher.Helpers
         public string failed_mod_patch
         {
             get => _failed_mod_patch;
-            set
-            {
-                if (_failed_mod_patch != value)
-                {
-                    _failed_mod_patch = value;
-                    RaisePropertyChanged(nameof(failed_mod_patch));
-                }
-            }
+            set => SetProperty(ref _failed_mod_patch, value);
         }
         #endregion
 
@@ -1315,14 +847,7 @@ namespace SPT.Launcher.Helpers
         public string ok
         {
             get => _ok;
-            set
-            {
-                if (_ok != value)
-                {
-                    _ok = value;
-                    RaisePropertyChanged(nameof(ok));
-                }
-            }
+            set => SetProperty(ref _ok, value);
         }
         #endregion
 
@@ -1331,14 +856,7 @@ namespace SPT.Launcher.Helpers
         public string account_page_denied
         {
             get => _account_page_denied;
-            set
-            {
-                if (_account_page_denied != value)
-                {
-                    _account_page_denied = value;
-                    RaisePropertyChanged(nameof(account_page_denied));
-                }
-            }
+            set => SetProperty(ref _account_page_denied, value);
         }
         #endregion
 
@@ -1347,14 +865,7 @@ namespace SPT.Launcher.Helpers
         public string account_updated
         {
             get => _account_updated;
-            set
-            {
-                if (_account_updated != value)
-                {
-                    _account_updated = value;
-                    RaisePropertyChanged(nameof(_account_updated));
-                }
-            }
+            set => SetProperty(ref _account_updated, value);
         }
         #endregion
 
@@ -1363,14 +874,7 @@ namespace SPT.Launcher.Helpers
         public string nickname
         {
             get => _nickname;
-            set
-            {
-                if (_nickname != value)
-                {
-                    _nickname = value;
-                    RaisePropertyChanged(nameof(nickname));
-                }
-            }
+            set => SetProperty(ref _nickname, value);
         }
         #endregion
 
@@ -1379,14 +883,7 @@ namespace SPT.Launcher.Helpers
         public string side
         {
             get => _side;
-            set
-            {
-                if (_side != value)
-                {
-                    _side = value;
-                    RaisePropertyChanged(nameof(side));
-                }
-            }
+            set => SetProperty(ref _side, value);
         }
         #endregion
 
@@ -1395,14 +892,7 @@ namespace SPT.Launcher.Helpers
         public string level
         {
             get => _level;
-            set
-            {
-                if (_level != value)
-                {
-                    _level = value;
-                    RaisePropertyChanged(nameof(level));
-                }
-            }
+            set => SetProperty(ref _level, value);
         }
         #endregion
 
@@ -1411,14 +901,7 @@ namespace SPT.Launcher.Helpers
         public string patching
         {
             get => _patching;
-            set
-            {
-                if(_patching != value)
-                {
-                    _patching = value;
-                    RaisePropertyChanged(nameof(patching));
-                }
-            }
+            set => SetProperty(ref _patching, value);
         }
         #endregion
 
@@ -1427,14 +910,7 @@ namespace SPT.Launcher.Helpers
         public string file_mismatch_dialog_message
         {
             get => _file_mismatch_dialog_message;
-            set
-            {
-                if(_file_mismatch_dialog_message != value)
-                {
-                    _file_mismatch_dialog_message = value;
-                    RaisePropertyChanged(nameof(file_mismatch_dialog_message));
-                }
-            }
+            set => SetProperty(ref _file_mismatch_dialog_message, value);
         }
         #endregion
 
@@ -1443,14 +919,7 @@ namespace SPT.Launcher.Helpers
         public string yes
         {
             get => _yes;
-            set
-            {
-                if(_yes != value)
-                {
-                    _yes = value;
-                    RaisePropertyChanged(nameof(yes));
-                }
-            }
+            set => SetProperty(ref _yes, value);
         }
         #endregion
 
@@ -1459,14 +928,7 @@ namespace SPT.Launcher.Helpers
         public string no
         {
             get => _no;
-            set
-            {
-                if(_no != value)
-                {
-                    _no = value;
-                    RaisePropertyChanged(nameof(no));
-                }
-            }
+            set => SetProperty(ref _no, value);
         }
         #endregion
 
@@ -1475,14 +937,7 @@ namespace SPT.Launcher.Helpers
         public string profile_created
         {
             get => _profile_created;
-            set
-            {
-                if(_profile_created != value)
-                {
-                    _profile_created = value;
-                    RaisePropertyChanged(nameof(profile_created));
-                }
-            }
+            set => SetProperty(ref _profile_created, value);
         }
         #endregion
 
@@ -1491,14 +946,7 @@ namespace SPT.Launcher.Helpers
         public string open_folder
         {
             get => _open_folder;
-            set
-            {
-                if(_open_folder != value)
-                {
-                    _open_folder = value;
-                    RaisePropertyChanged(nameof(open_folder));
-                }
-            }
+            set => SetProperty(ref _open_folder, value);
         }
         #endregion
 
@@ -1507,14 +955,7 @@ namespace SPT.Launcher.Helpers
         public string select_edition
         {
             get => _select_edition;
-            set
-            {
-                if(_select_edition != value)
-                {
-                    _select_edition = value;
-                    RaisePropertyChanged(nameof(select_edition));
-                }
-            }
+            set => SetProperty(ref _select_edition, value);
         }
         #endregion
 
@@ -1523,14 +964,7 @@ namespace SPT.Launcher.Helpers
         public string copied
         {
             get => _copied;
-            set
-            {
-                if(_copied != value)
-                {
-                    _copied = value;
-                    RaisePropertyChanged(nameof(copied));
-                }
-            }
+            set => SetProperty(ref _copied, value);
         }
         #endregion
 
@@ -1539,14 +973,7 @@ namespace SPT.Launcher.Helpers
         public string next_level_in
         {
             get => _next_level_in;
-            set
-            {
-                if(_next_level_in != value)
-                {
-                    _next_level_in = value;
-                    RaisePropertyChanged(nameof(next_level_in));
-                }
-            }
+            set => SetProperty(ref _next_level_in, value);
         }
         #endregion
 
@@ -1555,14 +982,7 @@ namespace SPT.Launcher.Helpers
         public string no_profile_data
         {
             get => _no_profile_data;
-            set
-            {
-                if (_no_profile_data != value)
-                {
-                    _no_profile_data = value;
-                    RaisePropertyChanged(nameof(no_profile_data));
-                }
-            }
+            set => SetProperty(ref _no_profile_data, value);
         }
         #endregion
 
@@ -1571,14 +991,7 @@ namespace SPT.Launcher.Helpers
         public string profile_version_mismath
         {
             get => _profile_version_mismath;
-            set
-            {
-                if(_profile_version_mismath != value)
-                {
-                    _profile_version_mismath = value;
-                    RaisePropertyChanged(nameof(profile_version_mismath));
-                }
-            }
+            set => SetProperty(ref _profile_version_mismath, value);
         }
         #endregion
 
@@ -1587,14 +1000,7 @@ namespace SPT.Launcher.Helpers
         public string profile_removed
         {
             get => _profile_removed;
-            set
-            {
-                if(_profile_removed != value)
-                {
-                    _profile_removed = value;
-                    RaisePropertyChanged(nameof(profile_removed));
-                }
-            }
+            set => SetProperty(ref _profile_removed, value);
         }
         #endregion
 
@@ -1603,14 +1009,7 @@ namespace SPT.Launcher.Helpers
         public string profile_removal_failed
         {
             get => _profile_removal_failed;
-            set
-            {
-                if(_profile_removal_failed != value)
-                {
-                    _profile_removal_failed = value;
-                    RaisePropertyChanged(nameof(profile_removal_failed));
-                }
-            }
+            set => SetProperty(ref _profile_removal_failed, value);
         }
         #endregion
 
@@ -1619,14 +1018,7 @@ namespace SPT.Launcher.Helpers
         public string profile_remove_question_format_1
         {
             get => _profile_remove_question_format_1;
-            set
-            {
-                if(_profile_remove_question_format_1 != value)
-                {
-                    _profile_remove_question_format_1 = value;
-                    RaisePropertyChanged(nameof(profile_remove_question_format_1));
-                }
-            }
+            set => SetProperty(ref _profile_remove_question_format_1, value);
         }
         #endregion
 
@@ -1635,14 +1027,7 @@ namespace SPT.Launcher.Helpers
         public string i_understand
         {
             get => _i_understand;
-            set
-            {
-                if(_i_understand != value)
-                {
-                    _i_understand = value;
-                    RaisePropertyChanged(nameof(i_understand));
-                }
-            }
+            set => SetProperty(ref _i_understand, value);
         }
         #endregion
 
@@ -1651,14 +1036,7 @@ namespace SPT.Launcher.Helpers
         public string game_version_mismatch_format_2
         {
             get => _game_version_mismatch_format_2;
-            set
-            {
-                if(_game_version_mismatch_format_2 != value)
-                {
-                    _game_version_mismatch_format_2 = value;
-                    RaisePropertyChanged(nameof(game_version_mismatch_format_2));
-                }
-            }
+            set => SetProperty(ref _game_version_mismatch_format_2, value);
         }
         #endregion
 
@@ -1667,14 +1045,7 @@ namespace SPT.Launcher.Helpers
         public string description
         {
             get => _description;
-            set
-            {
-                if(_description != value)
-                {
-                    _description = value;
-                    RaisePropertyChanged(nameof(description));
-                }
-            }
+            set => SetProperty(ref _description, value);
         }
         #endregion
 
@@ -1683,14 +1054,7 @@ namespace SPT.Launcher.Helpers
         public string author
         {
             get => _author;
-            set
-            {
-                if (_author != value)
-                {
-                    _author = value;
-                    RaisePropertyChanged(nameof(author));
-                }
-            }
+            set => SetProperty(ref _author, value);
         }
 
         #endregion
@@ -1700,14 +1064,7 @@ namespace SPT.Launcher.Helpers
         public string wipe_on_start
         {
             get => _wipe_on_start;
-            set
-            {
-                if (_wipe_on_start != value)
-                {
-                    _wipe_on_start = value;
-                    RaisePropertyChanged(nameof(wipe_on_start));
-                }
-            }
+            set => SetProperty(ref _wipe_on_start, value);
         }
         #endregion
 
@@ -1716,14 +1073,7 @@ namespace SPT.Launcher.Helpers
         public string copy_live_settings_question
         {
             get => _copy_live_settings_question;
-            set
-            {
-                if (_copy_live_settings_question != value)
-                {
-                    _copy_live_settings_question = value;
-                    RaisePropertyChanged(nameof(copy_live_settings_question));
-                }
-            }
+            set => SetProperty(ref _copy_live_settings_question, value);
         }
         #endregion
         
@@ -1732,14 +1082,7 @@ namespace SPT.Launcher.Helpers
         public string mod_not_in_server_warning
         {
             get => _mod_not_in_server_warning;
-            set
-            {
-                if (_mod_not_in_server_warning != value)
-                {
-                    _mod_not_in_server_warning = value;
-                    RaisePropertyChanged(nameof(mod_not_in_server_warning));
-                }
-            }
+            set => SetProperty(ref _mod_not_in_server_warning, value);
         }
         #endregion
         
@@ -1748,14 +1091,7 @@ namespace SPT.Launcher.Helpers
         public string active_server_mods
         {
             get => _active_server_mods;
-            set
-            {
-                if (_active_server_mods != value)
-                {
-                    _active_server_mods = value;
-                    RaisePropertyChanged(nameof(active_server_mods));
-                }
-            }
+            set => SetProperty(ref _active_server_mods, value);
         }
         #endregion
         
@@ -1766,14 +1102,7 @@ namespace SPT.Launcher.Helpers
         public string active_server_mods_info_text
         {
             get => _active_server_mods_info_text;
-            set
-            {
-                if (_active_server_mods_info_text != value)
-                {
-                    _active_server_mods_info_text = value;
-                    RaisePropertyChanged(nameof(active_server_mods_info_text));
-                }
-            }
+            set => SetProperty(ref _active_server_mods_info_text, value);
         }
         #endregion
         
@@ -1782,14 +1111,7 @@ namespace SPT.Launcher.Helpers
         public string inactive_server_mods
         {
             get => _inactive_server_mods;
-            set
-            {
-                if (_inactive_server_mods != value)
-                {
-                    _inactive_server_mods = value;
-                    RaisePropertyChanged(nameof(inactive_server_mods));
-                }
-            }
+            set => SetProperty(ref _inactive_server_mods, value);
         }
         #endregion
         
@@ -1800,14 +1122,7 @@ namespace SPT.Launcher.Helpers
         public string inactive_server_mods_info_text
         {
             get => _inactive_server_mods_info_text;
-            set
-            {
-                if (_inactive_server_mods_info_text != value)
-                {
-                    _inactive_server_mods_info_text = value;
-                    RaisePropertyChanged(nameof(inactive_server_mods_info_text));
-                }
-            }
+            set => SetProperty(ref _inactive_server_mods_info_text, value);
         }
         #endregion
         
@@ -1818,14 +1133,7 @@ namespace SPT.Launcher.Helpers
         public string open_link_question_format_1
         {
             get => _open_link_question_format_1;
-            set
-            {
-                if (_open_link_question_format_1 != value)
-                {
-                    _open_link_question_format_1 = value;
-                    RaisePropertyChanged(nameof(open_link_question_format_1));
-                }
-            }
+            set => SetProperty(ref _open_link_question_format_1, value);
         }
         #endregion
         
@@ -1836,14 +1144,7 @@ namespace SPT.Launcher.Helpers
         public string open_link
         {
             get => _open_link;
-            set
-            {
-                if (_open_link != value)
-                {
-                    _open_link = value;
-                    RaisePropertyChanged(nameof(open_link));
-                }
-            }
+            set => SetProperty(ref _open_link, value);
         }
         #endregion
 
@@ -1853,25 +1154,11 @@ namespace SPT.Launcher.Helpers
         public string core_dll_file_version_mismatch
         {
             get => _core_dll_file_version_mismatch;
-            set
-            {
-                if (_core_dll_file_version_mismatch != value)
-                {
-                    _core_dll_file_version_mismatch = value;
-                    RaisePropertyChanged(nameof(core_dll_file_version_mismatch));
-                }
-            }
+            set => SetProperty(ref _core_dll_file_version_mismatch, value);
         }
 
         #endregion
 
         #endregion
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }
     }
 }

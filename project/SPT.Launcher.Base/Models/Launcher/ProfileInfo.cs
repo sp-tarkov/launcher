@@ -12,219 +12,131 @@ using SPT.Launcher.Models.SPT;
 using System;
 using System.ComponentModel;
 using System.IO;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class ProfileInfo : INotifyPropertyChanged
+    public class ProfileInfo : NotifyPropertyChangedBase
     {
-        private string _Username;
+        private string _username;
         public string Username
         {
-            get => _Username;
-            set
-            {
-                if(_Username != value)
-                {
-                    _Username = value;
-                    RaisePropertyChanged(nameof(Username));
-                }
-            }
+            get => _username;
+            set => SetProperty(ref _username, value);
         }
 
-        private string _Nickname;
+        private string _nickname;
         public string Nickname
         {
-            get => _Nickname;
-            set
-            {
-                if (_Nickname != value)
-                {
-                    _Nickname = value;
-                    RaisePropertyChanged(nameof(Nickname));
-                }
-            }
+            get => _nickname;
+            set => SetProperty(ref _nickname, value);
         }
 
-        private string _SideImage;
+        private string _sideImage;
         public string SideImage
         {
-            get => _SideImage;
-            set
-            {
-                if (_SideImage != value)
-                {
-                    _SideImage = value;
-                    RaisePropertyChanged(nameof(SideImage));
-                }
-            }
+            get => _sideImage;
+            set => SetProperty(ref _sideImage, value);
         }
 
-        private string _Side;
+        private string _side;
         public string Side
         {
-            get => _Side;
-            set
-            {
-                if (_Side != value)
-                {
-                    _Side = value;
-                    RaisePropertyChanged(nameof(Side));
-                }
-            }
+            get => _side;
+            set => SetProperty(ref _side, value);
         }
 
-        private string _Level;
+        private string _level;
         public string Level
         {
-            get => _Level;
-            set
-            {
-                if (_Level != value)
-                {
-                    _Level = value;
-                    RaisePropertyChanged(nameof(Level));
-                }
-            }
+            get => _level;
+            set => SetProperty(ref _level, value);
         }
 
         private int _XPLevelProgress;
         public int XPLevelProgress
         {
             get => _XPLevelProgress;
-            set
-            {
-                if (_XPLevelProgress != value)
-                {
-                    _XPLevelProgress = value;
-                    RaisePropertyChanged(nameof(XPLevelProgress));
-                }
-            }
+            set => SetProperty(ref _XPLevelProgress, value);
         }
 
-        private long _CurrentXP;
+        private long _currentXP;
         public long CurrentExp
         {
-            get => _CurrentXP;
-            set
-            {
-                if (_CurrentXP != value)
-                {
-                    _CurrentXP = value;
-                    RaisePropertyChanged(nameof(CurrentExp));
-                }
-            }
+            get => _currentXP;
+            set => SetProperty(ref _currentXP, value);
         }
 
-        private long _RemainingExp;
+        private long _remainingExp;
         public long RemainingExp
         {
-            get => _RemainingExp;
-            set
-            {
-                if (_RemainingExp != value)
-                {
-                    _RemainingExp = value;
-                    RaisePropertyChanged(nameof(RemainingExp));
-                }
-            }
+            get => _remainingExp;
+            set => SetProperty(ref _remainingExp, value);
         }
 
-        private long _NextLvlExp;
+        private long _nextLvlExp;
         public long NextLvlExp
         {
-            get => _NextLvlExp;
-            set
-            {
-                if (_NextLvlExp != value)
-                {
-                    _NextLvlExp = value;
-                    RaisePropertyChanged(nameof(NextLvlExp));
-                }
-            }
+            get => _nextLvlExp;
+            set => SetProperty(ref _nextLvlExp, value);
         }
 
-        private bool _HasData;
+        private bool _hasData;
         public bool HasData
         {
-            get => _HasData;
-            set
-            {
-                if (_HasData != value)
-                {
-                    _HasData = value;
-                    RaisePropertyChanged(nameof(HasData));
-                }
-            }
+            get => _hasData;
+            set => SetProperty(ref _hasData, value);
         }
 
         public string MismatchMessage => VersionMismatch ? LocalizationProvider.Instance.profile_version_mismath : null;
 
-        private bool _VersionMismatch;
+        private bool _versionMismatch;
         public bool VersionMismatch
         {
-            get => _VersionMismatch;
-            set
-            {
-                if(_VersionMismatch != value)
-                {
-                    _VersionMismatch = value;
-                    RaisePropertyChanged(nameof(VersionMismatch));
-                }
-            }
+            get => _versionMismatch;
+            set => SetProperty(ref _versionMismatch, value);
         }
 
-        private SPTData _SPT;
+        private SPTData _spt;
         public SPTData SPT
         {
-            get => _SPT;
-            set
-            {
-                if(_SPT != value)
-                {
-                    _SPT = value;
-                    RaisePropertyChanged(nameof(SPT));
-                }
-            }
+            get => _spt;
+            set => SetProperty(ref _spt, value);
         }
 
-        public void UpdateDisplayedProfile(ProfileInfo PInfo)
+        public void UpdateDisplayedProfile(ProfileInfo pInfo)
         {
-            if (PInfo.Side == null || string.IsNullOrWhiteSpace(PInfo.Side) || PInfo.Side == "unknown") return;
+            if (pInfo.Side == null || string.IsNullOrWhiteSpace(pInfo.Side) || pInfo.Side == "unknown") return;
 
             HasData = true;
-            Nickname = PInfo.Nickname;
-            Side = PInfo.Side;
-            SideImage = PInfo.SideImage;
-            Level = PInfo.Level;
-            CurrentExp = PInfo.CurrentExp;
-            NextLvlExp = PInfo.NextLvlExp;
-            RemainingExp = PInfo.RemainingExp;
-            XPLevelProgress = PInfo.XPLevelProgress;
+            Nickname = pInfo.Nickname;
+            Side = pInfo.Side;
+            SideImage = pInfo.SideImage;
+            Level = pInfo.Level;
+            CurrentExp = pInfo.CurrentExp;
+            NextLvlExp = pInfo.NextLvlExp;
+            RemainingExp = pInfo.RemainingExp;
+            XPLevelProgress = pInfo.XPLevelProgress;
 
-            SPT = PInfo.SPT;
+            SPT = pInfo.SPT;
         }
 
         /// <summary>
         /// Checks if the SPT versions are compatible (non-major changes)
         /// </summary>
-        /// <param name="CurrentVersion"></param>
-        /// <param name="ExpectedVersion"></param>
+        /// <param name="currentVersion"></param>
+        /// <param name="expectedVersion"></param>
         /// <returns></returns>
-        private bool CompareVersions(string CurrentVersion, string ExpectedVersion)
+        private bool CompareVersions(string currentVersion, string expectedVersion)
         {
-            if (ExpectedVersion == "") return false;
+            if (expectedVersion == "") return false;
 
-            SPTVersion v1 = new SPTVersion(CurrentVersion);
-            SPTVersion v2 = new SPTVersion(ExpectedVersion);
+            var v1 = new SPTVersion(currentVersion);
+            var v2 = new SPTVersion(expectedVersion);
 
-            // check 'X'.x.x
-            if (v1.Major != v2.Major) return false;
-
-            // check x.'X'.x
-            if(v1.Minor != v2.Minor) return false;
-
-            //otherwise probably good
-            return true;
+            return v1.Major == v2.Major // check 'X'.x.x
+                   || v1.Minor == v2.Minor // check x.'X'.x
+                   || true; //otherwise probably good
         }
 
         public ProfileInfo(ServerProfileInfo serverProfileInfo)
@@ -242,14 +154,7 @@ namespace SPT.Launcher.Models.Launcher
 
             SideImage = Path.Combine(ImageRequest.ImageCacheFolder, $"side_{Side.ToLower()}.png");
 
-            if (Side != null && !string.IsNullOrWhiteSpace(Side) && Side != "unknown")
-            {
-                HasData = true;
-            }
-            else
-            {
-                HasData = false;
-            }
+            HasData = Side != null && !string.IsNullOrWhiteSpace(Side) && Side != "unknown";
 
             Level = serverProfileInfo.currlvl.ToString();
             CurrentExp = serverProfileInfo.currexp;
@@ -268,13 +173,6 @@ namespace SPT.Launcher.Models.Launcher
             long currentLvlTotal = NextLvlExp - serverProfileInfo.prevexp;
 
             XPLevelProgress = (int)Math.Floor((((double)currentLvlTotal) - RemainingExp) / currentLvlTotal * 100);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

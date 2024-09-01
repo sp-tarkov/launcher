@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 using System.IO;
+using SPT.Launch.Utilities;
 using SPT.Launcher.Controllers;
 
 namespace SPT.Launcher.Helpers
@@ -23,7 +24,7 @@ namespace SPT.Launcher.Helpers
         public static Settings Instance { get; } = Json.Load<Settings>(DefaultSettingsFileLocation) ?? new Settings();
     }
 
-    public class Settings : INotifyPropertyChanged
+    public class Settings : NotifyPropertyChangedBase
     {
         public bool FirstRun { get; set; } = true;
 
@@ -72,121 +73,65 @@ namespace SPT.Launcher.Helpers
 
         public string DefaultLocale { get; set; } = "English";
 
-        private bool _IsAddingServer;
+        private bool _isAddingServer;
         [JsonIgnore]
         public bool IsAddingServer
         {
-            get => _IsAddingServer;
-            set
-            {
-                if (_IsAddingServer != value)
-                {
-                    _IsAddingServer = value;
-                    RaisePropertyChanged(nameof(IsAddingServer));
-                }
-            }
+            get => _isAddingServer;
+            set => SetProperty(ref _isAddingServer, value);
         }
 
-        private bool _AllowSettings;
+        private bool _allowSettings;
         [JsonIgnore]
         public bool AllowSettings
         {
-            get => _AllowSettings;
-            set
-            {
-                if (_AllowSettings != value)
-                {
-                    _AllowSettings = value;
-                    RaisePropertyChanged(nameof(AllowSettings));
-                }
-            }
+            get => _allowSettings;
+            set => SetProperty(ref _allowSettings, value);
         }
 
-        private bool _GameRunning;
+        private bool _gameRunning;
         [JsonIgnore]
         public bool GameRunning
         {
-            get => _GameRunning;
-            set
-            {
-                if (_GameRunning != value)
-                {
-                    _GameRunning = value;
-                    RaisePropertyChanged(nameof(GameRunning));
-                }
-            }
+            get => _gameRunning;
+            set => SetProperty(ref _gameRunning, value);
         }
 
-        private LauncherAction _LauncherStartGameAction;
+        private LauncherAction _launcherStartGameAction;
         public LauncherAction LauncherStartGameAction
         {
-            get => _LauncherStartGameAction;
-            set
-            {
-                if (_LauncherStartGameAction != value)
-                {
-                    _LauncherStartGameAction = value;
-                    RaisePropertyChanged(nameof(LauncherStartGameAction));
-                }
-            }
+            get => _launcherStartGameAction;
+            set => SetProperty(ref _launcherStartGameAction, value);
         }
 
-        private bool _UseAutoLogin;
+        private bool _useAutoLogin;
         public bool UseAutoLogin
         {
-            get => _UseAutoLogin;
-            set
-            {
-                if (_UseAutoLogin != value)
-                {
-                    _UseAutoLogin = value;
-                    RaisePropertyChanged(nameof(UseAutoLogin));
-                }
-            }
+            get => _useAutoLogin;
+            set => SetProperty(ref _useAutoLogin, value);
         }
 
-        private bool _IsDevMode;
+        private bool _isDevMode;
 
         public bool IsDevMode
         {
-            get => _IsDevMode;
-            set
-            {
-                if (_IsDevMode != value)
-                {
-                    _IsDevMode = value;
-                    RaisePropertyChanged(nameof(IsDevMode));
-                }
-            }
+            get => _isDevMode;
+            set => SetProperty(ref _isDevMode, value);
         }
 
-        private string _GamePath;
+        private string _gamePath;
         public string GamePath
         {
-            get => _GamePath;
-            set
-            {
-                if (_GamePath != value)
-                {
-                    _GamePath = value;
-                    RaisePropertyChanged(nameof(GamePath));
-                }
-            }
+            get => _gamePath;
+            set => SetProperty(ref _gamePath, value);
         }
 
-        private string[] _ExcludeFromCleanup;
+        private string[] _excludeFromCleanup = [];
 
         public string[] ExcludeFromCleanup
         {
-            get => _ExcludeFromCleanup ??= Array.Empty<string>();
-            set
-            {
-                if (_ExcludeFromCleanup != value)
-                {
-                    _ExcludeFromCleanup = value;
-                    RaisePropertyChanged(nameof(ExcludeFromCleanup));
-                }
-            }
+            get => _excludeFromCleanup;
+            set => SetProperty(ref _excludeFromCleanup, value);
         }
 
         public ServerSetting Server { get; set; } = new ServerSetting();
@@ -202,18 +147,15 @@ namespace SPT.Launcher.Helpers
                 GamePath = Environment.CurrentDirectory;
                 IsDevMode = false;
 
-                Server = new ServerSetting { Name = "SPT", Url = "http://127.0.0.1:6969" };
+                Server = new ServerSetting
+                {
+                    Name = "SPT", 
+                    Url = "http://127.0.0.1:6969"
+                };
                 SaveSettings();
             }
             
             LogManager.Instance.Info($"Using launcher config at: {LauncherSettingsProvider.DefaultSettingsFileLocation}");
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

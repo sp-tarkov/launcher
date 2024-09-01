@@ -11,38 +11,24 @@ using SPT.Launcher.Helpers;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class LocaleCollection : INotifyPropertyChanged
+    public class LocaleCollection : NotifyPropertyChangedBase
     {
-        private string _SelectedLocale;
+        private string _selectedLocale;
         public string SelectedLocale
         {
-            get => _SelectedLocale;
-            set
-            {
-                if (_SelectedLocale != value)
-                {
-                    _SelectedLocale = value;
-                    RaisePropertyChanged(nameof(SelectedLocale));
-                    LocalizationProvider.LoadLocalByName(value);
-                }
-            }
+            get => _selectedLocale;
+            set => SetProperty(ref _selectedLocale, value, () => LocalizationProvider.LoadLocalByName(value));
         }
 
         public ObservableCollection<string> AvailableLocales { get; set; } = LocalizationProvider.GetAvailableLocales();
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public LocaleCollection()
         {
             SelectedLocale = LocalizationProvider.LocaleNameDictionary.GetValueOrDefault(LauncherSettingsProvider.Instance.DefaultLocale, "English");
-        }
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

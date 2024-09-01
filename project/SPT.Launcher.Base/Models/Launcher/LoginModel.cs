@@ -6,44 +6,24 @@
  */
 
 
-using System.ComponentModel;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class LoginModel : INotifyPropertyChanged
+    public class LoginModel : NotifyPropertyChangedBase
     {
-        private string _Username = "";
+        private string _username = "";
         public string Username
         {
-            get => _Username;
-            set
-            {
-                if (_Username != value)
-                {
-                    _Username = value;
-                    RaisePropertyChanged(nameof(Username));
-                }
-            }
+            get => _username;
+            set => SetProperty(ref _username, value);
         }
 
-        private string _Password = "";
+        private string _password = "";
         public string Password
         {
-            get => _Password;
-            set
-            {
-                if (_Password != value)
-                {
-                    _Password = value;
-                    RaisePropertyChanged(nameof(Password));
-                }
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            get => _password;
+            set => SetProperty(ref _password, value);
         }
     }
 }

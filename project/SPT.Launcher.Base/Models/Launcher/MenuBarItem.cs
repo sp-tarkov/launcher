@@ -9,62 +9,35 @@
 using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using SPT.Launch.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {
-    public class MenuBarItem : INotifyPropertyChanged
+    public class MenuBarItem : NotifyPropertyChangedBase
     {
-        private string _Name;
+        private string _name;
         public string Name
         {
-            get => _Name;
-            set
-            {
-                if (_Name != value)
-                {
-                    _Name = value;
-                    RaisePropertyChanged(nameof(Name));
-                }
-            }
+            get => _name;
+            set => SetProperty(ref _name, value);
         }
 
-        private bool _IsSelected;
+        private bool _isSelected;
         public bool IsSelected
         {
-            get => _IsSelected;
-            set
-            {
-                if (_IsSelected != value)
-                {
-                    _IsSelected = value;
-                    RaisePropertyChanged(nameof(IsSelected));
-                }
-            }
+            get => _isSelected;
+            set => SetProperty(ref _isSelected, value);
         }
 
-        private Action _ItemAction;
+        private Action _itemAction;
         public Action ItemAction
         {
-            get => _ItemAction;
-            set
-            {
-                if (_ItemAction != value)
-                {
-                    _ItemAction = value;
-                    RaisePropertyChanged(nameof(ItemAction));
-                }
-            }
+            get => _itemAction;
+            set => SetProperty(ref _itemAction, value);
         }
 
         public Func<Task<bool>> CanUseAction = async () => await Task.FromResult(true);
 
         public Action OnFailedToUseAction = null;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void RaisePropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-        }
     }
 }
