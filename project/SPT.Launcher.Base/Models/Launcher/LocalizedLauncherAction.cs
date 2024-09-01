@@ -2,7 +2,7 @@
 using SPT.Launcher.Models.Launcher;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
-using SPT.Launch.Utilities;
+using SPT.Launcher.Utilities;
 
 namespace SPT.Launcher.Models
 {

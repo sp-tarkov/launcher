@@ -9,7 +9,7 @@
 using SPT.Launcher.Models.SPT;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using SPT.Launch.Utilities;
+using SPT.Launcher.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {

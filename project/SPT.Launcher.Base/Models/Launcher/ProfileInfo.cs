@@ -12,7 +12,7 @@ using SPT.Launcher.Models.SPT;
 using System;
 using System.ComponentModel;
 using System.IO;
-using SPT.Launch.Utilities;
+using SPT.Launcher.Utilities;
 
 namespace SPT.Launcher.Models.Launcher
 {

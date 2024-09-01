@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace SPT.Launch.Utilities;
+namespace SPT.Launcher.Utilities;
 
 public abstract class NotifyPropertyChangedBase : INotifyPropertyChanged
 {

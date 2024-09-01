@@ -6,7 +6,7 @@
  */
 
 
-using SPT.Launch.Utilities;
+using SPT.Launcher.Utilities;
 using SPT.Launcher.Models.Launcher;
 
 namespace SPT.Launch.Models.Launcher

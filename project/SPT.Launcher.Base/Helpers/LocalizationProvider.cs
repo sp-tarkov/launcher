@@ -16,7 +16,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using SPT.Launch.Utilities;
+using SPT.Launcher.Utilities;
 using SPT.Launcher.Controllers;
 
 namespace SPT.Launcher.Helpers
