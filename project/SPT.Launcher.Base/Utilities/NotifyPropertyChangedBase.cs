@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace SPT.Launch.Utilities;
 
-public class NotifyPropertyChangedBase : INotifyPropertyChanged
+public abstract class NotifyPropertyChangedBase : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler PropertyChanged;
 
