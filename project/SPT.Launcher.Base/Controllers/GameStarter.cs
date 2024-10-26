@@ -90,7 +90,6 @@ namespace SPT.Launcher
             if (account.wipe)
             {
                 LogManager.Instance.Info("[LaunchGame] Wipe profile requested");
-                RemoveRegistryKeys();
                 CleanTempFiles();
             }
 
@@ -285,30 +284,6 @@ namespace SPT.Launcher
             }
             
             return Path.Combine(gamePath, fileName);
-        }
-
-        /// <summary>
-        /// Remove the registry keys
-        /// </summary>
-        /// <returns>returns true if the keys were removed. returns false if an exception occured</returns>
-		public bool RemoveRegistryKeys()
-        {
-            try
-            {
-                var key = Registry.CurrentUser.OpenSubKey(registrySettings, true);
-
-                foreach (var value in key.GetValueNames())
-                {
-                    key.DeleteValue(value);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogManager.Instance.Exception(ex);
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

@@ -151,23 +151,6 @@ namespace SPT.Launcher.ViewModels
             }
         }
 
-        public void RemoveRegistryKeysCommand()
-        {
-            LogManager.Instance.Info("[Settings] Removing registry keys ...");
-            bool regKeysRemoved = gameStarter.RemoveRegistryKeys();
-
-            if (regKeysRemoved)
-            {
-                LogManager.Instance.Info("[Settings] Registry keys removed");
-                SendNotification("", LocalizationProvider.Instance.remove_registry_keys_succeeded, Avalonia.Controls.Notifications.NotificationType.Success);
-            }
-            else
-            {
-                LogManager.Instance.Info("[Settings] Registry keys failed to remove");
-                SendNotification("", LocalizationProvider.Instance.remove_registry_keys_failed, Avalonia.Controls.Notifications.NotificationType.Error);
-            }
-        }
-
         public async Task ResetGameSettingsCommand()
         {
             LogManager.Instance.Info("[Settings] Reseting game settings ...");

@@ -16,10 +16,6 @@
                Opacity=".7"
                />
     <WrapPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal">
-      <Button Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=remove_registry_keys}"
-              Command="{Binding RemoveRegistryKeysCommand}"
-              Classes="outlined" Margin="0 0 10 5"
-              />
 	  <Button Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=load_live_settings}"
               Command="{Binding ResetGameSettingsCommand}"
               Classes="outlined" Margin="0 0 10 5"
