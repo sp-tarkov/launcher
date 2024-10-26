@@ -289,6 +289,7 @@ namespace SPT.Launcher
             }
 
             SelectedAccount.edition = edition;
+            SelectedAccount.wipe = true;
             LogManager.Instance.Info($"Account Wiped: {data.username} -> {edition}");
             return AccountStatus.OK;
         }

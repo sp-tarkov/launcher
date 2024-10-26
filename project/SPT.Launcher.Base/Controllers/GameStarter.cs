@@ -21,6 +21,7 @@ using SPT.Launcher.Controllers;
 using SPT.Launcher.Interfaces;
 using System.Runtime.InteropServices;
 using SPT.Launcher.Models.SPT;
+using Newtonsoft.Json.Linq;
 
 namespace SPT.Launcher
 {
@@ -90,6 +91,7 @@ namespace SPT.Launcher
             if (account.wipe)
             {
                 LogManager.Instance.Info("[LaunchGame] Wipe profile requested");
+                RemoveProfileRegistryKeys(account.id);
                 CleanTempFiles();
             }
 
@@ -284,6 +286,27 @@ namespace SPT.Launcher
             }
             
             return Path.Combine(gamePath, fileName);
+        }
+
+        /// <summary>
+        /// Remove the SPT JSON-based registry keys associated with the given profile ID
+        /// </summary>
+		public void RemoveProfileRegistryKeys(string profileId)
+        {
+            var registryFile = new FileInfo(Path.Combine(Environment.CurrentDirectory, "user\\sptRegistry\\registry.json"));
+
+            if (!registryFile.Exists)
+            {
+                return;
+            }
+
+            JObject registryData = JObject.Parse(File.ReadAllText(registryFile.FullName));
+
+            // Find any property that has a key containing the profileId, and remove it
+            var propsToRemove = registryData.Properties().Where(prop => prop.Name.Contains(profileId, StringComparison.CurrentCultureIgnoreCase)).ToList();
+            propsToRemove.ForEach(prop => prop.Remove());
+
+            File.WriteAllText(registryFile.FullName, registryData.ToString());
         }
 
         /// <summary>
