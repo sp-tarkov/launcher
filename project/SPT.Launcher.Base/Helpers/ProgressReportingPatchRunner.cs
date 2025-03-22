@@ -10,7 +10,6 @@ using SPT.Launcher.MiniCommon;
 using SPT.Launcher.Models.Launcher;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SPT.ByteBanger;
 
 namespace SPT.Launcher.Helpers
 {

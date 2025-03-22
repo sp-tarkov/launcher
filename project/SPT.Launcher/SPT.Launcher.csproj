@@ -32,7 +32,6 @@
     <PackageReference Include="DialogHost.Avalonia" Version="0.8.0-avalonia11dot1-3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SPT.ByteBanger\SPT.ByteBanger.csproj" />
     <ProjectReference Include="..\SPT.Launcher.Base\SPT.Launcher.Base.csproj" />
   </ItemGroup>
   <ItemGroup>

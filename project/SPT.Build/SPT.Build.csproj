@@ -6,12 +6,11 @@
     </PropertyGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="dotnet publish ../SPT.Launcher/SPT.Launcher.csproj -c Release -f net8.0 -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true -p:PublishSingleFile=true --self-contained false"/>
+        <Exec Command="dotnet publish ../SPT.Launcher/SPT.Launcher.csproj -c Release -f net8.0 -r win-x64 /p:IncludeNativeLibrariesForSelfExtract=true -p:PublishSingleFile=true --self-contained false" />
         <Exec Command="pwsh -NoProfile -ExecutionPolicy Bypass ../build.ps1" WorkingDirectory="$(ProjectDir)" />
     </Target>
 
     <ItemGroup>
-      <ProjectReference Include="..\SPT.ByteBanger\SPT.ByteBanger.csproj" />
       <ProjectReference Include="..\SPT.Launcher.Base\SPT.Launcher.Base.csproj" />
       <ProjectReference Include="..\SPT.Launcher\SPT.Launcher.csproj" />
     </ItemGroup>

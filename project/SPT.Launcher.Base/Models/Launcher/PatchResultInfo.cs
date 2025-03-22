@@ -6,8 +6,6 @@
  * waffle.lord
  */
 
-using SPT.ByteBanger;
-
 namespace SPT.Launcher.Models.Launcher
 {
     public class PatchResultInfo
@@ -18,7 +16,7 @@ namespace SPT.Launcher.Models.Launcher
         
         public int NumTotal { get; }
 
-        public bool OK => (Status == PatchResultType.Success) || (Status == PatchResultType.AlreadyPatched);
+        public bool OK => (Status == PatchResultType.Success);
         
         public int PercentComplete => (NumCompleted * 100) / NumTotal;
 
@@ -28,5 +26,13 @@ namespace SPT.Launcher.Models.Launcher
             this.NumCompleted = NumCompleted;
             this.NumTotal = NumTotal;
         }
+    }
+
+    public enum PatchResultType
+    {
+        Success,
+        InputLengthMismatch,
+        InputChecksumMismatch,
+        OutputChecksumMismatch
     }
 }

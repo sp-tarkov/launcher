@@ -25,7 +25,7 @@ namespace SPT.Launcher.Models
                 var info = iter.Current;
                 if (!info.OK)
                 {
-                    if(info.Status == ByteBanger.PatchResultType.InputChecksumMismatch)
+                    if(info.Status == PatchResultType.InputChecksumMismatch)
                     {
                         string serverVersion = ServerManager.GetVersion();
 

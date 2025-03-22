@@ -8,7 +8,7 @@
 
 using System;
 using System.IO;
-using SPT.ByteBanger;
+using SharpHDiffPatch.Core;
 using SPT.Launcher.Controllers;
 using SPT.Launcher.MiniCommon;
 using SPT.Launcher.Models.Launcher;
@@ -25,25 +25,20 @@ namespace SPT.Launcher.Helpers
 
         public static PatchResultInfo Patch(string targetfile, string patchfile, bool IgnoreInputHashMismatch = false)
         {
-            byte[] target = VFS.ReadFile(targetfile);
-            byte[] patch = VFS.ReadFile(patchfile);
-
-            PatchResult result = PatchUtil.Patch(target, PatchInfo.FromBytes(patch));
-
-            switch (result.Result)
+            // Backup the original file if a backup doesn't exist yet
+            var backupFile = $"{targetfile}.spt-bak";
+            if (!File.Exists(backupFile))
             {
-                case PatchResultType.Success:
-                    File.Copy(targetfile, $"{targetfile}.spt-bak");
-                    VFS.WriteFile(targetfile, result.PatchedData);
-                    break;
+                File.Copy(targetfile, backupFile);
+            }
 
-                case PatchResultType.InputChecksumMismatch:
-                    if (IgnoreInputHashMismatch)
-                        return new PatchResultInfo(PatchResultType.Success, 1, 1);
-                    break;
+            PatchResultInfo result = ApplyPatch(patchfile, backupFile, targetfile);
+            if (result.Status == PatchResultType.InputChecksumMismatch && IgnoreInputHashMismatch)
+            {
+                return new PatchResultInfo(PatchResultType.Success, 1, 1);
             }
             
-            return new PatchResultInfo(result.Result, 1, 1);
+            return result;
         }
 
         private static PatchResultInfo PatchAll(string targetpath, string patchpath, bool IgnoreInputHashMismatch = false)
@@ -51,7 +46,7 @@ namespace SPT.Launcher.Helpers
             DirectoryInfo di = new DirectoryInfo(patchpath);
 
             // get all patch files within patchpath and it's sub directories.
-            var patchfiles = di.GetFiles("*.bpf", SearchOption.AllDirectories);
+            var patchfiles = di.GetFiles("*.delta", SearchOption.AllDirectories);
 
             int countfiles = patchfiles.Length;
 
@@ -68,7 +63,7 @@ namespace SPT.Launcher.Helpers
                 var relativefile = file.FullName.Substring(patchpath.Length).TrimStart('\\', '/');
 
                 // create a target file from the relative patch file while utilizing targetpath as the root directory.
-                target = new FileInfo(VFS.Combine(targetpath, relativefile.Replace(".bpf", "")));
+                target = new FileInfo(VFS.Combine(targetpath, relativefile.Replace(".delta", "")));
 
                 PatchResultInfo result = Patch(target.FullName, file.FullName, IgnoreInputHashMismatch);
 
@@ -122,8 +117,6 @@ namespace SPT.Launcher.Helpers
 
                         // Restore from backup
                         File.Copy(file.FullName, target);
-                        file.IsReadOnly = false;
-                        file.Delete();
                     }
                     catch (Exception ex)
                     {
@@ -131,6 +124,26 @@ namespace SPT.Launcher.Helpers
                     }
                 }
             }
+        }
+
+        private static PatchResultInfo ApplyPatch(string PatchFilePath, string SourceFilePath, string TargetFilePath)
+        {
+            // TODO: We should do checksum validation at some point
+            try
+            {
+                HDiffPatch patcher = new HDiffPatch();
+                HDiffPatch.LogVerbosity = Verbosity.Quiet;
+
+                patcher.Initialize(PatchFilePath);
+                patcher.Patch(SourceFilePath, TargetFilePath, false, default, false, false);
+            }
+            catch (Exception ex)
+            {
+                LogManager.Instance.Exception(ex);
+                return new PatchResultInfo(PatchResultType.InputLengthMismatch, 1, 1);
+            }
+
+            return new PatchResultInfo(PatchResultType.Success, 1, 1);
         }
     }
 }
