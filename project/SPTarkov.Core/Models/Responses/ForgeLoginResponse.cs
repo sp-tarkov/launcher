@@ -4,11 +4,15 @@ namespace SPTarkov.Core.Models;
 
 public class ForgeLoginResponse
 {
-    [JsonPropertyName("success")] public bool Success { get; set; }
+    [JsonPropertyName("success")]
+    public bool Success { get; set; }
 
-    [JsonPropertyName("code")] public string? Code { get; set; }
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
 
-    [JsonPropertyName("message")] public string? Message { get; set; }
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
 
-    [JsonPropertyName("data")] public ForgeResponseData? Data { get; set; }
+    [JsonPropertyName("data")]
+    public ForgeResponseData? Data { get; set; }
 }

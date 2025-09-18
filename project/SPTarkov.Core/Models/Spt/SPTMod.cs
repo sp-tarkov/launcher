@@ -4,11 +4,15 @@ namespace SPTarkov.Core.Models;
 
 public class SPTMod
 {
-    [JsonPropertyName("author")] public string Author { get; set; } = "";
+    [JsonPropertyName("author")]
+    public string Author { get; set; } = "";
 
-    [JsonPropertyName("name")] public string Name { get; set; } = "";
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
 
-    [JsonPropertyName("version")] public string Version { get; set; } = "";
+    [JsonPropertyName("version")]
+    public string Version { get; set; } = "";
 
-    [JsonPropertyName("url")] public string Url { get; set; } = "";
+    [JsonPropertyName("url")]
+    public string Url { get; set; } = "";
 }

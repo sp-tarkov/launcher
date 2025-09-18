@@ -13,7 +13,9 @@ public class SPTVersion
         EftVersion = eft;
     }
 
-    [JsonPropertyName("sptVersion")] public string SptVersion { get; set; }
+    [JsonPropertyName("sptVersion")]
+    public string SptVersion { get; set; }
 
-    [JsonPropertyName("eftVersion")] public string EftVersion { get; set; }
+    [JsonPropertyName("eftVersion")]
+    public string EftVersion { get; set; }
 }

@@ -2,6 +2,7 @@
 
 public class DebugSettings
 {
-    public bool DebugUser { get; set; } = false;
-    public bool ShowLoggingPage { get; set; } = false;
+    public bool DebugUser { get; set; }
+
+    public bool ShowLoggingPage { get; set; }
 }

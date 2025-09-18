@@ -15,15 +15,26 @@ public class LauncherSettings
     }
 
     public DebugSettings DebugSettings { get; set; } = new();
+
     public List<Server> Servers { get; set; } = new();
+
     public StartLocation StartLocation { get; set; } = new();
+
     public StartSize StartSize { get; set; } = new();
+
     public bool FirstRun { get; set; } = true;
-    public string GamePath { get; set; } = "";
-    public bool CloseToTray { get; set; } = false;
+
+    public string GamePath { get; set; }
+
+    public bool CloseToTray { get; set; }
+
     public bool MinimizeOnLaunch { get; set; } = true;
-    public bool AlwaysTop { get; set; } = false;
-    public bool AdvancedUser { get; set; } = false;
+
+    public bool AlwaysTop { get; set; }
+
+    public bool AdvancedUser { get; set; }
+
     public string ForgeApiKey { get; set; } = "";
-    public bool UseBackground { get; set; } = false;
+
+    public bool UseBackground { get; set; }
 }
