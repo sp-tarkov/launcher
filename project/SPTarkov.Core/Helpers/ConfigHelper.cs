@@ -12,7 +12,7 @@ public class ConfigHelper
     };
 
     private readonly Lock _lock = new();
-    private readonly LogHelper? _logHelper;
+    private readonly LogHelper _logHelper;
 
     public readonly DialogOptions DialogOptions = new()
     {
@@ -28,11 +28,6 @@ public class ConfigHelper
     private readonly string LauncherAssetsPath = Path.Combine(Environment.CurrentDirectory, "SPT_Data", "Launcher");
 
     private LauncherSettings? _settings;
-
-    public ConfigHelper()
-    {
-        LoadSettingsFromFile();
-    }
 
     public ConfigHelper(
         LogHelper logHelper
@@ -61,7 +56,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            return _settings;
+            return _settings!;
         }
     }
 
@@ -78,8 +73,8 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetClientSize: {height}, {width}");
-            _settings.StartSize.Height = height;
-            _settings.StartSize.Width = width;
+            _settings!.StartSize.Height = height;
+            _settings!.StartSize.Width = width;
             SaveConfig();
         }
     }
@@ -89,8 +84,8 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetClientLocation: {x},{y}");
-            _settings.StartLocation.X = x;
-            _settings.StartLocation.Y = y;
+            _settings!.StartLocation.X = x;
+            _settings!.StartLocation.Y = y;
             SaveConfig();
         }
     }
@@ -100,7 +95,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetFirstRun: {firstRun}");
-            _settings.FirstRun = firstRun;
+            _settings!.FirstRun = firstRun;
             SaveConfig();
         }
     }
@@ -110,7 +105,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetServers: {servers.Count}");
-            _settings.Servers = servers;
+            _settings!.Servers = servers;
             SaveConfig();
         }
     }
@@ -120,7 +115,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetCloseToTray: {closeToTray}");
-            _settings.CloseToTray = closeToTray;
+            _settings!.CloseToTray = closeToTray;
             SaveConfig();
         }
     }
@@ -130,7 +125,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetMinimizeOnLaunch: {minimizeOnLaunch}");
-            _settings.MinimizeOnLaunch = minimizeOnLaunch;
+            _settings!.MinimizeOnLaunch = minimizeOnLaunch;
             SaveConfig();
         }
     }
@@ -140,7 +135,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetAlwaysOnTop: {alwaysOnTop}");
-            _settings.AlwaysTop = alwaysOnTop;
+            _settings!.AlwaysTop = alwaysOnTop;
             SaveConfig();
         }
     }
@@ -150,7 +145,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetAdvancedUser: {advancedUser}");
-            _settings.AdvancedUser = advancedUser;
+            _settings!.AdvancedUser = advancedUser;
             SaveConfig();
         }
     }
@@ -160,7 +155,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetDebugUser: {debugUser}");
-            _settings.DebugSettings.DebugUser = debugUser;
+            _settings!.DebugSettings.DebugUser = debugUser;
             SaveConfig();
         }
     }
@@ -170,7 +165,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetDebugLoggingPage: {access}");
-            _settings.DebugSettings.ShowLoggingPage = access;
+            _settings!.DebugSettings.ShowLoggingPage = access;
             SaveConfig();
         }
     }
@@ -180,7 +175,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetApiKey: {apiKey}");
-            _settings.ForgeApiKey = apiKey;
+            _settings!.ForgeApiKey = apiKey;
             SaveConfig();
         }
     }
@@ -190,7 +185,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logHelper.LogInfo($"SetUseBackground: {useBackground}");
-            _settings.UseBackground = useBackground;
+            _settings!.UseBackground = useBackground;
             SaveConfig();
         }
     }
