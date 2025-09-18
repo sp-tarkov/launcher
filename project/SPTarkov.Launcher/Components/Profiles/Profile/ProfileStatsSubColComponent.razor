@@ -1,0 +1,15 @@
+﻿<div class="d-flex flex-column justify-space-between align-center">
+    <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">@P1:</MudText>
+    <MudText Typo="Typo.h6">@P1value</MudText>
+    <MudDivider DividerType="DividerType.Middle"/>
+    <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">@P2:</MudText>
+    <MudText Typo="Typo.h6">@P2value</MudText>
+</div>
+
+@code
+{
+    [Parameter] public string P1 { get; set; }
+    [Parameter] public string P1value { get; set; }
+    [Parameter] public string P2 { get; set; }
+    [Parameter] public string P2value { get; set; }
+}

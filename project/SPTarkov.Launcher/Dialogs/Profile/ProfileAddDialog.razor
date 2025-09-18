@@ -1,0 +1,145 @@
+﻿@inject ISnackbar _snackbar
+@inject StateHelper _stateHelper
+@inject HttpHelper _httpHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            @if (requestInProgress)
+            {
+                <MudContainer Class="d-flex flex-column align-center gap-4">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                    <MudText>@TaskText</MudText>
+                </MudContainer>
+            }
+            else
+            {
+                <MudForm Model="request" @bind-IsValid="@success" Class="gap-2 mt-3">
+                    <MudSelect @bind-Value="request.Edition" Variant="Variant.Outlined" Label="Edition" Margin="Margin.Dense" Dense="true" Required="true">
+                        @foreach (var edition in serverEditions)
+                        {
+                            <MudSelectItem Value="@edition"/>
+                        }
+                    </MudSelect>
+                    <MudTextField Immediate="true" @bind-Value="request.Username" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true"/>
+                    <PasswordFieldComponent @bind-Password="request.Password"/>
+                    @if (tooltipText != "")
+                    {
+                        <MudCard Class="pa-2 edition-text" Outlined="true">
+                            <MudText>@tooltipText</MudText>
+                        </MudCard>
+                    }
+                </MudForm>
+                <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" @onclick="RunAddTask">Add</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Cancel</MudButton>
+                </MudContainer>
+            }
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private bool success;
+    private bool requestInProgress;
+    private string TaskText = "";
+    public RegisterRequest request = new();
+    private List<string> serverEditions { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    private CancellationTokenSource token { get; set; }
+    private bool UserCancel { get; set; }
+    private string tooltipText => _stateHelper.ProfileTypes.GetValueOrDefault(request.Edition, "");
+
+    protected override void OnInitialized()
+    {
+        serverEditions = _stateHelper.ProfileTypes.Keys.ToList();
+        base.OnInitialized();
+    }
+
+    private async Task RunAddTask()
+    {
+        var result = false;
+        requestInProgress = true;
+        try
+        {
+            result = await CallServer("Adding profile details to server", "Failed adding profile details to server");
+        }
+        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        {
+            AbortOrFail("Request Timed out!");
+            return;
+        }
+        catch (HttpRequestException e)
+        {
+            AbortOrFail();
+            return;
+        }
+        catch (Exception e)
+        {
+            AbortOrFail();
+            return;
+        }
+
+        if (result)
+        {
+            Submit();
+            requestInProgress = false;
+        }
+    }
+
+    private async Task<bool> CallServer(string taskText = "", string failString = "")
+    {
+        try
+        {
+            token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            TaskText = taskText;
+            StateHasChanged();
+            await Task.Delay(20);
+
+            var returnResult = await _httpHelper.GameServerPut<RegisterResponse>(RequestUrl.Register, request, token.Token);
+            _stateHelper.ProfileList = returnResult.Profiles;
+            var result = returnResult.Response;
+
+            if (!result)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
+            token?.Dispose();
+            return true;
+        }
+        catch (Exception e)
+        {
+            AbortOrFail();
+            return false;
+        }
+    }
+
+    private void Submit()
+    {
+        _snackbar.Add($"Added profile: {request?.Username}!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void AbortOrFail(string message = "Error connecting to server!")
+    {
+        if (!UserCancel)
+        {
+            _snackbar.Add(message, Severity.Error);
+        }
+
+        token?.Cancel();
+        MudDialog.Cancel();
+        requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        requestInProgress = false;
+        token?.Cancel();
+        MudDialog.Cancel();
+    }
+
+}

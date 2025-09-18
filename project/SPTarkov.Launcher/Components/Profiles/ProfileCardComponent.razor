@@ -1,0 +1,160 @@
+﻿@inject IDialogService _dialogService
+@inject ConfigHelper _configHelper
+@inject StateHelper _stateHelper
+@inject NavigationHelper _navigationHelper
+@inject NavigationManager _navman
+@inject LogHelper _logHelper
+
+<MudItem sm="12" md="4">
+    <MudPaper Elevation="2"
+              Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
+        <div class="card-overflow">
+            @if (!sideIsUnknown)
+            {
+                <MudImage Src=@(ImageName()) Elevation="0" Class=@(ImageClassNames())/>
+            }
+        </div>
+        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Name:</MudText>
+        <MudText Typo="Typo.h6">@MiniProfile.Username</MudText>
+        <MudDivider DividerType="DividerType.Middle"/>
+        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Level:</MudText>
+        <MudText Typo="Typo.h6">@MiniProfile.CurrentLevel</MudText>
+        <MudDivider DividerType="DividerType.Middle"/>
+        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Edition:</MudText>
+        <MudText Typo="Typo.h6">@MiniProfile.Edition</MudText>
+        <MudDivider DividerType="DividerType.Middle"/>
+        <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">ID:</MudText>
+        <MudText Typo="Typo.body1">@MiniProfile.ProfileID</MudText>
+        <MudContainer Class="justify-end d-flex pa-0">
+            @if (MiniProfile.HasPassword)
+            {
+                <MudTooltip Arrow="true" Placement="Placement.Right" Text="Password Protected">
+                    <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.Lock" Size="Size.Small"/>
+                </MudTooltip>
+                <MudSpacer/>
+            }
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? "Logout of this profile" : "Login to this profile")">
+                <MudIconButton Class="mr-1" Color="Color.Default"
+                               Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)"
+                               Size="Size.Small"
+                               @onclick="RunLoginTask"/>
+            </MudTooltip>
+
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="Edit this profile">
+                <MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.Build" Size="Size.Small"
+                               @onclick="RunEditTask"/>
+            </MudTooltip>
+
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="Delete this profile">
+                <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small"
+                               @onclick="RunDeleteTask"/>
+            </MudTooltip>
+
+        </MudContainer>
+    </MudPaper>
+</MudItem>
+
+@code {
+    [Parameter] public MiniProfile MiniProfile { get; set; }
+    [Parameter] public List<MiniProfile> ProfileList { get; set; }
+    [Parameter] public EventCallback<List<MiniProfile>> ProfileListChanged { get; set; }
+    private bool sideIsUnknown { get; set; }
+    private bool loggedIn { get; set; }
+
+    private string ImageClassNames()
+    {
+        return $"no-pointers background-image-{(MiniProfile.Side.ToLower() != "unknown" ? MiniProfile.Side.ToLower() : "usec")}";
+    }
+
+    private string ImageName()
+    {
+        return $"side_{(MiniProfile.Side.ToLower() != "unknown" ? MiniProfile.Side.ToLower() : "usec")}.png";
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        loggedIn = _stateHelper.SelectedProfile != null && _stateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID;
+        if (MiniProfile.Side.ToLower() == "unknown")
+        {
+            sideIsUnknown = true;
+        }
+    }
+
+    private async Task RunLoginTask()
+    {
+        if (_stateHelper.SelectedProfile != null)
+        {
+            if (_stateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID)
+            {
+                _stateHelper.SelectedProfile = null;
+                _navigationHelper.SetProfilePages(false);
+                loggedIn = false;
+                return;
+            }
+        }
+
+        var dialogParams = new DialogParameters
+        {
+            {
+                "MiniProfile", MiniProfile
+            }
+        };
+
+        var dialog = await _dialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", dialogParams, _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            _stateHelper.SetSelectedProfile(MiniProfile);
+            loggedIn = _stateHelper.SelectedProfile != null;
+
+            _logHelper.LogInfo("Navigating to /Profile");
+            _navman.NavigateTo("/ProfilePage");
+        }
+    }
+
+    private async Task RunDeleteTask()
+    {
+        var dialogParams = new DialogParameters
+        {
+            {
+                "MiniProfile", MiniProfile
+            }
+        };
+
+        var dialog = await _dialogService.ShowAsync<ProfileRemoveDialog>("ProfileRemoveDialog", dialogParams, _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            ProfileList = _stateHelper.ProfileList;
+            await ProfileListChanged.InvokeAsync(ProfileList);
+        }
+    }
+
+    private async Task RunEditTask()
+    {
+        _stateHelper.SelectedProfile = null;
+        loggedIn = false;
+        _navigationHelper.SetProfilePages(false);
+
+        var dialogParams = new DialogParameters
+        {
+            {
+                "MiniProfile", MiniProfile
+            }
+        };
+
+        var dialog = await _dialogService.ShowAsync<ProfileEditDialog>("ProfileEditDialog", dialogParams, _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            ProfileList = _stateHelper.ProfileList;
+            await ProfileListChanged.InvokeAsync(ProfileList);
+        }
+    }
+
+}

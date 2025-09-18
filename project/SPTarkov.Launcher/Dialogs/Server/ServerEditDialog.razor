@@ -1,0 +1,44 @@
+﻿@inject ISnackbar _snackbar
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            <MudForm Model="Server" @bind-IsValid="@success" Class="gap-2 mt-3">
+                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="IP Address" Required="true" RequiredError="IP is required!" Variant="Variant.Outlined" Margin="Margin.Dense" Mask="@ipPortMask"/>
+            </MudForm>
+            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" @onclick="Submit">Confirm</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">Cancel</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private bool success;
+
+    private readonly IMask ipPortMask = RegexMask.IPv4(true);
+
+    [Parameter] public Server Server { get; set; }
+
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    protected override void OnInitialized()
+    {
+        success = !string.IsNullOrEmpty(Server.Name) && !string.IsNullOrEmpty(Server.IpAddress);
+        base.OnInitialized();
+    }
+
+    private void Submit()
+    {
+        _snackbar.Add("Edited Server!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(Server));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+}

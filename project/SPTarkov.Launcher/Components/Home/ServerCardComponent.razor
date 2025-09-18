@@ -1,0 +1,169 @@
+﻿@inject ISnackbar _snackbar
+@inject IDialogService _dialogService
+@inject NavigationManager _navman
+@inject StateHelper _stateHelper
+@inject ConfigHelper _configHelper
+@inject NavigationHelper _navigationHelper
+
+<MudItem md="4">
+    <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Name:</MudText>
+                <MudText Typo="Typo.body1">@Server.Name</MudText>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                @if (Server.Locked)
+                {
+                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected">
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" Disabled="true"/>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="Edit server">
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" @onclick="RunEditTask"/>
+                    </MudTooltip>
+                }
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent Class="py-2">
+            <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">Address:</MudText>
+            <MudText Typo="Typo.body1">@Server.IpAddress</MudText>
+        </MudCardContent>
+        <MudCardActions Class="pa-4 d-flex mt-2">
+            <MudTooltip Arrow="true" Placement="Placement.Right" Text="@(IsConnectedServer ? "Connected" : "Disconnected")">
+                <MudIcon Class="mb-n2" Icon="@Icons.Material.Filled.Circle" Color="@(IsConnectedServer ? Color.Success : Color.Error)"/>
+            </MudTooltip>
+            <MudSpacer/>
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(!IsConnectedServer ? "Login to server" : "Logout of server")">
+                <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!IsConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
+            </MudTooltip>
+            @if (Server.Locked)
+            {
+                <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected">
+                    <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.Lock" Size="Size.Small"/>
+                </MudTooltip>
+            }
+            else
+            {
+                <MudTooltip Arrow="true" Placement="Placement.Left" Text="Delete server">
+                    <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" @onclick="RunDeleteTask"/>
+                </MudTooltip>
+            }
+        </MudCardActions>
+    </MudCard>
+</MudItem>
+
+@code {
+    [Parameter] public Server Server { get; set; }
+
+    [Parameter] public List<Server> ServerList { get; set; }
+
+    [Parameter] public EventCallback<List<Server>> ServerListChanged { get; set; }
+
+    private bool IsConnectedServer { get; set; }
+
+    protected override void OnInitialized()
+    {
+        IsConnectedServer = _stateHelper.SelectedServer?.ServerId == Server.ServerId;
+        base.OnInitialized();
+    }
+
+    private async Task RunEditTask()
+    {
+        if (_stateHelper.SelectedServer?.ServerId == Server.ServerId)
+        {
+            _stateHelper.LogoutAndDispose();
+            _navigationHelper.SetProfilesPages(false);
+            _navigationHelper.SetProfilePages(false);
+            IsConnectedServer = false;
+        }
+
+        var param = new DialogParameters
+        {
+            {
+                "Server", Server
+            }
+        };
+
+        var dialog = await _dialogService.ShowAsync<ServerEditDialog>("ServerEditDialog", param, _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            var serverToChange = ServerList.FirstOrDefault(x => x.ServerId == Server.ServerId);
+
+            if (serverToChange != null)
+            {
+                serverToChange.Name = Server.Name;
+                serverToChange.IpAddress = Server.IpAddress;
+            }
+
+            _configHelper.SetServers(ServerList);
+            await ServerListChanged.InvokeAsync(ServerList);
+        }
+    }
+
+    private async Task RunLoginTask()
+    {
+        if (_stateHelper.SelectedServer != null)
+        {
+            if (_stateHelper.SelectedServer.ServerId == Server.ServerId)
+            {
+                _stateHelper.LogoutAndDispose();
+                _navigationHelper.SetProfilesPages(false);
+                _navigationHelper.SetProfilePages(false);
+                IsConnectedServer = false;
+                return;
+            }
+
+            _stateHelper.LogoutAndDispose();
+            _navigationHelper.SetProfilesPages(false);
+            _navigationHelper.SetProfilePages(false);
+            IsConnectedServer = false;
+        }
+
+        var param = new DialogParameters
+        {
+            {
+                "Server", Server
+            }
+        };
+
+        var dialog = await _dialogService.ShowAsync<ServerLoginDialog>("ServerLoginDialog", param, _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            _stateHelper.SetSelectedServer(Server);
+            if (_stateHelper.SelectedServer != null)
+            {
+                IsConnectedServer = _stateHelper.SelectedServer.ServerId == Server.ServerId;
+            }
+
+            _navman.NavigateTo("/ProfilesPage");
+        }
+    }
+
+    private async Task RunDeleteTask()
+    {
+        if (_stateHelper.SelectedServer != null)
+        {
+            _stateHelper.LogoutAndDispose();
+            IsConnectedServer = false;
+        }
+
+        var dialog = await _dialogService.ShowAsync<ServerRemoveDialog>("ServerRemoveDialog", _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            ServerList.Remove(Server);
+            await ServerListChanged.InvokeAsync(ServerList);
+
+            _configHelper.SetServers(ServerList);
+        }
+    }
+
+}

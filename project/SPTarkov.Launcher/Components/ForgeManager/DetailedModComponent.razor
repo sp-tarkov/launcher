@@ -1,0 +1,157 @@
+﻿@inject ISnackbar _snackbar
+@inject IDialogService _dialogService
+@inject ForgeHelper _forgeHelper
+@inject HttpHelper _httpHelper
+@inject ConfigHelper _configHelper
+@inject LogHelper _logHelper
+@inject NavigationManager _navman
+@inject IJSRuntime JS
+
+<MudItem sm="12">
+    @if (IsSkeleton)
+    {
+        // Create replica of Below layout as a skeleton
+        <MudGrid>
+            <MudItem sm="8">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="200px" Class="mb-4"/>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Class="mb-4"/>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="300px"/>
+            </MudItem>
+            <MudItem sm="4">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="300px" Class="mb-4"/>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px"/>
+            </MudItem>
+        </MudGrid>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem sm="8">
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4">
+                    <MudCardHeader>
+                        <MudGrid>
+                            <MudItem>
+                                <MudImage Src="@($"https://forge-static.sp-tarkov.com/{ForgeMod.Thumbnail}")"
+                                          Class="mod-thumbnail" Style="background-color: transparent !important;"/>
+                            </MudItem>
+                            <MudItem>
+                                <MudLink Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
+                                <MudText Typo="Typo.body1" Class="no-pointers no-select">
+                                    By @ForgeMod.GetModdersName()</MudText>
+                                <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Downloads Downloads
+                                </MudText>
+                                <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Id ID</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>@ForgeMod.Teaser</MudText>
+                    </MudCardContent>
+                </MudCard>
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4">
+                    <MudCardHeader>
+                        <MudGrid>
+                            <MudItem sm="8">
+                                <MudText Typo="Typo.h6" Class="no-pointers no-select">
+                                    Version @(_latestVersion.Version)</MudText>
+
+                                @if (!string.IsNullOrEmpty(_latestVersion.VirusTotalLink))
+                                {
+                                    <MudLink
+                                        Href="@(_latestVersion.VirusTotalLink)">
+                                        Virus Total Results
+                                    </MudLink>
+                                }
+                            </MudItem>
+                            <MudItem sm="4" Class="d-flex flex-column align-end">
+                                <MudText Typo="Typo.body1" Class="no-pointers no-select">
+                                    Created @(_latestVersion.GetCreatedDateFormatted())</MudText>
+                                <MudText Typo="Typo.body1" Class="no-pointers no-select">
+                                    Published @(_latestVersion.GetPublishedDateFormatted())</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardHeader>
+                    <MudCardContent Class="">
+                        @((MarkupString)_latestVersion.Description)
+                    </MudCardContent>
+                </MudCard>
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+                    <MudCardContent Class="user-markdown">
+                        @((MarkupString)ForgeMod.Description)
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem sm="4">
+                <MudItem sm="12">
+                    <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Download"
+                               Variant="Variant.Filled" Class="mb-4"
+                               Style="width: 100%">@($"Download Latest ({_latestVersion.Version})")</MudButton>
+                </MudItem>
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+                    <MudCardContent Class="d-flex flex-column align-start text-overflow">
+                        <MudItem Class="pb-4">
+                            <MudText Typo="Typo.h6" Class="no-pointers no-select">Details</MudText>
+                        </MudItem>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">
+                            @(ForgeMod.GetAdditionalAuthors())
+                        </MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">License</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">
+                            @if (ForgeMod.License is not null)
+                            {
+                                <MudLink Typo="Typo.caption"
+                                         Href="@ForgeMod.License.Link">@ForgeMod.License.Name</MudLink>
+                            }
+                            else
+                            {
+                                @("None")
+                            }
+                        </MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Source Code</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">
+                            @if (!string.IsNullOrEmpty(ForgeMod.SourceCode))
+                            {
+                                <MudLink Typo="Typo.caption" Href="@ForgeMod.SourceCode">@ForgeMod.SourceCode</MudLink>
+                            }
+                            else
+                            {
+                                @("None")
+                            }
+                        </MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result
+                        </MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">
+                            @if (!string.IsNullOrEmpty(_latestVersion.VirusTotalLink))
+                            {
+                                <MudLink Typo="Typo.caption"
+                                         Href="@_latestVersion.VirusTotalLink">@_latestVersion.VirusTotalLink</MudLink>
+                            }
+                            else
+                            {
+                                @("None")
+                            }
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    }
+</MudItem>
+
+@code {
+    [Parameter] public bool IsSkeleton { get; set; }
+    [Parameter] public ForgeBase ForgeMod { get; set; }
+
+    private ForgeModVersion _latestVersion
+    {
+        get { return ForgeMod.Versions.FirstOrDefault(); }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        JS.InvokeVoidAsync("setTabContent");
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+}

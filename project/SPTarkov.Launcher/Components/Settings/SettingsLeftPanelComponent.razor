@@ -1,0 +1,45 @@
+﻿@inject ConfigHelper _ConfigHelper
+
+<MudItem sm="6">
+    <MudPaper Class="pa-5 mr-1 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
+        <SettingOptionComponent Switch="@closeToTraySwitch" OptionName="Close To Tray" SwitchFunc="@SetCloseToTray"/>
+        <SettingOptionComponent Switch="@minimizeOnLaunchSwitch" OptionName="Minimize On Game Start" SwitchFunc="@SetMinimizeOnLaunch"/>
+        <SettingOptionComponent Switch="@alwaysOnTopSwitch" OptionName="Always On Top" SwitchFunc="@SetAlwaysOnTop"/>
+    </MudPaper>
+</MudItem>
+
+@code
+{
+    private bool closeToTraySwitch { get; set; }
+    private bool minimizeOnLaunchSwitch { get; set; }
+    private bool alwaysOnTopSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var settings = _ConfigHelper.GetConfig();
+        closeToTraySwitch = settings.CloseToTray;
+        minimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
+        alwaysOnTopSwitch = settings.AlwaysTop;
+
+        base.OnInitialized();
+    }
+
+    private async Task SetCloseToTray()
+    {
+        closeToTraySwitch = !closeToTraySwitch;
+        _ConfigHelper.SetCloseToTray(closeToTraySwitch);
+    }
+
+    private async Task SetMinimizeOnLaunch()
+    {
+        minimizeOnLaunchSwitch = !minimizeOnLaunchSwitch;
+        _ConfigHelper.SetMinimizeOnLaunch(minimizeOnLaunchSwitch);
+    }
+
+    private async Task SetAlwaysOnTop()
+    {
+        alwaysOnTopSwitch = !alwaysOnTopSwitch;
+        Launcher.App.MainWindow.SetTopMost(alwaysOnTopSwitch);
+        _ConfigHelper.SetAlwaysOnTop(alwaysOnTopSwitch);
+    }
+}

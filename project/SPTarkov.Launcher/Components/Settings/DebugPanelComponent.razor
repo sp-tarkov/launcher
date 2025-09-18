@@ -1,0 +1,50 @@
+﻿@inject ConfigHelper _configHelper
+@inject NavigationHelper _navigationHelper
+
+<MudItem sm="12">
+    <MudPaper Class="pa-5 ml-1 gap-2 d-flex flex-column setting-on-hover-container mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="3">
+        <SettingOptionComponent Switch="@debugUserSwitch" OptionName="Debug Options" SwitchFunc="@SetDebugUser"/>
+        <SettingOptionComponent Switch="@showLoggingPageSwitch" Disabled="!debugUserSwitch" OptionName="Show Logging Page" SwitchFunc="@SetLoggingPage"/>
+    </MudPaper>
+</MudItem>
+
+@code
+{
+    private bool debugUserSwitch { get; set; }
+    private bool showLoggingPageSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        debugUserSwitch = _configHelper.GetConfig().DebugSettings.DebugUser;
+        showLoggingPageSwitch = _configHelper.GetConfig().DebugSettings.ShowLoggingPage;
+
+        base.OnInitialized();
+    }
+
+    private async Task SetDebugUser()
+    {
+        debugUserSwitch = !debugUserSwitch;
+        _configHelper.SetDebugUser(debugUserSwitch);
+
+        // clean up later
+        if (!debugUserSwitch)
+        {
+            // set all debug options to false
+            showLoggingPageSwitch = debugUserSwitch;
+            _navigationHelper.SetLoggingPages(debugUserSwitch);
+            _configHelper.SetDebugLoggingPage(debugUserSwitch);
+        }
+    }
+
+    private async Task SetLoggingPage()
+    {
+        if (!debugUserSwitch)
+        {
+            return;
+        }
+
+        showLoggingPageSwitch = !showLoggingPageSwitch;
+        _navigationHelper.SetLoggingPages(showLoggingPageSwitch);
+        _configHelper.SetDebugLoggingPage(showLoggingPageSwitch);
+    }
+}

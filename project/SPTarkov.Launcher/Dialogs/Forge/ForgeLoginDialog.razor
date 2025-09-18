@@ -1,0 +1,152 @@
+﻿@inject ISnackbar _snackbar
+@inject HttpHelper _httpHelper
+@inject LogHelper _logHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            @if (requestInProgress)
+            {
+                <MudContainer Class="d-flex flex-column align-center gap-4">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                    <MudText>@TaskText</MudText>
+                </MudContainer>
+            }
+            else
+            {
+                <MudForm Model="request" @bind-IsValid="@success" Class="gap-2 mt-3">
+                    <MudTextField Immediate="true" @bind-Value="request.Email" Label="Email" Variant="Variant.Outlined"
+                                  Margin="Margin.Dense" Required="true"/>
+                    <PasswordFieldComponent @bind-Password="request.Password" IsRequired="true"/>
+                </MudForm>
+            }
+
+            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunLoginTask" Disabled="@requestInProgress">
+                    Login
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private bool success;
+    private bool requestInProgress;
+    private string TaskText = "";
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    private ForgeLoginRequest request { get; } = new();
+    private CancellationTokenSource token { get; set; }
+    private bool UserCancel { get; set; }
+
+    private async Task RunLoginTask()
+    {
+        var result = false;
+        requestInProgress = true;
+        try
+        {
+            result = await CallForge("Trying to login", "Failed to login");
+        }
+        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        {
+            AbortOrFail("Request Timed out!");
+            return;
+        }
+        catch (HttpRequestException e)
+        {
+            AbortOrFail();
+            return;
+        }
+        catch (Exception e)
+        {
+            AbortOrFail();
+            return;
+        }
+
+        if (result)
+        {
+            Submit();
+            requestInProgress = false;
+        }
+    }
+
+    private async Task<bool> CallForge(string taskText = "", string failString = "")
+    {
+        try
+        {
+            token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            TaskText = taskText;
+            StateHasChanged();
+            await Task.Delay(20);
+
+            var result = await _httpHelper.ForgeLogin(request, token.Token);
+
+            if (result is null)
+            {
+                _logHelper.AddLog("Forge ForgeLogin result is null");
+                return false;
+            }
+
+            if (result.Success)
+            {
+                _logHelper.AddLog("Forge ForgeLogin Authenticated");
+                _httpHelper.SetApiKey(result.Data.Token);
+                token?.Dispose();
+                return true;
+            }
+
+            switch (result.Code)
+            {
+                case ForgeResponseMessage.Unauthenticated:
+                    _logHelper.AddLog("Forge ForgeLogin failed to authenticate");
+                    AbortOrFail();
+                    return false;
+                case ForgeResponseMessage.InvalidCredentials:
+                    _logHelper.AddLog("Forge ForgeLogin failed, Invalid Credentials");
+                    AbortOrFail();
+                    return false;
+                case ForgeResponseMessage.InvalidEmail:
+                    _logHelper.AddLog("Forge ForgeLogin failed due to invalid email");
+                    AbortOrFail();
+                    return false;
+                default:
+                    _logHelper.AddLog($"Forge ForgeLogin ?? {result.Message}");
+                    AbortOrFail();
+                    return false;
+            }
+        }
+        catch (Exception e)
+        {
+            AbortOrFail();
+            return false;
+        }
+    }
+
+    private void Submit()
+    {
+        _snackbar.Add($"Logged in to {request.Email}!", Severity.Success);
+        MudDialog.Close();
+    }
+
+    private void AbortOrFail(string message = "Error connecting to server!")
+    {
+        if (!UserCancel)
+        {
+            _snackbar.Add(message, Severity.Error);
+        }
+
+        token?.Cancel();
+        MudDialog.Cancel();
+        requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        requestInProgress = false;
+        token?.Cancel();
+        MudDialog.Cancel();
+    }
+
+}

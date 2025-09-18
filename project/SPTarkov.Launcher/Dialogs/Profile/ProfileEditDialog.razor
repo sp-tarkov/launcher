@@ -1,0 +1,136 @@
+﻿@inject ISnackbar _snackbar
+@inject StateHelper _stateHelper
+@inject HttpHelper _httpHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            @if (requestInProgress)
+            {
+                <MudContainer Class="d-flex flex-column align-center gap-4">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                    <MudText>@TaskText</MudText>
+                </MudContainer>
+            }
+            else
+            {
+                <MudForm Model="MiniProfile" @bind-IsValid="@success" Class="gap-2 mt-3">
+                    <MudTextField Immediate="true" @bind-Value="request.Username" Label="Username" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="true"/>
+                    @if (MiniProfile.HasPassword)
+                    {
+                        <PasswordFieldComponent @bind-Password="request.Password" Title="Old Password"/>
+                    }
+                    <PasswordFieldComponent @bind-Password="request.Change" Title="New Password"/>
+                </MudForm>
+                <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" @onclick="RunEditTask">Confirm</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Cancel</MudButton>
+                </MudContainer>
+            }
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private bool success;
+    private bool requestInProgress;
+    private string TaskText = "";
+    [Parameter] public MiniProfile MiniProfile { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    private PasswordChangeRequest request { get; } = new();
+    private CancellationTokenSource token { get; set; }
+    private bool UserCancel { get; set; }
+
+    protected override void OnInitialized()
+    {
+        request.Username = MiniProfile.Username;
+        base.OnInitialized();
+    }
+
+    private async Task RunEditTask()
+    {
+        var result = false;
+        requestInProgress = true;
+        try
+        {
+            result = await CallServer("Changing password with server", "Failed to change password with server");
+        }
+        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        {
+            AbortOrFail("Request Timed out!");
+            return;
+        }
+        catch (HttpRequestException e)
+        {
+            AbortOrFail();
+            return;
+        }
+        catch (Exception e)
+        {
+            AbortOrFail();
+            return;
+        }
+
+        if (result)
+        {
+            Submit();
+            requestInProgress = false;
+        }
+    }
+
+    private async Task<bool> CallServer(string taskText = "", string failString = "")
+    {
+        try
+        {
+            token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            TaskText = taskText;
+            StateHasChanged();
+            await Task.Delay(20);
+
+            var returnResult = await _httpHelper.GameServerPut<PasswordChangeResponse>(RequestUrl.PasswordChange, request, token.Token);
+            _stateHelper.ProfileList = returnResult.Profiles;
+            var result = returnResult.Response;
+
+            if (!result)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
+            token?.Dispose();
+            return true;
+        }
+        catch (Exception e)
+        {
+            AbortOrFail();
+            return false;
+        }
+    }
+
+    private void Submit()
+    {
+        _snackbar.Add($"Changed password to {MiniProfile?.Username}!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(MiniProfile));
+    }
+
+    private void AbortOrFail(string message = "Error changing password!")
+    {
+        if (!UserCancel)
+        {
+            _snackbar.Add(message, Severity.Error);
+        }
+
+        token?.Cancel();
+        MudDialog.Cancel();
+        requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        requestInProgress = false;
+        token?.Cancel();
+        MudDialog.Cancel();
+    }
+
+}

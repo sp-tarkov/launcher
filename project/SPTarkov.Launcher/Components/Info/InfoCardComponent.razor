@@ -1,0 +1,22 @@
+﻿<MudItem sm="4" Class="setting-on-hover">
+    <MudLink Href="@Link">
+        <MudCard Class="info-card-height cursor-pointer mud-background-gray border-2 border-solid mud-border-lines-default">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Name:</MudText>
+                    <MudText Typo="Typo.body1">@Name</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent Class="pt-2">
+                <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">Description:</MudText>
+                <MudText Typo="Typo.body2">@Description</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudLink>
+</MudItem>
+
+@code {
+    [Parameter] public string Name { get; set; }
+    [Parameter] public string Description { get; set; }
+    [Parameter] public string Link { get; set; }
+}

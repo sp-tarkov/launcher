@@ -1,0 +1,35 @@
+﻿@inject ConfigHelper _configHelper
+@inject NavigationHelper _navigationHelper
+
+<MudItem sm="12">
+    <MudPaper Class="pa-5 ml-1 gap-2 d-flex flex-column setting-on-hover-container mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="3">
+        <SettingOptionComponent Switch="@advancedUserSwitch" OptionName="Advanced User" SwitchFunc="@SetAdvUser"/>
+        <SettingOptionComponent Switch="@showBackgroundSwitch" OptionName="Use Background Image" SwitchFunc="@SetBackgroundUsage"/>
+    </MudPaper>
+</MudItem>
+
+@code
+{
+    private bool advancedUserSwitch { get; set; }
+    private bool showBackgroundSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        advancedUserSwitch = _configHelper.GetConfig().AdvancedUser;
+        showBackgroundSwitch = _configHelper.GetConfig().UseBackground;
+        base.OnInitialized();
+    }
+
+    private async Task SetAdvUser()
+    {
+        advancedUserSwitch = !advancedUserSwitch;
+        _configHelper.SetAdvancedUser(advancedUserSwitch);
+    }
+
+    private async Task SetBackgroundUsage()
+    {
+        showBackgroundSwitch = !showBackgroundSwitch;
+        _navigationHelper.SetBackground(showBackgroundSwitch);
+        _configHelper.SetUseBackground(showBackgroundSwitch);
+    }
+}

@@ -1,0 +1,55 @@
+﻿@implements IDisposable
+@inject NavigationHelper _navigationHelper
+
+<MudNavMenu Class="mud-typography-nowrap">
+    <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Home" Inline="false">
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.ConnectedTv" Match="NavLinkMatch.All" Href="/"/>
+    </MudTooltip>
+    @if (_navigationHelper.ShowProfilesPage)
+    {
+        <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Profiles" Inline="false">
+            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.All" Href="/ProfilesPage"/>
+        </MudTooltip>
+    }
+    @if (_navigationHelper.ShowProfilePage)
+    {
+        <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Profile" Inline="false">
+            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.All" Href="/ProfilePage"/>
+        </MudTooltip>
+    }
+</MudNavMenu>
+<MudSpacer/>
+<MudNavMenu Class="mud-typography-nowrap">
+    @if (_navigationHelper.ShowLoggingPage)
+    {
+        <MudTooltip Arrow="true" Text="Admin" Placement="Placement.Right" Inline="false">
+            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.AdminPanelSettings" Match="NavLinkMatch.All" Href="/AdminPage"/>
+        </MudTooltip>
+    }
+    <MudTooltip Arrow="true" Text="Mod Loader" Placement="Placement.Right" Inline="false">
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Reorder" Match="NavLinkMatch.All" Href="/ModLoaderPage"/>
+    </MudTooltip>
+    <MudTooltip Arrow="true" Text="Forge" Placement="Placement.Right" Inline="false">
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.FolderZip" Match="NavLinkMatch.All" Href="/ForgePage"/>
+    </MudTooltip>
+    <MudTooltip Arrow="true" Text="Settings" Placement="Placement.Right" Inline="false">
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Settings" Match="NavLinkMatch.All" Href="/SettingsPage"/>
+    </MudTooltip>
+    <MudTooltip Arrow="true" Text="Info" Placement="Placement.Right" Inline="false">
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Info" Match="NavLinkMatch.All" Href="/InfoPage"/>
+    </MudTooltip>
+</MudNavMenu>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        _navigationHelper.OnStateChanged += StateHasChanged;
+        base.OnInitialized();
+    }
+
+    public void Dispose()
+    {
+        _navigationHelper.OnStateChanged -= StateHasChanged;
+    }
+}

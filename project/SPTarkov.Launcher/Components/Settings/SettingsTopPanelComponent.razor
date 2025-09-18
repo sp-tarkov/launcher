@@ -1,0 +1,211 @@
+﻿@using System.Collections.Specialized
+@using System.Windows
+@using Size = MudBlazor.Size
+@inject LogHelper _logHelper
+@inject ConfigHelper _configHelper
+@inject HttpHelper _httpHelper
+@inject ISnackbar _snackbar
+
+<MudContainer Class="pa-0 pb-4 d-flex justify-start gap-2">
+    <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">Load Live Settings</MudButton>
+    <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">Clear Game Settings</MudButton>
+    <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">Clean Temp Files</MudButton>
+    <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">Copy Logs</MudButton>
+    <MudButton Color="Color.Primary" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">Clear ApiKey</MudButton>
+</MudContainer>
+
+@code {
+
+    private async Task LoadLiveSettings()
+    {
+        _logHelper.AddLog("Loading Live Settings");
+        var eftSettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape From Tarkov", "Settings");
+        var sptSettingsFolder = Path.Combine(_configHelper.GetConfig().GamePath, "user", "sptsettings");
+
+        if (!Directory.Exists(eftSettingsFolder))
+        {
+            _logHelper.AddLog($"Settings can not be loaded from live, path given: {eftSettingsFolder}");
+            _snackbar.Add("Settings can not be loaded from live, path given", Severity.Error);
+            return;
+        }
+
+        try
+        {
+            Directory.CreateDirectory(sptSettingsFolder);
+
+            foreach (var path in Directory.GetDirectories(eftSettingsFolder, "*", SearchOption.AllDirectories))
+            {
+                Directory.CreateDirectory(path.Replace(eftSettingsFolder, sptSettingsFolder));
+            }
+
+            foreach (var file in Directory.GetFiles(eftSettingsFolder, "*.*", SearchOption.AllDirectories))
+            {
+                File.Copy(file, file.Replace(eftSettingsFolder, sptSettingsFolder), true);
+            }
+        }
+        catch (Exception e)
+        {
+            _logHelper.AddLog("Unable to load live settings");
+            _logHelper.AddLog(e.ToString());
+            _snackbar.Add("Loading live settings failed", Severity.Error);
+            return;
+        }
+
+        _logHelper.AddLog("Loaded live settings to SPTsettings folder");
+        _snackbar.Add("Loaded live settings", Severity.Success);
+    }
+
+    private async Task ClearGameSettings()
+    {
+        _logHelper.AddLog("clearing game settings");
+        var sptSettings = new DirectoryInfo(Path.Combine(_configHelper.GetConfig().GamePath, "user", "sptsettings"));
+
+        try
+        {
+            sptSettings.Delete(true);
+
+            Directory.CreateDirectory(sptSettings.FullName);
+        }
+        catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+        {
+            _logHelper.AddLog("Unable to clean game settings, UnauthorizedAccessException or IOException");
+            _logHelper.AddLog(e.ToString());
+            _snackbar.Add("Clearing game settings failed due to Unauthorized Access", Severity.Error);
+            return;
+        }
+        catch (Exception e)
+        {
+            _logHelper.AddLog(e.ToString());
+            _logHelper.AddLog("Clearing game settings failed");
+            _snackbar.Add("Clearing game settings failed", Severity.Error);
+            return;
+        }
+
+        _logHelper.AddLog("Cleared game settings");
+        _snackbar.Add("Cleared game settings", Severity.Success);
+    }
+
+    private async Task CleanTempFiles()
+    {
+        try
+        {
+            var rootdir = new DirectoryInfo(Path.Join(_configHelper.GetConfig().GamePath, "user\\sptappdata"));
+            rootdir.Delete(true);
+        }
+        catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+        {
+            _logHelper.AddLog("Unable to clean temp files, UnauthorizedAccessException or IOException");
+            _logHelper.AddLog(e.ToString());
+            _snackbar.Add("Unable to clean temp files due to Unauthorized Access", Severity.Warning);
+            return;
+        }
+        catch (Exception e)
+        {
+            _logHelper.AddLog("Unable to clean temp files");
+            _logHelper.AddLog(e.ToString());
+            _snackbar.Add("Unable to clean temp files", Severity.Error);
+            return;
+        }
+
+        _logHelper.AddLog("Cleaned temp files");
+        _snackbar.Add("Cleaned temp files", Severity.Success);
+    }
+
+    private async Task CopyLogs()
+    {
+        var filesToCopy = new List<string>();
+        var path = _configHelper.GetConfig().GamePath;
+        var bepinPath = Path.Combine(path, "BepInEx", "LogOutput.log");
+        var serverPath = Path.Combine(path, "user", "logs", $"server-{DateTime.Now:yyyy-MM-dd}.log");
+        var launcherPath = Path.Combine(path, "user", "logs", "launcher.log");
+        var tracePath = Path.Combine(path, "Logs");
+        // var profilePath = Path.Combine(path, "user", "profiles", $"{AccountManager.SelectedAccount.id}.json")) TODO: needs to be reworked to deal with new multiprofile approach
+
+        if (File.Exists(bepinPath))
+        {
+            filesToCopy.Add(bepinPath);
+        }
+
+        if (File.Exists(serverPath))
+        {
+            filesToCopy.Add(serverPath);
+        }
+
+        if (File.Exists(launcherPath))
+        {
+            filesToCopy.Add(launcherPath);
+        }
+
+        if (Directory.Exists(tracePath))
+        {
+            var logs = Directory.GetFiles(tracePath, $"{DateTime.Now:yyyy.MM.dd}_* traces.log", SearchOption.AllDirectories);
+
+            var log = logs.Length > 0 ? logs.FirstOrDefault() : "";
+
+            if (!string.IsNullOrWhiteSpace(log))
+            {
+                filesToCopy.Add(log);
+            }
+        }
+
+        // TODO: profile - if not logged in show dialog to choose profile to copy
+
+        try
+        {
+            CopyFilePathsToClipboard(filesToCopy);
+        }
+        catch (Exception e)
+        {
+            _logHelper.AddLog("Unable to set clipboard with logs");
+            _logHelper.AddLog(e.ToString());
+            _snackbar.Add("Unable to set clipboard with logs", Severity.Error);
+            return;
+        }
+
+        _logHelper.AddLog($"Copied {filesToCopy.Count} log/s to clipboard");
+        _snackbar.Add($"Copied {filesToCopy.Count} log{(filesToCopy.Count > 1 ? "s" : "")} to clipboard", Severity.Success);
+    }
+
+    private void CopyFilePathsToClipboard(List<string> filePaths)
+    {
+        var collection = new StringCollection();
+        collection.AddRange(filePaths.ToArray());
+        // Clipboard.Clear();
+        // Clipboard.SetFileDropList(collection);
+    }
+
+    private async Task ClearApiKey()
+    {
+        ForgeLogoutResponse? result = null;
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            result = await _httpHelper.ForgeLogout(token.Token);
+        }
+        catch (Exception e)
+        {
+            _logHelper.AddLog("Exception thrown from SettingsTopPanelComponent.ClearApiKey");
+            _logHelper.AddLog(e.ToString());
+            return;
+        }
+
+        if (result is null)
+        {
+            _logHelper.LogInfo("Forge ForgeLogout result is null");
+            return;
+        }
+
+        if (result.Code == ForgeResponseMessage.Unauthenticated)
+        {
+            _logHelper.AddLog("Forge ForgeLogout failed to authenticate");
+            return;
+        }
+
+        if (result.Success)
+        {
+            _logHelper.AddLog("Forge ForgeLogout Successful");
+            _httpHelper.ClearApiKey();
+        }
+    }
+
+}

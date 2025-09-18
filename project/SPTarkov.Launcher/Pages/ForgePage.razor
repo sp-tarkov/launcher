@@ -1,0 +1,236 @@
+﻿@page "/ForgePage"
+
+@inject ISnackbar _snackbar
+@inject IDialogService _dialogService
+@inject ForgeHelper _forgeHelper
+@inject HttpHelper _httpHelper
+@inject StateHelper _stateHelper
+@inject ConfigHelper _configHelper
+@inject LogHelper _logHelper
+
+<MudContainer Class="px-8 mt-2 mb-6 pa-0" MaxWidth="MaxWidth.Large">
+    @if (_netAvailable && _apiKeyAvailable)
+    {
+        <MudItem sm="12" Class="mb-6">
+            <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
+                <SearchComponent @bind-Search="Search" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" SearchFunc="@SearchUpdate"/>
+
+                @if (_searchResponse?.Meta?.LastPage is not null && _searchResponse?.Data?.Count > 0)
+                {
+                    <MudItem sm="12" Class="d-flex justify-center">
+                        <MudPagination Rectangular="true" Variant="Variant.Text" Count="@((int)_searchResponse.Meta.LastPage)" Class="mb-4"
+                                       ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@_paginationSelected"/>
+                    </MudItem>
+                }
+            </MudCard>
+        </MudItem>
+    }
+
+    @if (!_netAvailable)
+    {
+        <MudItem sm="12">
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No Internet access found, please fix and refresh!</MudAlert>
+        </MudItem>
+        <MudItem sm="12" Class="mt-4 d-flex justify-center align-center">
+            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" @onclick="CheckInternetAccess">Refresh</MudButton>
+        </MudItem>
+    }
+    else if (!_apiKeyAvailable)
+    {
+        <MudItem sm="12">
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">No API Key found, please follow the instructions below to be able to use Forge!</MudAlert>
+        </MudItem>
+        <MudItem sm="12" Class="my-2 pa-2">
+            <MudText Class="mb-1">To use Forge via the launcher you must:</MudText>
+            <MudText>1. Have an account on the Forge.</MudText>
+            <MudText>2. Login and generate an Api Key for you to use.</MudText>
+            <MudText Class="mt-1">Below are two paths on how to generate that key.</MudText>
+        </MudItem>
+        <MudExpansionPanels MultiExpansion="true">
+            <MudExpansionPanel Text="Email and password login">
+                <MudText>If you have a Email and password login we are able to get a key automatically,</MudText>
+                <MudText>This requires you to login via the button below.</MudText>
+                <MudAlert Dense="true" Severity="Severity.Info" Variant="Variant.Outlined" Class="my-2">None of your login details will be saved!</MudAlert>
+                <MudItem sm="12" Class="mt-4 d-flex justify-start">
+                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeLoginTask">Login</MudButton>
+                </MudItem>
+            </MudExpansionPanel>
+            <MudExpansionPanel Text="Discord login">
+                <MudText>If you have a Discord login we are NOT able to get a key automatically,</MudText>
+                <MudText>This requires you to login via the Forge.</MudText>
+                <MudText Class="mt-2">1. Start by logging into
+                    <MudLink Href="https://forge.sp-tarkov.com">The Forge</MudLink>
+                    .
+                </MudText>
+                <MudText>2. Click your icon top right and select API Tokens.</MudText>
+                <MudText>3. Under "Token Name" put "SPT Launcher Key" and click create.</MudText>
+                <MudText>4. Click the button below to save this Token and test it. if it worked you'll be moved to the Forge Section.</MudText>
+                <MudItem sm="12" Class="mt-4 d-flex justify-start">
+                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeDiscordTask" Disabled="true">Login</MudButton>
+                </MudItem>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    }
+    else if (_searchResponse is null || _searchInProgress)
+    {
+        <MudGrid>
+            <ModCardComponent IsSkeleton="true"/>
+            <ModCardComponent IsSkeleton="true"/>
+        </MudGrid>
+    }
+    else if (_searchResponse?.Data?.Count > 0)
+    {
+        <MudGrid>
+            @foreach (var mod in _searchResponse.Data)
+            {
+                <ModCardComponent ForgeMod="@mod"/>
+            }
+        </MudGrid>
+    }
+</MudContainer>
+
+@code {
+    private bool _netAvailable { get; set; }
+    private bool _apiKeyAvailable { get; set; }
+    private ForgeModsResponse? _searchResponse { get; set; }
+    private bool _searchInProgress { get; set; }
+    private int _selected = 1;
+    private string _search = "";
+    private string _sortValue = "-created_at";
+    private string _filterValue = "Include";
+    private string _aiValue = "Exclude";
+
+    private int _paginationSelected
+    {
+        get => _selected;
+        set
+        {
+            if (_selected != value)
+            {
+                SearchForMods(value);
+                _selected = value;
+            }
+        }
+    }
+
+    // search functionality
+    public string Search
+    {
+        get => _search;
+        set
+        {
+            _search = value;
+            SearchUpdate();
+        }
+    }
+
+    public string SortValue
+    {
+        get => _sortValue;
+        set
+        {
+            _sortValue = value;
+            SearchUpdate();
+        }
+    }
+
+    public string FilterValue
+    {
+        get => _filterValue;
+        set
+        {
+            _filterValue = value;
+            SearchUpdate();
+        }
+    }
+
+    public string AiValue
+    {
+        get => _aiValue;
+        set
+        {
+            _aiValue = value;
+            SearchUpdate();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _netAvailable = _httpHelper.IsInternetAccessAvailable();
+        _apiKeyAvailable = !string.IsNullOrEmpty(_httpHelper.GetApiKey());
+        SearchForMods();
+        base.OnInitialized();
+    }
+
+    private async Task CheckInternetAccess()
+    {
+        _netAvailable = _httpHelper.IsInternetAccessAvailable();
+    }
+
+    private async Task SearchUpdate()
+    {
+        await SearchForMods(1);
+    }
+
+    private async Task SearchForMods(int? page = null)
+    {
+        _searchInProgress = true;
+        if (page is null)
+        {
+            page = _stateHelper.CurrentPagination;
+        }
+
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            _searchResponse = await _httpHelper.ForgeGetMods(token.Token, Search, SortValue, page ?? 1, FilterValue, AiValue);
+        }
+        catch (Exception e)
+        {
+            _logHelper.AddLog("Exception thrown from ForgeHelper.SearchForMods");
+            _logHelper.AddLog(e.ToString());
+            return;
+        }
+
+        if (!_searchResponse.Success)
+        {
+            _configHelper.SetApiKey("");
+            _searchResponse = null;
+            _apiKeyAvailable = false;
+        }
+
+        _paginationSelected = page ?? 1;
+        _stateHelper.CurrentPagination = _paginationSelected;
+        _searchInProgress = false;
+        StateHasChanged();
+    }
+
+    private async Task StartForgeLoginTask()
+    {
+        var dialog = await _dialogService.ShowAsync<ForgeLoginDialog>("ForgeLoginDialog", _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            _apiKeyAvailable = true;
+            _logHelper.LogInfo("Saved Apikey");
+            SearchForMods();
+        }
+    }
+
+    // TODO: see if Fridge is up for adding a apikey check endpoint
+    // like ping/pong with validation
+    private async Task StartForgeDiscordTask()
+    {
+        var dialog = await _dialogService.ShowAsync<ForgeDiscordDialog>("ForgeDiscordDialog", _configHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            _apiKeyAvailable = true;
+            _logHelper.LogInfo("Saved Apikey");
+            SearchForMods();
+        }
+    }
+
+}

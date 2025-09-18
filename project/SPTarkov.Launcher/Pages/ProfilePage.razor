@@ -1,0 +1,52 @@
+﻿@page "/ProfilePage"
+@inject StateHelper _stateHelper
+@inject GameHelper _gameHelper
+@inject LogHelper _logHelper
+
+<MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
+    <MudContainer Class="pa-0 pb-4">
+        <ProfileStatsComponent MiniProfile="@SelectedMiniProfile"/>
+    </MudContainer>
+    <MudContainer Class="d-flex pa-0 pb-4">
+        <MudPaper Elevation="2" Class="pa-4 mr-4">
+            <MudImage Src="https://placehold.co/150" Elevation="25" Class="rounded-lg"
+                      FallbackSrc="https://placehold.co/150"/>
+        </MudPaper>
+        <MudPaper Elevation="2" Class="pa-4 d-flex flex-column justify-space-between mr-4">
+            <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">₽:</MudText>
+            <MudText Typo="Typo.h6">1,000,000,000</MudText>
+            <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">$:</MudText>
+            <MudText Typo="Typo.h6">1,000,000,000</MudText>
+            <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">€:</MudText>
+            <MudText Typo="Typo.h6">1,000,000,000</MudText>
+            <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">GP:</MudText>
+            <MudText Typo="Typo.h6">1,000,000,000</MudText>
+        </MudPaper>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="StartGame"
+                   EndIcon="@Icons.Material.Filled.ArrowRight">Start Game
+        </MudButton>
+    </MudContainer>
+</MudContainer>
+
+@code {
+    private MiniProfile SelectedMiniProfile { get; set; }
+
+    protected override void OnInitialized()
+    {
+        SelectedMiniProfile = _stateHelper.SelectedProfile;
+        _logHelper.LogInfo($"Selected profile: {SelectedMiniProfile?.Username}");
+        base.OnInitialized();
+    }
+
+    private async Task StartGame()
+    {
+        // do checks
+        _logHelper.LogInfo("Launching Game");
+        await _gameHelper.LaunchGame();
+        _logHelper.LogInfo("Launched Game");
+        // patch game
+        // start game
+        // TODO: Call server for updated profiles
+    }
+
+}
