@@ -12,58 +12,44 @@
         <MudButton OnClick="RevertChanges" Variant="Variant.Filled" Disabled="@(!_unsavedData)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Undo" Size="Size.Large" Class="flex-grow-1">Undo Changes</MudButton>
         <MudButton OnClick="SaveChanges" Variant="Variant.Filled" Disabled="@(!_unsavedData)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="Size.Large" Class="flex-grow-1">Save Changes</MudButton>
     </MudItem>
-    <MudGrid>
-        <MudItem sm="6">
-            <MudPaper Class="pa-4 d-flex gap-2 flex-column mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="2">
-                <MudItem sm="12">
-                    <MudText Typo="Typo.h6" Color="Color.Info" Class="mb-n2 no-pointers no-select">Unloaded Mods</MudText>
-                    <MudText Typo="Typo.caption" Color="Color.Info" Class="no-pointers no-select">Click the arrow to load a mod</MudText>
+
+    <MudDropContainer T="DropItem" @ref="_container" Items="_items" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-column flex-grow-1" CanDropClass="mud-border-success">
+        <ChildContent>
+            <MudGrid>
+                <MudItem sm="6">
+                    <MudDropZone T="DropItem" Identifier="1" Class="rounded pa-4 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default mud-height-full" CanDrop="@((item) => item.Zone == "2")">
+                        <MudText Typo="Typo.h6" Color="Color.Success" Class="no-pointers no-select">Unloaded Server Mods</MudText>
+                        @if (_items.All(x => x.Zone != "1"))
+                        {
+                            <div class="mud-drop-item no-select no-pointers">
+                                <MudPaper Elevation="25" Class="pa-4 my-1 flex-grow-1 d-flex justify-space-between">
+                                    <MudText Inline="true" Class="no-pointers no-select" Color="Color.Primary">Drag a mod here to unload it!</MudText>
+                                </MudPaper>
+                            </div>
+                        }
+                    </MudDropZone>
                 </MudItem>
-                @foreach (var mod in _items.Where(x => !x.IsLoaded).OrderBy(o => o.Name))
-                {
-                    <MudPaper Class="pa-4 flex-grow-1 d-flex justify-space-between" Elevation="25">
-                        <MudText Inline="true" Class="no-pointers no-select">@mod.Name - @(mod.HasServerComponent ? "has server mod" : "Client only")</MudText>
-                        <MudIconButton Icon="@Icons.Material.Filled.AddCircle" Color="Color.Primary" Class="pa-0 px-2" @onclick="@(() => MoveModCallback(mod))"/>
-                    </MudPaper>
-                }
-            </MudPaper>
-        </MudItem>
-        <MudItem sm="6">
-            <MudPaper Class="pa-4 d-flex gap-2 flex-column mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="2">
-                <MudDropContainer T="DropItem" @ref="_container" Items="_items" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-column flex-grow-1">
-                    <ChildContent>
-                        <MudGrid>
-                            <MudItem sm="12">
-                                <MudDropZone T="DropItem" Identifier="2" Class="rounded" AllowReorder="true">
-                                    <MudText Typo="Typo.h6" Color="Color.Success" Class="mb-n2 no-pointers no-select">Loaded Server Mods</MudText>
-                                    <MudText Typo="Typo.caption" Color="Color.Success" Class="no-pointers no-select">Drag to adjust load order.</MudText>
-                                </MudDropZone>
-                            </MudItem>
-                        </MudGrid>
-                    </ChildContent>
-                    <ItemRenderer>
-                        <MudPaper Elevation="25" Class="pa-4 my-2 flex-grow-1 d-flex justify-space-between">
-                            <MudText Inline="true" Class="no-pointers no-select">@context.Name - @(context.HasServerComponent ? "has server mod" : "Client only")</MudText>
-                            <MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" Color="Color.Primary" Class="pa-0 px-2" @onclick="@(() => MoveModCallback(context))"/>
-                        </MudPaper>
-                    </ItemRenderer>
-                </MudDropContainer>
-                <MudItem sm="12" Class="d-flex flex-column gap-2">
-                    <MudItem sm="12">
-                        <MudText Typo="Typo.h6" Color="Color.Success" Class="mb-n2 no-pointers no-select">Loaded Client Mods</MudText>
-                        <MudText Typo="Typo.caption" Color="Color.Success" Class="no-pointers no-select">Load order is not adjustable.</MudText>
-                    </MudItem>
-                    @foreach (var mod in _items.Where(x => !x.HasServerComponent && x.IsLoaded).OrderBy(o => o.Name))
-                    {
-                        <MudPaper Class="pa-4 flex-grow-1 d-flex justify-space-between" Elevation="25">
-                            <MudText Inline="true" Class="no-pointers no-select">@mod.Name - @(mod.HasServerComponent ? "has server mod" : "Client only")</MudText>
-                            <MudIconButton Icon="@Icons.Material.Filled.RemoveCircle" Color="Color.Primary" Class="pa-0 px-2" @onclick="@(() => MoveModCallback(mod))"/>
-                        </MudPaper>
-                    }
+                <MudItem sm="6">
+                    <MudDropZone T="DropItem" Identifier="2" Class="rounded pa-4 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default mud-height-full" CanDrop="@((item) => item.Zone == "1")">
+                        <MudText Typo="Typo.h6" Color="Color.Success" Class="no-pointers no-select">Loaded Server Mods</MudText>
+                        @if (_items.All(x => x.Zone != "2"))
+                        {
+                            <div class="mud-drop-item no-select no-pointers">
+                                <MudPaper Elevation="25" Class="pa-4 my-1 flex-grow-1 d-flex justify-space-between">
+                                    <MudText Inline="true" Class="no-pointers no-select" Color="Color.Primary">Drag a mod here to load it!</MudText>
+                                </MudPaper>
+                            </div>
+                        }
+                    </MudDropZone>
                 </MudItem>
+            </MudGrid>
+        </ChildContent>
+        <ItemRenderer>
+            <MudPaper Elevation="25" Class="pa-4 my-1 flex-grow-1 d-flex justify-space-between">
+                <MudText Inline="true" Class="no-pointers no-select">@context.Name</MudText>
             </MudPaper>
-        </MudItem>
-    </MudGrid>
+        </ItemRenderer>
+    </MudDropContainer>
 </MudContainer>
 
 @code {
@@ -82,22 +68,9 @@
     private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
     {
         _unsavedData = true;
-
-        switch (dropItem.DropzoneIdentifier)
-        {
-            case "1":
-                dropItem.Item.Zone = dropItem.DropzoneIdentifier;
-                break;
-            case "2":
-            case "3":
-                dropItem.Item.Zone = dropItem.Item.HasServerComponent ? "2" : "3";
-                break;
-            default:
-                dropItem.Item.Zone = "1";
-                Console.WriteLine("something went wrong");
-                break;
-        }
-
+        dropItem.Item.Zone = dropItem.DropzoneIdentifier;
+        _items = _items.OrderBy(x => x.Name).ToList();
+        _container.Refresh();
         StateHasChanged();
     }
 
@@ -105,24 +78,6 @@
     {
         public string Name { get; set; }
         public string Zone { get; set; }
-        public bool HasServerComponent { get; set; }
-        public bool IsLoaded { get; set; }
-    }
-
-    private void MoveModCallback(DropItem item)
-    {
-        _unsavedData = true;
-
-        if (item.HasServerComponent)
-        {
-            item.Zone = item.IsLoaded ? "1" : "2";
-        }
-        else
-        {
-            item.Zone = item.IsLoaded ? "1" : "3";
-        }
-
-        item.IsLoaded = !item.IsLoaded;
     }
 
     private async ValueTask Handler(LocationChangingContext context)
@@ -169,48 +124,12 @@
     {
         return new List<DropItem>
         {
-            new() { Name = "Mod1", Zone = "2", IsLoaded = true, HasServerComponent = true },
-            new() { Name = "Mod2", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod3", Zone = "2", IsLoaded = true, HasServerComponent = true },
-            new() { Name = "Mod4", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod5", Zone = "3", IsLoaded = true, HasServerComponent = false },
-            new() { Name = "Mod6", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod7", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod1", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod2", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod3", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod4", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod5", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod6", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod7", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod1", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod2", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod3", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod4", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod5", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod6", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod7", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod1", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod2", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod3", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod4", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod5", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod6", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod7", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod1", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod2", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod3", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod4", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod5", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod6", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod7", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod1", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod2", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod3", Zone = "1", IsLoaded = false, HasServerComponent = true },
-            new() { Name = "Mod4", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod5", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod6", Zone = "1", IsLoaded = false, HasServerComponent = false },
-            new() { Name = "Mod7", Zone = "1", IsLoaded = false, HasServerComponent = false }
+            new() { Name = "a", Zone = "2" },
+            new() { Name = "b", Zone = "1" },
+            new() { Name = "c", Zone = "2" },
+            new() { Name = "d", Zone = "1" },
+            new() { Name = "e", Zone = "2" },
+            new() { Name = "f", Zone = "1" }
         };
     }
 
