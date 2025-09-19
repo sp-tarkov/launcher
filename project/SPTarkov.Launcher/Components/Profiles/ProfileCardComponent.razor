@@ -31,9 +31,19 @@
                 </MudTooltip>
                 <MudSpacer/>
             }
-            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? "Logout of this profile" : "Login to this profile")">
-                <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
-            </MudTooltip>
+
+            @if (!MiniProfile.InvalidOrUnloadableProfile)
+            {
+                <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? "Logout of this profile" : "Login to this profile")">
+                    <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
+                </MudTooltip>
+            }
+            else
+            {
+                <MudTooltip Arrow="true" Color="Color.Error" Placement="Placement.Left" Text="Profile is marked as Invalid">
+                    <MudIconButton Class="mr-1" Color="Color.Default" Icon="@Icons.Material.Filled.Recycling" Size="Size.Small"/>
+                </MudTooltip>
+            }
 
             <MudTooltip Arrow="true" Placement="Placement.Left" Text="Edit this profile">
                 <MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.Build" Size="Size.Small" @onclick="RunEditTask"/>

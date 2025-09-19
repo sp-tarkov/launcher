@@ -36,4 +36,7 @@ public class MiniProfile
 
     [JsonPropertyName("sptData")]
     public SPTData SptData { get; set; } = new();
+
+    [JsonPropertyName("invalidOrUnloadableProfile")]
+    public bool InvalidOrUnloadableProfile { get; set; }
 }
