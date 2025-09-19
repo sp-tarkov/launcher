@@ -95,6 +95,8 @@
   "open_link_question_format_1": "Вы уверены, что хотите открыть следующую ссылку? \n{0}",
   "open_link": "Открыть ссылку",
   "dev_mode": "Режим разработчика",
+  "auto_launch_game": "Автоматически запускать игру после авторизации",
+  "auto_launch_delay": "Задержка (сек)",
   "failed_to_save_settings": "Не удалось сохранить настройки",
   "core_dll_file_version_mismatch": "Версия файла BepinEx/plugins/spt/spt-core.dll не совпадает с ожидаемой версией, из-за чего запуск невозможен. Попытайтесь переустановить SPT",
   "register_failed_name_limit": "длина имени не может превышать 15 символов",

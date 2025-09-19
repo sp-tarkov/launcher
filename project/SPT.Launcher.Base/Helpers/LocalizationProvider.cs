@@ -192,6 +192,8 @@ namespace SPT.Launcher.Helpers
             englishLocale.open_link_question_format_1 = "Are you sure you want to open the following link: \n{0}";
             englishLocale.open_link = "Open Link";
             englishLocale.dev_mode = "Developer Mode";
+            englishLocale.auto_launch_game = "Auto-launch game after authentication";
+            englishLocale.auto_launch_delay = "Delay (sec)";
             englishLocale.failed_to_save_settings = "Failed to save settings";
             englishLocale.register_failed_name_limit = "name cannot exceed 15 characters";
             englishLocale.copy_failed = "Failed to copy data to clipboard";
@@ -279,6 +281,24 @@ namespace SPT.Launcher.Helpers
         {
             get => _dev_mode;
             set => SetProperty(ref _dev_mode, value);
+        }
+        #endregion
+
+        #region auto_launch_game
+        private string _auto_launch_game;
+        public string auto_launch_game
+        {
+            get => _auto_launch_game;
+            set => SetProperty(ref _auto_launch_game, value);
+        }
+        #endregion
+
+        #region auto_launch_delay
+        private string _auto_launch_delay;
+        public string auto_launch_delay
+        {
+            get => _auto_launch_delay;
+            set => SetProperty(ref _auto_launch_delay, value);
         }
         #endregion
 

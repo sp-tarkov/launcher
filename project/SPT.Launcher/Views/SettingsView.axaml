@@ -70,10 +70,11 @@
     
     <!-- Auto Launch Game -->
     <StackPanel Grid.Row="4" Grid.Column="2">
-      <CheckBox Content="Автоматически запускать игру после авторизации" 
+      <CheckBox Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=auto_launch_game}" 
                 IsChecked="{Binding AutoLaunchGame}" />
       <StackPanel Orientation="Horizontal" Margin="20 5 0 0" IsVisible="{Binding AutoLaunchGame}">
-        <Label Content="Задержка (сек):" VerticalAlignment="Center" />
+        <Label Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=auto_launch_delay}" 
+               VerticalAlignment="Center" />
         <TextBox Text="{Binding AutoLaunchDelay}" 
                  Width="50" 
                  Margin="5 0 0 0" 

@@ -95,6 +95,8 @@
   "open_link_question_format_1": "Are you sure you want to open the following link: \n{0}",
   "open_link": "Open Link",
   "dev_mode": "Developer Mode",
+  "auto_launch_game": "Auto-launch game after authentication",
+  "auto_launch_delay": "Delay (sec)",
   "failed_to_save_settings": "Failed to save settings",
   "core_dll_file_version_mismatch": "Your BepinEx/plugins/spt/spt-core.dll file version doesn't match what was expected and is unable to start. Try reinstalling SPT",
   "register_failed_name_limit": "name cannot exceed 15 characters",
