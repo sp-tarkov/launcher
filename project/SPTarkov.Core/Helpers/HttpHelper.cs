@@ -54,7 +54,7 @@ public class HttpHelper
         return "https://" + _stateHelper.SelectedServer.IpAddress + url;
     }
 
-    public async Task<T> GameServerGet<T>(string url, CancellationToken token)
+    public async Task<T?> GameServerGet<T>(string url, CancellationToken token)
     {
         _logHelper.LogInfo($"GET: {url}");
         var task = await _httpClient?.GetAsync(BuildGameUrl(url), token);
@@ -66,7 +66,7 @@ public class HttpHelper
         );
     }
 
-    public async Task<T> GameServerPut<T>(string url, object request, CancellationToken token)
+    public async Task<T?> GameServerPut<T>(string url, object request, CancellationToken token)
     {
         _logHelper.LogInfo($"Put: {url}");
 
@@ -86,7 +86,7 @@ public class HttpHelper
         );
     }
 
-    public async Task<ForgeVersionResponse> ForgeGetVersions(string? modId, CancellationToken token)
+    public async Task<ForgeVersionResponse?> ForgeGetVersions(string? modId, CancellationToken token)
     {
         _logHelper.LogInfo("forge ForgeGetVersions");
 
@@ -111,7 +111,7 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeVersionResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
-    public async Task<ForgeModResponse> ForgeGetMod(string? modId, CancellationToken token)
+    public async Task<ForgeModResponse?> ForgeGetMod(string? modId, CancellationToken token)
     {
         _logHelper.LogInfo("forge GetModFromForge");
 
@@ -136,7 +136,7 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeModResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
-    public async Task<ForgeModsResponse> ForgeGetMods(
+    public async Task<ForgeModsResponse?> ForgeGetMods(
         CancellationToken token,
         string search = "",
         string sort = "-featured,name",
@@ -178,7 +178,7 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeModsResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
-    public async Task<ForgeLogoutResponse> ForgeLogout(CancellationToken token)
+    public async Task<ForgeLogoutResponse?> ForgeLogout(CancellationToken token)
     {
         _logHelper.LogInfo("Forge ForgeLogout");
 
@@ -200,7 +200,7 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeLogoutResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
-    public async Task<ForgeLoginResponse> ForgeLogin(object request, CancellationToken token)
+    public async Task<ForgeLoginResponse?> ForgeLogin(object request, CancellationToken token)
     {
         _logHelper.LogInfo("Forge ForgeLogin");
 
@@ -278,6 +278,7 @@ public class HttpHelper
 
     public bool IsInternetAccessAvailable()
     {
+        // change to just pinging forge https://forge.sp-tarkov.com/api/v0/ping?
         try
         {
             using (var ping = new Ping())
