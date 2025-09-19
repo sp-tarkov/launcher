@@ -51,7 +51,7 @@ namespace SPT.Launcher.ViewModels
 
         private readonly ProcessMonitor _monitor;
 
-        public ProfileViewModel(IScreen Host) : base(Host)
+        public ProfileViewModel(IScreen Host, bool AutoLaunch = false) : base(Host)
         {
             // cache and load side image if profile has a side
             if(AccountManager.SelectedProfileInfo != null && AccountManager.SelectedProfileInfo.Side != null)
@@ -66,6 +66,19 @@ namespace SPT.Launcher.ViewModels
             CurrentEdition = AccountManager.SelectedAccount.edition;
 
             CurrentId = AccountManager.SelectedAccount.id;
+
+            // Автозапуск игры
+            if (AutoLaunch && LauncherSettingsProvider.Instance.AutoLaunchGame)
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(LauncherSettingsProvider.Instance.AutoLaunchDelay * 1000);
+                    await Dispatcher.UIThread.InvokeAsync(async () =>
+                    {
+                        await StartGameCommand();
+                    });
+                });
+            }
         }
 
         private async Task GameVersionCheck()

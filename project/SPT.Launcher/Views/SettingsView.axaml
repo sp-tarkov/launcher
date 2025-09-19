@@ -68,6 +68,19 @@
     
     <CheckBox Grid.Row="4" Grid.Column="1" Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=dev_mode}" IsChecked="{Binding Source={x:Static helpers:LauncherSettingsProvider.Instance}, Path=IsDevMode}"/>
     
+    <!-- Auto Launch Game -->
+    <StackPanel Grid.Row="4" Grid.Column="2">
+      <CheckBox Content="Автоматически запускать игру после авторизации" 
+                IsChecked="{Binding AutoLaunchGame}" />
+      <StackPanel Orientation="Horizontal" Margin="20 5 0 0" IsVisible="{Binding AutoLaunchGame}">
+        <Label Content="Задержка (сек):" VerticalAlignment="Center" />
+        <TextBox Text="{Binding AutoLaunchDelay}" 
+                 Width="50" 
+                 Margin="5 0 0 0" 
+                 VerticalContentAlignment="Center" />
+      </StackPanel>
+    </StackPanel>
+    
     <!-- Game Path -->
     <StackPanel Grid.Row="5" Grid.Column="1" Margin="0 10 10 10" IsEnabled="{Binding Source={x:Static helpers:LauncherSettingsProvider.Instance}, Path=IsDevMode}">
       <Label Content="{Binding Source={x:Static helpers:LocalizationProvider.Instance}, Path=game_path}"

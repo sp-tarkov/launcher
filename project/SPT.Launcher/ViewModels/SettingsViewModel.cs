@@ -242,5 +242,26 @@ namespace SPT.Launcher.ViewModels
                 LauncherSettingsProvider.Instance.GamePath = dir[0].Path.LocalPath;
             }
         }
+
+        // Свойства для автозапуска игры
+        public bool AutoLaunchGame
+        {
+            get => LauncherSettingsProvider.Instance.AutoLaunchGame;
+            set
+            {
+                LauncherSettingsProvider.Instance.AutoLaunchGame = value;
+                this.RaisePropertyChanged();
+            }
+        }
+
+        public int AutoLaunchDelay
+        {
+            get => LauncherSettingsProvider.Instance.AutoLaunchDelay;
+            set
+            {
+                LauncherSettingsProvider.Instance.AutoLaunchDelay = value;
+                this.RaisePropertyChanged();
+            }
+        }
     }
 }

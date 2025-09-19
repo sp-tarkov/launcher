@@ -111,6 +111,20 @@ namespace SPT.Launcher.Helpers
             set => SetProperty(ref _useAutoLogin, value);
         }
 
+        private bool _autoLaunchGame;
+        public bool AutoLaunchGame
+        {
+            get => _autoLaunchGame;
+            set => SetProperty(ref _autoLaunchGame, value);
+        }
+
+        private int _autoLaunchDelay = 5;
+        public int AutoLaunchDelay
+        {
+            get => _autoLaunchDelay;
+            set => SetProperty(ref _autoLaunchDelay, value);
+        }
+
         private bool _isDevMode;
 
         public bool IsDevMode
@@ -144,6 +158,8 @@ namespace SPT.Launcher.Helpers
                 LogManager.Instance.Info($"Creating launcher config: {LauncherSettingsProvider.DefaultSettingsFileLocation}");
                 LauncherStartGameAction = LauncherAction.MinimizeAction;
                 UseAutoLogin = true;
+                AutoLaunchGame = false;
+                AutoLaunchDelay = 5;
                 GamePath = Environment.CurrentDirectory;
                 IsDevMode = false;
 

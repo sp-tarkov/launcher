@@ -41,7 +41,7 @@ namespace SPT.Launcher.ViewModels
                             }
 
                             LauncherSettingsProvider.Instance.SaveSettings();
-                            NavigateTo(new ProfileViewModel(HostScreen));
+                            NavigateTo(new ProfileViewModel(HostScreen, LauncherSettingsProvider.Instance.AutoLaunchGame));
                             break;
                         }
                     case AccountStatus.LoginFailed:
@@ -72,7 +72,7 @@ namespace SPT.Launcher.ViewModels
 
                                                 LauncherSettingsProvider.Instance.SaveSettings();
                                                 SendNotification(LocalizationProvider.Instance.profile_created, Login.Username, NotificationType.Success);
-                                                NavigateTo(new ProfileViewModel(HostScreen));
+                                                NavigateTo(new ProfileViewModel(HostScreen, LauncherSettingsProvider.Instance.AutoLaunchGame));
                                                 break;
                                             }
                                         case AccountStatus.RegisterFailed:
