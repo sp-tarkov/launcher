@@ -19,11 +19,6 @@ public class StateHelper
     {
         _logHelper = logHelper;
 
-        if (configHelper.GetConfig().DebugSettings.DebugUser && configHelper.GetConfig().DebugSettings.ShowLoggingPage)
-        {
-            SetLoggingPages(true);
-        }
-
         if (configHelper.GetConfig().UseBackground)
         {
             SetBackground(true);
@@ -33,8 +28,6 @@ public class StateHelper
     public void LogoutAndDispose()
     {
         _logHelper.LogInfo($"Logged out of server {SelectedServer?.IpAddress ?? "Unknown"} and disposed");
-        SetProfilesPages(false);
-        SetProfilePages(false);
         ProfileTypes = new Dictionary<string, string>();
         ProfileList = [];
         ModList = [];
@@ -42,12 +35,12 @@ public class StateHelper
         SelectedServer = null;
     }
 
-    public void SetSelectedServer(Server server)
+    public void SetSelectedServer(Server? server)
     {
         SelectedServer = server;
     }
 
-    public void SetSelectedProfile(MiniProfile miniProfile)
+    public void SetSelectedProfile(MiniProfile? miniProfile)
     {
         SelectedProfile = miniProfile;
     }
@@ -57,29 +50,7 @@ public class StateHelper
     {
         OnStateChanged?.Invoke();
     }
-
-    public bool ShowProfilesPage { get; set; }
-    public bool ShowProfilePage { get; set; }
-    public bool ShowLoggingPage { get; set; }
     public bool ShowBackground { get; set; }
-
-    public void SetProfilesPages(bool state)
-    {
-        ShowProfilesPage = state;
-        NotifyStateChanged();
-    }
-
-    public void SetProfilePages(bool state)
-    {
-        ShowProfilePage = state;
-        NotifyStateChanged();
-    }
-
-    public void SetLoggingPages(bool state)
-    {
-        ShowLoggingPage = state;
-        NotifyStateChanged();
-    }
 
     public void SetBackground(bool state)
     {
