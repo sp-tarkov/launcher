@@ -1,4 +1,4 @@
-﻿@page "/ForgePage"
+﻿@page "/Forge"
 
 @inject IDialogService DialogService
 @inject HttpHelper HttpHelper
@@ -7,7 +7,13 @@
 @inject LogHelper LogHelper
 
 <MudContainer Class="px-8 mt-2 mb-6 pa-0" MaxWidth="MaxWidth.Large">
-    @if (netAvailable && apiKeyAvailable)
+    @if (!_forgeAvailable)
+    {
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">Forge is coming soon!</MudAlert>
+    }
+    else
+    {
+        @if (netAvailable && apiKeyAvailable)
     {
         <MudItem sm="12" Class="mb-6">
             <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
@@ -85,9 +91,12 @@
             }
         </MudGrid>
     }
+    }
+
 </MudContainer>
 
 @code {
+    private readonly bool _forgeAvailable = false;
     private bool netAvailable { get; set; }
     private bool apiKeyAvailable { get; set; }
     private ForgeModsResponse searchResponse { get; set; }

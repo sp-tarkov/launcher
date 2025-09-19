@@ -9,35 +9,29 @@
     @if (StateHelper.ShowProfilesPage)
     {
         <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Profiles" Inline="false">
-            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.All" Href="/ProfilesPage"/>
+            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.All" Href="/Profiles"/>
         </MudTooltip>
     }
     @if (StateHelper.ShowProfilePage)
     {
         <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Profile" Inline="false">
-            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.All" Href="/ProfilePage"/>
+            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.All" Href="/Profile"/>
         </MudTooltip>
     }
 </MudNavMenu>
 <MudSpacer/>
 <MudNavMenu Class="mud-typography-nowrap">
-    @if (StateHelper.ShowLoggingPage)
-    {
-        <MudTooltip Arrow="true" Text="Admin" Placement="Placement.Right" Inline="false">
-            <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.AdminPanelSettings" Match="NavLinkMatch.All" Href="/AdminPage"/>
-        </MudTooltip>
-    }
     <MudTooltip Arrow="true" Text="Mod Loader" Placement="Placement.Right" Inline="false">
-        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Reorder" Match="NavLinkMatch.All" Href="/ModLoaderPage"/>
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Reorder" Match="NavLinkMatch.All" Href="/ModLoader"/>
     </MudTooltip>
     <MudTooltip Arrow="true" Text="Forge" Placement="Placement.Right" Inline="false">
-        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.FolderZip" Match="NavLinkMatch.All" Href="/ForgePage"/>
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.FolderZip" Match="NavLinkMatch.All" Href="/Forge"/>
     </MudTooltip>
     <MudTooltip Arrow="true" Text="Settings" Placement="Placement.Right" Inline="false">
-        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Settings" Match="NavLinkMatch.All" Href="/SettingsPage"/>
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Settings" Match="NavLinkMatch.All" Href="/Settings"/>
     </MudTooltip>
     <MudTooltip Arrow="true" Text="Info" Placement="Placement.Right" Inline="false">
-        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Info" Match="NavLinkMatch.All" Href="/InfoPage"/>
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Info" Match="NavLinkMatch.All" Href="/Info"/>
     </MudTooltip>
 </MudNavMenu>
 
