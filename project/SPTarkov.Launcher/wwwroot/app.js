@@ -6,7 +6,7 @@ window.scrollToTopSmooth = function () {
 }
 
 window.toggleScrollButton = function () {
-    var scrollButton = document.getElementById('scrollTopBtn');
+    const scrollButton = document.getElementById('scrollTopBtn');
     if (!scrollButton) {
         return;
     }
