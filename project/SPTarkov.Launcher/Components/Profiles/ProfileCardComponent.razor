@@ -35,13 +35,13 @@
             @if (!MiniProfile.InvalidOrUnloadableProfile)
             {
                 <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? "Logout of this profile" : "Login to this profile")">
-                    <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
+                    <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
                 </MudTooltip>
             }
             else
             {
                 <MudTooltip Arrow="true" Color="Color.Error" Placement="Placement.Left" Text="Profile is marked as Invalid">
-                    <MudIconButton Class="mr-1" Color="Color.Default" Icon="@Icons.Material.Filled.Recycling" Size="Size.Small"/>
+                    <MudIconButton Class="mr-1" Color="Color.Error" Icon="@Icons.Material.Filled.Recycling" Size="Size.Small"/>
                 </MudTooltip>
             }
 
@@ -98,7 +98,6 @@
             if (StateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID)
             {
                 StateHelper.SelectedProfile = null;
-                StateHelper.SetProfilePages(false);
                 loggedIn = false;
                 return;
             }
@@ -120,7 +119,7 @@
             loggedIn = StateHelper.SelectedProfile != null;
 
             LogHelper.LogInfo("Navigating to /Profile");
-            NavigationManager.NavigateTo("/ProfilePage");
+            NavigationManager.NavigateTo("/Profile");
         }
     }
 
@@ -147,7 +146,6 @@
     {
         StateHelper.SelectedProfile = null;
         loggedIn = false;
-        StateHelper.SetProfilePages(false);
 
         var dialogParams = new DialogParameters
         {

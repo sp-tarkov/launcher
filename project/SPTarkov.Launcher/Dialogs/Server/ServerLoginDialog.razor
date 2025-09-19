@@ -115,15 +115,12 @@
         }
 
         StateHelper.LogoutAndDispose();
-        StateHelper.SetProfilesPages(false);
-        StateHelper.SetProfilePages(false);
         token?.Cancel();
         mudDialog.Cancel();
     }
 
     private void Submit()
     {
-        StateHelper.SetProfilesPages(true);
         mudDialog.Close(DialogResult.Ok(Server));
         Snackbar.Add("Logged In. Visit Profiles Page!", Severity.Success);
     }

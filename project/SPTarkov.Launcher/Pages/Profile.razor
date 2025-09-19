@@ -3,8 +3,13 @@
 @inject StateHelper StateHelper
 @inject GameHelper GameHelper
 @inject LogHelper LogHelper
+@inject NavigationManager NavigationManager
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
+    <MudContainer Class="pa-0 pb-4">
+        <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">Logout of Profile</MudButton>
+        @* <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ReturnToServers" StartIcon="@Icons.Material.Filled.ArrowBack">Disconnect</MudButton> *@
+    </MudContainer>
     <MudContainer Class="pa-0 pb-4">
         <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/>
     </MudContainer>
@@ -23,7 +28,7 @@
             <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">GP:</MudText>
             <MudText Typo="Typo.h6">1,000,000,000</MudText>
         </MudPaper>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="StartGame"
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGame"
                    EndIcon="@Icons.Material.Filled.ArrowRight">Start Game
         </MudButton>
     </MudContainer>
@@ -50,4 +55,16 @@
         // TODO: Call server for updated profiles
     }
 
+    private async Task ReturnToProfiles()
+    {
+        StateHelper.SetSelectedProfile(null);
+        NavigationManager.NavigateTo("/Profiles");
+    }
+
+    private async Task ReturnToServers()
+    {
+        StateHelper.SetSelectedProfile(null);
+        StateHelper.SetSelectedServer(null);
+        NavigationManager.NavigateTo("/");
+    }
 }

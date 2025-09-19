@@ -1,0 +1,31 @@
+﻿@page "/ServerPageWrapper"
+
+@inject NavigationManager NavigationManager
+@inject StateHelper StateHelper
+
+<h3>ServerPageWrapper</h3>
+
+@code {
+    protected override void OnInitialized()
+    {
+        // check status of server in State Helper
+        // if none, direct to Home page "/"
+        if (StateHelper.SelectedServer is null)
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        // if connected but no profile is selected
+        // direct to Profiles page "/Profiles"
+        if (StateHelper.SelectedProfile is null)
+        {
+            NavigationManager.NavigateTo("/Profiles");
+            return;
+        }
+
+        // if profile selected
+        // direct to Profile page "/Profile
+        NavigationManager.NavigateTo("/Profile");
+    }
+}

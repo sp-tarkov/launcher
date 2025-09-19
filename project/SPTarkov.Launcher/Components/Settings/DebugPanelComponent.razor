@@ -31,7 +31,6 @@
         {
             // set all debug options to false
             showLoggingPageSwitch = debugUserSwitch;
-            StateHelper.SetLoggingPages(debugUserSwitch);
             ConfigHelper.SetDebugLoggingPage(debugUserSwitch);
         }
     }
@@ -44,7 +43,6 @@
         }
 
         showLoggingPageSwitch = !showLoggingPageSwitch;
-        StateHelper.SetLoggingPages(showLoggingPageSwitch);
         ConfigHelper.SetDebugLoggingPage(showLoggingPageSwitch);
     }
 }

@@ -123,6 +123,20 @@
                 return false;
             }
 
+            if (MiniProfile is null) // manual login
+            {
+                var returnResult2 = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrl.Profile, request, token.Token);
+                var result2 = returnResult2.Response;
+
+                if (result2 is null)
+                {
+                    AbortOrFail(failString);
+                    return false;
+                }
+
+                MiniProfile = result2;
+            }
+
             token?.Dispose();
             return true;
         }
@@ -135,7 +149,6 @@
 
     private void Submit()
     {
-        StateHelper.SetProfilePages(true);
         Snackbar.Add($"Logged in to {MiniProfile?.Username}!", Severity.Success);
         mudDialog.Close(DialogResult.Ok(MiniProfile));
     }
@@ -147,7 +160,6 @@
             Snackbar.Add(message, Severity.Error);
         }
 
-        StateHelper.SetProfilePages(false);
         token?.Cancel();
         mudDialog.Cancel();
         _requestInProgress = false;

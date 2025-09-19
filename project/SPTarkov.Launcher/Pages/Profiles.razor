@@ -3,15 +3,14 @@
 @inject IDialogService DialogService
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
+@inject NavigationManager NavigationManager
+@inject LogHelper LogHelper
 
 <MudContainer Class="px-8 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 d-flex justify-start gap-2 pb-4">
-        <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.PersonAdd" Size="Size.Large"
-                   @onclick="RunAddTask" Variant="Variant.Filled" Disabled="@(!isConnected)">Create New Profile
-        </MudButton>
-        <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" Size="Size.Large"
-                   @onclick="RunLoginTaskWithDetails" Variant="Variant.Filled" Disabled="true">Login with details @* @(!IsConnected) *@
-        </MudButton>
+        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" OnClick="ReturnToServers" Variant="Variant.Filled" IconColor="Color.Error">Disconnect from server</MudButton>
+        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.PersonAdd" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success">Create New Profile</MudButton>
+        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" Size="Size.Medium" OnClick="RunLoginTaskWithDetails" Variant="Variant.Filled" IconColor="Color.Success">Login with details</MudButton>
     </MudContainer>
     <MudGrid>
         @foreach (var profile in ProfilesList)
@@ -24,15 +23,12 @@
             // TODO: server might hide profiles, but an edge case might be a fresh server
             case 0 when isConnected:
                 <MudItem sm="12">
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Server has no profiles yet or does not show them.
-                        Please create a new profile or login with details.
-                    </MudAlert>
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Server has no profiles yet or does not show them. Please create a new profile or login with details.</MudAlert>
                 </MudItem>
                 break;
             case 0 when !isConnected:
                 <MudItem sm="12">
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Please connect to a Server first!
-                    </MudAlert>
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Please connect to a Server first!</MudAlert>
                 </MudItem>
                 break;
         }
@@ -40,7 +36,7 @@
 </MudContainer>
 
 @code {
-
+    private MiniProfile _partialProfile { get; set; }
     public List<MiniProfile> ProfilesList { get; set; }
     private bool isConnected { get; set; }
 
@@ -62,24 +58,31 @@
         }
     }
 
-    private async Task RunLoginTask()
-    {
-        var dialog = await DialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", ConfigHelper.DialogOptions);
-        var result = await dialog.Result;
-
-        if (result?.Canceled is false)
-        {
-        }
-    }
-
     // TODO: currently does not work as intended
     private async Task RunLoginTaskWithDetails()
     {
-        var dialog = await DialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", ConfigHelper.DialogOptions);
+        var dialogParams = new DialogParameters
+        {
+            {
+                "MiniProfile", _partialProfile
+            }
+        };
+
+        var dialog = await DialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", dialogParams, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
+            var objectToUse = result.Data as MiniProfile;
+            _partialProfile = objectToUse;
+            StateHelper.SetSelectedProfile(objectToUse);
+            NavigationManager.NavigateTo("/Profile");
         }
+    }
+
+    private async Task ReturnToServers()
+    {
+        StateHelper.SetSelectedServer(null);
+        NavigationManager.NavigateTo("/");
     }
 }

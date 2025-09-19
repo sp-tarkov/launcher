@@ -13,7 +13,7 @@
             <CardHeaderActions>
                 @if (Server.Locked)
                 {
-                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected">
+                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected from edits">
                         <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" Disabled="true"/>
                     </MudTooltip>
                 }
@@ -35,11 +35,11 @@
             </MudTooltip>
             <MudSpacer/>
             <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(!isConnectedServer ? "Login to server" : "Logout of server")">
-                <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!isConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
+                <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!isConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
             </MudTooltip>
             @if (Server.Locked)
             {
-                <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected">
+                <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected from edits">
                     <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.Lock" Size="Size.Small"/>
                 </MudTooltip>
             }
@@ -76,8 +76,6 @@
         if (StateHelper.SelectedServer?.ServerId == Server.ServerId)
         {
             StateHelper.LogoutAndDispose();
-            StateHelper.SetProfilesPages(false);
-            StateHelper.SetProfilePages(false);
             isConnectedServer = false;
         }
 
@@ -113,15 +111,11 @@
             if (StateHelper.SelectedServer.ServerId == Server.ServerId)
             {
                 StateHelper.LogoutAndDispose();
-                StateHelper.SetProfilesPages(false);
-                StateHelper.SetProfilePages(false);
                 isConnectedServer = false;
                 return;
             }
 
             StateHelper.LogoutAndDispose();
-            StateHelper.SetProfilesPages(false);
-            StateHelper.SetProfilePages(false);
             isConnectedServer = false;
         }
 
@@ -143,7 +137,7 @@
                 isConnectedServer = StateHelper.SelectedServer.ServerId == Server.ServerId;
             }
 
-            NavigationManager.NavigateTo("/ProfilesPage");
+            NavigationManager.NavigateTo("/Profiles");
         }
     }
 
