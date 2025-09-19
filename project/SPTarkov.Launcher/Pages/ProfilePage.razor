@@ -1,11 +1,12 @@
 ﻿@page "/ProfilePage"
-@inject StateHelper _stateHelper
-@inject GameHelper _gameHelper
-@inject LogHelper _logHelper
+
+@inject StateHelper StateHelper
+@inject GameHelper GameHelper
+@inject LogHelper LogHelper
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 pb-4">
-        <ProfileStatsComponent MiniProfile="@SelectedMiniProfile"/>
+        <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/>
     </MudContainer>
     <MudContainer Class="d-flex pa-0 pb-4">
         <MudPaper Elevation="2" Class="pa-4 mr-4">
@@ -29,21 +30,21 @@
 </MudContainer>
 
 @code {
-    private MiniProfile SelectedMiniProfile { get; set; }
+    private MiniProfile selectedMiniProfile { get; set; }
 
     protected override void OnInitialized()
     {
-        SelectedMiniProfile = _stateHelper.SelectedProfile;
-        _logHelper.LogInfo($"Selected profile: {SelectedMiniProfile?.Username}");
+        selectedMiniProfile = StateHelper.SelectedProfile;
+        LogHelper.LogInfo($"Selected profile: {selectedMiniProfile?.Username}");
         base.OnInitialized();
     }
 
     private async Task StartGame()
     {
         // do checks
-        _logHelper.LogInfo("Launching Game");
-        await _gameHelper.LaunchGame();
-        _logHelper.LogInfo("Launched Game");
+        LogHelper.LogInfo("Launching Game");
+        await GameHelper.LaunchGame();
+        LogHelper.LogInfo("Launched Game");
         // patch game
         // start game
         // TODO: Call server for updated profiles

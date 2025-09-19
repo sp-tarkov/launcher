@@ -1,10 +1,4 @@
-﻿@inject ISnackbar _snackbar
-@inject IDialogService _dialogService
-@inject ForgeHelper _forgeHelper
-@inject HttpHelper _httpHelper
-@inject ConfigHelper _configHelper
-@inject LogHelper _logHelper
-@inject NavigationManager _navman
+﻿@inject NavigationManager NavigationManager
 
 <MudItem sm="6">
     @if (IsSkeleton)
@@ -84,15 +78,17 @@
 </MudItem>
 
 @code {
-    [Parameter] public bool IsSkeleton { get; set; }
+    [Parameter]
+    public bool IsSkeleton { get; set; }
 
-    [Parameter] public ForgeBase ForgeMod { get; set; }
+    [Parameter]
+    public ForgeBase ForgeMod { get; set; }
 
     private void NavigateToSingleMod(int? modId)
     {
         // navigate to mod page
         Console.WriteLine($"Navigating to mod page: {modId}");
-        _navman.NavigateTo($"/ForgeModPage/{modId}");
+        NavigationManager.NavigateTo($"/ForgeModPage/{modId}");
     }
 
 }

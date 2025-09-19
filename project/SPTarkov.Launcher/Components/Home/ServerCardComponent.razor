@@ -30,12 +30,12 @@
             <MudText Typo="Typo.body1">@Server.IpAddress</MudText>
         </MudCardContent>
         <MudCardActions Class="pa-4 d-flex mt-2">
-            <MudTooltip Arrow="true" Placement="Placement.Right" Text="@(IsConnectedServer ? "Connected" : "Disconnected")">
-                <MudIcon Class="mb-n2" Icon="@Icons.Material.Filled.Circle" Color="@(IsConnectedServer ? Color.Success : Color.Error)"/>
+            <MudTooltip Arrow="true" Placement="Placement.Right" Text="@(isConnectedServer ? "Connected" : "Disconnected")">
+                <MudIcon Class="mb-n2" Icon="@Icons.Material.Filled.Circle" Color="@(isConnectedServer ? Color.Success : Color.Error)"/>
             </MudTooltip>
             <MudSpacer/>
-            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(!IsConnectedServer ? "Login to server" : "Logout of server")">
-                <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!IsConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(!isConnectedServer ? "Login to server" : "Logout of server")">
+                <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!isConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
             </MudTooltip>
             @if (Server.Locked)
             {
@@ -54,17 +54,20 @@
 </MudItem>
 
 @code {
-    [Parameter] public Server Server { get; set; }
+    [Parameter]
+    public Server Server { get; set; }
 
-    [Parameter] public List<Server> ServerList { get; set; }
+    [Parameter]
+    public List<Server> ServerList { get; set; }
 
-    [Parameter] public EventCallback<List<Server>> ServerListChanged { get; set; }
+    [Parameter]
+    public EventCallback<List<Server>> ServerListChanged { get; set; }
 
-    private bool IsConnectedServer { get; set; }
+    private bool isConnectedServer { get; set; }
 
     protected override void OnInitialized()
     {
-        IsConnectedServer = StateHelper.SelectedServer?.ServerId == Server.ServerId;
+        isConnectedServer = StateHelper.SelectedServer?.ServerId == Server.ServerId;
         base.OnInitialized();
     }
 
@@ -75,7 +78,7 @@
             StateHelper.LogoutAndDispose();
             StateHelper.SetProfilesPages(false);
             StateHelper.SetProfilePages(false);
-            IsConnectedServer = false;
+            isConnectedServer = false;
         }
 
         var param = new DialogParameters
@@ -112,14 +115,14 @@
                 StateHelper.LogoutAndDispose();
                 StateHelper.SetProfilesPages(false);
                 StateHelper.SetProfilePages(false);
-                IsConnectedServer = false;
+                isConnectedServer = false;
                 return;
             }
 
             StateHelper.LogoutAndDispose();
             StateHelper.SetProfilesPages(false);
             StateHelper.SetProfilePages(false);
-            IsConnectedServer = false;
+            isConnectedServer = false;
         }
 
         var param = new DialogParameters
@@ -137,7 +140,7 @@
             StateHelper.SetSelectedServer(Server);
             if (StateHelper.SelectedServer != null)
             {
-                IsConnectedServer = StateHelper.SelectedServer.ServerId == Server.ServerId;
+                isConnectedServer = StateHelper.SelectedServer.ServerId == Server.ServerId;
             }
 
             NavigationManager.NavigateTo("/ProfilesPage");
@@ -149,7 +152,7 @@
         if (StateHelper.SelectedServer != null)
         {
             StateHelper.LogoutAndDispose();
-            IsConnectedServer = false;
+            isConnectedServer = false;
         }
 
         var dialog = await DialogService.ShowAsync<ServerRemoveDialog>("ServerRemoveDialog", ConfigHelper.DialogOptions);

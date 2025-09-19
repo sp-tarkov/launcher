@@ -34,45 +34,44 @@
 </MudContainer>
 
 @code {
-    private string search = "";
     [Parameter]
     public string Search
     {
-        get => search;
+        get => _search;
         set
         {
-            if (search == value)
+            if (_search == value)
             {
                 return;
             }
 
-            search = value;
-            SearchChanged.InvokeAsync(search);
+            _search = value;
+            SearchChanged.InvokeAsync(_search);
         }
     }
+    private string _search = "";
     [Parameter]
     public EventCallback<string> SearchChanged { get; set; }
 
-    private string sortValue = "-created_at";
     [Parameter]
     public string SortValue
     {
-        get => sortValue;
+        get => _sortValue;
         set
         {
-            if (sortValue == value)
+            if (_sortValue == value)
             {
                 return;
             }
 
-            sortValue = value;
-            SortValueChanged.InvokeAsync(sortValue);
+            _sortValue = value;
+            SortValueChanged.InvokeAsync(_sortValue);
         }
     }
+    private string _sortValue = "-created_at";
     [Parameter]
     public EventCallback<string> SortValueChanged { get; set; }
 
-    private string filterValue = "Include";
     [Parameter]
     public string FilterValue
     {
@@ -88,25 +87,26 @@
             FilterValueChanged.InvokeAsync(filterValue);
         }
     }
+    private string filterValue = "Include";
     [Parameter]
     public EventCallback<string> FilterValueChanged { get; set; }
 
-    private string aiValue = "Exclude";
     [Parameter]
     public string AiValue
     {
-        get => aiValue;
+        get => _aiValue;
         set
         {
-            if (aiValue == value)
+            if (_aiValue == value)
             {
                 return;
             }
 
-            aiValue = value;
-            AiValueChanged.InvokeAsync(aiValue);
+            _aiValue = value;
+            AiValueChanged.InvokeAsync(_aiValue);
         }
     }
+    private string _aiValue = "Exclude";
     [Parameter]
     public EventCallback<string> AiValueChanged { get; set; }
 

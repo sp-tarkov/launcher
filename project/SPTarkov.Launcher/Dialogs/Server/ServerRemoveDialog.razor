@@ -1,4 +1,4 @@
-﻿@inject ISnackbar _snackbar
+﻿@inject ISnackbar Snackbar
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -13,17 +13,18 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance mudDialog { get; set; }
 
     private void Submit()
     {
-        _snackbar.Add("Removed!");
-        MudDialog.Close(DialogResult.Ok(true));
+        Snackbar.Add("Removed!");
+        mudDialog.Close(DialogResult.Ok(true));
     }
 
     private void Cancel()
     {
-        MudDialog.Cancel();
+        mudDialog.Cancel();
     }
 
 }

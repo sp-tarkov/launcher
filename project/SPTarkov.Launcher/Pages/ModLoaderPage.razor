@@ -1,19 +1,18 @@
 ﻿@page "/ModLoaderPage"
 
 @implements IDisposable;
-@inject ConfigHelper _configHelper
-@inject LogHelper _logHelper
-@inject ModHelper _modHelper
-@inject IDialogService _dialogService
-@inject NavigationManager _navigationManager;
+
+@inject ConfigHelper ConfigHelper
+@inject IDialogService DialogService
+@inject NavigationManager NavigationManager;
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
     <MudItem sm="12" Class="mb-4">
-        <MudButton OnClick="RevertChanges" Variant="Variant.Filled" Disabled="@(!_unsavedData)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Undo" Size="Size.Large" Class="flex-grow-1">Undo Changes</MudButton>
-        <MudButton OnClick="SaveChanges" Variant="Variant.Filled" Disabled="@(!_unsavedData)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="Size.Large" Class="flex-grow-1">Save Changes</MudButton>
+        <MudButton OnClick="RevertChanges" Variant="Variant.Filled" Disabled="@(!unsavedData)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Undo" Size="Size.Large" Class="flex-grow-1">Undo Changes</MudButton>
+        <MudButton OnClick="SaveChanges" Variant="Variant.Filled" Disabled="@(!unsavedData)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="Size.Large" Class="flex-grow-1">Save Changes</MudButton>
     </MudItem>
 
-    <MudDropContainer T="DropItem" @ref="_container" Items="_items" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-column flex-grow-1" CanDropClass="mud-border-success">
+    <MudDropContainer T="DropItem" @ref="container" Items="_items" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-column flex-grow-1" CanDropClass="mud-border-success">
         <ChildContent>
             <MudGrid>
                 <MudItem sm="6">
@@ -53,24 +52,24 @@
 </MudContainer>
 
 @code {
-    private MudDropContainer<DropItem> _container { get; set; }
-    private bool _unsavedData { get; set; }
+    private MudDropContainer<DropItem> container { get; set; }
+    private bool unsavedData { get; set; }
     private List<DropItem> _items = new();
-    private IDisposable _handler { get; set; }
+    private IDisposable handler { get; set; }
 
     protected override void OnInitialized()
     {
-        _handler = _navigationManager.RegisterLocationChangingHandler(Handler);
+        handler = NavigationManager.RegisterLocationChangingHandler(Handler);
         _items = LoadData();
         base.OnInitialized();
     }
 
     private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
     {
-        _unsavedData = true;
+        unsavedData = true;
         dropItem.Item.Zone = dropItem.DropzoneIdentifier;
         _items = _items.OrderBy(x => x.Name).ToList();
-        _container.Refresh();
+        container.Refresh();
         StateHasChanged();
     }
 
@@ -82,7 +81,7 @@
 
     private async ValueTask Handler(LocationChangingContext context)
     {
-        if (!_unsavedData)
+        if (!unsavedData)
         {
             // no unsavedData
             return;
@@ -90,7 +89,7 @@
 
         Console.WriteLine("Check user wants to navigate with unsaved data");
 
-        var dialog = await _dialogService.ShowAsync<UnsavedDataDialog>("UnsavedDataDialog", _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<UnsavedDataDialog>("UnsavedDataDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
@@ -105,19 +104,19 @@
 
     private void SaveChanges()
     {
-        _unsavedData = false;
+        unsavedData = false;
     }
 
     private void RevertChanges()
     {
         _items = LoadData();
         StateHasChanged();
-        _unsavedData = false;
+        unsavedData = false;
     }
 
     public void Dispose()
     {
-        _handler.Dispose();
+        handler.Dispose();
     }
 
     private List<DropItem> LoadData()

@@ -1,29 +1,27 @@
 ﻿@page "/ForgeModPage/{ModId}"
 
-@inject ISnackbar _snackbar
-@inject IDialogService _dialogService
-@inject ForgeHelper _forgeHelper
-@inject HttpHelper _httpHelper
-@inject ConfigHelper _configHelper
-@inject LogHelper _logHelper
+@inject HttpHelper HttpHelper
+@inject LogHelper LogHelper
 
 <MudContainer Class="px-8 mt-2 mb-6 pa-0" MaxWidth="MaxWidth.Large">
     <MudGrid>
-        @if (_searchResponse is null || _searchInProgress)
+        @if (searchResponse is null || searchInProgress)
         {
             <DetailedModComponent IsSkeleton="true"/>
         }
-        else if (_searchResponse?.Data is not null)
+        else if (searchResponse?.Data is not null)
         {
-            <DetailedModComponent ForgeMod="@_searchResponse?.Data"/>
+            <DetailedModComponent ForgeMod="@searchResponse?.Data"/>
         }
     </MudGrid>
 </MudContainer>
 
 @code {
-    private ForgeModResponse _searchResponse { get; set; }
-    private bool _searchInProgress { get; set; }
-    [Parameter] public string ModId { get; set; }
+    private ForgeModResponse searchResponse { get; set; }
+    private bool searchInProgress { get; set; }
+
+    [Parameter]
+    public string ModId { get; set; }
 
     protected override async void OnInitialized()
     {
@@ -33,21 +31,21 @@
 
     private async Task SearchForMod()
     {
-        _searchInProgress = true;
+        searchInProgress = true;
 
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            _searchResponse = await _httpHelper.ForgeGetMod(ModId, token.Token);
+            searchResponse = await HttpHelper.ForgeGetMod(ModId, token.Token);
         }
         catch (Exception e)
         {
-            _logHelper.AddLog("Exception thrown from ForgeHelper.SearchForMod");
-            _logHelper.AddLog(e.ToString());
+            LogHelper.AddLog("Exception thrown from ForgeHelper.SearchForMod");
+            LogHelper.AddLog(e.ToString());
             return;
         }
 
-        _searchInProgress = false;
+        searchInProgress = false;
         StateHasChanged();
     }
 }

@@ -1,4 +1,4 @@
-﻿@inject ConfigHelper _ConfigHelper
+﻿@inject ConfigHelper ConfigHelper
 
 <MudItem sm="6">
     <MudPaper Class="pa-5 mr-1 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
@@ -16,7 +16,7 @@
 
     protected override void OnInitialized()
     {
-        var settings = _ConfigHelper.GetConfig();
+        var settings = ConfigHelper.GetConfig();
         closeToTraySwitch = settings.CloseToTray;
         minimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
         alwaysOnTopSwitch = settings.AlwaysTop;
@@ -27,19 +27,19 @@
     private async Task SetCloseToTray()
     {
         closeToTraySwitch = !closeToTraySwitch;
-        _ConfigHelper.SetCloseToTray(closeToTraySwitch);
+        ConfigHelper.SetCloseToTray(closeToTraySwitch);
     }
 
     private async Task SetMinimizeOnLaunch()
     {
         minimizeOnLaunchSwitch = !minimizeOnLaunchSwitch;
-        _ConfigHelper.SetMinimizeOnLaunch(minimizeOnLaunchSwitch);
+        ConfigHelper.SetMinimizeOnLaunch(minimizeOnLaunchSwitch);
     }
 
     private async Task SetAlwaysOnTop()
     {
         alwaysOnTopSwitch = !alwaysOnTopSwitch;
         Launcher.App.MainWindow.SetTopMost(alwaysOnTopSwitch);
-        _ConfigHelper.SetAlwaysOnTop(alwaysOnTopSwitch);
+        ConfigHelper.SetAlwaysOnTop(alwaysOnTopSwitch);
     }
 }

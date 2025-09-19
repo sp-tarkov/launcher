@@ -1,18 +1,18 @@
 ﻿@page "/"
 
-@inject IDialogService _dialogService
-@inject ConfigHelper _configHelper
+@inject IDialogService DialogService
+@inject ConfigHelper ConfigHelper
 
 <MudContainer Class="px-8 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 d-flex justify-space-between pb-4">
         <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddToQueue" Size="Size.Large" @onclick="RunAddTask" Variant="Variant.Filled">Add New Server</MudButton>
     </MudContainer>
     <MudGrid>
-        @if (ServerList.Any())
+        @if (serverList.Any())
         {
-            @foreach (var server in ServerList)
+            @foreach (var server in serverList)
             {
-                <ServerCardComponent Server="@server" @bind-ServerList="ServerList"/>
+                <ServerCardComponent Server="@server" @bind-ServerList="serverList"/>
             }
         }
         else
@@ -25,24 +25,24 @@
 </MudContainer>
 
 @code {
-    private List<Server> ServerList;
+    private List<Server> serverList;
 
     protected override void OnInitialized()
     {
-        ServerList = _configHelper.GetConfig().Servers;
+        serverList = ConfigHelper.GetConfig().Servers;
         Launcher.App.MainWindow.SetMinimized(false);
         base.OnInitialized();
     }
 
     private async Task RunAddTask()
     {
-        var dialog = await _dialogService.ShowAsync<ServerAddDialog>("ServerAddDialog", _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ServerAddDialog>("ServerAddDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            ServerList.Add(result.Data as Server);
-            _configHelper.SetServers(ServerList);
+            serverList.Add(result.Data as Server);
+            ConfigHelper.SetServers(serverList);
         }
     }
 }

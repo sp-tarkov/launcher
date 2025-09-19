@@ -5,8 +5,7 @@
 @inject LogHelper LogHelper
 
 <MudItem sm="12" md="4">
-    <MudPaper Elevation="2"
-              Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
+    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
         <div class="card-overflow">
             @if (!sideIsUnknown)
             {
@@ -33,20 +32,15 @@
                 <MudSpacer/>
             }
             <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? "Logout of this profile" : "Login to this profile")">
-                <MudIconButton Class="mr-1" Color="Color.Default"
-                               Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)"
-                               Size="Size.Small"
-                               @onclick="RunLoginTask"/>
+                <MudIconButton Class="mr-1" Color="Color.Default" Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
             </MudTooltip>
 
             <MudTooltip Arrow="true" Placement="Placement.Left" Text="Edit this profile">
-                <MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.Build" Size="Size.Small"
-                               @onclick="RunEditTask"/>
+                <MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.Build" Size="Size.Small" @onclick="RunEditTask"/>
             </MudTooltip>
 
             <MudTooltip Arrow="true" Placement="Placement.Left" Text="Delete this profile">
-                <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small"
-                               @onclick="RunDeleteTask"/>
+                <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" @onclick="RunDeleteTask"/>
             </MudTooltip>
 
         </MudContainer>
@@ -54,9 +48,15 @@
 </MudItem>
 
 @code {
-    [Parameter] public MiniProfile MiniProfile { get; set; }
-    [Parameter] public List<MiniProfile> ProfileList { get; set; }
-    [Parameter] public EventCallback<List<MiniProfile>> ProfileListChanged { get; set; }
+    [Parameter]
+    public MiniProfile MiniProfile { get; set; }
+
+    [Parameter]
+    public List<MiniProfile> ProfileList { get; set; }
+
+    [Parameter]
+    public EventCallback<List<MiniProfile>> ProfileListChanged { get; set; }
+
     private bool sideIsUnknown { get; set; }
     private bool loggedIn { get; set; }
 

@@ -1,10 +1,10 @@
 ﻿@page "/AdminPage"
 
-@inject LogHelper _logHelper
+@inject LogHelper LogHelper
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
     <MudPaper Class="mud-width-full pa-4 flex-column">
-        @foreach (var log in _logHelper.GetLogs())
+        @foreach (var log in LogHelper.GetLogs())
         {
             <MudText Typo="Typo.body1">
                 @log

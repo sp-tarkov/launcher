@@ -1,8 +1,4 @@
-﻿@inject ISnackbar _snackbar
-@inject StateHelper _stateHelper
-@inject HttpHelper _httpHelper
-
-<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+﻿<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="py-4">
             <MudText>Are you sure you want to leave? Any unsaved data will be lost.</MudText>
@@ -15,16 +11,17 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance mudDialog { get; set; }
 
     private void Submit()
     {
-        MudDialog.Close(DialogResult.Ok(true));
+        mudDialog.Close(DialogResult.Ok(true));
     }
 
     private void Cancel()
     {
-        MudDialog.Cancel();
+        mudDialog.Cancel();
     }
 
 }

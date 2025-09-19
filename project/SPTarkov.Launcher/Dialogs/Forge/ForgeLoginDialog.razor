@@ -1,20 +1,20 @@
-﻿@inject ISnackbar _snackbar
-@inject HttpHelper _httpHelper
-@inject LogHelper _logHelper
+﻿@inject ISnackbar Snackbar
+@inject HttpHelper HttpHelper
+@inject LogHelper LogHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="py-4">
-            @if (requestInProgress)
+            @if (_requestInProgress)
             {
                 <MudContainer Class="d-flex flex-column align-center gap-4">
                     <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
-                    <MudText>@TaskText</MudText>
+                    <MudText>@_taskText</MudText>
                 </MudContainer>
             }
             else
             {
-                <MudForm Model="request" @bind-IsValid="@success" Class="gap-2 mt-3">
+                <MudForm Model="request" @bind-IsValid="@_success" Class="gap-2 mt-3">
                     <MudTextField Immediate="true" @bind-Value="request.Email" Label="Email" Variant="Variant.Outlined"
                                   Margin="Margin.Dense" Required="true"/>
                     <PasswordFieldComponent @bind-Password="request.Password" IsRequired="true"/>
@@ -22,7 +22,7 @@
             }
 
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunLoginTask" Disabled="@requestInProgress">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunLoginTask" Disabled="@_requestInProgress">
                     Login
                 </MudButton>
                 <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton>
@@ -32,18 +32,20 @@
 </MudDialog>
 
 @code {
-    private bool success;
-    private bool requestInProgress;
-    private string TaskText = "";
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance mudDialog { get; set; }
+
+    private bool _success;
+    private bool _requestInProgress;
+    private string _taskText = "";
     private ForgeLoginRequest request { get; } = new();
     private CancellationTokenSource token { get; set; }
-    private bool UserCancel { get; set; }
+    private bool userCancel { get; set; }
 
     private async Task RunLoginTask()
     {
         var result = false;
-        requestInProgress = true;
+        _requestInProgress = true;
         try
         {
             result = await CallForge("Trying to login", "Failed to login");
@@ -67,7 +69,7 @@
         if (result)
         {
             Submit();
-            requestInProgress = false;
+            _requestInProgress = false;
         }
     }
 
@@ -76,22 +78,22 @@
         try
         {
             token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            TaskText = taskText;
+            _taskText = taskText;
             StateHasChanged();
             await Task.Delay(20);
 
-            var result = await _httpHelper.ForgeLogin(request, token.Token);
+            var result = await HttpHelper.ForgeLogin(request, token.Token);
 
             if (result is null)
             {
-                _logHelper.AddLog("Forge ForgeLogin result is null");
+                LogHelper.AddLog("Forge ForgeLogin result is null");
                 return false;
             }
 
             if (result.Success)
             {
-                _logHelper.AddLog("Forge ForgeLogin Authenticated");
-                _httpHelper.SetApiKey(result.Data.Token);
+                LogHelper.AddLog("Forge ForgeLogin Authenticated");
+                HttpHelper.SetApiKey(result.Data.Token);
                 token?.Dispose();
                 return true;
             }
@@ -99,19 +101,19 @@
             switch (result.Code)
             {
                 case ForgeResponseMessage.Unauthenticated:
-                    _logHelper.AddLog("Forge ForgeLogin failed to authenticate");
+                    LogHelper.AddLog("Forge ForgeLogin failed to authenticate");
                     AbortOrFail();
                     return false;
                 case ForgeResponseMessage.InvalidCredentials:
-                    _logHelper.AddLog("Forge ForgeLogin failed, Invalid Credentials");
+                    LogHelper.AddLog("Forge ForgeLogin failed, Invalid Credentials");
                     AbortOrFail();
                     return false;
                 case ForgeResponseMessage.InvalidEmail:
-                    _logHelper.AddLog("Forge ForgeLogin failed due to invalid email");
+                    LogHelper.AddLog("Forge ForgeLogin failed due to invalid email");
                     AbortOrFail();
                     return false;
                 default:
-                    _logHelper.AddLog($"Forge ForgeLogin ?? {result.Message}");
+                    LogHelper.AddLog($"Forge ForgeLogin ?? {result.Message}");
                     AbortOrFail();
                     return false;
             }
@@ -125,28 +127,28 @@
 
     private void Submit()
     {
-        _snackbar.Add($"Logged in to {request.Email}!", Severity.Success);
-        MudDialog.Close();
+        Snackbar.Add($"Logged in to {request.Email}!", Severity.Success);
+        mudDialog.Close();
     }
 
     private void AbortOrFail(string message = "Error connecting to server!")
     {
-        if (!UserCancel)
+        if (!userCancel)
         {
-            _snackbar.Add(message, Severity.Error);
+            Snackbar.Add(message, Severity.Error);
         }
 
         token?.Cancel();
-        MudDialog.Cancel();
-        requestInProgress = false;
+        mudDialog.Cancel();
+        _requestInProgress = false;
     }
 
     private void UserCancelled()
     {
-        UserCancel = true;
-        requestInProgress = false;
+        userCancel = true;
+        _requestInProgress = false;
         token?.Cancel();
-        MudDialog.Cancel();
+        mudDialog.Cancel();
     }
 
 }

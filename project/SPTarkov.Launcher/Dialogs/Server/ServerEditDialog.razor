@@ -1,4 +1,4 @@
-﻿@inject ISnackbar _snackbar
+﻿@inject ISnackbar Snackbar
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -20,9 +20,11 @@
 
     private readonly IMask ipPortMask = RegexMask.IPv4(true);
 
-    [Parameter] public Server Server { get; set; }
+    [Parameter]
+    public Server Server { get; set; }
 
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance mudDialog { get; set; }
 
     protected override void OnInitialized()
     {
@@ -32,13 +34,13 @@
 
     private void Submit()
     {
-        _snackbar.Add("Edited Server!", Severity.Success);
-        MudDialog.Close(DialogResult.Ok(Server));
+        Snackbar.Add("Edited Server!", Severity.Success);
+        mudDialog.Close(DialogResult.Ok(Server));
     }
 
     private void Cancel()
     {
-        MudDialog.Cancel();
+        mudDialog.Cancel();
     }
 
 }

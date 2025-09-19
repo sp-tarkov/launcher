@@ -1,12 +1,13 @@
 ﻿@page "/ProfilesPage"
-@inject IDialogService _dialogService
-@inject StateHelper _stateHelper
-@inject ConfigHelper _configHelper
+
+@inject IDialogService DialogService
+@inject StateHelper StateHelper
+@inject ConfigHelper ConfigHelper
 
 <MudContainer Class="px-8 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 d-flex justify-start gap-2 pb-4">
         <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.PersonAdd" Size="Size.Large"
-                   @onclick="RunAddTask" Variant="Variant.Filled" Disabled="@(!IsConnected)">Create New Profile
+                   @onclick="RunAddTask" Variant="Variant.Filled" Disabled="@(!isConnected)">Create New Profile
         </MudButton>
         <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" Size="Size.Large"
                    @onclick="RunLoginTaskWithDetails" Variant="Variant.Filled" Disabled="true">Login with details @* @(!IsConnected) *@
@@ -21,14 +22,14 @@
         @switch (ProfilesList.Count)
         {
             // TODO: server might hide profiles, but an edge case might be a fresh server
-            case 0 when IsConnected:
+            case 0 when isConnected:
                 <MudItem sm="12">
                     <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Server has no profiles yet or does not show them.
                         Please create a new profile or login with details.
                     </MudAlert>
                 </MudItem>
                 break;
-            case 0 when !IsConnected:
+            case 0 when !isConnected:
                 <MudItem sm="12">
                     <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Please connect to a Server first!
                     </MudAlert>
@@ -41,29 +42,29 @@
 @code {
 
     public List<MiniProfile> ProfilesList { get; set; }
-    private bool IsConnected { get; set; }
+    private bool isConnected { get; set; }
 
     protected override void OnInitialized()
     {
-        ProfilesList = _stateHelper.ProfileList;
-        IsConnected = _stateHelper.SelectedServer is not null;
+        ProfilesList = StateHelper.ProfileList;
+        isConnected = StateHelper.SelectedServer is not null;
         base.OnInitialized();
     }
 
     private async Task RunAddTask()
     {
-        var dialog = await _dialogService.ShowAsync<ProfileAddDialog>("ProfileAddDialog", _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ProfileAddDialog>("ProfileAddDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            ProfilesList = _stateHelper.ProfileList;
+            ProfilesList = StateHelper.ProfileList;
         }
     }
 
     private async Task RunLoginTask()
     {
-        var dialog = await _dialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
@@ -74,7 +75,7 @@
     // TODO: currently does not work as intended
     private async Task RunLoginTaskWithDetails()
     {
-        var dialog = await _dialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)

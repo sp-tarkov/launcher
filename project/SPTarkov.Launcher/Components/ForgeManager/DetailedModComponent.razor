@@ -1,11 +1,4 @@
-﻿@inject ISnackbar _snackbar
-@inject IDialogService _dialogService
-@inject ForgeHelper _forgeHelper
-@inject HttpHelper _httpHelper
-@inject ConfigHelper _configHelper
-@inject LogHelper _logHelper
-@inject NavigationManager _navman
-@inject IJSRuntime JS
+﻿@inject IJSRuntime JsRuntime
 
 <MudItem sm="12">
     @if (IsSkeleton)
@@ -53,26 +46,26 @@
                         <MudGrid>
                             <MudItem sm="8">
                                 <MudText Typo="Typo.h6" Class="no-pointers no-select">
-                                    Version @(_latestVersion.Version)</MudText>
+                                    Version @(latestVersion.Version)</MudText>
 
-                                @if (!string.IsNullOrEmpty(_latestVersion.VirusTotalLink))
+                                @if (!string.IsNullOrEmpty(latestVersion.VirusTotalLink))
                                 {
                                     <MudLink
-                                        Href="@(_latestVersion.VirusTotalLink)">
+                                        Href="@(latestVersion.VirusTotalLink)">
                                         Virus Total Results
                                     </MudLink>
                                 }
                             </MudItem>
                             <MudItem sm="4" Class="d-flex flex-column align-end">
                                 <MudText Typo="Typo.body1" Class="no-pointers no-select">
-                                    Created @(_latestVersion.GetCreatedDateFormatted())</MudText>
+                                    Created @(latestVersion.GetCreatedDateFormatted())</MudText>
                                 <MudText Typo="Typo.body1" Class="no-pointers no-select">
-                                    Published @(_latestVersion.GetPublishedDateFormatted())</MudText>
+                                    Published @(latestVersion.GetPublishedDateFormatted())</MudText>
                             </MudItem>
                         </MudGrid>
                     </MudCardHeader>
                     <MudCardContent Class="">
-                        @((MarkupString)_latestVersion.Description)
+                        @((MarkupString)latestVersion.Description)
                     </MudCardContent>
                 </MudCard>
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
@@ -85,7 +78,7 @@
                 <MudItem sm="12">
                     <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Download"
                                Variant="Variant.Filled" Class="mb-4"
-                               Style="width: 100%">@($"Download Latest ({_latestVersion.Version})")</MudButton>
+                               Style="width: 100%">@($"Download Latest ({latestVersion.Version})")</MudButton>
                 </MudItem>
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start text-overflow">
@@ -122,10 +115,10 @@
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result
                         </MudText>
                         <MudText Typo="Typo.caption" Class="pb-2">
-                            @if (!string.IsNullOrEmpty(_latestVersion.VirusTotalLink))
+                            @if (!string.IsNullOrEmpty(latestVersion.VirusTotalLink))
                             {
                                 <MudLink Typo="Typo.caption"
-                                         Href="@_latestVersion.VirusTotalLink">@_latestVersion.VirusTotalLink</MudLink>
+                                         Href="@latestVersion.VirusTotalLink">@latestVersion.VirusTotalLink</MudLink>
                             }
                             else
                             {
@@ -140,17 +133,22 @@
 </MudItem>
 
 @code {
-    [Parameter] public bool IsSkeleton { get; set; }
-    [Parameter] public ForgeBase ForgeMod { get; set; }
+    [Parameter]
+    public bool IsSkeleton { get; set; }
+    [Parameter]
+    public ForgeBase ForgeMod { get; set; }
 
-    private ForgeModVersion _latestVersion
+    private ForgeModVersion latestVersion
     {
-        get { return ForgeMod.Versions.FirstOrDefault(); }
+        get
+        {
+            return ForgeMod.Versions.FirstOrDefault();
+        }
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        JS.InvokeVoidAsync("setTabContent");
+        JsRuntime.InvokeVoidAsync("setTabContent");
         return base.OnAfterRenderAsync(firstRender);
     }
 

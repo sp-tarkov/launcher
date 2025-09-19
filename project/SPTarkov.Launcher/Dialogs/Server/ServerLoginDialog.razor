@@ -7,7 +7,7 @@
         <MudContainer Class="py-4">
             <MudContainer Class="d-flex flex-column align-center gap-4">
                 <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
-                <MudText>@TaskText</MudText>
+                <MudText>@_taskText</MudText>
             </MudContainer>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
                 <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="UserCancelled">Cancel</MudButton>
@@ -17,11 +17,16 @@
 </MudDialog>
 
 @code {
-    private string TaskText = "";
-    [Parameter] public Server Server { get; set; }
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    private string _taskText = "";
+
+    [Parameter]
+    public Server Server { get; set; }
+
+    [CascadingParameter]
+    private IMudDialogInstance mudDialog { get; set; }
+
     private CancellationTokenSource token { get; set; }
-    private bool UserCancel { get; set; }
+    private bool userCancel { get; set; }
 
     protected override void OnInitialized()
     {
@@ -62,7 +67,7 @@
     {
         var result = false;
         token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        TaskText = taskText;
+        _taskText = taskText;
         StateHasChanged();
         await Task.Delay(20);
 
@@ -104,7 +109,7 @@
 
     private void AbortOrFail(string message = "Error connecting to server!")
     {
-        if (!UserCancel)
+        if (!userCancel)
         {
             Snackbar.Add(message, Severity.Error);
         }
@@ -113,21 +118,21 @@
         StateHelper.SetProfilesPages(false);
         StateHelper.SetProfilePages(false);
         token?.Cancel();
-        MudDialog.Cancel();
+        mudDialog.Cancel();
     }
 
     private void Submit()
     {
         StateHelper.SetProfilesPages(true);
-        MudDialog.Close(DialogResult.Ok(Server));
+        mudDialog.Close(DialogResult.Ok(Server));
         Snackbar.Add("Logged In. Visit Profiles Page!", Severity.Success);
     }
 
     private void UserCancelled()
     {
-        UserCancel = true;
+        userCancel = true;
         token?.Cancel();
-        MudDialog.Cancel();
+        mudDialog.Cancel();
     }
 
 }
