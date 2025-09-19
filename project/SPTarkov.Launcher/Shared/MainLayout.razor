@@ -1,15 +1,16 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
-@inject IJSRuntime _jsRuntime
-@inject NavigationHelper _navigationHelper
-@inject ConfigHelper _configHelper
+
+@inject IJSRuntime JsRuntime
+@inject ConfigHelper ConfigHelper
+@inject StateHelper StateHelper
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudPopoverProvider/>
 <MudSnackbarProvider/>
 <MudDialogProvider/>
 <MudFab id="scrollTopBtn" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Class="fixed z-90" Style="bottom: 10px; right: 10px; display: none;" @onclick="ScrollToTop" Size="Size.Small"/>
-@if (_navigationHelper.ShowBackground)
+@if (StateHelper.ShowBackground)
 {
     <MudContainer Class="no-select overlay-container unset absolute">
         <MudImage Src="./bg.png" Class="no-select fixed mud-height-full mud-width-full background-image-cover"/>
@@ -29,17 +30,17 @@
 @code {
     protected override void OnInitialized()
     {
-        _navigationHelper.OnStateChanged += StateHasChanged;
+        StateHelper.OnStateChanged += StateHasChanged;
         base.OnInitialized();
     }
 
     public void Dispose()
     {
-        _navigationHelper.OnStateChanged -= StateHasChanged;
+        StateHelper.OnStateChanged -= StateHasChanged;
     }
 
     private async Task ScrollToTop()
     {
-        await _jsRuntime.InvokeVoidAsync("scrollToTopSmooth");
+        await JsRuntime.InvokeVoidAsync("scrollToTopSmooth");
     }
 }

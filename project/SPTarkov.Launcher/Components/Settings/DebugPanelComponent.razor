@@ -1,5 +1,5 @@
-﻿@inject ConfigHelper _configHelper
-@inject NavigationHelper _navigationHelper
+﻿@inject ConfigHelper ConfigHelper
+@inject StateHelper StateHelper
 
 <MudItem sm="12">
     <MudPaper Class="pa-5 ml-1 gap-2 d-flex flex-column setting-on-hover-container mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="3">
@@ -15,8 +15,8 @@
 
     protected override void OnInitialized()
     {
-        debugUserSwitch = _configHelper.GetConfig().DebugSettings.DebugUser;
-        showLoggingPageSwitch = _configHelper.GetConfig().DebugSettings.ShowLoggingPage;
+        debugUserSwitch = ConfigHelper.GetConfig().DebugSettings.DebugUser;
+        showLoggingPageSwitch = ConfigHelper.GetConfig().DebugSettings.ShowLoggingPage;
 
         base.OnInitialized();
     }
@@ -24,15 +24,15 @@
     private async Task SetDebugUser()
     {
         debugUserSwitch = !debugUserSwitch;
-        _configHelper.SetDebugUser(debugUserSwitch);
+        ConfigHelper.SetDebugUser(debugUserSwitch);
 
         // clean up later
         if (!debugUserSwitch)
         {
             // set all debug options to false
             showLoggingPageSwitch = debugUserSwitch;
-            _navigationHelper.SetLoggingPages(debugUserSwitch);
-            _configHelper.SetDebugLoggingPage(debugUserSwitch);
+            StateHelper.SetLoggingPages(debugUserSwitch);
+            ConfigHelper.SetDebugLoggingPage(debugUserSwitch);
         }
     }
 
@@ -44,7 +44,7 @@
         }
 
         showLoggingPageSwitch = !showLoggingPageSwitch;
-        _navigationHelper.SetLoggingPages(showLoggingPageSwitch);
-        _configHelper.SetDebugLoggingPage(showLoggingPageSwitch);
+        StateHelper.SetLoggingPages(showLoggingPageSwitch);
+        ConfigHelper.SetDebugLoggingPage(showLoggingPageSwitch);
     }
 }

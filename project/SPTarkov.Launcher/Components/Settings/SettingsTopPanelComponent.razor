@@ -89,10 +89,10 @@
     {
         try
         {
-            var rootdir = new DirectoryInfo(Path.Join(_configHelper.GetConfig().GamePath, "user\\sptappdata"));
+            var rootdir = new DirectoryInfo(Path.Join(_configHelper.GetConfig().GamePath, "user", "sptappdata"));
             rootdir.Delete(true);
         }
-        catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             _logHelper.AddLog("Unable to clean temp files, UnauthorizedAccessException or IOException");
             _logHelper.AddLog(e.ToString());
@@ -176,7 +176,7 @@
 
     private async Task ClearApiKey()
     {
-        ForgeLogoutResponse? result = null;
+        ForgeLogoutResponse result = null;
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
@@ -207,5 +207,4 @@
             _httpHelper.ClearApiKey();
         }
     }
-
 }

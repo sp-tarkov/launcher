@@ -1,9 +1,7 @@
-﻿@inject ISnackbar _snackbar
-@inject IDialogService _dialogService
-@inject NavigationManager _navman
-@inject StateHelper _stateHelper
-@inject ConfigHelper _configHelper
-@inject NavigationHelper _navigationHelper
+﻿@inject IDialogService DialogService
+@inject NavigationManager NavigationManager
+@inject StateHelper StateHelper
+@inject ConfigHelper ConfigHelper
 
 <MudItem md="4">
     <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
@@ -66,17 +64,17 @@
 
     protected override void OnInitialized()
     {
-        IsConnectedServer = _stateHelper.SelectedServer?.ServerId == Server.ServerId;
+        IsConnectedServer = StateHelper.SelectedServer?.ServerId == Server.ServerId;
         base.OnInitialized();
     }
 
     private async Task RunEditTask()
     {
-        if (_stateHelper.SelectedServer?.ServerId == Server.ServerId)
+        if (StateHelper.SelectedServer?.ServerId == Server.ServerId)
         {
-            _stateHelper.LogoutAndDispose();
-            _navigationHelper.SetProfilesPages(false);
-            _navigationHelper.SetProfilePages(false);
+            StateHelper.LogoutAndDispose();
+            StateHelper.SetProfilesPages(false);
+            StateHelper.SetProfilePages(false);
             IsConnectedServer = false;
         }
 
@@ -87,7 +85,7 @@
             }
         };
 
-        var dialog = await _dialogService.ShowAsync<ServerEditDialog>("ServerEditDialog", param, _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ServerEditDialog>("ServerEditDialog", param, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
@@ -100,27 +98,27 @@
                 serverToChange.IpAddress = Server.IpAddress;
             }
 
-            _configHelper.SetServers(ServerList);
+            ConfigHelper.SetServers(ServerList);
             await ServerListChanged.InvokeAsync(ServerList);
         }
     }
 
     private async Task RunLoginTask()
     {
-        if (_stateHelper.SelectedServer != null)
+        if (StateHelper.SelectedServer != null)
         {
-            if (_stateHelper.SelectedServer.ServerId == Server.ServerId)
+            if (StateHelper.SelectedServer.ServerId == Server.ServerId)
             {
-                _stateHelper.LogoutAndDispose();
-                _navigationHelper.SetProfilesPages(false);
-                _navigationHelper.SetProfilePages(false);
+                StateHelper.LogoutAndDispose();
+                StateHelper.SetProfilesPages(false);
+                StateHelper.SetProfilePages(false);
                 IsConnectedServer = false;
                 return;
             }
 
-            _stateHelper.LogoutAndDispose();
-            _navigationHelper.SetProfilesPages(false);
-            _navigationHelper.SetProfilePages(false);
+            StateHelper.LogoutAndDispose();
+            StateHelper.SetProfilesPages(false);
+            StateHelper.SetProfilePages(false);
             IsConnectedServer = false;
         }
 
@@ -131,30 +129,30 @@
             }
         };
 
-        var dialog = await _dialogService.ShowAsync<ServerLoginDialog>("ServerLoginDialog", param, _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ServerLoginDialog>("ServerLoginDialog", param, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            _stateHelper.SetSelectedServer(Server);
-            if (_stateHelper.SelectedServer != null)
+            StateHelper.SetSelectedServer(Server);
+            if (StateHelper.SelectedServer != null)
             {
-                IsConnectedServer = _stateHelper.SelectedServer.ServerId == Server.ServerId;
+                IsConnectedServer = StateHelper.SelectedServer.ServerId == Server.ServerId;
             }
 
-            _navman.NavigateTo("/ProfilesPage");
+            NavigationManager.NavigateTo("/ProfilesPage");
         }
     }
 
     private async Task RunDeleteTask()
     {
-        if (_stateHelper.SelectedServer != null)
+        if (StateHelper.SelectedServer != null)
         {
-            _stateHelper.LogoutAndDispose();
+            StateHelper.LogoutAndDispose();
             IsConnectedServer = false;
         }
 
-        var dialog = await _dialogService.ShowAsync<ServerRemoveDialog>("ServerRemoveDialog", _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ServerRemoveDialog>("ServerRemoveDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
@@ -162,7 +160,7 @@
             ServerList.Remove(Server);
             await ServerListChanged.InvokeAsync(ServerList);
 
-            _configHelper.SetServers(ServerList);
+            ConfigHelper.SetServers(ServerList);
         }
     }
 

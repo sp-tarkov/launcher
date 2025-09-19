@@ -1,9 +1,8 @@
-﻿@inject IDialogService _dialogService
-@inject ConfigHelper _configHelper
-@inject StateHelper _stateHelper
-@inject NavigationHelper _navigationHelper
-@inject NavigationManager _navman
-@inject LogHelper _logHelper
+﻿@inject IDialogService DialogService
+@inject ConfigHelper ConfigHelper
+@inject StateHelper StateHelper
+@inject NavigationManager NavigationManager
+@inject LogHelper LogHelper
 
 <MudItem sm="12" md="4">
     <MudPaper Elevation="2"
@@ -75,7 +74,7 @@
     {
         base.OnInitialized();
 
-        loggedIn = _stateHelper.SelectedProfile != null && _stateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID;
+        loggedIn = StateHelper.SelectedProfile != null && StateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID;
         if (MiniProfile.Side.ToLower() == "unknown")
         {
             sideIsUnknown = true;
@@ -84,12 +83,12 @@
 
     private async Task RunLoginTask()
     {
-        if (_stateHelper.SelectedProfile != null)
+        if (StateHelper.SelectedProfile != null)
         {
-            if (_stateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID)
+            if (StateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID)
             {
-                _stateHelper.SelectedProfile = null;
-                _navigationHelper.SetProfilePages(false);
+                StateHelper.SelectedProfile = null;
+                StateHelper.SetProfilePages(false);
                 loggedIn = false;
                 return;
             }
@@ -102,16 +101,16 @@
             }
         };
 
-        var dialog = await _dialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", dialogParams, _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", dialogParams, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            _stateHelper.SetSelectedProfile(MiniProfile);
-            loggedIn = _stateHelper.SelectedProfile != null;
+            StateHelper.SetSelectedProfile(MiniProfile);
+            loggedIn = StateHelper.SelectedProfile != null;
 
-            _logHelper.LogInfo("Navigating to /Profile");
-            _navman.NavigateTo("/ProfilePage");
+            LogHelper.LogInfo("Navigating to /Profile");
+            NavigationManager.NavigateTo("/ProfilePage");
         }
     }
 
@@ -124,21 +123,21 @@
             }
         };
 
-        var dialog = await _dialogService.ShowAsync<ProfileRemoveDialog>("ProfileRemoveDialog", dialogParams, _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ProfileRemoveDialog>("ProfileRemoveDialog", dialogParams, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            ProfileList = _stateHelper.ProfileList;
+            ProfileList = StateHelper.ProfileList;
             await ProfileListChanged.InvokeAsync(ProfileList);
         }
     }
 
     private async Task RunEditTask()
     {
-        _stateHelper.SelectedProfile = null;
+        StateHelper.SelectedProfile = null;
         loggedIn = false;
-        _navigationHelper.SetProfilePages(false);
+        StateHelper.SetProfilePages(false);
 
         var dialogParams = new DialogParameters
         {
@@ -147,12 +146,12 @@
             }
         };
 
-        var dialog = await _dialogService.ShowAsync<ProfileEditDialog>("ProfileEditDialog", dialogParams, _configHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ProfileEditDialog>("ProfileEditDialog", dialogParams, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            ProfileList = _stateHelper.ProfileList;
+            ProfileList = StateHelper.ProfileList;
             await ProfileListChanged.InvokeAsync(ProfileList);
         }
     }

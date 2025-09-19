@@ -1,7 +1,6 @@
-﻿@inject ISnackbar _snackbar
-@inject StateHelper _stateHelper
-@inject NavigationHelper _navigationHelper
-@inject HttpHelper _httpHelper
+﻿@inject ISnackbar Snackbar
+@inject StateHelper StateHelper
+@inject HttpHelper HttpHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -34,7 +33,7 @@
     {
         try
         {
-            _stateHelper.SetSelectedServer(Server);
+            StateHelper.SetSelectedServer(Server);
             await CallServer(RequestTask.Ping, "Checking connection to server");
             await CallServer(RequestTask.Profiles, "Getting profiles from server", "Error getting profiles from server!");
             await CallServer(RequestTask.Types, "Getting profile creation data from server", "Error getting profile creation data!");
@@ -69,28 +68,28 @@
 
         if (option == RequestTask.Ping)
         {
-            var returnResult = await _httpHelper.GameServerGet<PingResponse>(RequestUrl.Ping, token.Token);
+            var returnResult = await HttpHelper.GameServerGet<PingResponse>(RequestUrl.Ping, token.Token);
             result = returnResult.Response == "Pong!";
         }
 
         if (option == RequestTask.Profiles)
         {
-            var returnResult = await _httpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, token.Token);
-            _stateHelper.ProfileList = returnResult.Response;
+            var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, token.Token);
+            StateHelper.ProfileList = returnResult.Response;
             result = true;
         }
 
         if (option == RequestTask.Types)
         {
-            var returnResult = await _httpHelper.GameServerGet<TypesResponse>(RequestUrl.Types, token.Token);
-            _stateHelper.ProfileTypes = returnResult.Response;
+            var returnResult = await HttpHelper.GameServerGet<TypesResponse>(RequestUrl.Types, token.Token);
+            StateHelper.ProfileTypes = returnResult.Response;
             result = true;
         }
 
         if (option == RequestTask.Mods)
         {
-            var returnResult = await _httpHelper.GameServerGet<ModsResponse>(RequestUrl.Mods, token.Token);
-            _stateHelper.ModList = returnResult.Response;
+            var returnResult = await HttpHelper.GameServerGet<ModsResponse>(RequestUrl.Mods, token.Token);
+            StateHelper.ModList = returnResult.Response;
             result = true;
         }
 
@@ -107,21 +106,21 @@
     {
         if (!UserCancel)
         {
-            _snackbar.Add(message, Severity.Error);
+            Snackbar.Add(message, Severity.Error);
         }
 
-        _stateHelper.LogoutAndDispose();
-        _navigationHelper.SetProfilesPages(false);
-        _navigationHelper.SetProfilePages(false);
+        StateHelper.LogoutAndDispose();
+        StateHelper.SetProfilesPages(false);
+        StateHelper.SetProfilePages(false);
         token?.Cancel();
         MudDialog.Cancel();
     }
 
     private void Submit()
     {
-        _navigationHelper.SetProfilesPages(true);
+        StateHelper.SetProfilesPages(true);
         MudDialog.Close(DialogResult.Ok(Server));
-        _snackbar.Add("Logged In. Visit Profiles Page!", Severity.Success);
+        Snackbar.Add("Logged In. Visit Profiles Page!", Severity.Success);
     }
 
     private void UserCancelled()

@@ -33,7 +33,6 @@ public class Launcher
             .AddSingleton<HttpHelper>()
             .AddSingleton<LogHelper>()
             .AddSingleton<ModHelper>()
-            .AddSingleton<NavigationHelper>()
             .AddSingleton<PatchHelper>()
             .AddSingleton<StateHelper>()
             .AddMudServices(config =>
@@ -45,7 +44,6 @@ public class Launcher
                 config.SnackbarConfiguration.HideTransitionDuration = _hideTransitionDuration;
             });
 
-        // register root component and selector
         appBuilder.RootComponents.Add<App>("app");
 
         App = appBuilder.Build();

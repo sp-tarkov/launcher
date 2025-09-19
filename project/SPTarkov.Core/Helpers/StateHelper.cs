@@ -5,7 +5,6 @@ namespace SPTarkov.Core.Helpers;
 public class StateHelper
 {
     private readonly LogHelper _logHelper;
-    private readonly NavigationHelper _navigationHelper;
     public int? CurrentPagination;
     public Dictionary<string, SPTMod> ModList = [];
     public List<MiniProfile> ProfileList = [];
@@ -15,18 +14,27 @@ public class StateHelper
 
     public StateHelper(
         LogHelper logHelper,
-        NavigationHelper navigationHelper
+        ConfigHelper configHelper
     )
     {
         _logHelper = logHelper;
-        _navigationHelper = navigationHelper;
+
+        if (configHelper.GetConfig().DebugSettings.DebugUser && configHelper.GetConfig().DebugSettings.ShowLoggingPage)
+        {
+            SetLoggingPages(true);
+        }
+
+        if (configHelper.GetConfig().UseBackground)
+        {
+            SetBackground(true);
+        }
     }
 
     public void LogoutAndDispose()
     {
         _logHelper.LogInfo($"Logged out of server {SelectedServer?.IpAddress ?? "Unknown"} and disposed");
-        _navigationHelper.SetProfilesPages(false);
-        _navigationHelper.SetProfilePages(false);
+        SetProfilesPages(false);
+        SetProfilePages(false);
         ProfileTypes = new Dictionary<string, string>();
         ProfileList = [];
         ModList = [];
@@ -42,5 +50,40 @@ public class StateHelper
     public void SetSelectedProfile(MiniProfile miniProfile)
     {
         SelectedProfile = miniProfile;
+    }
+
+    public event Action? OnStateChanged;
+    private void NotifyStateChanged()
+    {
+        OnStateChanged?.Invoke();
+    }
+
+    public bool ShowProfilesPage { get; set; }
+    public bool ShowProfilePage { get; set; }
+    public bool ShowLoggingPage { get; set; }
+    public bool ShowBackground { get; set; }
+
+    public void SetProfilesPages(bool state)
+    {
+        ShowProfilesPage = state;
+        NotifyStateChanged();
+    }
+
+    public void SetProfilePages(bool state)
+    {
+        ShowProfilePage = state;
+        NotifyStateChanged();
+    }
+
+    public void SetLoggingPages(bool state)
+    {
+        ShowLoggingPage = state;
+        NotifyStateChanged();
+    }
+
+    public void SetBackground(bool state)
+    {
+        ShowBackground = state;
+        NotifyStateChanged();
     }
 }
