@@ -38,6 +38,7 @@ public class Launcher
             .AddSingleton<ModHelper>()
             .AddSingleton<PatchHelper>()
             .AddSingleton<StateHelper>()
+            .AddSingleton<LocaleHelper>()
             .AddLogging(builder =>
             {
                 builder.ClearProviders();

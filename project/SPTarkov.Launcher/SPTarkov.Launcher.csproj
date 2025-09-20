@@ -22,4 +22,19 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.8"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Chinese (Simplified).json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Chinese (Traditional).json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\English.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\French.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\German.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Italian.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Japanese.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Korean.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Polish.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Russian.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Spanish.json" />
+    <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Turkish.json" />
+  </ItemGroup>
+
 </Project>

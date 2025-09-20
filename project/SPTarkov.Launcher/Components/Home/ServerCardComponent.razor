@@ -2,50 +2,51 @@
 @inject NavigationManager NavigationManager
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
+@inject LocaleHelper LocaleHelper
 
 <MudItem md="4">
     <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
         <MudCardHeader>
             <CardHeaderContent>
-                <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Name:</MudText>
+                <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("server_card_name"))</MudText>
                 <MudText Typo="Typo.body1">@Server.Name</MudText>
             </CardHeaderContent>
             <CardHeaderActions>
                 @if (Server.Locked)
                 {
-                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected from edits">
+                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("server_card_protect"))">
                         <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" Disabled="true"/>
                     </MudTooltip>
                 }
                 else
                 {
-                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="Edit server">
+                    <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("server_card_edit"))">
                         <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" @onclick="RunEditTask"/>
                     </MudTooltip>
                 }
             </CardHeaderActions>
         </MudCardHeader>
         <MudCardContent Class="py-2">
-            <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">Address:</MudText>
+            <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("server_card_address"))</MudText>
             <MudText Typo="Typo.body1">@Server.IpAddress</MudText>
         </MudCardContent>
         <MudCardActions Class="pa-4 d-flex mt-2">
-            <MudTooltip Arrow="true" Placement="Placement.Right" Text="@(isConnectedServer ? "Connected" : "Disconnected")">
+            <MudTooltip Arrow="true" Placement="Placement.Right" Text="@(isConnectedServer ? LocaleHelper.Get("server_card_connected") : LocaleHelper.Get("server_card_disconnected"))">
                 <MudIcon Class="mb-n2" Icon="@Icons.Material.Filled.Circle" Color="@(isConnectedServer ? Color.Success : Color.Error)"/>
             </MudTooltip>
             <MudSpacer/>
-            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(!isConnectedServer ? "Login to server" : "Logout of server")">
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(!isConnectedServer ? LocaleHelper.Get("server_card_login") : LocaleHelper.Get("server_card_logout"))">
                 <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!isConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
             </MudTooltip>
             @if (Server.Locked)
             {
-                <MudTooltip Arrow="true" Placement="Placement.Left" Text="Protected from edits">
+                <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("server_card_protect"))">
                     <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.Lock" Size="Size.Small"/>
                 </MudTooltip>
             }
             else
             {
-                <MudTooltip Arrow="true" Placement="Placement.Left" Text="Delete server">
+                <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("server_card_delete"))">
                     <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" @onclick="RunDeleteTask"/>
                 </MudTooltip>
             }

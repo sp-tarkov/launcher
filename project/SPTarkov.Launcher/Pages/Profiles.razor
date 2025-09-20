@@ -4,12 +4,13 @@
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
 @inject NavigationManager NavigationManager
+@inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-8 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 d-flex justify-start gap-2 pb-4">
-        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" OnClick="ReturnToServers" Variant="Variant.Filled" IconColor="Color.Error">Disconnect from server</MudButton>
-        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.PersonAdd" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success">Create New Profile</MudButton>
-        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" Size="Size.Medium" OnClick="RunLoginTaskWithDetails" Variant="Variant.Filled" IconColor="Color.Success">Login with details</MudButton>
+        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" OnClick="ReturnToServers" Variant="Variant.Filled" IconColor="Color.Error">@(LocaleHelper.Get("profiles_disconnect"))</MudButton>
+        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.PersonAdd" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success">@(LocaleHelper.Get("profiles_create"))</MudButton>
+        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" Size="Size.Medium" OnClick="RunLoginTaskWithDetails" Variant="Variant.Filled" IconColor="Color.Success">@(LocaleHelper.Get("profiles_login"))</MudButton>
     </MudContainer>
     <MudGrid>
         @foreach (var profile in ProfilesList)
@@ -22,12 +23,12 @@
             // TODO: server might hide profiles, but an edge case might be a fresh server
             case 0 when isConnected:
                 <MudItem sm="12">
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Server has no profiles yet or does not show them. Please create a new profile or login with details.</MudAlert>
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">@(LocaleHelper.Get("profiles_empty_warning"))</MudAlert>
                 </MudItem>
                 break;
             case 0 when !isConnected:
                 <MudItem sm="12">
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Please connect to a Server first!</MudAlert>
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">@(LocaleHelper.Get("profiles_connect_warning"))</MudAlert>
                 </MudItem>
                 break;
         }
@@ -57,7 +58,6 @@
         }
     }
 
-    // TODO: currently does not work as intended
     private async Task RunLoginTaskWithDetails()
     {
         var dialogParams = new DialogParameters

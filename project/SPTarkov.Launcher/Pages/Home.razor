@@ -2,10 +2,11 @@
 
 @inject IDialogService DialogService
 @inject ConfigHelper ConfigHelper
+@inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-8 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 d-flex justify-space-between pb-4">
-        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.AddToQueue" Size="Size.Large" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success">Add New Server</MudButton>
+        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.AddToQueue" Size="Size.Large" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success">@(LocaleHelper.Get("home_add_server"))</MudButton>
     </MudContainer>
     <MudGrid>
         @if (serverList.Any())
@@ -18,7 +19,7 @@
         else
         {
             <MudItem sm="12">
-                <MudAlert Severity="Severity.Info" Variant="Variant.Filled">Please Add a server using the "Add New Server" button above.</MudAlert>
+                <MudAlert Severity="Severity.Info" Variant="Variant.Filled">@(LocaleHelper.Get("home_add_server_cta"))</MudAlert>
             </MudItem>
         }
     </MudGrid>
