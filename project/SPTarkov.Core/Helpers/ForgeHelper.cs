@@ -1,4 +1,6 @@
-﻿using SPTarkov.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using SPTarkov.Core.Logging;
+using SPTarkov.Core.Models;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -6,16 +8,16 @@ public class ForgeHelper
 {
     private ConfigHelper _configHelper;
     private HttpHelper _httpHelper;
-    private LogHelper _logHelper;
+    private ILogger<ForgeHelper> _logger;
 
     public ForgeHelper
     (
-        LogHelper logHelper,
+        ILogger<ForgeHelper> logger,
         ConfigHelper configHelper,
         HttpHelper httpHelper
     )
     {
-        _logHelper = logHelper;
+        _logger = logger;
         _configHelper = configHelper;
         _httpHelper = httpHelper;
     }

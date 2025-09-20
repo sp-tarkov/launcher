@@ -1,4 +1,4 @@
-﻿@inject LogHelper LogHelper
+﻿@inject ILogger<SettingsTopPanelComponent> Logger
 @inject ConfigHelper ConfigHelper
 @inject HttpHelper HttpHelper
 @inject ISnackbar Snackbar
@@ -15,13 +15,13 @@
 
     private async Task LoadLiveSettings()
     {
-        LogHelper.AddLog("Loading Live Settings");
+        Logger.LogInformation("Loading Live Settings");
         var eftSettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape From Tarkov", "Settings");
         var sptSettingsFolder = Path.Combine(ConfigHelper.GetConfig().GamePath, "user", "sptsettings");
 
         if (!Directory.Exists(eftSettingsFolder))
         {
-            LogHelper.AddLog($"Settings can not be loaded from live, path given: {eftSettingsFolder}");
+            Logger.LogWarning($"Settings can not be loaded from live, path given: {eftSettingsFolder}");
             Snackbar.Add("Settings can not be loaded from live, path given", Severity.Error);
             return;
         }
@@ -42,19 +42,18 @@
         }
         catch (Exception e)
         {
-            LogHelper.AddLog("Unable to load live settings");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogWarning($"Unable to load live settings {e}");
             Snackbar.Add("Loading live settings failed", Severity.Error);
             return;
         }
 
-        LogHelper.AddLog("Loaded live settings to SPTsettings folder");
+        Logger.LogInformation("Loaded live settings to SPTsettings folder");
         Snackbar.Add("Loaded live settings", Severity.Success);
     }
 
     private async Task ClearGameSettings()
     {
-        LogHelper.AddLog("clearing game settings");
+        Logger.LogInformation("clearing game settings");
         var sptSettings = new DirectoryInfo(Path.Combine(ConfigHelper.GetConfig().GamePath, "user", "sptsettings"));
 
         try
@@ -65,20 +64,18 @@
         }
         catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
         {
-            LogHelper.AddLog("Unable to clean game settings, UnauthorizedAccessException or IOException");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogError($"Unable to clean game settings, UnauthorizedAccessException or IOException: {e}");
             Snackbar.Add("Clearing game settings failed due to Unauthorized Access", Severity.Error);
             return;
         }
         catch (Exception e)
         {
-            LogHelper.AddLog(e.ToString());
-            LogHelper.AddLog("Clearing game settings failed");
+            Logger.LogError($"Clearing game settings failed: {e}");
             Snackbar.Add("Clearing game settings failed", Severity.Error);
             return;
         }
 
-        LogHelper.AddLog("Cleared game settings");
+        Logger.LogInformation("Cleared game settings");
         Snackbar.Add("Cleared game settings", Severity.Success);
     }
 
@@ -91,20 +88,18 @@
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            LogHelper.AddLog("Unable to clean temp files, UnauthorizedAccessException or IOException");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogError($"Unable to clean temp files, UnauthorizedAccessException or IOException: {e}");
             Snackbar.Add("Unable to clean temp files due to Unauthorized Access", Severity.Warning);
             return;
         }
         catch (Exception e)
         {
-            LogHelper.AddLog("Unable to clean temp files");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogError($"Unable to clean temp files: {e}");
             Snackbar.Add("Unable to clean temp files", Severity.Error);
             return;
         }
 
-        LogHelper.AddLog("Cleaned temp files");
+        Logger.LogInformation("Cleaned temp files");
         Snackbar.Add("Cleaned temp files", Severity.Success);
     }
 
@@ -153,13 +148,12 @@
         }
         catch (Exception e)
         {
-            LogHelper.AddLog("Unable to set clipboard with logs");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogError($"Unable to set clipboard with logs: {e}");
             Snackbar.Add("Unable to set clipboard with logs", Severity.Error);
             return;
         }
 
-        LogHelper.AddLog($"Copied {filesToCopy.Count} log/s to clipboard");
+        Logger.LogInformation($"Copied {filesToCopy.Count} log/s to clipboard");
         Snackbar.Add($"Copied {filesToCopy.Count} log{(filesToCopy.Count > 1 ? "s" : "")} to clipboard", Severity.Success);
     }
 
@@ -173,7 +167,7 @@
 
     private async Task ClearApiKey()
     {
-        ForgeLogoutResponse result = null;
+        ForgeLogoutResponse result;
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
@@ -181,26 +175,25 @@
         }
         catch (Exception e)
         {
-            LogHelper.AddLog("Exception thrown from SettingsTopPanelComponent.ClearApiKey");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogError($"Exception thrown from SettingsTopPanelComponent.ClearApiKey: {e}");
             return;
         }
 
         if (result is null)
         {
-            LogHelper.LogInfo("Forge ForgeLogout result is null");
+            Logger.LogError("Forge ForgeLogout result is null");
             return;
         }
 
         if (result.Code == ForgeResponseMessage.Unauthenticated)
         {
-            LogHelper.AddLog("Forge ForgeLogout failed to authenticate");
+            Logger.LogWarning("Forge ForgeLogout failed to authenticate");
             return;
         }
 
         if (result.Success)
         {
-            LogHelper.AddLog("Forge ForgeLogout Successful");
+            Logger.LogInformation("Forge ForgeLogout Successful");
             HttpHelper.ClearApiKey();
         }
     }

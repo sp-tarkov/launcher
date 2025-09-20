@@ -1,27 +1,7 @@
-﻿@implements IDisposable
-
-@inject StateHelper StateHelper
-
-<MudNavMenu Class="mud-typography-nowrap">
+﻿<MudNavMenu Class="mud-typography-nowrap">
     <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Home" Inline="false">
-        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.ConnectedTv" Match="NavLinkMatch.All" Href="/ServerPageWrapper"/>
+        <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.ConnectedTv" Match="NavLinkMatch.All" Href="/ServerPageWrapper" />
     </MudTooltip>
-
-
-
-
-    @* @if (StateHelper.ShowProfilesPage) *@
-    @* { *@
-    @*     <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Profiles" Inline="false"> *@
-    @*         <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.PeopleAlt" Match="NavLinkMatch.All" Href="/Profiles"/> *@
-    @*     </MudTooltip> *@
-    @* } *@
-    @* @if (StateHelper.ShowProfilePage) *@
-    @* { *@
-    @*     <MudTooltip Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="Profile" Inline="false"> *@
-    @*         <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Person" Match="NavLinkMatch.All" Href="/Profile"/> *@
-    @*     </MudTooltip> *@
-    @* } *@
 </MudNavMenu>
 <MudSpacer/>
 <MudNavMenu Class="mud-typography-nowrap">
@@ -38,17 +18,3 @@
         <MudNavLink IconColor="Color.Default" Icon="@Icons.Material.Filled.Info" Match="NavLinkMatch.All" Href="/Info"/>
     </MudTooltip>
 </MudNavMenu>
-
-@code
-{
-    protected override void OnInitialized()
-    {
-        StateHelper.OnStateChanged += StateHasChanged;
-        base.OnInitialized();
-    }
-
-    public void Dispose()
-    {
-        StateHelper.OnStateChanged -= StateHasChanged;
-    }
-}

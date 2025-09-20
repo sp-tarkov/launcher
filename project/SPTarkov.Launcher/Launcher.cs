@@ -2,10 +2,13 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using Photino.Blazor;
+using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
+using SPTarkov.Core.Logging;
 
 namespace SPTarkov.Launcher;
 
@@ -19,6 +22,7 @@ public class Launcher
     private static int _showTransitionDuration = 100;
     private static int _hideTransitionDuration = 100;
     private static string _openExternalString = "open-external:";
+    private static ILogger<Launcher> _logger;
 
     [STAThread]
     private static void Main(string[] args)
@@ -31,10 +35,15 @@ public class Launcher
             .AddSingleton<ForgeHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
-            .AddSingleton<LogHelper>()
             .AddSingleton<ModHelper>()
             .AddSingleton<PatchHelper>()
             .AddSingleton<StateHelper>()
+            .AddLogging(builder =>
+            {
+                builder.ClearProviders();
+                builder.AddConsole();
+                builder.AddFileLogger();
+            })
             .AddMudServices(config =>
             {
                 config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopCenter;
@@ -48,6 +57,7 @@ public class Launcher
 
         App = appBuilder.Build();
 
+        _logger = App.Services.GetService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetService<ConfigHelper>();
         var http = App.Services.GetService<HttpHelper>();
         var modLoader = App.Services.GetService<ModHelper>();
@@ -58,10 +68,7 @@ public class Launcher
 
         CustomizeComponent();
 
-        AppDomain.CurrentDomain.UnhandledException += (_, error) =>
-        {
-            App.MainWindow.ShowMessage("Fatal exception", error.ExceptionObject.ToString());
-        };
+        AppDomain.CurrentDomain.UnhandledException += (_, error) => { App.MainWindow.ShowMessage("Fatal exception", error.ExceptionObject.ToString()); };
 
         try
         {
@@ -123,7 +130,7 @@ public class Launcher
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to open URL: " + ex.Message);
+                    _logger.LogError("Failed to open URL: {ex}", ex);
                 }
             }
         });
@@ -146,22 +153,22 @@ public class Launcher
 
     private static void ValidateRuntimeEnvironment(Exception e)
     {
-        Console.WriteLine(e);
+        _logger.LogCritical("Exception occured: {Exception}", e);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // TODO: check if the exception is related to missing webview2 deps.
-            Console.WriteLine("[SPTarkov.Launcher] Please check the following is installed:");
-            Console.WriteLine("[SPTarkov.Launcher] WebView2 - https://developer.microsoft.com/en-us/microsoft-edge/webview2");
-            Console.WriteLine("[SPTarkov.Launcher] DotNet 9.0 runtime - https://dotnet.microsoft.com/en-us/download/dotnet/9.0");
+            _logger.LogCritical("Please check the following is installed:");
+            _logger.LogCritical("WebView2 - https://developer.microsoft.com/en-us/microsoft-edge/webview2");
+            _logger.LogCritical("DotNet 9.0 runtime - https://dotnet.microsoft.com/en-us/download/dotnet/9.0");
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             // TODO: check if the exception is related to missing webkit2gtk4.1 deps.
-            Console.WriteLine("[SPTarkov.Launcher] Please check the following is installed:");
-            Console.WriteLine("[SPTarkov.Launcher] Libwebkit2gtk-4.1");
-            Console.WriteLine("[SPTarkov.Launcher] DotNet 9.0 runtime");
+            _logger.LogCritical("Please check the following is installed:");
+            _logger.LogCritical("Libwebkit2gtk-4.1");
+            _logger.LogCritical("DotNet 9.0 runtime");
         }
     }
 }

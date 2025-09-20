@@ -1,6 +1,5 @@
 ﻿@inject ISnackbar Snackbar
-@inject StateHelper StateHelper
-@inject LogHelper LogHelper
+@inject ILogger<ProfileLoginDialog> Logger
 @inject HttpHelper HttpHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
@@ -69,7 +68,7 @@
 
         if (!MiniProfile.HasPassword)
         {
-            LogHelper.LogInfo($"Profile: {MiniProfile.Username} does not have a password, logging in without dialog");
+            Logger.LogInformation($"Profile: {MiniProfile.Username} does not have a password, logging in without dialog");
             RunLoginTask();
         }
     }

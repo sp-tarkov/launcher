@@ -1,4 +1,7 @@
-﻿namespace SPTarkov.Core.Helpers;
+﻿using Microsoft.Extensions.Logging;
+using SPTarkov.Core.Logging;
+
+namespace SPTarkov.Core.Helpers;
 
 public class ModHelper
 {
@@ -9,15 +12,15 @@ public class ModHelper
     private readonly List<string> _ServerModRootDirectories = [];
     private List<string> _clientModRootDirectories = [];
     private ConfigHelper _configHelper;
-    private LogHelper _logHelper;
+    private ILogger<ModHelper> _logger;
 
     public ModHelper
     (
-        LogHelper logHelper,
+        ILogger<ModHelper> logger,
         ConfigHelper configHelper
     )
     {
-        _logHelper = logHelper;
+        _logger = logger;
         _configHelper = configHelper;
     }
 

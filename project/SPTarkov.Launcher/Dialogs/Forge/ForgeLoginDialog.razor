@@ -1,6 +1,6 @@
 ﻿@inject ISnackbar Snackbar
 @inject HttpHelper HttpHelper
-@inject LogHelper LogHelper
+@inject ILogger<ForgeLoginDialog> Logger
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -86,13 +86,13 @@
 
             if (result is null)
             {
-                LogHelper.AddLog("Forge ForgeLogin result is null");
+                Logger.LogError("Forge ForgeLogin result is null");
                 return false;
             }
 
             if (result.Success)
             {
-                LogHelper.AddLog("Forge ForgeLogin Authenticated");
+                Logger.LogInformation("Forge ForgeLogin Authenticated");
                 HttpHelper.SetApiKey(result.Data.Token);
                 token?.Dispose();
                 return true;
@@ -101,19 +101,19 @@
             switch (result.Code)
             {
                 case ForgeResponseMessage.Unauthenticated:
-                    LogHelper.AddLog("Forge ForgeLogin failed to authenticate");
+                    Logger.LogWarning("Forge ForgeLogin failed to authenticate");
                     AbortOrFail();
                     return false;
                 case ForgeResponseMessage.InvalidCredentials:
-                    LogHelper.AddLog("Forge ForgeLogin failed, Invalid Credentials");
+                    Logger.LogWarning("Forge ForgeLogin failed, Invalid Credentials");
                     AbortOrFail();
                     return false;
                 case ForgeResponseMessage.InvalidEmail:
-                    LogHelper.AddLog("Forge ForgeLogin failed due to invalid email");
+                    Logger.LogWarning("Forge ForgeLogin failed due to invalid email");
                     AbortOrFail();
                     return false;
                 default:
-                    LogHelper.AddLog($"Forge ForgeLogin ?? {result.Message}");
+                    Logger.LogWarning($"Forge ForgeLogin ?? {result.Message}");
                     AbortOrFail();
                     return false;
             }

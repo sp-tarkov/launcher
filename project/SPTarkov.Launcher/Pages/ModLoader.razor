@@ -5,6 +5,7 @@
 @inject ConfigHelper ConfigHelper
 @inject IDialogService DialogService
 @inject NavigationManager NavigationManager;
+@inject ILogger<ModLoader> Logger;
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
     @if (!_modLoaderAvailable)
@@ -95,18 +96,18 @@
             return;
         }
 
-        Console.WriteLine("Check user wants to navigate with unsaved data");
+        Logger.LogInformation("Check user wants to navigate with unsaved data");
 
         var dialog = await DialogService.ShowAsync<UnsavedDataDialog>("UnsavedDataDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            Console.WriteLine($"User did not want to save data, navigating to: {context.TargetLocation}");
+            Logger.LogInformation($"User did not want to save data, navigating to: {context.TargetLocation}");
             return;
         }
 
-        Console.WriteLine("User cancelled navigation");
+        Logger.LogInformation("User cancelled navigation");
         context.PreventNavigation();
     }
 

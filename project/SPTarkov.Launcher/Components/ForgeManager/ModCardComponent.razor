@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
+@inject ILogger<ModCardComponent> Logger
 
 <MudItem sm="6">
     @if (IsSkeleton)
@@ -87,7 +88,7 @@
     private void NavigateToSingleMod(int? modId)
     {
         // navigate to mod page
-        Console.WriteLine($"Navigating to mod page: {modId}");
+        Logger.LogInformation($"Navigating to mod page: {modId}");
         NavigationManager.NavigateTo($"/ForgeMod/{modId}");
     }
 

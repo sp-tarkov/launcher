@@ -1,7 +1,7 @@
 ﻿@page "/ForgeMod/{ModId}"
 
 @inject HttpHelper HttpHelper
-@inject LogHelper LogHelper
+@inject ILogger<ForgeMod> Logger
 
 <MudContainer Class="px-8 mt-2 mb-6 pa-0" MaxWidth="MaxWidth.Large">
     <MudGrid>
@@ -40,8 +40,7 @@
         }
         catch (Exception e)
         {
-            LogHelper.AddLog("Exception thrown from ForgeHelper.SearchForMod");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogError($"Exception thrown from ForgeHelper.SearchForMod {e}");
             return;
         }
 

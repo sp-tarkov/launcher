@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
 namespace SPTarkov.Core.Helpers;
@@ -9,18 +10,18 @@ public class GameHelper
     private const string registryInstall = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
     private const string registrySettings = @"Software\Battlestate Games\EscapeFromTarkov";
     private readonly ConfigHelper _configHelper;
-    private readonly LogHelper _logHelper;
+    private readonly ILogger<GameHelper> _logger;
 
     private readonly StateHelper _stateHelper;
 
     public GameHelper(
         StateHelper stateHelper,
-        LogHelper logHelper,
+        ILogger<GameHelper> logger,
         ConfigHelper configHelper
     )
     {
         _stateHelper = stateHelper;
-        _logHelper = logHelper;
+        _logger = logger;
         _configHelper = configHelper;
     }
 
@@ -52,8 +53,7 @@ public class GameHelper
 
         if (!File.Exists(clientExecutable))
         {
-            _logHelper.AddLog("[LaunchGame] Valid Game Path   :: FAILED");
-            _logHelper.AddLog($"Could not find {clientExecutable}");
+            _logger.LogError($"Could not find {clientExecutable}");
             return false;
         }
 
@@ -65,7 +65,7 @@ public class GameHelper
             $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile.ProfileID} -config=" +
             $"{{'BackendUrl':'https://{_stateHelper.SelectedServer.IpAddress}','Version':'live','MatchingVersion':'live'}}";
 
-        _logHelper.AddLog(args);
+        _logger.LogInformation($"args: {args}");
 
         var clientProcess = new ProcessStartInfo(clientExecutable)
         {
@@ -77,11 +77,11 @@ public class GameHelper
         try
         {
             Process.Start(clientProcess);
-            _logHelper.AddLog("[LaunchGame] Game process started");
+            _logger.LogInformation("Game process started");
         }
         catch (Exception ex)
         {
-            _logHelper.AddLog(ex.ToString());
+            _logger.LogError($"Starting game process failed: {ex}");
             return false;
         }
 
@@ -180,7 +180,7 @@ public class GameHelper
     }
 
     /// <summary>
-    ///     Clean the temp folder
+    /// Clean the temp folder
     /// </summary>
     /// <returns>returns true if the temp folder was cleaned succefully or doesn't exist. returns false if something went wrong.</returns>
     public bool CleanTempFiles()

@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using MudBlazor;
+using SPTarkov.Core.Logging;
 using SPTarkov.Core.Models;
 
 namespace SPTarkov.Core.Helpers;
@@ -12,7 +14,7 @@ public class ConfigHelper
     };
 
     private readonly Lock _lock = new();
-    private readonly LogHelper _logHelper;
+    private readonly ILogger<ConfigHelper> _logger;
 
     public readonly DialogOptions DialogOptions = new()
     {
@@ -30,10 +32,10 @@ public class ConfigHelper
     private LauncherSettings? _settings;
 
     public ConfigHelper(
-        LogHelper logHelper
+        ILogger<ConfigHelper> logger
     )
     {
-        _logHelper = logHelper;
+        _logger = logger;
         LoadSettingsFromFile();
     }
 
@@ -41,7 +43,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo("LoadSettingsFromFile.");
+            _logger.LogInformation("LoadSettingsFromFile.");
 
             if (!File.Exists(Path.Combine(LauncherAssetsPath, "LauncherSettings.json")))
             {
@@ -60,7 +62,7 @@ public class ConfigHelper
         }
     }
 
-    public void SaveConfig()
+    private void SaveConfig()
     {
         lock (_lock)
         {
@@ -72,7 +74,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetClientSize: {height}, {width}");
+            _logger.LogInformation("SetClientSize: {Height}-{Width}", height, width);
             _settings!.StartSize.Height = height;
             _settings!.StartSize.Width = width;
             SaveConfig();
@@ -83,7 +85,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetClientLocation: {x},{y}");
+            _logger.LogInformation("SetClientLocation: {x}-{y}", x, y);
             _settings!.StartLocation.X = x;
             _settings!.StartLocation.Y = y;
             SaveConfig();
@@ -94,7 +96,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetFirstRun: {firstRun}");
+            _logger.LogInformation("SetFirstRun: {FirstRun}", firstRun);
             _settings!.FirstRun = firstRun;
             SaveConfig();
         }
@@ -104,7 +106,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetServers: {servers.Count}");
+            _logger.LogInformation("SetServers: {ServersCount}", servers.Count);
             _settings!.Servers = servers;
             SaveConfig();
         }
@@ -114,7 +116,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetCloseToTray: {closeToTray}");
+            _logger.LogInformation("SetCloseToTray: {CloseToTray}", closeToTray);
             _settings!.CloseToTray = closeToTray;
             SaveConfig();
         }
@@ -124,7 +126,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetMinimizeOnLaunch: {minimizeOnLaunch}");
+            _logger.LogInformation("SetMinimizeOnLaunch: {MinimizeOnLaunch}", minimizeOnLaunch);
             _settings!.MinimizeOnLaunch = minimizeOnLaunch;
             SaveConfig();
         }
@@ -134,38 +136,8 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetAlwaysOnTop: {alwaysOnTop}");
+            _logger.LogInformation("SetAlwaysOnTop: {AlwaysOnTop}", alwaysOnTop);
             _settings!.AlwaysTop = alwaysOnTop;
-            SaveConfig();
-        }
-    }
-
-    public void SetAdvancedUser(bool advancedUser)
-    {
-        lock (_lock)
-        {
-            _logHelper.LogInfo($"SetAdvancedUser: {advancedUser}");
-            _settings!.AdvancedUser = advancedUser;
-            SaveConfig();
-        }
-    }
-
-    public void SetDebugUser(bool debugUser)
-    {
-        lock (_lock)
-        {
-            _logHelper.LogInfo($"SetDebugUser: {debugUser}");
-            _settings!.DebugSettings.DebugUser = debugUser;
-            SaveConfig();
-        }
-    }
-
-    public void SetDebugLoggingPage(bool access)
-    {
-        lock (_lock)
-        {
-            _logHelper.LogInfo($"SetDebugLoggingPage: {access}");
-            _settings!.DebugSettings.ShowLoggingPage = access;
             SaveConfig();
         }
     }
@@ -174,7 +146,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetApiKey: {apiKey}");
+            _logger.LogInformation("SetApiKey: {ApiKey}", apiKey);
             _settings!.ForgeApiKey = apiKey;
             SaveConfig();
         }
@@ -184,7 +156,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo($"SetUseBackground: {useBackground}");
+            _logger.LogInformation("SetUseBackground: {UseBackground}", useBackground);
             _settings!.UseBackground = useBackground;
             SaveConfig();
         }
@@ -194,7 +166,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logHelper.LogInfo("SaveDefaults.");
+            _logger.LogInformation("SaveDefaults.");
             Directory.CreateDirectory(LauncherAssetsPath);
             File.WriteAllText(Path.Combine(LauncherAssetsPath, "LauncherSettings.json"), JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
         }

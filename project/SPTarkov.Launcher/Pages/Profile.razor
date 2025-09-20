@@ -2,7 +2,7 @@
 
 @inject StateHelper StateHelper
 @inject GameHelper GameHelper
-@inject LogHelper LogHelper
+@inject ILogger<Profile> Logger
 @inject NavigationManager NavigationManager
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
@@ -40,16 +40,16 @@
     protected override void OnInitialized()
     {
         selectedMiniProfile = StateHelper.SelectedProfile;
-        LogHelper.LogInfo($"Selected profile: {selectedMiniProfile?.Username}");
+        Logger.LogInformation($"Selected profile: {selectedMiniProfile?.Username}");
         base.OnInitialized();
     }
 
     private async Task StartGame()
     {
         // do checks
-        LogHelper.LogInfo("Launching Game");
+        Logger.LogInformation("Launching Game");
         await GameHelper.LaunchGame();
-        LogHelper.LogInfo("Launched Game");
+        Logger.LogInformation("Launched Game");
         // patch game
         // start game
         // TODO: Call server for updated profiles
@@ -59,12 +59,5 @@
     {
         StateHelper.SetSelectedProfile(null);
         NavigationManager.NavigateTo("/Profiles");
-    }
-
-    private async Task ReturnToServers()
-    {
-        StateHelper.SetSelectedProfile(null);
-        StateHelper.SetSelectedServer(null);
-        NavigationManager.NavigateTo("/");
     }
 }

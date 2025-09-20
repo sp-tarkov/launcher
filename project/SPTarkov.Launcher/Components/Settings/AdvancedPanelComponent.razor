@@ -3,7 +3,6 @@
 
 <MudItem sm="12">
     <MudPaper Class="pa-5 ml-1 gap-2 d-flex flex-column setting-on-hover-container mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="3">
-        @* <SettingOptionComponent Switch="@advancedUserSwitch" OptionName="Advanced User" SwitchFunc="@SetAdvUser"/> *@
         <MudTooltip Arrow="true" Placement="Placement.Bottom" Color="Color.Info" Text="Image cannot be changed for now">
             <SettingOptionComponent Switch="@showBackgroundSwitch" OptionName="Use Background Image" SwitchFunc="@SetBackgroundUsage"/>
         </MudTooltip>
@@ -21,12 +20,6 @@
         showBackgroundSwitch = ConfigHelper.GetConfig().UseBackground;
         base.OnInitialized();
     }
-
-    // private async Task SetAdvUser()
-    // {
-    //     advancedUserSwitch = !advancedUserSwitch;
-    //     ConfigHelper.SetAdvancedUser(advancedUserSwitch);
-    // }
 
     private async Task SetBackgroundUsage()
     {

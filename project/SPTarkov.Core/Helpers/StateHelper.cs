@@ -1,10 +1,12 @@
-﻿using SPTarkov.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+using SPTarkov.Core.Logging;
+using SPTarkov.Core.Models;
 
 namespace SPTarkov.Core.Helpers;
 
 public class StateHelper
 {
-    private readonly LogHelper _logHelper;
+    private readonly ILogger<StateHelper> _logger;
     public int? CurrentPagination;
     public Dictionary<string, SPTMod> ModList = [];
     public List<MiniProfile> ProfileList = [];
@@ -12,12 +14,15 @@ public class StateHelper
     public MiniProfile? SelectedProfile;
     public Server? SelectedServer;
 
+    public bool ShowBackground { get; set; }
+    public event Action? OnStateChanged;
+
     public StateHelper(
-        LogHelper logHelper,
+        ILogger<StateHelper> logger,
         ConfigHelper configHelper
     )
     {
-        _logHelper = logHelper;
+        _logger = logger;
 
         if (configHelper.GetConfig().UseBackground)
         {
@@ -27,7 +32,7 @@ public class StateHelper
 
     public void LogoutAndDispose()
     {
-        _logHelper.LogInfo($"Logged out of server {SelectedServer?.IpAddress ?? "Unknown"} and disposed");
+        _logger.LogInformation("Logged out of server {SelectedServerIpAddress} and disposed", SelectedServer?.IpAddress ?? "Unknown");
         ProfileTypes = new Dictionary<string, string>();
         ProfileList = [];
         ModList = [];
@@ -45,12 +50,10 @@ public class StateHelper
         SelectedProfile = miniProfile;
     }
 
-    public event Action? OnStateChanged;
     private void NotifyStateChanged()
     {
         OnStateChanged?.Invoke();
     }
-    public bool ShowBackground { get; set; }
 
     public void SetBackground(bool state)
     {

@@ -4,7 +4,7 @@
 @inject HttpHelper HttpHelper
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
-@inject LogHelper LogHelper
+@inject ILogger<Forge> Logger
 
 <MudContainer Class="px-8 mt-2 mb-6 pa-0" MaxWidth="MaxWidth.Large">
     @if (!_forgeAvailable)
@@ -195,8 +195,7 @@
         }
         catch (Exception e)
         {
-            LogHelper.AddLog("Exception thrown from ForgeHelper.SearchForMods");
-            LogHelper.AddLog(e.ToString());
+            Logger.LogError($"Exception thrown from ForgeHelper.SearchForMods {e}");
             return;
         }
 
@@ -221,7 +220,7 @@
         if (result?.Canceled is false)
         {
             apiKeyAvailable = true;
-            LogHelper.LogInfo("Saved Apikey");
+            Logger.LogInformation("Saved Apikey");
             SearchForMods();
         }
     }
@@ -236,7 +235,7 @@
         if (result?.Canceled is false)
         {
             apiKeyAvailable = true;
-            LogHelper.LogInfo("Saved Apikey");
+            Logger.LogInformation("Saved Apikey");
             SearchForMods();
         }
     }

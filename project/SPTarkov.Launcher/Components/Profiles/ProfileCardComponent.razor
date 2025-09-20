@@ -2,7 +2,7 @@
 @inject ConfigHelper ConfigHelper
 @inject StateHelper StateHelper
 @inject NavigationManager NavigationManager
-@inject LogHelper LogHelper
+@inject ILogger<ProfileCardComponent> Logger
 
 <MudItem sm="12" md="4">
     <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
@@ -118,7 +118,7 @@
             StateHelper.SetSelectedProfile(MiniProfile);
             loggedIn = StateHelper.SelectedProfile != null;
 
-            LogHelper.LogInfo("Navigating to /Profile");
+            Logger.LogInformation("Navigating to /Profile");
             NavigationManager.NavigateTo("/Profile");
         }
     }
