@@ -37,4 +37,6 @@ public class LauncherSettings
     public string ForgeApiKey { get; set; } = "";
 
     public bool UseBackground { get; set; }
+
+    public List<string> ExcludeFromCleanup { get; set; } = new();
 }

@@ -9,6 +9,7 @@ using Photino.Blazor;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
 using SPTarkov.Core.Logging;
+using SPTarkov.Core.Patching;
 
 namespace SPTarkov.Launcher;
 
@@ -36,9 +37,9 @@ public class Launcher
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
             .AddSingleton<ModHelper>()
-            .AddSingleton<PatchHelper>()
             .AddSingleton<StateHelper>()
             .AddSingleton<LocaleHelper>()
+            .AddSingleton<FilePatcher>()
             .AddLogging(builder =>
             {
                 builder.ClearProviders();

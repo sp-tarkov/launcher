@@ -5,13 +5,12 @@
  * Basuro
  */
 
-namespace SPTarkov.Core.Models;
+namespace SPTarkov.Core.Patching;
 
 public enum PatchResultEnum
 {
     Success,
     InputLengthMismatch,
     InputChecksumMismatch,
-    AlreadyPatched,
     OutputChecksumMismatch
 }

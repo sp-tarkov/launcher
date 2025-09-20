@@ -27,7 +27,7 @@ public class ConfigHelper
         BackgroundClass = "dialog-backdrop-class"
     };
 
-    private readonly string LauncherAssetsPath = Path.Combine(Environment.CurrentDirectory, "SPT_Data", "Launcher");
+    private readonly string LauncherAssetsPath = Path.Combine(Environment.CurrentDirectory, "user", "Launcher");
 
     private LauncherSettings? _settings;
 
