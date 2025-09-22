@@ -51,6 +51,9 @@ public class ConfigHelper
             }
 
             _settings = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(Path.Combine(LauncherAssetsPath, "LauncherSettings.json")));
+
+            // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
+            SetGamePath(Environment.CurrentDirectory);
         }
     }
 
@@ -158,6 +161,16 @@ public class ConfigHelper
         {
             _logger.LogInformation("SetUseBackground: {UseBackground}", useBackground);
             _settings!.UseBackground = useBackground;
+            SaveConfig();
+        }
+    }
+
+    private void SetGamePath(string gamePath)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetGamePath: {GamePath}", gamePath);
+            _settings!.GamePath = gamePath;
             SaveConfig();
         }
     }
