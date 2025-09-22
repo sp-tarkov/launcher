@@ -22,6 +22,16 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.8"/>
   </ItemGroup>
 
+  <Target Name="CopySptData" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <SptData Include="$(SolutionDir)SPTarkov.Core\SPT_Data\**\*.*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(SptData);"
+      DestinationFolder="$(ProjectDir)$(OutDir)SPT_Data\%(RecursiveDir)"
+    />
+  </Target>
+
   <ItemGroup>
     <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Chinese (Simplified).json" />
     <None Include="bin\Debug\net9.0\SPT_Data\Launcher\Locales\Chinese (Traditional).json" />
