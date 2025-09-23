@@ -11,7 +11,6 @@ public class LauncherSettings
             ServerId = "1721162719",
             Locked = true
         });
-        GamePath = Environment.CurrentDirectory;
     }
 
     public DebugSettings DebugSettings { get; set; } = new();
@@ -24,7 +23,7 @@ public class LauncherSettings
 
     public bool FirstRun { get; set; } = true;
 
-    public string GamePath { get; set; }
+    public string GamePath { get; set; } = "";
 
     public bool CloseToTray { get; set; }
 
