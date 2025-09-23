@@ -5,6 +5,10 @@ window.scrollToTopSmooth = function () {
     });
 }
 
+window.reloadBrowser = function () {
+    location.reload();
+}
+
 window.toggleScrollButton = function () {
     const scrollButton = document.getElementById('scrollTopBtn');
     if (!scrollButton) {
@@ -39,3 +43,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+
