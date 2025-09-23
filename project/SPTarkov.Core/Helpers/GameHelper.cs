@@ -275,7 +275,10 @@ public class GameHelper
 
             foreach (var directory in directories.Where(directory => Directory.Exists(directory.FullName)))
             {
-                RemoveFilesRecurse(directory);
+                if (!TryRemoveFilesRecursively(directory))
+                {
+                    _logger.LogWarning("Directory removal failed - found in live dir: {DirectoryFullName}", directory.FullName);
+                }
                 _logger.LogWarning("Directory removed - found in live dir: {DirectoryFullName}", directory.FullName);
                 isInstalledInLive = true;
             }
@@ -293,7 +296,13 @@ public class GameHelper
     {
         var files = new[]
         {
-            GetFileForCleanup("BattlEye"), GetFileForCleanup("Logs"), GetFileForCleanup("ConsistencyInfo"), GetFileForCleanup("EscapeFromTarkov_BE.exe"), GetFileForCleanup("Uninstall.exe"), GetFileForCleanup("UnityCrashHandler64.exe"), GetFileForCleanup("WinPixEventRuntime.dll"),
+            GetFileForCleanup("BattlEye"),
+            GetFileForCleanup("Logs"),
+            GetFileForCleanup("ConsistencyInfo"),
+            GetFileForCleanup("EscapeFromTarkov_BE.exe"),
+            GetFileForCleanup("Uninstall.exe"),
+            GetFileForCleanup("UnityCrashHandler64.exe"),
+            GetFileForCleanup("WinPixEventRuntime.dll"),
 
             // Don't allow excluding this from cleanup ever
             Path.Combine(_configHelper.GetConfig().GamePath, @"EscapeFromTarkov_Data\Plugins\x86_64\hwecho.dll")
@@ -308,7 +317,7 @@ public class GameHelper
 
             if (Directory.Exists(file))
             {
-                RemoveFilesRecurse(new DirectoryInfo(file));
+                TryRemoveFilesRecursively(new DirectoryInfo(file));
             }
 
             if (File.Exists(file))
@@ -351,25 +360,9 @@ public class GameHelper
         File.WriteAllText(registryFile.FullName, registryData.ToString());
     }
 
-    /// <summary>
-    /// Clean the temp folder
-    /// </summary>
-    /// <returns>returns true if the temp folder was cleaned succefully or doesn't exist. returns false if something went wrong.</returns>
-    public bool CleanTempFiles()
+    private bool TryRemoveFilesRecursively(DirectoryInfo basedir)
     {
-        var rootdir = new DirectoryInfo(Path.Join(_configHelper.GetConfig().GamePath, "user", "sptappdata"));
-
-        if (!rootdir.Exists)
-        {
-            return true;
-        }
-
-        return RemoveFilesRecurse(rootdir);
-    }
-
-    private bool RemoveFilesRecurse(DirectoryInfo basedir)
-    {
-        _logger.LogInformation($"Recursive Removal: {basedir}");
+        _logger.LogInformation("Recursive Removal: {DirectoryInfo}", basedir);
 
         if (!basedir.Exists)
         {
@@ -381,7 +374,7 @@ public class GameHelper
             // remove subdirectories
             foreach (var dir in basedir.EnumerateDirectories())
             {
-                RemoveFilesRecurse(dir);
+                TryRemoveFilesRecursively(dir);
             }
 
             // remove files
@@ -417,7 +410,12 @@ public class GameHelper
             var v3 = new DirectoryInfo(v2);
             var v4 = new FileSystemInfo[]
             {
-                v3, new FileInfo(Path.Join(v2, @"BattlEye\BEClient_x64.dll")), new FileInfo(Path.Join(v2, @"BattlEye\BEService_x64.dll")), new FileInfo(Path.Join(v2, "ConsistencyInfo")), new FileInfo(Path.Join(v2, "Uninstall.exe")), new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
+                v3,
+                new FileInfo(Path.Join(v2, @"BattlEye\BEClient_x64.dll")),
+                new FileInfo(Path.Join(v2, @"BattlEye\BEService_x64.dll")),
+                new FileInfo(Path.Join(v2, "ConsistencyInfo")),
+                new FileInfo(Path.Join(v2, "Uninstall.exe")),
+                new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
             };
 
             v0 = v4.Length - 1;
