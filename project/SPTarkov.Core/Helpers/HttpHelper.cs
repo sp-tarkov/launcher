@@ -61,10 +61,12 @@ public class HttpHelper
         _logger.LogInformation("GET: {Url}", url);
         var task = await _httpClient?.GetAsync(BuildGameUrl(url), token);
 
+        var json = SimpleZlib.Decompress(
+            await task.Content.ReadAsByteArrayAsync(token)
+        );
+
         return JsonSerializer.Deserialize<T>(
-            SimpleZlib.Decompress(
-                await task.Content.ReadAsByteArrayAsync(token)
-            )
+            json
         );
     }
 

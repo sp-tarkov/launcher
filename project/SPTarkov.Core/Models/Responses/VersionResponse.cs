@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class VersionResponse : ISptResponse<SPTVersion>
+public class VersionResponse : ISptResponse<string>
 {
-    public SPTVersion Response { get; set; } = new();
+    public required string Response { get; set; }
 }

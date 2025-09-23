@@ -44,13 +44,7 @@
 
     private async Task StartGame()
     {
-        // do checks
-        Logger.LogInformation("Launching Game");
         await GameHelper.LaunchGame();
-        Logger.LogInformation("Launched Game");
-        // patch game
-        // start game
-        // TODO: Call server for updated profiles
     }
 
     private async Task ReturnToProfiles()

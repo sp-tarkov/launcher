@@ -14,6 +14,7 @@ public class GameHelper
     private const string registrySettings = @"Software\Battlestate Games\EscapeFromTarkov";
     private readonly ConfigHelper _configHelper;
     private readonly ILogger<GameHelper> _logger;
+    private HttpHelper _httpHelper;
 
     private readonly StateHelper _stateHelper;
     private FilePatcher _filePatcher;
@@ -28,13 +29,15 @@ public class GameHelper
         StateHelper stateHelper,
         ILogger<GameHelper> logger,
         ConfigHelper configHelper,
-        FilePatcher filePatcher
+        FilePatcher filePatcher,
+        HttpHelper httpHelper
     )
     {
         _stateHelper = stateHelper;
         _logger = logger;
         _configHelper = configHelper;
         _filePatcher = filePatcher;
+        _httpHelper = httpHelper;
         _originalGamePath = DetectOriginalGamePath();
     }
 
@@ -66,7 +69,7 @@ public class GameHelper
 
         _logger.LogInformation("SPT is not installed in Live");
 
-        if (IsCoreDllVersionMismatched())
+        if (await IsCoreDllVersionMismatched())
         {
             _logger.LogError("Core dll mismatch");
             return false;
@@ -136,7 +139,7 @@ public class GameHelper
         return true;
     }
 
-    public async IAsyncEnumerable<PatchResultInfo> PatchFiles()
+    private async IAsyncEnumerable<PatchResultInfo> PatchFiles()
     {
         await foreach (var info in TryPatchFiles(false))
         {
@@ -187,40 +190,41 @@ public class GameHelper
     }
 
 
-    private bool IsCoreDllVersionMismatched()
+    private async Task<bool> IsCoreDllVersionMismatched()
     {
         try
         {
-            var serverVersion = new SPTVersion("4.0.0", "123123"); // TODO: get from server via api call
+            var call = await _httpHelper.GameServerGet<VersionResponse>(RequestUrl.Version, CancellationToken.None);
+            var serverVersion = new SPTVersion(call.Response);
 
             var coreDllVersionInfo = FileVersionInfo.GetVersionInfo(Path.Join(_configHelper.GetConfig().GamePath, "BepinEx", "plugins", "spt", "spt-core.dll"));
             var dllVersion = new SPTVersion(coreDllVersionInfo.FileVersion);
 
-            _logger.LogInformation("spt-core.dll version: {DllVersion}", dllVersion);
+            _logger.LogInformation("server version: {serverVersion} - spt-core.dll version: {DllVersion}", serverVersion, dllVersion);
 
             // Edge case, running on locally built modules dlls, ignore check and return ok
-            // if (dllVersion.Major == 1)
-            // {
-            //     return false;
-            // }
-            //
-            // // check 'X'.x.x
-            // if (serverVersion.Major != dllVersion.Major)
-            // {
-            //     return true;
-            // }
-            //
-            // // check x.'X'.x
-            // if (serverVersion.Minor != dllVersion.Minor)
-            // {
-            //     return true;
-            // }
-            //
-            // // check x.x.'X'
-            // if (serverVersion.Build != dllVersion.Build)
-            // {
-            //     return true;
-            // }
+            if (dllVersion.Major == 1)
+            {
+                return false;
+            }
+
+            // check 'X'.x.x
+            if (serverVersion.Major != dllVersion.Major)
+            {
+                return true;
+            }
+
+            // check x.'X'.x
+            if (serverVersion.Minor != dllVersion.Minor)
+            {
+                return true;
+            }
+
+            // check x.x.'X'
+            if (serverVersion.Build != dllVersion.Build)
+            {
+                return true;
+            }
 
             return false; // Versions match, hooray
         }
