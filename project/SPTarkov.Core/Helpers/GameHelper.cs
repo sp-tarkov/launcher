@@ -19,6 +19,7 @@ public class GameHelper
     private readonly StateHelper _stateHelper;
     private FilePatcher _filePatcher;
     private string? _originalGamePath;
+    public string? ErrorMessage;
 
     private List<string> patches
     {
@@ -64,6 +65,7 @@ public class GameHelper
         if (IsInstalledInLive())
         {
             _logger.LogError("SPT is installed in Live");
+            ErrorMessage = "SPT is installed in Live";
             return false;
         }
 
@@ -72,6 +74,7 @@ public class GameHelper
         if (await IsCoreDllVersionMismatched())
         {
             _logger.LogError("Core dll mismatch");
+            ErrorMessage = "Core dll mismatch";
             return false;
         }
 
@@ -82,6 +85,7 @@ public class GameHelper
         if (!Validate())
         {
             _logger.LogError("Game Validation Failed");
+            ErrorMessage = "Game Validation Failed";
             return false;
         }
 
@@ -97,7 +101,8 @@ public class GameHelper
         catch (Exception e)
         {
             _logger.LogError("patching failed: {e}", e);
-            throw;
+            ErrorMessage = "Patching failed";
+            return false;
         }
 
         // check game path
@@ -106,6 +111,7 @@ public class GameHelper
         if (!File.Exists(clientExecutable))
         {
             _logger.LogError("Could not find {ClientExecutable}", clientExecutable);
+            ErrorMessage = "Could not find EscapeFromTarkov.exe";
             return false;
         }
 
@@ -133,6 +139,7 @@ public class GameHelper
         catch (Exception ex)
         {
             _logger.LogError($"Starting game process failed: {ex}");
+            ErrorMessage = "Starting game process failed";
             return false;
         }
 
@@ -434,5 +441,15 @@ public class GameHelper
         }
 
         return v0 == 0;
+    }
+
+    public async Task<bool> MonitorGame()
+    {
+        var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
+        while (!process.HasExited)
+        {
+            await Task.Delay(5000);
+        }
+        return false;
     }
 }

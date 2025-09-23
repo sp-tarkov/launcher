@@ -14,6 +14,7 @@ public class StateHelper
     public MiniProfile? SelectedProfile;
     public Server? SelectedServer;
 
+    public bool AllowNavigation { get; set; } = true;
     public bool ShowBackground { get; set; }
     public event Action? OnStateChanged;
 
@@ -58,6 +59,12 @@ public class StateHelper
     public void SetBackground(bool state)
     {
         ShowBackground = state;
+        NotifyStateChanged();
+    }
+
+    public void SetAllowNavigation(bool state)
+    {
+        AllowNavigation = state;
         NotifyStateChanged();
     }
 }

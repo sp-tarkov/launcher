@@ -5,10 +5,12 @@
 @inject ILogger<Profile> Logger
 @inject NavigationManager NavigationManager
 @inject LocaleHelper LocaleHelper
+@inject ConfigHelper ConfigHelper
+@inject ISnackbar Snackbar
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 pb-4">
-        <MudButton Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
+        <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
     </MudContainer>
     <MudContainer Class="pa-0 pb-4">
         <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/>
@@ -28,12 +30,13 @@
             <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">GP:</MudText>
             <MudText Typo="Typo.h6">1,000,000,000</MudText>
         </MudPaper>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGame" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>
+        <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGame" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
 </MudContainer>
 
 @code {
     private MiniProfile selectedMiniProfile { get; set; }
+    private bool _buttonDisabled;
 
     protected override void OnInitialized()
     {
@@ -44,7 +47,37 @@
 
     private async Task StartGame()
     {
-        await GameHelper.LaunchGame();
+        // set play button to disabled while game is open
+        _buttonDisabled = true;
+        StateHelper.SetAllowNavigation(false);
+
+        Snackbar.Add($"Launching Game");
+        if (!await GameHelper.LaunchGame())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"Game Failed to start: {message}", Severity.Error);
+            return;
+        }
+
+        // call minimize on window
+        if (ConfigHelper.GetConfig().MinimizeOnLaunch)
+        {
+            Launcher.App.MainWindow.SetMinimized(true);
+        }
+
+        if (!await GameHelper.MonitorGame())
+        {
+            Snackbar.Add("Game has closed", Severity.Info);
+        }
+
+        _buttonDisabled = false;
+
+        if (ConfigHelper.GetConfig().MinimizeOnLaunch)
+        {
+            Launcher.App.MainWindow.SetMinimized(false);
+        }
+
+        StateHelper.SetAllowNavigation(true);
     }
 
     private async Task ReturnToProfiles()
