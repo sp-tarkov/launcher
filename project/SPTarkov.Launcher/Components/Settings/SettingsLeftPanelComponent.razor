@@ -3,9 +3,9 @@
 
 <MudItem sm="6">
     <MudPaper Class="pa-5 mr-1 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
-        <SettingOptionComponent Switch="@closeToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="@SetCloseToTray"/>
-        <SettingOptionComponent Switch="@minimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="@SetMinimizeOnLaunch"/>
-        <SettingOptionComponent Switch="@alwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="@SetAlwaysOnTop"/>
+        <SettingSwitchComponent Switch="@closeToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="@SetCloseToTray"/>
+        <SettingSwitchComponent Switch="@minimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="@SetMinimizeOnLaunch"/>
+        <SettingSwitchComponent Switch="@alwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="@SetAlwaysOnTop"/>
     </MudPaper>
 </MudItem>
 

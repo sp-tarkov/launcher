@@ -1,0 +1,56 @@
+﻿@inject LocaleHelper LocaleHelper
+@inject ConfigHelper ConfigHelper
+@inject IJSRuntime JsRuntime
+
+<MudContainer Class="pa-0">
+    <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 pl-5">
+        <MudText Class="no-select">@OptionName</MudText>
+        <MudSpacer/>
+        <MudSelect T="string" Value="_selectedOption" Disabled="@Disabled" Clearable="false" ValueChanged="(v) => OnLocaleChange(v)">
+            @foreach (var item in Options)
+            {
+                <MudSelectItem Value="@item.Key">@item.Value</MudSelectItem>
+            }
+        </MudSelect>
+    </a>
+</MudContainer>
+@if (AddDiv)
+{
+    <MudDivider DividerType="DividerType.Middle" Class="ma-0"/>
+}
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        _selectedOption = ConfigHelper.GetConfig().Language;
+        base.OnInitialized();
+    }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool AddDiv { get; set; }
+
+    [Parameter]
+    public Dictionary<string, string> Options { get; set; }
+
+    [Parameter]
+    public string OptionName { get; set; }
+
+    private string _selectedOption { get; set; }
+
+    private void OnLocaleChange(string locale)
+    {
+        _selectedOption = locale;
+        // Set locale in helper
+        LocaleHelper.SetLocale(_selectedOption);
+
+        // Set locale in config
+        ConfigHelper.SetLocale(_selectedOption);
+
+        // reload page from JS side, this will change already loaded locales to the correct ones
+        JsRuntime.InvokeVoidAsync("reloadBrowser");
+    }
+}

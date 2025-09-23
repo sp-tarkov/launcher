@@ -39,4 +39,6 @@ public class LauncherSettings
     public bool UseBackground { get; set; }
 
     public List<string> ExcludeFromCleanup { get; set; } = new();
+
+    public string Language { get; set; } = "en";
 }

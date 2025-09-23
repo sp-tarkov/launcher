@@ -184,4 +184,14 @@ public class ConfigHelper
             File.WriteAllText(Path.Combine(LauncherAssetsPath, "LauncherSettings.json"), JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
         }
     }
+
+    public void SetLocale(string locale)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetLocale: {Locale}", locale);
+            _settings!.Language = locale;
+            SaveConfig();
+        }
+    }
 }
