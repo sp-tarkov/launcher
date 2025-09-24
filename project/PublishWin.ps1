@@ -6,3 +6,12 @@ Remove-Item "./Build" -Recurse -Force
 mkdir "./Build" -Force
 Copy-Item "./SPTarkov.Launcher/bin/Release/net9.0/win-x64/publish/SPTarkov.Launcher.exe" "./Build/SPTarkov.Launcher.exe"
 Copy-Item "./SPTarkov.Core/SPT_Data" "./Build/SPT_Data" -Recurse
+
+if ($args.count -eq 1)
+{
+    $gameDir = [IO.Path]::GetFullPath($args[0])
+    Copy-Item "./Build" -Recurse -Force -Destination $gameDir
+
+    Write-Host ""
+    Write-Host "Copied build to game folder" -ForegroundColor Green
+}
