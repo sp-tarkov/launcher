@@ -51,6 +51,22 @@
         _buttonDisabled = true;
         StateHelper.SetAllowNavigation(false);
 
+        Snackbar.Add("Checking Install");
+        if (!await GameHelper.CheckGame())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"Game check failed: {message}", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add("Patching Game");
+        if (!await GameHelper.PatchGame())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"Failed to Patch game: {message}", Severity.Error);
+            return;
+        }
+
         Snackbar.Add($"Launching Game");
         if (!await GameHelper.LaunchGame())
         {

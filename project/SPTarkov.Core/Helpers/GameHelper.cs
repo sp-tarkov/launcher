@@ -11,13 +11,14 @@ namespace SPTarkov.Core.Helpers;
 public class GameHelper
 {
     private const string registryInstall = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
-    private const string registrySettings = @"Software\Battlestate Games\EscapeFromTarkov";
+
     private readonly ConfigHelper _configHelper;
     private readonly ILogger<GameHelper> _logger;
-    private HttpHelper _httpHelper;
-
     private readonly StateHelper _stateHelper;
-    private FilePatcher _filePatcher;
+    private readonly HttpHelper _httpHelper;
+    private readonly FilePatcher _filePatcher;
+    private readonly LocaleHelper _localeHelper;
+
     private string? _originalGamePath;
     public string? ErrorMessage;
 
@@ -31,7 +32,8 @@ public class GameHelper
         ILogger<GameHelper> logger,
         ConfigHelper configHelper,
         FilePatcher filePatcher,
-        HttpHelper httpHelper
+        HttpHelper httpHelper,
+        LocaleHelper localeHelper
     )
     {
         _stateHelper = stateHelper;
@@ -39,6 +41,7 @@ public class GameHelper
         _configHelper = configHelper;
         _filePatcher = filePatcher;
         _httpHelper = httpHelper;
+        _localeHelper = localeHelper;
         _originalGamePath = DetectOriginalGamePath();
     }
 
@@ -55,17 +58,12 @@ public class GameHelper
         return info?.FullName;
     }
 
-    public async Task<bool> LaunchGame()
+    public async Task<bool> CheckGame()
     {
-        _logger.LogInformation("Launching game");
-        _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile.Username);
-        _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer.IpAddress);
-
-        // setup directories
         if (IsInstalledInLive())
         {
             _logger.LogError("SPT is installed in Live");
-            ErrorMessage = "SPT is installed in Live";
+            ErrorMessage = _localeHelper.Get("gamehelper_error_1");
             return false;
         }
 
@@ -74,7 +72,7 @@ public class GameHelper
         if (await IsCoreDllVersionMismatched())
         {
             _logger.LogError("Core dll mismatch");
-            ErrorMessage = "Core dll mismatch";
+            ErrorMessage = _localeHelper.Get("gamehelper_error_2");
             return false;
         }
 
@@ -85,12 +83,17 @@ public class GameHelper
         if (!Validate())
         {
             _logger.LogError("Game Validation Failed");
-            ErrorMessage = "Game Validation Failed";
+            ErrorMessage = _localeHelper.Get("gamehelper_error_3");
             return false;
         }
 
         _logger.LogInformation("Game Validation passed");
 
+        return true;
+    }
+
+    public async Task<bool> PatchGame()
+    {
         try
         {
             await foreach (var patchResultInfo in PatchFiles())
@@ -101,22 +104,30 @@ public class GameHelper
         catch (Exception e)
         {
             _logger.LogError("patching failed: {e}", e);
-            ErrorMessage = "Patching failed";
+            ErrorMessage = _localeHelper.Get("gamehelper_error_4");
             return false;
         }
 
+        return true;
+    }
+
+    public async Task<bool> LaunchGame()
+    {
+        _logger.LogInformation("Launching game");
+        _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile.Username);
+        _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer.IpAddress);
+
         // check game path
-        var clientExecutable = Path.Join(_configHelper.GetConfig().GamePath, "EscapeFromTarkov.exe");
+        var clientExecutable = Path.Combine(_configHelper.GetConfig().GamePath, "EscapeFromTarkov.exe");
 
         if (!File.Exists(clientExecutable))
         {
             _logger.LogError("Could not find {ClientExecutable}", clientExecutable);
-            ErrorMessage = "Could not find EscapeFromTarkov.exe";
+            ErrorMessage = _localeHelper.Get("gamehelper_error_5");
             return false;
         }
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
-
 
         //start game
         var args = $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile.ProfileID} -config=" +
@@ -139,7 +150,7 @@ public class GameHelper
         catch (Exception ex)
         {
             _logger.LogError($"Starting game process failed: {ex}");
-            ErrorMessage = "Starting game process failed";
+            ErrorMessage = _localeHelper.Get("gamehelper_error_6");
             return false;
         }
 
@@ -196,7 +207,6 @@ public class GameHelper
         return Directory.GetDirectories(Path.Combine(_configHelper.GetConfig().GamePath, "SPT_Data", "Launcher", "Patches")).ToList();
     }
 
-
     private async Task<bool> IsCoreDllVersionMismatched()
     {
         try
@@ -204,7 +214,8 @@ public class GameHelper
             var call = await _httpHelper.GameServerGet<VersionResponse>(RequestUrl.Version, CancellationToken.None);
             var serverVersion = new SPTVersion(call.Response);
 
-            var coreDllVersionInfo = FileVersionInfo.GetVersionInfo(Path.Join(_configHelper.GetConfig().GamePath, "BepinEx", "plugins", "spt", "spt-core.dll"));
+            var coreDllVersionInfo =
+                FileVersionInfo.GetVersionInfo(Path.Combine(_configHelper.GetConfig().GamePath, "BepinEx", "plugins", "spt", "spt-core.dll"));
             var dllVersion = new SPTVersion(coreDllVersionInfo.FileVersion);
 
             _logger.LogInformation("server version: {serverVersion} - spt-core.dll version: {DllVersion}", serverVersion, dllVersion);
@@ -286,6 +297,7 @@ public class GameHelper
                 {
                     _logger.LogWarning("Directory removal failed - found in live dir: {DirectoryFullName}", directory.FullName);
                 }
+
                 _logger.LogWarning("Directory removed - found in live dir: {DirectoryFullName}", directory.FullName);
                 isInstalledInLive = true;
             }
@@ -312,7 +324,7 @@ public class GameHelper
             GetFileForCleanup("WinPixEventRuntime.dll"),
 
             // Don't allow excluding this from cleanup ever
-            Path.Combine(_configHelper.GetConfig().GamePath, @"EscapeFromTarkov_Data\Plugins\x86_64\hwecho.dll")
+            Path.Combine(_configHelper.GetConfig().GamePath, "EscapeFromTarkov_Data", "Plugins", "x86_64", "hwecho.dll")
         };
 
         foreach (var file in files)
@@ -343,7 +355,7 @@ public class GameHelper
             return null;
         }
 
-        return Path.Join(_configHelper.GetConfig().GamePath, fileName);
+        return Path.Combine(_configHelper.GetConfig().GamePath, fileName);
     }
 
     /// <summary>
@@ -418,11 +430,11 @@ public class GameHelper
             var v4 = new FileSystemInfo[]
             {
                 v3,
-                new FileInfo(Path.Join(v2, @"BattlEye\BEClient_x64.dll")),
-                new FileInfo(Path.Join(v2, @"BattlEye\BEService_x64.dll")),
-                new FileInfo(Path.Join(v2, "ConsistencyInfo")),
-                new FileInfo(Path.Join(v2, "Uninstall.exe")),
-                new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
+                new FileInfo(Path.Combine(v2, "BattlEye", "BEClient_x64.dll")),
+                new FileInfo(Path.Combine(v2, "BattlEye", "BEService_x64.dll")),
+                new FileInfo(Path.Combine(v2, "ConsistencyInfo")),
+                new FileInfo(Path.Combine(v2, "Uninstall.exe")),
+                new FileInfo(Path.Combine(v2, "UnityCrashHandler64.exe"))
             };
 
             v0 = v4.Length - 1;
@@ -448,8 +460,9 @@ public class GameHelper
         var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
         while (!process.HasExited)
         {
-            await Task.Delay(5000);
+            await Task.Delay(3000);
         }
+
         return false;
     }
 }
