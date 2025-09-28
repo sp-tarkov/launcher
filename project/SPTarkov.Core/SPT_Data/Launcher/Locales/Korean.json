@@ -32,5 +32,11 @@
   "profiles_connect_warning": "Please connect to a Server first!",
   "setting_close": "Close To Tray",
   "setting_minimize": "Minimize On Game Start",
-  "setting_always_top": "Always On Top"
+  "setting_always_top": "Always On Top",
+  "game_helper_error_1": "SPT is installed in Live",
+  "game_helper_error_2": "Core dll mismatch",
+  "game_helper_error_3": "Game Validation Failed",
+  "game_helper_error_4": "Patching failed",
+  "game_helper_error_5": "Could not find EscapeFromTarkov.exe",
+  "game_helper_error_6": "Starting game process failed"
 }
