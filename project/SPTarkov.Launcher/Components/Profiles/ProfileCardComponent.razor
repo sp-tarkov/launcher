@@ -3,6 +3,7 @@
 @inject StateHelper StateHelper
 @inject NavigationManager NavigationManager
 @inject ILogger<ProfileCardComponent> Logger
+@inject LocaleHelper LocaleHelper
 
 <MudItem sm="12" md="4">
     <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
@@ -12,21 +13,21 @@
                 <MudImage Src=@(ImageName()) Elevation="0" Class=@(ImageClassNames())/>
             }
         </div>
-        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Name:</MudText>
+        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_name")):</MudText>
         <MudText Typo="Typo.h6">@MiniProfile.Username</MudText>
         <MudDivider DividerType="DividerType.Middle"/>
-        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Level:</MudText>
+        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_level")):</MudText>
         <MudText Typo="Typo.h6">@MiniProfile.CurrentLevel</MudText>
         <MudDivider DividerType="DividerType.Middle"/>
-        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">Edition:</MudText>
+        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_edition")):</MudText>
         <MudText Typo="Typo.h6">@MiniProfile.Edition</MudText>
         <MudDivider DividerType="DividerType.Middle"/>
-        <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">ID:</MudText>
+        <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_id")):</MudText>
         <MudText Typo="Typo.body1">@MiniProfile.ProfileID</MudText>
         <MudContainer Class="justify-end d-flex pa-0">
             @if (MiniProfile.HasPassword)
             {
-                <MudTooltip Arrow="true" Placement="Placement.Right" Text="Password Protected">
+                <MudTooltip Arrow="true" Placement="Placement.Right" Text="@(LocaleHelper.Get("profile_card_password"))">
                     <MudIconButton Color="Color.Tertiary" Icon="@Icons.Material.Filled.Lock" Size="Size.Small"/>
                 </MudTooltip>
                 <MudSpacer/>
@@ -34,22 +35,22 @@
 
             @if (!MiniProfile.InvalidOrUnloadableProfile)
             {
-                <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? "Logout of this profile" : "Login to this profile")">
+                <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? LocaleHelper.Get("profile_card_logout") : LocaleHelper.Get("profile_card_login"))">
                     <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
                 </MudTooltip>
             }
             else
             {
-                <MudTooltip Arrow="true" Color="Color.Error" Placement="Placement.Left" Text="Profile is marked as Invalid">
+                <MudTooltip Arrow="true" Color="Color.Error" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_invalid"))">
                     <MudIconButton Class="mr-1" Color="Color.Error" Icon="@Icons.Material.Filled.Recycling" Size="Size.Small"/>
                 </MudTooltip>
             }
 
-            <MudTooltip Arrow="true" Placement="Placement.Left" Text="Edit this profile">
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_edit"))">
                 <MudIconButton Color="Color.Default" Icon="@Icons.Material.Filled.Build" Size="Size.Small" @onclick="RunEditTask"/>
             </MudTooltip>
 
-            <MudTooltip Arrow="true" Placement="Placement.Left" Text="Delete this profile">
+            <MudTooltip Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_delete"))">
                 <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" @onclick="RunDeleteTask"/>
             </MudTooltip>
 

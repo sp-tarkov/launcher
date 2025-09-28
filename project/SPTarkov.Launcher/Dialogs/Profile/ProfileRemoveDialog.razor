@@ -1,6 +1,7 @@
 ﻿@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
 @inject HttpHelper HttpHelper
+@inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -14,15 +15,15 @@
             }
             else
             {
-                <MudText>Do you really want to delete this Profile? This process cannot be undone.</MudText>
+                <MudText>@(LocaleHelper.Get("profile_remove_text"))</MudText>
                 @if (MiniProfile.HasPassword)
                 {
                     <PasswordFieldComponent @bind-Password="request.Password"/>
                 }
 
                 <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="RunDeleteTask">Delete</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Cancel</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="RunDeleteTask">@(LocaleHelper.Get("profile_remove_confirm"))</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">@(LocaleHelper.Get("profile_remove_cancel"))</MudButton>
                 </MudContainer>
             }
         </MudContainer>
@@ -51,23 +52,23 @@
 
     private async Task RunDeleteTask()
     {
-        var result = false;
+        bool result;
         _requestInProgress = true;
         try
         {
-            result = await CallServer("Deleting profile details from server", "Failed deleting profile details from server");
+            result = await CallServer(LocaleHelper.Get("profile_remove_task_1"), LocaleHelper.Get("profile_remove_task_fail"));
         }
-        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        catch (TaskCanceledException _) when (token.IsCancellationRequested)
         {
-            AbortOrFail("Request Timed out!");
+            AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
-        catch (HttpRequestException e)
+        catch (HttpRequestException _)
         {
             AbortOrFail();
             return;
         }
-        catch (Exception e)
+        catch (Exception _)
         {
             AbortOrFail();
             return;
@@ -111,12 +112,14 @@
 
     private void Submit()
     {
-        Snackbar.Add($"Deleted profile: {MiniProfile?.Username}!", Severity.Success);
+        Snackbar.Add($"{LocaleHelper.Get("profile_remove_task_success")}: {MiniProfile?.Username}!", Severity.Success);
         _mudDialog.Close(DialogResult.Ok(MiniProfile));
     }
 
-    private void AbortOrFail(string message = "Error deleting profile from server!")
+    private void AbortOrFail(string message = null)
     {
+        message ??= LocaleHelper.Get("profile_remove_task_default");
+
         if (!userCancel)
         {
             Snackbar.Add(message, Severity.Error);

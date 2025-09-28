@@ -50,12 +50,13 @@ public class ConfigHelper
                 SaveDefaults();
             }
 
-            _settings = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(Path.Combine(LauncherAssetsPath, "LauncherSettings.json")));
+            _settings = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(Path.Combine(LauncherAssetsPath,
+                "LauncherSettings.json")));
 
             // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
-            SetGamePath(Environment.CurrentDirectory);
+            // SetGamePath(Environment.CurrentDirectory);
             // Unless you are running the launcher from the IDE.
-            // SetGamePath(@"C:\SPT\4.0.0");
+            SetGamePath(@"C:\SPT\4.0.0");
         }
     }
 
@@ -79,7 +80,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logger.LogInformation("SetClientSize: {Height}-{Width}", height, width);
+            _logger.LogInformation("SetClientSize: h{Height} w{Width}", height, width);
             _settings!.StartSize.Height = height;
             _settings!.StartSize.Width = width;
             SaveConfig();
@@ -90,7 +91,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logger.LogInformation("SetClientLocation: {x}-{y}", x, y);
+            _logger.LogInformation("SetClientLocation: x{x} y{y}", x, y);
             _settings!.StartLocation.X = x;
             _settings!.StartLocation.Y = y;
             SaveConfig();
@@ -183,7 +184,8 @@ public class ConfigHelper
         {
             _logger.LogInformation("SaveDefaults.");
             Directory.CreateDirectory(LauncherAssetsPath);
-            File.WriteAllText(Path.Combine(LauncherAssetsPath, "LauncherSettings.json"), JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
+            File.WriteAllText(Path.Combine(LauncherAssetsPath, "LauncherSettings.json"),
+                JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
         }
     }
 

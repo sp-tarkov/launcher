@@ -1,6 +1,7 @@
 ﻿@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
 @inject HttpHelper HttpHelper
+@inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -15,16 +16,16 @@
             else
             {
                 <MudForm Model="MiniProfile" @bind-IsValid="@_success" Class="gap-2 mt-3">
-                    <MudTextField Immediate="true" @bind-Value="request.Username" Label="Username" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="true"/>
+                    <MudTextField Immediate="true" @bind-Value="request.Username" Label="@(LocaleHelper.Get("profile_edit_username"))" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="true"/>
                     @if (MiniProfile.HasPassword)
                     {
-                        <PasswordFieldComponent @bind-Password="request.Password" Title="Old Password"/>
+                        <PasswordFieldComponent @bind-Password="request.Password" Title="@(LocaleHelper.Get("profile_edit_old_pass"))"/>
                     }
-                    <PasswordFieldComponent @bind-Password="request.Change" Title="New Password"/>
+                    <PasswordFieldComponent @bind-Password="request.Change" Title="@(LocaleHelper.Get("profile_edit_new_pass"))"/>
                 </MudForm>
                 <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" @onclick="RunEditTask">Confirm</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Cancel</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" @onclick="RunEditTask">@(LocaleHelper.Get("profile_edit_confirm"))</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">@(LocaleHelper.Get("profile_edit_cancel"))</MudButton>
                 </MudContainer>
             }
         </MudContainer>
@@ -57,11 +58,11 @@
         _requestInProgress = true;
         try
         {
-            result = await CallServer("Changing password with server", "Failed to change password with server");
+            result = await CallServer(LocaleHelper.Get("profile_edit_task_1"), LocaleHelper.Get("profile_edit_task_fail"));
         }
         catch (TaskCanceledException e) when (token.IsCancellationRequested)
         {
-            AbortOrFail("Request Timed out!");
+            AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
         catch (HttpRequestException e)
@@ -113,12 +114,14 @@
 
     private void Submit()
     {
-        Snackbar.Add($"Changed password to {MiniProfile?.Username}!", Severity.Success);
+        Snackbar.Add($"{LocaleHelper.Get("profile_edit_task_success")} {MiniProfile?.Username}!", Severity.Success);
         mudDialog.Close(DialogResult.Ok(MiniProfile));
     }
 
-    private void AbortOrFail(string message = "Error changing password!")
+    private void AbortOrFail(string? message = null)
     {
+        message ??= LocaleHelper.Get("profile_edit_task_default");
+
         if (!userCancel)
         {
             Snackbar.Add(message, Severity.Error);

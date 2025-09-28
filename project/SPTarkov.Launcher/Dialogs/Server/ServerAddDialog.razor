@@ -1,15 +1,16 @@
 ﻿@inject ISnackbar Snackbar
+@inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="py-4">
             <MudForm Model="Server" @bind-IsValid="@success" Class="gap-2 mt-3">
-                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="Name" Variant="Variant.Outlined" Margin="Margin.Dense"/>
-                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="Address" Required="true" RequiredError="IP is required!" Variant="Variant.Outlined" Margin="Margin.Dense" Mask="@ipPortMask"/>
+                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_add_name"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_add_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_add_required"))" Variant="Variant.Outlined" Margin="Margin.Dense" Mask="@ipPortMask"/>
             </MudForm>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" @onclick="Submit">Add</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">Cancel</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" @onclick="Submit">@(LocaleHelper.Get("server_add_confirm"))</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">@(LocaleHelper.Get("server_add_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>
@@ -22,14 +23,13 @@
 
     public Server Server = new();
 
-    [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
+    [CascadingParameter] private IMudDialogInstance mudDialog { get; set; }
 
     private void Submit()
     {
         Server.ServerId = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         Server.Locked = false;
-        Snackbar.Add("Added Server!", Severity.Success);
+        Snackbar.Add(LocaleHelper.Get("server_add_success"), Severity.Success);
         mudDialog.Close(DialogResult.Ok(Server));
     }
 

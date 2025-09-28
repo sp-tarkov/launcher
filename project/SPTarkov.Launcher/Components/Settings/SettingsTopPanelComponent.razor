@@ -2,13 +2,14 @@
 @inject ConfigHelper ConfigHelper
 @inject HttpHelper HttpHelper
 @inject ISnackbar Snackbar
+@inject LocaleHelper LocaleHelper
 
 <MudContainer Class="pa-0 pb-4 d-flex justify-start gap-2">
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">Load Live Settings</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">Clear Game Settings</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">Clean Temp Files</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">Copy Logs</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">Clear ApiKey</MudButton>
+    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
+    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
+    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
+    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
+    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">@(LocaleHelper.Get("setting_clear_api"))</MudButton>
 </MudContainer>
 
 @code {
@@ -21,8 +22,8 @@
 
         if (!Directory.Exists(eftSettingsFolder))
         {
-            Logger.LogWarning($"Settings can not be loaded from live, path given: {eftSettingsFolder}");
-            Snackbar.Add("Settings can not be loaded from live, path given", Severity.Error);
+            Logger.LogWarning("Settings can not be loaded from live, path given: {EftSettingsFolder}", eftSettingsFolder);
+            Snackbar.Add(LocaleHelper.Get("setting_load_live_error_1"), Severity.Error);
             return;
         }
 
@@ -42,13 +43,13 @@
         }
         catch (Exception e)
         {
-            Logger.LogWarning($"Unable to load live settings {e}");
-            Snackbar.Add("Loading live settings failed", Severity.Error);
+            Logger.LogWarning("Unable to load live settings {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_load_live_error_2"), Severity.Error);
             return;
         }
 
         Logger.LogInformation("Loaded live settings to SPTsettings folder");
-        Snackbar.Add("Loaded live settings", Severity.Success);
+        Snackbar.Add(LocaleHelper.Get("setting_load_live_success"), Severity.Success);
     }
 
     private async Task ClearGameSettings()
@@ -64,19 +65,19 @@
         }
         catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
         {
-            Logger.LogError($"Unable to clean game settings, UnauthorizedAccessException or IOException: {e}");
-            Snackbar.Add("Clearing game settings failed due to Unauthorized Access", Severity.Error);
+            Logger.LogError("Unable to clean game settings, UnauthorizedAccessException or IOException: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clear_game_error_1"), Severity.Error);
             return;
         }
         catch (Exception e)
         {
-            Logger.LogError($"Clearing game settings failed: {e}");
-            Snackbar.Add("Clearing game settings failed", Severity.Error);
+            Logger.LogError("Clearing game settings failed: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clear_game_error_2"), Severity.Error);
             return;
         }
 
         Logger.LogInformation("Cleared game settings");
-        Snackbar.Add("Cleared game settings", Severity.Success);
+        Snackbar.Add(LocaleHelper.Get("setting_clear_game_success"), Severity.Success);
     }
 
     private async Task CleanTempFiles()
@@ -88,19 +89,19 @@
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
-            Logger.LogError($"Unable to clean temp files, UnauthorizedAccessException or IOException: {e}");
-            Snackbar.Add("Unable to clean temp files due to Unauthorized Access", Severity.Warning);
+            Logger.LogError("Unable to clean temp files, UnauthorizedAccessException or IOException: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clean_temp_error_1"), Severity.Warning);
             return;
         }
         catch (Exception e)
         {
-            Logger.LogError($"Unable to clean temp files: {e}");
-            Snackbar.Add("Unable to clean temp files", Severity.Error);
+            Logger.LogError("Unable to clean temp files: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clean_temp_error_2"), Severity.Error);
             return;
         }
 
         Logger.LogInformation("Cleaned temp files");
-        Snackbar.Add("Cleaned temp files", Severity.Success);
+        Snackbar.Add(LocaleHelper.Get("setting_clean_temp_success"), Severity.Success);
     }
 
     private async Task CopyLogs()
@@ -148,19 +149,20 @@
         }
         catch (Exception e)
         {
-            Logger.LogError($"Unable to set clipboard with logs: {e}");
-            Snackbar.Add("Unable to set clipboard with logs", Severity.Error);
+            Logger.LogError("Unable to set clipboard with logs: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_copy_logs_error_1"), Severity.Error);
             return;
         }
 
-        Logger.LogInformation($"Copied {filesToCopy.Count} log/s to clipboard");
-        Snackbar.Add($"Copied {filesToCopy.Count} log{(filesToCopy.Count > 1 ? "s" : "")} to clipboard", Severity.Success);
+        Logger.LogInformation("Copied {Count} log/s to clipboard", filesToCopy.Count);
+        Snackbar.Add(LocaleHelper.Get("setting_copy_logs_success"), Severity.Success);
     }
 
     private void CopyFilePathsToClipboard(List<string> filePaths)
     {
         var collection = new StringCollection();
         collection.AddRange(filePaths.ToArray());
+        // TODO: implement this as photino doesnt have this api like wpf
         // Clipboard.Clear();
         // Clipboard.SetFileDropList(collection);
     }
@@ -176,24 +178,28 @@
         catch (Exception e)
         {
             Logger.LogError($"Exception thrown from SettingsTopPanelComponent.ClearApiKey: {e}");
+            Snackbar.Add(LocaleHelper.Get("setting_clear_api_error_1"), Severity.Error);
             return;
         }
 
         if (result is null)
         {
             Logger.LogError("Forge ForgeLogout result is null");
+            Snackbar.Add(LocaleHelper.Get("setting_clear_api_error_1"), Severity.Error);
             return;
         }
 
         if (result.Code == ForgeResponseMessage.Unauthenticated)
         {
             Logger.LogWarning("Forge ForgeLogout failed to authenticate");
+            Snackbar.Add(LocaleHelper.Get("setting_clear_api_error_1"), Severity.Error);
             return;
         }
 
         if (result.Success)
         {
             Logger.LogInformation("Forge ForgeLogout Successful");
+            Snackbar.Add(LocaleHelper.Get("setting_clear_api_success"), Severity.Error);
             HttpHelper.ClearApiKey();
         }
     }

@@ -61,16 +61,20 @@ public class Launcher
 
         _logger = App.Services.GetService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetService<ConfigHelper>();
-        var http = App.Services.GetService<HttpHelper>();
-        var modLoader = App.Services.GetService<ModHelper>();
 
-        http.IsInternetAccessAvailable();
-        _ = modLoader.GetClientMods();
-        _ = modLoader.GetServerMods();
+        // var http = App.Services.GetService<HttpHelper>();
+        // var modLoader = App.Services.GetService<ModHelper>();
+        //
+        // http.IsInternetAccessAvailable();
+        // _ = modLoader.GetClientMods();
+        // _ = modLoader.GetServerMods();
 
         CustomizeComponent();
 
-        AppDomain.CurrentDomain.UnhandledException += (_, error) => { App.MainWindow.ShowMessage("Fatal exception", error.ExceptionObject.ToString()); };
+        AppDomain.CurrentDomain.UnhandledException += (_, error) =>
+        {
+            App.MainWindow.ShowMessage("Fatal exception", error.ExceptionObject.ToString());
+        };
 
         try
         {
@@ -163,7 +167,6 @@ public class Launcher
             // TODO: check if the exception is related to missing webview2 deps.
             _logger.LogCritical("Please check the following is installed:");
             _logger.LogCritical("WebView2 - https://developer.microsoft.com/en-us/microsoft-edge/webview2");
-            _logger.LogCritical("DotNet 9.0 runtime - https://dotnet.microsoft.com/en-us/download/dotnet/9.0");
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -171,7 +174,6 @@ public class Launcher
             // TODO: check if the exception is related to missing webkit2gtk4.1 deps.
             _logger.LogCritical("Please check the following is installed:");
             _logger.LogCritical("Libwebkit2gtk-4.1");
-            _logger.LogCritical("DotNet 9.0 runtime");
         }
     }
 }

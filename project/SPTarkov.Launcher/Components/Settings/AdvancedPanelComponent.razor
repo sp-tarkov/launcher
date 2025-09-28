@@ -5,9 +5,9 @@
 <MudItem sm="12">
     <MudPaper Class="pa-5 ml-1 gap-2 d-flex flex-column setting-on-hover-container mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="3">
         <MudTooltip Arrow="true" Placement="Placement.Bottom" Color="Color.Info" Text="Image cannot be changed for now">
-            <SettingSwitchComponent Switch="@showBackgroundSwitch" OptionName="Use Background Image" SwitchFunc="@SetBackgroundUsage"/>
+            <SettingSwitchComponent Switch="@showBackgroundSwitch" OptionName="@(LocaleHelper.Get("setting_option_background"))" SwitchFunc="@SetBackgroundUsage"/>
         </MudTooltip>
-        <SettingLocaleComponent Options="@_localeOptions" OptionName="Language"/>
+        <SettingLocaleComponent Options="@_localeOptions" OptionName="@(LocaleHelper.Get("setting_option_language"))"/>
     </MudPaper>
 </MudItem>
 

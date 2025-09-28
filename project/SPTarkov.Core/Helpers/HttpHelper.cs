@@ -34,6 +34,8 @@ public class HttpHelper
 
         var handler = new HttpClientHandler();
         handler.ServerCertificateCustomValidationCallback = CertificateValidationCallback;
+        handler.UseCookies = false;
+
         _httpClient = new HttpClient(handler);
         _httpClient.DefaultRequestVersion = new Version(3, 0);
         _httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
@@ -41,7 +43,7 @@ public class HttpHelper
         _token = configHelper.GetConfig().ForgeApiKey;
     }
 
-    private bool CertificateValidationCallback(
+    private static bool CertificateValidationCallback(
         HttpRequestMessage httpRequestMessage,
         X509Certificate2? x509Certificate2,
         X509Chain? x509Chain,
@@ -214,7 +216,7 @@ public class HttpHelper
         }
 
         // make this dynamic later
-        queryString.Add("filter[spt_version]", "3.11.3");
+        queryString.Add("filter[spt_version]", "4.0.0");
 
         if (!string.IsNullOrWhiteSpace(sort))
         {
