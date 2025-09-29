@@ -20,7 +20,6 @@
 
         @switch (ProfilesList.Count)
         {
-            // TODO: server might hide profiles, but an edge case might be a fresh server
             case 0 when isConnected:
                 <MudItem sm="12">
                     <MudAlert Severity="Severity.Info" Variant="Variant.Filled">@(LocaleHelper.Get("profiles_empty_warning"))</MudAlert>

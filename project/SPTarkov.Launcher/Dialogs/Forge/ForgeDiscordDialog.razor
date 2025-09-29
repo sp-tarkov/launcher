@@ -70,22 +70,8 @@
 
     private async Task<bool> CallForge(string taskText = "", string failString = "")
     {
-        token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        _taskText = taskText;
-        StateHasChanged();
-        await Task.Delay(20);
-
+        // Discord cant be authenticated via api, so do this to make sure its known
         throw new NotImplementedException();
-        // var result = await _forge.ForgeLogin("https://forge.sp-tarkov.com/api/login", request, token.Token);
-
-        // if (!result)
-        // {
-        //     AbortOrFail(failString);
-        //     return false;
-        // }
-        //
-        // token?.Dispose();
-        // return true;
     }
 
     private void Submit()
