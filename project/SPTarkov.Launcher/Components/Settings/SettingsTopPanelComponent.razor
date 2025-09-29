@@ -15,7 +15,7 @@
 
 @code {
 
-    private bool IsWindows => OperatingSystem.IsWindows();
+    private bool IsWindows => !OperatingSystem.IsWindows();
 
     private async Task LoadLiveSettings()
     {
@@ -66,7 +66,7 @@
 
             Directory.CreateDirectory(sptSettings.FullName);
         }
-        catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             Logger.LogError("Unable to clean game settings, UnauthorizedAccessException or IOException: {Exception}", e);
             Snackbar.Add(LocaleHelper.Get("setting_clear_game_error_1"), Severity.Error);
