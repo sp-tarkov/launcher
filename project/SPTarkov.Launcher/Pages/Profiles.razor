@@ -75,13 +75,13 @@
             var objectToUse = result.Data as MiniProfile;
             _partialProfile = objectToUse;
             StateHelper.SetSelectedProfile(objectToUse);
-            NavigationManager.NavigateTo("/Profile");
+            NavigationManager.NavigateTo("/ServerPageWrapper");
         }
     }
 
     private async Task ReturnToServers()
     {
         StateHelper.SetSelectedServer(null);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/ServerPageWrapper");
     }
 }

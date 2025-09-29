@@ -40,7 +40,7 @@
         }
         catch (Exception e)
         {
-            Logger.LogError($"Exception thrown from ForgeHelper.SearchForMod {e}");
+            Logger.LogError("Exception thrown from ForgeHelper.SearchForMod {Exception}", e);
             return;
         }
 

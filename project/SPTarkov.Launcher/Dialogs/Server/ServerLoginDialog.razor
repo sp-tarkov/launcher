@@ -1,6 +1,7 @@
 ﻿@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
 @inject HttpHelper HttpHelper
+@inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -10,7 +11,7 @@
                 <MudText>@_taskText</MudText>
             </MudContainer>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="UserCancelled">Cancel</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="UserCancelled">@(LocaleHelper.Get("server_login_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>
@@ -19,11 +20,9 @@
 @code {
     private string _taskText = "";
 
-    [Parameter]
-    public Server Server { get; set; }
+    [Parameter] public Server Server { get; set; }
 
-    [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
+    [CascadingParameter] private IMudDialogInstance mudDialog { get; set; }
 
     private CancellationTokenSource token { get; set; }
     private bool userCancel { get; set; }
@@ -39,14 +38,14 @@
         try
         {
             StateHelper.SetSelectedServer(Server);
-            await CallServer(RequestTask.Ping, "Checking connection to server");
-            await CallServer(RequestTask.Profiles, "Getting profiles from server", "Error getting profiles from server!");
-            await CallServer(RequestTask.Types, "Getting profile creation data from server", "Error getting profile creation data!");
-            await CallServer(RequestTask.Mods, "Getting active mod list from server", "Error getting mod list from server!");
+            await CallServer(RequestTask.Ping, LocaleHelper.Get("server_login_task_1"));
+            await CallServer(RequestTask.Profiles, LocaleHelper.Get("server_login_task_2"), LocaleHelper.Get("server_login_task_fail_1"));
+            await CallServer(RequestTask.Types, LocaleHelper.Get("server_login_task_3"), LocaleHelper.Get("server_login_task_fail_2"));
+            await CallServer(RequestTask.Mods, LocaleHelper.Get("server_login_task_4"), LocaleHelper.Get("server_login_task_fail_3"));
         }
         catch (TaskCanceledException e) when (token.IsCancellationRequested)
         {
-            AbortOrFail("Request Timed out!");
+            AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
         catch (HttpRequestException e)
@@ -65,37 +64,44 @@
 
     private async Task CallServer(RequestTask option, string taskText = "", string failString = "")
     {
-        var result = false;
+        bool result;
         token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         _taskText = taskText;
         StateHasChanged();
         await Task.Delay(20);
 
-        if (option == RequestTask.Ping)
+        switch (option)
         {
-            var returnResult = await HttpHelper.GameServerGet<PingResponse>(RequestUrl.Ping, token.Token);
-            result = returnResult.Response == "Pong!";
-        }
-
-        if (option == RequestTask.Profiles)
-        {
-            var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, token.Token);
-            StateHelper.ProfileList = returnResult.Response;
-            result = true;
-        }
-
-        if (option == RequestTask.Types)
-        {
-            var returnResult = await HttpHelper.GameServerGet<TypesResponse>(RequestUrl.Types, token.Token);
-            StateHelper.ProfileTypes = returnResult.Response;
-            result = true;
-        }
-
-        if (option == RequestTask.Mods)
-        {
-            var returnResult = await HttpHelper.GameServerGet<ModsResponse>(RequestUrl.Mods, token.Token);
-            StateHelper.ModList = returnResult.Response;
-            result = true;
+            case RequestTask.Ping:
+            {
+                var returnResult = await HttpHelper.GameServerGet<PingResponse>(RequestUrl.Ping, token.Token);
+                result = returnResult.Response == "Pong!";
+                break;
+            }
+            case RequestTask.Profiles:
+            {
+                var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, token.Token);
+                StateHelper.ProfileList = returnResult.Response;
+                result = true;
+                break;
+            }
+            case RequestTask.Types:
+            {
+                var returnResult = await HttpHelper.GameServerGet<TypesResponse>(RequestUrl.Types, token.Token);
+                StateHelper.ProfileTypes = returnResult.Response;
+                result = true;
+                break;
+            }
+            case RequestTask.Mods:
+            {
+                var returnResult = await HttpHelper.GameServerGet<ModsResponse>(RequestUrl.Mods, token.Token);
+                StateHelper.ModList = returnResult.Response;
+                result = true;
+                break;
+            }
+            case RequestTask.Profile:
+            default:
+                throw new ArgumentOutOfRangeException(nameof(option), option, null);
         }
 
         if (!result)
@@ -107,8 +113,10 @@
         token?.Dispose();
     }
 
-    private void AbortOrFail(string message = "Error connecting to server!")
+    private void AbortOrFail(string message = null)
     {
+        message ??= LocaleHelper.Get("server_login_default");
+
         if (!userCancel)
         {
             Snackbar.Add(message, Severity.Error);
@@ -122,7 +130,7 @@
     private void Submit()
     {
         mudDialog.Close(DialogResult.Ok(Server));
-        Snackbar.Add("Logged In. Visit Profiles Page!", Severity.Success);
+        Snackbar.Add(LocaleHelper.Get("server_login_task_success"), Severity.Success);
     }
 
     private void UserCancelled()

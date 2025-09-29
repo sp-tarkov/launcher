@@ -5,11 +5,12 @@
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
 @inject ILogger<Forge> Logger
+@inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-8 mt-2 mb-6 pa-0" MaxWidth="MaxWidth.Large">
     @if (!_forgeAvailable)
     {
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">Forge is coming soon!</MudAlert>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("forge_page_coming"))</MudAlert>
     }
     else
     {
@@ -96,7 +97,7 @@
 </MudContainer>
 
 @code {
-    private readonly bool _forgeAvailable = false;
+    private readonly bool _forgeAvailable = false; // TODO remove once forge is implemented
     private bool netAvailable { get; set; }
     private bool apiKeyAvailable { get; set; }
     private ForgeModsResponse searchResponse { get; set; }

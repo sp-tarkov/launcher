@@ -1,12 +1,13 @@
 ﻿@inject ISnackbar Snackbar
+@inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="py-4">
-            <MudText>Do you really want to delete this server? This process cannot be undone.</MudText>
+            <MudText>@(LocaleHelper.Get("server_remove_text"))</MudText>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="Submit">Delete</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">Cancel</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="Submit">@(LocaleHelper.Get("server_remove_confirm"))</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">@(LocaleHelper.Get("server_remove_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>
@@ -18,7 +19,7 @@
 
     private void Submit()
     {
-        Snackbar.Add("Removed!");
+        Snackbar.Add(LocaleHelper.Get("server_remove_submit"));
         mudDialog.Close(DialogResult.Ok(true));
     }
 

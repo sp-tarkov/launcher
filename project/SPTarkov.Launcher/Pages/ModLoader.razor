@@ -1,16 +1,17 @@
 ﻿@page "/ModLoader"
 
-@implements IDisposable;
+@implements IDisposable
 
 @inject ConfigHelper ConfigHelper
 @inject IDialogService DialogService
-@inject NavigationManager NavigationManager;
-@inject ILogger<ModLoader> Logger;
+@inject NavigationManager NavigationManager
+@inject ILogger<ModLoader> Logger
+@inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
     @if (!_modLoaderAvailable)
     {
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">Mod Loader is coming soon!</MudAlert>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("mod_page_coming"))</MudAlert>
     }
     else
     {
@@ -60,7 +61,7 @@
 </MudContainer>
 
 @code {
-    private const bool _modLoaderAvailable = false;
+    private const bool _modLoaderAvailable = false; // TODO: remove once this page has been implemented
     private MudDropContainer<DropItem> container { get; set; }
     private bool unsavedData { get; set; }
     private List<DropItem> _items = new();
