@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeResponseData
+public record ForgeResponseData
 {
     [JsonPropertyName("token")]
     public string? Token { get; set; }

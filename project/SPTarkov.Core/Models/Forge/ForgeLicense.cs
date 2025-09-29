@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeLicense
+public record ForgeLicense
 {
     [JsonPropertyName("id")]
     public int? Id { get; set; }

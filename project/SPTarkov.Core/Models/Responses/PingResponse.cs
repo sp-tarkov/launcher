@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class PingResponse : ISptResponse<string>
+public record PingResponse : ISptResponse<string>
 {
     public string Response { get; set; } = "";
 }

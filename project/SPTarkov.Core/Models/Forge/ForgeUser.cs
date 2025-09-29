@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeUser
+public record ForgeUser
 {
     [JsonPropertyName("id")]
     public int? Id { get; set; }

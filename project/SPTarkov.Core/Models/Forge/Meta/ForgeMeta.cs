@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeMeta
+public record ForgeMeta
 {
     [JsonPropertyName("current_page")]
     public int? CurrentPage { get; set; }

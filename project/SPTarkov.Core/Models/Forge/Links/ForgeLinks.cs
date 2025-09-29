@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeLinks
+public record ForgeLinks
 {
     [JsonPropertyName("first")]
     public string? First { get; set; }

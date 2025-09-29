@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class Server
+public record Server
 {
     public string Name { get; set; } = "LocalHost";
 

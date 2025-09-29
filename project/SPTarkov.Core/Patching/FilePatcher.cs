@@ -19,13 +19,8 @@ public class FilePatcher
     {
         _logger = logger;
     }
-    //     public static event EventHandler<ProgressInfo> PatchProgress;
-    //     private static void RaisePatchProgress(int Percentage, string Message)
-    //     {
-    //         PatchProgress?.Invoke(null, new ProgressInfo(Percentage, Message));
-    //     }
 
-    public PatchResultInfo Patch(string targetfile, string patchfile, bool IgnoreInputHashMismatch = false)
+    private PatchResultInfo Patch(string targetfile, string patchfile, bool IgnoreInputHashMismatch = false)
     {
         // Backup the original file if a backup doesn't exist yet
         var backupFile = $"{targetfile}.spt-bak";
@@ -34,7 +29,7 @@ public class FilePatcher
             File.Copy(targetfile, backupFile);
         }
 
-        PatchResultInfo result = ApplyPatch(patchfile, backupFile, targetfile);
+        var result = ApplyPatch(patchfile, backupFile, targetfile);
         if (result.Status == PatchResultEnum.InputChecksumMismatch && IgnoreInputHashMismatch)
         {
             return new PatchResultInfo(PatchResultEnum.Success, 1, 1);
@@ -45,20 +40,20 @@ public class FilePatcher
 
     private PatchResultInfo PatchAll(string targetpath, string patchpath, bool IgnoreInputHashMismatch = false)
     {
-        DirectoryInfo di = new DirectoryInfo(patchpath);
+        var di = new DirectoryInfo(patchpath);
 
         // get all patch files within patchpath and it's sub directories.
         var patchfiles = di.GetFiles("*.delta", SearchOption.AllDirectories);
 
-        int countfiles = patchfiles.Length;
+        var countfiles = patchfiles.Length;
 
-        int processed = 0;
+        var processed = 0;
 
         foreach (FileInfo file in patchfiles)
         {
             FileInfo target;
 
-            int progress = (int) Math.Floor((double) processed / countfiles * 100);
+            var progress = (int) Math.Floor((double) processed / countfiles * 100);
 
             // get the relative portion of the patch file that will be appended to targetpath in order to create an official target file.
             var relativefile = file.FullName.Substring(patchpath.Length).TrimStart('\\', '/');
@@ -66,7 +61,7 @@ public class FilePatcher
             // create a target file from the relative patch file while utilizing targetpath as the root directory.
             target = new FileInfo(Path.Combine(targetpath, relativefile.Replace(".delta", "")));
 
-            PatchResultInfo result = Patch(target.FullName, file.FullName, IgnoreInputHashMismatch);
+            var result = Patch(target.FullName, file.FullName, IgnoreInputHashMismatch);
 
             if (!result.OK)
             {
@@ -90,7 +85,7 @@ public class FilePatcher
         RestoreRecurse(new DirectoryInfo(filepath));
     }
 
-    public void RestoreRecurse(DirectoryInfo basedir)
+    private void RestoreRecurse(DirectoryInfo basedir)
     {
         // scan subdirectories
         foreach (var dir in basedir.EnumerateDirectories())
@@ -130,7 +125,7 @@ public class FilePatcher
         // TODO: We should do checksum validation at some point
         try
         {
-            HDiffPatch patcher = new HDiffPatch();
+            var patcher = new HDiffPatch();
             HDiffPatch.LogVerbosity = Verbosity.Quiet;
 
             patcher.Initialize(PatchFilePath);

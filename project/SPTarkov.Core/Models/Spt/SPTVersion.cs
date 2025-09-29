@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SPTarkov.Core.Models;
 
-public class SPTVersion
+public record SPTVersion
 {
     public int Major { get; set; }
 

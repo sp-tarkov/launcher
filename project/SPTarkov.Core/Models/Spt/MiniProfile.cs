@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class MiniProfile
+public record MiniProfile
 {
     [JsonPropertyName("username")]
     public string Username { get; set; } = "";

@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class RemoveResponse : ISptResponse<bool>
+public record RemoveResponse : ISptResponse<bool>
 {
     public List<MiniProfile> Profiles { get; set; } = [];
 

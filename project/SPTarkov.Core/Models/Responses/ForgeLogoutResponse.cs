@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeLogoutResponse
+public record ForgeLogoutResponse
 {
     [JsonPropertyName("message")]
     public string? Message { get; set; }

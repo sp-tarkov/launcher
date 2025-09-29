@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class SPTMod
+public record SPTMod
 {
     [JsonPropertyName("author")]
     public string Author { get; set; } = "";

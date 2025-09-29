@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeModsResponse
+public record ForgeModsResponse
 {
     [JsonPropertyName("success")]
     public bool Success { get; set; }

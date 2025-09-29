@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeMetaLinks
+public record ForgeMetaLinks
 {
     [JsonPropertyName("url")]
     public string? Url { get; set; }
