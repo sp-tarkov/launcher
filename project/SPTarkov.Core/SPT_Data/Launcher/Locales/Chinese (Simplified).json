@@ -6,6 +6,7 @@
   "mod_loader": "模组加载器",
   "settings": "设置",
   "info": "信息",
+  "request_timed_out": "请求超时！",
   "home_add_server": "添加新服务器",
   "home_add_server_cta": "请使用上面的\"添加新服务器\"按钮添加服务器",
   "server_card_protect": "禁止编辑",

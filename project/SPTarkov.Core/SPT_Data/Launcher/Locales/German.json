@@ -6,6 +6,7 @@
   "mod_loader": "Mod Loader",
   "settings": "Settings",
   "info": "Info",
+  "request_timed_out": "Request Timed out!",
   "home_add_server": "Add New Server",
   "home_add_server_cta": "Please Add a server using the \"Add New Server\" button above.",
   "server_card_protect": "Protected from edits",
