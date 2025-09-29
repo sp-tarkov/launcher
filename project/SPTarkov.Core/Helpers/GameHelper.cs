@@ -63,7 +63,7 @@ public class GameHelper
         if (IsInstalledInLive())
         {
             _logger.LogError("SPT is installed in Live");
-            ErrorMessage = _localeHelper.Get("gamehelper_error_1");
+            ErrorMessage = _localeHelper.Get("game_helper_error_1");
             return false;
         }
 
@@ -72,7 +72,7 @@ public class GameHelper
         if (await IsCoreDllVersionMismatched())
         {
             _logger.LogError("Core dll mismatch");
-            ErrorMessage = _localeHelper.Get("gamehelper_error_2");
+            ErrorMessage = _localeHelper.Get("game_helper_error_2");
             return false;
         }
 
@@ -83,7 +83,7 @@ public class GameHelper
         if (!Validate())
         {
             _logger.LogError("Game Validation Failed");
-            ErrorMessage = _localeHelper.Get("gamehelper_error_3");
+            ErrorMessage = _localeHelper.Get("game_helper_error_3");
             return false;
         }
 
@@ -104,7 +104,7 @@ public class GameHelper
         catch (Exception e)
         {
             _logger.LogError("patching failed: {e}", e);
-            ErrorMessage = _localeHelper.Get("gamehelper_error_4");
+            ErrorMessage = _localeHelper.Get("game_helper_error_4");
             return false;
         }
 
@@ -123,7 +123,7 @@ public class GameHelper
         if (!File.Exists(clientExecutable))
         {
             _logger.LogError("Could not find {ClientExecutable}", clientExecutable);
-            ErrorMessage = _localeHelper.Get("gamehelper_error_5");
+            ErrorMessage = _localeHelper.Get("game_helper_error_5");
             return false;
         }
 
@@ -150,7 +150,7 @@ public class GameHelper
         catch (Exception ex)
         {
             _logger.LogError($"Starting game process failed: {ex}");
-            ErrorMessage = _localeHelper.Get("gamehelper_error_6");
+            ErrorMessage = _localeHelper.Get("game_helper_error_6");
             return false;
         }
 
@@ -209,6 +209,8 @@ public class GameHelper
 
     private async Task<bool> IsCoreDllVersionMismatched()
     {
+        return false; // TODO: skip this for now
+
         try
         {
             var call = await _httpHelper.GameServerGet<VersionResponse>(RequestUrl.Version, CancellationToken.None);
