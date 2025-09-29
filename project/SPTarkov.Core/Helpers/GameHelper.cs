@@ -209,8 +209,6 @@ public class GameHelper
 
     private async Task<bool> IsCoreDllVersionMismatched()
     {
-        return false; // TODO: skip this for now
-
         try
         {
             var call = await _httpHelper.GameServerGet<VersionResponse>(RequestUrl.Version, CancellationToken.None);
