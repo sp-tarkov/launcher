@@ -7,7 +7,7 @@
 @inject ILogger<Forge> Logger
 @inject LocaleHelper LocaleHelper
 
-<MudContainer Class="px-8 mt-2 mb-6 pa-0" MaxWidth="MaxWidth.Large">
+<MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     @if (!_forgeAvailable)
     {
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("forge_page_coming"))</MudAlert>
@@ -165,9 +165,9 @@
 
     protected override void OnInitialized()
     {
-        netAvailable = HttpHelper.IsInternetAccessAvailable();
-        apiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
-        SearchForMods();
+        // netAvailable = HttpHelper.IsInternetAccessAvailable();
+        // apiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
+        // SearchForMods();
         base.OnInitialized();
     }
 

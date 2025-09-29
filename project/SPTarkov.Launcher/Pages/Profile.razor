@@ -8,7 +8,7 @@
 @inject ConfigHelper ConfigHelper
 @inject ISnackbar Snackbar
 
-<MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
+<MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 pb-4">
         <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
         <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGame" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>

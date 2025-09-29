@@ -8,7 +8,7 @@
 @inject ILogger<ModLoader> Logger
 @inject LocaleHelper LocaleHelper
 
-<MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
+<MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
     @if (!_modLoaderAvailable)
     {
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("mod_page_coming"))</MudAlert>

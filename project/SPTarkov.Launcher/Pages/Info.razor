@@ -2,21 +2,20 @@
 
 @inject LocaleHelper LocaleHelper
 
-<MudContainer Class="px-8 my-2 pa-0" MaxWidth="MaxWidth.Large">
+<MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
     <MudGrid>
-        <InfoCardComponent Name="Hub" Description="@(LocaleHelper.Get("info_hub_desc"))" Link="https://hub.sp-tarkov.com/"/>
         <InfoCardComponent Name="Forge" Description="@(LocaleHelper.Get("info_forge_desc"))" Link="https://forge.sp-tarkov.com/"/>
         <InfoCardComponent Name="Github" Description="@(LocaleHelper.Get("info_github_desc"))" Link="https://github.com/sp-tarkov"/>
         <InfoCardComponent Name="Discord" Description="@(LocaleHelper.Get("info_discord_desc"))" Link="https://discord.com/invite/Xn9msqQZan"/>
         <InfoCardComponent Name="Escape From Tarkov Wiki" Description="@(LocaleHelper.Get("info_wiki_desc"))" Link="https://escapefromtarkov.fandom.com/wiki/Escape_from_Tarkov_Wiki"/>
         <InfoCardComponent Name="Wiki Changelog" Description="@(LocaleHelper.Get("info_changelog_desc"))" Link="https://escapefromtarkov.fandom.com/wiki/Changelog"/>
+        <InfoCardComponent Name="SPT Launcher Github" Description="@(LocaleHelper.Get("info_translations"))" Link="https://github.com/sp-tarkov/launcher/issues"/>
     </MudGrid>
 </MudContainer>
 
 @code {
     // https://escapefromtarkov.fandom.com/wiki/Escape_from_Tarkov_Wiki
     // https://escapefromtarkov.fandom.com/wiki/Changelog
-    // https://hub.sp-tarkov.com/
     // https://forge.sp-tarkov.com/
     // https://github.com/sp-tarkov
     // https://discord.com/invite/Xn9msqQZan
