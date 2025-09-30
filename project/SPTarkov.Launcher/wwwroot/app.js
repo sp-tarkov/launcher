@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (!target.href.startsWith('#') && !target.href.includes('//localhost')) {
+        if (!target.href.startsWith('#') && !target.href.startsWith('https://localhost') && !target.href.startsWith('http://localhost')) {
             console.log('Opening external link:', target.href);
             e.preventDefault();
             window.external.sendMessage('open-external:' + target.href);

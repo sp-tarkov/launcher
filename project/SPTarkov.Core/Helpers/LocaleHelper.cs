@@ -11,7 +11,7 @@ public class LocaleHelper
     private readonly Lock _lock = new();
     private readonly ILogger<LocaleHelper> _logger;
     private readonly ConfigHelper _configHelper;
-    private readonly string _dirPath = Path.Combine(Directory.GetCurrentDirectory(), "SPT_Data", "Launcher", "Locales");
+    private readonly string _dirPath = Path.Combine(Directory.GetCurrentDirectory(), "SPT_Data", "Launcher", "locales");
     private string _defaultLocale;
     private List<Dictionary<string, string>> _listOfLocales = [];
     private Dictionary<string, string> _selectedLocale = new();
