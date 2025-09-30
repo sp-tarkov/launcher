@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeModIncludes
+public record ForgeModIncludes
 {
     [JsonPropertyName("users")]
     public List<ForgeBase> Users { get; set; }

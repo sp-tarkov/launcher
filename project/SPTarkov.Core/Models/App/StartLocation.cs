@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class StartLocation
+public record StartLocation
 {
     public int X { get; set; }
 

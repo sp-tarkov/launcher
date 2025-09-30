@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class StartSize
+public record StartSize
 {
     public int Height { get; set; } = 1070;
 

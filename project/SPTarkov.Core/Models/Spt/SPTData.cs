@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class SPTData
+public record SPTData
 {
     [JsonPropertyName("version")]
     public string Version { get; set; } = "";

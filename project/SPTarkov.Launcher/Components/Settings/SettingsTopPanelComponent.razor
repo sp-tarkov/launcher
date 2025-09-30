@@ -3,16 +3,19 @@
 @inject HttpHelper HttpHelper
 @inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
+@inject WindowsClipboard Clipboard
 
 <MudContainer Class="pa-0 pb-4 d-flex justify-start gap-2">
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
+    <MudButton Disabled="@IsWindows" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">@(LocaleHelper.Get("setting_clear_api"))</MudButton>
 </MudContainer>
 
 @code {
+
+    private bool IsWindows => !OperatingSystem.IsWindows();
 
     private async Task LoadLiveSettings()
     {
@@ -63,7 +66,7 @@
 
             Directory.CreateDirectory(sptSettings.FullName);
         }
-        catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
             Logger.LogError("Unable to clean game settings, UnauthorizedAccessException or IOException: {Exception}", e);
             Snackbar.Add(LocaleHelper.Get("setting_clear_game_error_1"), Severity.Error);
@@ -160,11 +163,14 @@
 
     private void CopyFilePathsToClipboard(List<string> filePaths)
     {
-        var collection = new StringCollection();
-        collection.AddRange(filePaths.ToArray());
-        // TODO: implement this as photino doesnt have this api like wpf
-        // Clipboard.Clear();
-        // Clipboard.SetFileDropList(collection);
+        if (!OperatingSystem.IsWindows())
+        {
+            // added this just incase for whatever reason disabling the button doesnt work.
+            Logger.LogWarning("Clipboard.CopyFiles is not supported on this platform");
+            return;
+        }
+
+        Clipboard.CopyFiles(filePaths.ToArray());
     }
 
     private async Task ClearApiKey()
@@ -177,7 +183,7 @@
         }
         catch (Exception e)
         {
-            Logger.LogError($"Exception thrown from SettingsTopPanelComponent.ClearApiKey: {e}");
+            Logger.LogError("Exception thrown from SettingsTopPanelComponent.ClearApiKey: {Exception}", e);
             Snackbar.Add(LocaleHelper.Get("setting_clear_api_error_1"), Severity.Error);
             return;
         }

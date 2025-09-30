@@ -2,7 +2,7 @@
 
 namespace SPTarkov.Core.Models;
 
-public class ForgeModVersion
+public record ForgeModVersion
 {
     [JsonPropertyName("id")]
     public int? Id { get; set; }

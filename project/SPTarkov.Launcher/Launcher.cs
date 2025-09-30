@@ -8,7 +8,6 @@ using MudBlazor.Services;
 using Photino.Blazor;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
-using SPTarkov.Core.Logging;
 using SPTarkov.Core.Patching;
 
 namespace SPTarkov.Launcher;
@@ -40,6 +39,7 @@ public class Launcher
             .AddSingleton<StateHelper>()
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
+            .AddSingleton<WindowsClipboard>()
             .AddLogging(builder =>
             {
                 builder.ClearProviders();
@@ -164,14 +164,12 @@ public class Launcher
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            // TODO: check if the exception is related to missing webview2 deps.
             _logger.LogCritical("Please check the following is installed:");
             _logger.LogCritical("WebView2 - https://developer.microsoft.com/en-us/microsoft-edge/webview2");
         }
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            // TODO: check if the exception is related to missing webkit2gtk4.1 deps.
             _logger.LogCritical("Please check the following is installed:");
             _logger.LogCritical("Libwebkit2gtk-4.1");
         }

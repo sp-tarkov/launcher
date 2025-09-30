@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class LauncherSettings
+public record LauncherSettings
 {
     public LauncherSettings()
     {
@@ -12,8 +12,6 @@ public class LauncherSettings
             Locked = true
         });
     }
-
-    public DebugSettings DebugSettings { get; set; } = new();
 
     public List<Server> Servers { get; set; } = new();
 

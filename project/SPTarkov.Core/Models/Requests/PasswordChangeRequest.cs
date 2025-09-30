@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SPTarkov.Core.Models;
 
-public class PasswordChangeRequest : LoginRequest
+public record PasswordChangeRequest : LoginRequest
 {
     [Required]
     [JsonPropertyName("change")]

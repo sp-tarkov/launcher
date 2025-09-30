@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SPTarkov.Core.Models;
 
-public class LoginRequest
+public record LoginRequest
 {
     [Required]
     [JsonPropertyName("username")]

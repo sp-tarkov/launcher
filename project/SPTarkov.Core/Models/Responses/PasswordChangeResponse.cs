@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Models;
 
-public class PasswordChangeResponse : ISptResponse<bool>
+public record PasswordChangeResponse : ISptResponse<bool>
 {
     public List<MiniProfile> Profiles { get; set; } = [];
 

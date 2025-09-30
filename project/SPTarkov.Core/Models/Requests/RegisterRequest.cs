@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SPTarkov.Core.Models;
 
-public class RegisterRequest : LoginRequest
+public record RegisterRequest : LoginRequest
 {
     [Required]
     [JsonPropertyName("edition")]
