@@ -18,6 +18,7 @@
   "server_card_logout": "Vom Server abmelden",
   "server_card_delete": "Server löschen",
   "info_hub_desc": "Das aktuelle Zuhause von SPT",
+  "info_translations": "Probleme mit den Übersetzungen? Bitte öffne einen PR mit den Korrekturen auf GitHub.",
   "info_forge_desc": "Die beste Ressource für Single Player Tarkov Mods.",
   "info_github_desc": "Das GitHub für alle SPT-bezogenen Repositories",
   "info_discord_desc": "Der SPT Discord",
