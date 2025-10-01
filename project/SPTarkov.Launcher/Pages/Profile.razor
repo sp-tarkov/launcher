@@ -9,28 +9,30 @@
 @inject ISnackbar Snackbar
 
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
-    <MudContainer Class="pa-0 pb-4">
+    <MudContainer Class="pa-0 pb-4 d-flex flex-row justify-space-between">
         <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
+        <MudSpacer/>
         <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGame" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
-    @* <MudContainer Class="pa-0 pb-4"> *@
-    @*     <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/> *@
-    @* </MudContainer> *@
-    @* <MudContainer Class="d-flex pa-0 pb-4"> *@
-    @*     <MudPaper Elevation="2" Class="pa-4 mr-4"> *@
-    @*         <MudImage Src="https://placehold.co/150" Elevation="25" Class="rounded-lg" FallbackSrc="https://placehold.co/150"/> *@
-    @*     </MudPaper> *@
-    @*     <MudPaper Elevation="2" Class="pa-4 d-flex flex-column justify-space-between mr-4"> *@
-    @*         <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">₽:</MudText> *@
-    @*         <MudText Typo="Typo.h6">1,000,000,000</MudText> *@
-    @*         <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">$:</MudText> *@
-    @*         <MudText Typo="Typo.h6">1,000,000,000</MudText> *@
-    @*         <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">€:</MudText> *@
-    @*         <MudText Typo="Typo.h6">1,000,000,000</MudText> *@
-    @*         <MudText Class="mb-n2 no-pointers no-select" Typo="Typo.caption">GP:</MudText> *@
-    @*         <MudText Typo="Typo.h6">1,000,000,000</MudText> *@
-    @*     </MudPaper> *@
-    @* </MudContainer> *@
+    <MudContainer Class="pa-0 mb-2">
+        <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8">
+            <MudText Typo="Typo.h6">@selectedMiniProfile.Username</MudText>
+            <MudText Typo="Typo.h6">@selectedMiniProfile.ProfileID</MudText>
+            <MudText Typo="Typo.h6">@selectedMiniProfile.Edition</MudText>
+            <MudText Typo="Typo.h6">@selectedMiniProfile.SptData.Version</MudText>
+        </MudPaper>
+    </MudContainer>
+    <MudContainer Class="pa-0 mb-2">
+        <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8">
+            <MudText Typo="Typo.h6">₽: 1,000,000,000</MudText>
+            <MudText Typo="Typo.h6">$: 1,000,000,000</MudText>
+            <MudText Typo="Typo.h6">€: 1,000,000,000</MudText>
+            <MudText Typo="Typo.h6">GP: 1,000,000,000</MudText>
+        </MudPaper>
+    </MudContainer>
+    <MudContainer Class="pa-0 pb-4">
+        <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/>
+    </MudContainer>
 </MudContainer>
 
 @code {
