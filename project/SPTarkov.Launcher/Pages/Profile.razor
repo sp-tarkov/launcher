@@ -12,7 +12,7 @@
     <MudContainer Class="pa-0 pb-4 d-flex flex-row justify-space-between">
         <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
         <MudSpacer/>
-        <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGame" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>
+        <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
     <MudContainer Class="pa-0 mb-2">
         <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8">
@@ -46,12 +46,26 @@
         base.OnInitialized();
     }
 
-    private async Task StartGame()
+    /// <summary>
+    /// Wrap the StartGame method to easily control navigation.
+    /// </summary>
+    private async Task StartGameTask()
     {
-        // set play button to disabled while game is open
         _buttonDisabled = true;
         StateHelper.SetAllowNavigation(false);
 
+        await StartGame();
+
+        _buttonDisabled = false;
+        if (ConfigHelper.GetConfig().MinimizeOnLaunch)
+        {
+            Launcher.App.MainWindow.SetMinimized(false);
+        }
+        StateHelper.SetAllowNavigation(true);
+    }
+
+    private async Task StartGame()
+    {
         Snackbar.Add(LocaleHelper.Get("profile_page_task_1"));
         if (!await GameHelper.CheckGame())
         {
@@ -76,7 +90,6 @@
             return;
         }
 
-        // call minimize on window
         if (ConfigHelper.GetConfig().MinimizeOnLaunch)
         {
             Launcher.App.MainWindow.SetMinimized(true);
@@ -86,15 +99,6 @@
         {
             Snackbar.Add(LocaleHelper.Get("profile_page_game_closed"), Severity.Info);
         }
-
-        _buttonDisabled = false;
-
-        if (ConfigHelper.GetConfig().MinimizeOnLaunch)
-        {
-            Launcher.App.MainWindow.SetMinimized(false);
-        }
-
-        StateHelper.SetAllowNavigation(true);
     }
 
     private async Task ReturnToProfiles()
