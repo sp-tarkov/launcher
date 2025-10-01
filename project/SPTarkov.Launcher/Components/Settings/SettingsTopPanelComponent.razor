@@ -87,8 +87,8 @@
     {
         try
         {
-            var rootdir = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, "user", "sptappdata"));
-            rootdir.Delete(true);
+            var tempFolder = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, "user", "sptappdata"));
+            tempFolder.Delete(true);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
