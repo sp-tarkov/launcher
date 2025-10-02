@@ -1,17 +1,17 @@
-﻿using SPT.Launcher.Attributes;
+﻿using Avalonia.Controls.Notifications;
+using Avalonia.Threading;
+using ReactiveUI;
+using Splat;
+using SPT.Launcher.Attributes;
 using SPT.Launcher.Helpers;
 using SPT.Launcher.MiniCommon;
 using SPT.Launcher.Models;
-using SPT.Launcher.Models.SPT;
 using SPT.Launcher.Models.Launcher;
+using SPT.Launcher.Models.SPT;
 using SPT.Launcher.ViewModels.Dialogs;
-using Avalonia.Controls.Notifications;
-using ReactiveUI;
-using Splat;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Threading.Tasks;
-using Avalonia.Threading;
 
 namespace SPT.Launcher.ViewModels
 {
@@ -62,7 +62,7 @@ namespace SPT.Launcher.ViewModels
 
                                 if (result != null && result is SPTEdition edition)
                                 {
-                                    AccountStatus registerResult = await AccountManager.RegisterAsync(Login.Username, Login.Password, edition.Name);
+                                    AccountStatus registerResult = await AccountManager.RegisterAsync(Login.Username, edition.Name);
 
                                     switch (registerResult)
                                     {

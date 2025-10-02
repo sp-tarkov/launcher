@@ -6,8 +6,8 @@
  */
 
 
-using SPT.Launcher.Utilities;
 using SPT.Launcher.Models.Launcher;
+using SPT.Launcher.Utilities;
 
 namespace SPT.Launch.Models.Launcher
 {
@@ -18,13 +18,6 @@ namespace SPT.Launch.Models.Launcher
         {
             get => _username;
             set => SetProperty(ref _username, value);
-        }
-
-        private string _password;
-        public string Password
-        {
-            get => _password;
-            set => SetProperty(ref _password, value);
         }
 
         public EditionCollection EditionsCollection { get; set; } = new EditionCollection();

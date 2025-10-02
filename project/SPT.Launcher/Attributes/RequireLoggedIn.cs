@@ -1,7 +1,7 @@
-﻿using SPT.Launcher.Helpers;
+﻿using ReactiveUI;
+using SPT.Launcher.Helpers;
 using SPT.Launcher.Models;
 using SPT.Launcher.ViewModels;
-using ReactiveUI;
 using System.Threading.Tasks;
 
 namespace SPT.Launcher.Attributes
@@ -10,7 +10,7 @@ namespace SPT.Launcher.Attributes
     {
         public override async Task<NavigationPreConditionResult> TestPreCondition(IScreen Host)
         {
-            AccountStatus status = await AccountManager.LoginAsync(AccountManager.SelectedAccount.username, AccountManager.SelectedAccount.password);
+            AccountStatus status = await AccountManager.LoginAsync(AccountManager.SelectedAccount.username);
 
             if (status == AccountStatus.OK) return NavigationPreConditionResult.FromSuccess();
 

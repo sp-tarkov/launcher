@@ -41,12 +41,12 @@ namespace SPT.Launcher
 
         public static async Task<AccountStatus> LoginAsync(LoginModel Creds)
         {
-            return await LoginAsync(Creds.Username, Creds.Password);
+            return await LoginAsync(Creds.Username);
         }
 
-        public static async Task<AccountStatus> LoginAsync(string username, string password)
+        public static async Task<AccountStatus> LoginAsync(string username)
         {
-            LoginRequestData data = new LoginRequestData(username, password);
+            LoginRequestData data = new LoginRequestData(username);
             string id = STATUS_FAILED;
             string json = "";
 
@@ -76,7 +76,7 @@ namespace SPT.Launcher
 
         public static async Task UpdateProfileInfoAsync()
         {
-            LoginRequestData data = new LoginRequestData(SelectedAccount.username, SelectedAccount.password);
+            LoginRequestData data = new LoginRequestData(SelectedAccount.username);
             string profileInfoJson = await RequestHandler.RequestProfileInfo(data);
 
             if (profileInfoJson != null)
@@ -103,12 +103,12 @@ namespace SPT.Launcher
             return [];
         }
 
-        public static async Task<AccountStatus> RegisterAsync(string username, string password, string edition)
+        public static async Task<AccountStatus> RegisterAsync(string username, string edition)
         {
             string registerResult;
             try
             {
-                registerResult = await RequestHandler.RequestRegister(new RegisterRequestData(username, password, edition));
+                registerResult = await RequestHandler.RequestRegister(new RegisterRequestData(username, edition));
             }
             catch
             {
@@ -122,12 +122,12 @@ namespace SPT.Launcher
 
             LogManager.Instance.Info($"Account Registered: {username} {registerResult}");
 
-            return await LoginAsync(username, password);
+            return await LoginAsync(username);
         }
 
         public static async Task<AccountStatus> RemoveAsync()
         {
-            LoginRequestData data = new LoginRequestData(SelectedAccount.username, SelectedAccount.password);
+            LoginRequestData data = new LoginRequestData(SelectedAccount.username);
 
             try
             {
@@ -158,7 +158,7 @@ namespace SPT.Launcher
 
         public static async Task<AccountStatus> ChangeUsernameAsync(string username)
         {
-            ChangeRequestData data = new ChangeRequestData(SelectedAccount.username, SelectedAccount.password, username);
+            ChangeRequestData data = new ChangeRequestData(SelectedAccount.username, username);
             string json = STATUS_FAILED;
 
             try
@@ -188,41 +188,9 @@ namespace SPT.Launcher
             return AccountStatus.OK;
         }
 
-        public static async Task<AccountStatus> ChangePasswordAsync(string password)
-        {
-            ChangeRequestData data = new ChangeRequestData(SelectedAccount.username, SelectedAccount.password, password);
-            string json = STATUS_FAILED;
-
-            try
-            {
-                json = await RequestHandler.RequestChangePassword(data);
-
-                if (json != STATUS_OK)
-                {
-                    return AccountStatus.UpdateFailed;
-                }
-            }
-            catch
-            {
-                return AccountStatus.NoConnection;
-            }
-
-            ServerSetting DefaultServer = LauncherSettingsProvider.Instance.Server;
-
-            if (DefaultServer.AutoLoginCreds != null)
-            {
-                DefaultServer.AutoLoginCreds.Password = password;
-            }
-
-            SelectedAccount.password = password;
-            LauncherSettingsProvider.Instance.SaveSettings();
-
-            return AccountStatus.OK;
-        }
-
         public static async Task<AccountStatus> WipeAsync(string edition)
         {
-            RegisterRequestData data = new RegisterRequestData(SelectedAccount.username, SelectedAccount.password, edition);
+            RegisterRequestData data = new RegisterRequestData(SelectedAccount.username, edition);
             string json = STATUS_FAILED;
 
             try

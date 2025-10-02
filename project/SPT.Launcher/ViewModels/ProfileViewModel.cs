@@ -1,18 +1,18 @@
-﻿using SPT.Launcher.Helpers;
+﻿using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
+using ReactiveUI;
+using SPT.Launcher.Attributes;
+using SPT.Launcher.Helpers;
 using SPT.Launcher.MiniCommon;
 using SPT.Launcher.Models;
 using SPT.Launcher.Models.Launcher;
-using Avalonia;
-using ReactiveUI;
-using System.Threading.Tasks;
-using SPT.Launcher.Attributes;
+using SPT.Launcher.Models.SPT;
 using SPT.Launcher.ViewModels.Dialogs;
-using Avalonia.Threading;
+using System;
 using System.Diagnostics;
 using System.IO;
-using Avalonia.Controls.ApplicationLifetimes;
-using SPT.Launcher.Models.SPT;
-using System;
+using System.Threading.Tasks;
 
 namespace SPT.Launcher.ViewModels
 {
@@ -129,7 +129,7 @@ namespace SPT.Launcher.ViewModels
         {
             LauncherSettingsProvider.Instance.AllowSettings = false;
 
-            AccountStatus status = await AccountManager.LoginAsync(AccountManager.SelectedAccount.username, AccountManager.SelectedAccount.password);
+            AccountStatus status = await AccountManager.LoginAsync(AccountManager.SelectedAccount.username);
 
             LauncherSettingsProvider.Instance.AllowSettings = true;
 

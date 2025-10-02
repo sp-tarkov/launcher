@@ -85,11 +85,6 @@ namespace SPT.Launcher
             return await request.PostJsonAsync("/launcher/profile/change/username", Json.Serialize(data), true, requestCancellationTokenSource.Token);
         }
 
-        public static async Task<string> RequestChangePassword(ChangeRequestData data)
-        {
-            return await request.PostJsonAsync("/launcher/profile/change/password", Json.Serialize(data), true, requestCancellationTokenSource.Token);
-        }
-
         public static async Task<string> RequestWipe(RegisterRequestData data)
         {
             return await request.PostJsonAsync("/launcher/profile/change/wipe", Json.Serialize(data), true, requestCancellationTokenSource.Token);
