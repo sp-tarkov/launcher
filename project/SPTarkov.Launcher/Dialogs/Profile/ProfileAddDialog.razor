@@ -23,7 +23,6 @@
                         }
                     </MudSelect>
                     <MudTextField Immediate="true" @bind-Value="_request.Username" Label="@(LocaleHelper.Get("profile_add_name"))" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true"/>
-                    <PasswordFieldComponent @bind-Password="_request.Password"/>
                     @if (tooltipText != "")
                     {
                         <MudCard Class="pa-2 edition-text" Outlined="true">

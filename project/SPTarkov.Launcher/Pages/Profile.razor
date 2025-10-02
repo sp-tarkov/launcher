@@ -14,24 +14,20 @@
         <MudSpacer/>
         <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
-    <MudContainer Class="pa-0 mb-2">
-        <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8">
-            <MudText Typo="Typo.h6">@selectedMiniProfile.Username</MudText>
-            <MudText Typo="Typo.h6">@selectedMiniProfile.ProfileID</MudText>
-            <MudText Typo="Typo.h6">@selectedMiniProfile.Edition</MudText>
-            <MudText Typo="Typo.h6">@selectedMiniProfile.SptData.Version</MudText>
-        </MudPaper>
-    </MudContainer>
-    <MudContainer Class="pa-0 mb-2">
-        <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8">
+    <MudContainer Class="pa-0 mb-4">
+        <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
             <MudText Typo="Typo.h6">₽: 1,000,000,000</MudText>
             <MudText Typo="Typo.h6">$: 1,000,000,000</MudText>
             <MudText Typo="Typo.h6">€: 1,000,000,000</MudText>
             <MudText Typo="Typo.h6">GP: 1,000,000,000</MudText>
         </MudPaper>
     </MudContainer>
-    <MudContainer Class="pa-0 pb-4">
+    <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
+        <ProfileCardComponent MiniProfile="selectedMiniProfile" HideButtons="true"/>
         <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/>
+    </MudContainer>
+    <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
+        <ProfileLevelComponent CurrentExp="selectedMiniProfile.CurrentExp" CurrentLevel="selectedMiniProfile.CurrentLevel" NeededExp="selectedMiniProfile.NextLevel"/>
     </MudContainer>
 </MudContainer>
 
@@ -61,6 +57,7 @@
         {
             Launcher.App.MainWindow.SetMinimized(false);
         }
+
         StateHelper.SetAllowNavigation(true);
     }
 
@@ -106,4 +103,5 @@
         StateHelper.SetSelectedProfile(null);
         NavigationManager.NavigateTo("/ServerPageWrapper");
     }
+
 }

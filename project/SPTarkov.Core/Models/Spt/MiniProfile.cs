@@ -7,9 +7,6 @@ public record MiniProfile
     [JsonPropertyName("username")]
     public string Username { get; set; } = "";
 
-    [JsonPropertyName("hasPassword")]
-    public bool HasPassword { get; set; }
-
     [JsonPropertyName("side")]
     public string Side { get; set; } = "";
 

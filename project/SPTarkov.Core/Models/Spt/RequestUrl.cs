@@ -6,7 +6,6 @@ public record RequestUrl
     public const string Types = "/launcher/v2/types";
     public const string Login = "/launcher/v2/login";
     public const string Register = "/launcher/v2/register";
-    public const string PasswordChange = "/launcher/v2/passwordChange";
     public const string Remove = "/launcher/v2/remove";
     public const string Version = "/launcher/v2/version";
     public const string Mods = "/launcher/v2/mods";

@@ -16,19 +16,7 @@
             else
             {
                 <MudForm Model="request" @bind-IsValid="@_success" Class="gap-2 mt-3">
-                    @if (MiniProfile != null)
-                    {
-                        <MudTextField Immediate="true" @bind-Value="request.Username" Label="@(LocaleHelper.Get("profile_login_username"))" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="true" Required="true" ReadOnly="true"/>
-                        @if (MiniProfile.HasPassword)
-                        {
-                            <PasswordFieldComponent @bind-Password="request.Password"/>
-                        }
-                    }
-                    else
-                    {
-                        <MudTextField Immediate="true" @bind-Value="request.Username" Label="@(LocaleHelper.Get("profile_login_username"))" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="false" Required="true"/>
-                        <PasswordFieldComponent @bind-Password="request.Password"/>
-                    }
+                    <MudTextField Immediate="true" @bind-Value="request.Username" Label="@(LocaleHelper.Get("profile_login_username"))" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="false" Required="true"/>
                 </MudForm>
             }
 
@@ -65,11 +53,7 @@
             request.Username = MiniProfile.Username;
         }
 
-        if (!MiniProfile.HasPassword)
-        {
-            Logger.LogInformation("Profile: {MiniProfileUsername} does not have a password, logging in without dialog", MiniProfile.Username);
-            await RunLoginTask();
-        }
+        await RunLoginTask();
 
         await base.OnInitializedAsync();
     }
