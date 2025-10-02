@@ -14,20 +14,20 @@
         <MudSpacer/>
         <MudButton Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowRight">@(LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
+    <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
+        <ProfileLevelComponent CurrentExp="selectedMiniProfile.CurrentExp" CurrentLevel="selectedMiniProfile.CurrentLevel" NeededExp="selectedMiniProfile.NextLevel"/>
+    </MudContainer>
     <MudContainer Class="pa-0 mb-4">
         <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
             <MudText Typo="Typo.h6">₽: 1,000,000,000</MudText>
-            <MudText Typo="Typo.h6">$: 1,000,000,000</MudText>
-            <MudText Typo="Typo.h6">€: 1,000,000,000</MudText>
-            <MudText Typo="Typo.h6">GP: 1,000,000,000</MudText>
+            <MudText Typo="Typo.h6">$: 1,000,000</MudText>
+            <MudText Typo="Typo.h6">€: 1,000,000</MudText>
+            <MudText Typo="Typo.h6">GP: 69</MudText>
         </MudPaper>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
         <ProfileCardComponent MiniProfile="selectedMiniProfile" HideButtons="true"/>
         <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/>
-    </MudContainer>
-    <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
-        <ProfileLevelComponent CurrentExp="selectedMiniProfile.CurrentExp" CurrentLevel="selectedMiniProfile.CurrentLevel" NeededExp="selectedMiniProfile.NextLevel"/>
     </MudContainer>
 </MudContainer>
 
