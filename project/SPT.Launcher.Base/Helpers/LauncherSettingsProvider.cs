@@ -37,7 +37,7 @@ namespace SPT.Launcher.Helpers
         public void ResetDefaults()
         {
             string defaultUrl = "https://127.0.0.1:6969";
-            string defaultPath = Environment.CurrentDirectory;
+            string defaultPath = Directory.GetParent(Environment.CurrentDirectory).FullName;
             
             // don't reset if running in dev mode
             if (IsDevMode)
@@ -144,7 +144,7 @@ namespace SPT.Launcher.Helpers
                 LogManager.Instance.Info($"Creating launcher config: {LauncherSettingsProvider.DefaultSettingsFileLocation}");
                 LauncherStartGameAction = LauncherAction.MinimizeAction;
                 UseAutoLogin = true;
-                GamePath = Environment.CurrentDirectory;
+                GamePath = Directory.GetParent(Environment.CurrentDirectory).FullName;
                 IsDevMode = false;
 
                 Server = new ServerSetting

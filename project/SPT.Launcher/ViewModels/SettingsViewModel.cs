@@ -50,13 +50,13 @@ namespace SPT.Launcher.ViewModels
 
                 var filesToCopy = new List<string> { LogManager.Instance.LogFile };
                 
-                var serverLog = Path.Join(LauncherSettingsProvider.Instance.GamePath, @"\user\logs",
+                var serverLog = Path.Join(Environment.CurrentDirectory, @"\user\logs",
                     $"server-{DateTime.Now:yyyy-MM-dd}.log");
                 var bepinexLog = Path.Join(LauncherSettingsProvider.Instance.GamePath, @"BepInEx\LogOutput.log");
 
                 if (AccountManager.SelectedAccount?.id != null)
                 {
-                    filesToCopy.Add(Path.Join(LauncherSettingsProvider.Instance.GamePath, @"\user\profiles",
+                    filesToCopy.Add(Path.Join(Environment.CurrentDirectory, @"\user\profiles",
                         $"{AccountManager.SelectedAccount.id}.json"));
                 }
 
@@ -155,7 +155,7 @@ namespace SPT.Launcher.ViewModels
         {
             LogManager.Instance.Info("[Settings] Reseting game settings ...");
             string EFTSettingsFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape from Tarkov", "Settings");
-            string SPTSettingsFolder = Path.Join(LauncherSettingsProvider.Instance.GamePath, "user", "sptsettings");
+            string SPTSettingsFolder = Path.Join(Environment.CurrentDirectory, "user", "sptsettings");
 
             if (!Directory.Exists(EFTSettingsFolder))
             {
@@ -193,7 +193,7 @@ namespace SPT.Launcher.ViewModels
         public async Task ClearGameSettingsCommand()
         {
             LogManager.Instance.Info("[Settings] Clearing game settings ...");
-            var SPTSettingsDir = new DirectoryInfo(Path.Join(LauncherSettingsProvider.Instance.GamePath, "user", "sptsettings"));
+            var SPTSettingsDir = new DirectoryInfo(Path.Join(LauncherSettingsProvider.Instance.GamePath, "SPT", "user", "sptsettings"));
 
             try
             {

@@ -20,7 +20,7 @@ namespace SPT.Launcher.MiniCommon
 
     public static class ImageRequest
     {
-        public static string ImageCacheFolder = Path.Join(LauncherSettingsProvider.Instance.GamePath, "SPT_Data", "Launcher", "Image_Cache");
+        public static string ImageCacheFolder = Path.Join(LauncherSettingsProvider.Instance.GamePath, "SPT", "SPT_Data", "Launcher", "Image_Cache");
 
         private static List<string> CachedRoutes = new List<string>();
 
