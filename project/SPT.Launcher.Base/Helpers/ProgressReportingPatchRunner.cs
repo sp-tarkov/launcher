@@ -63,7 +63,7 @@ namespace SPT.Launcher.Helpers
 
         private string[] GetCorePatches()
         {
-            return VFS.GetDirectories(VFS.Combine(GamePath, "SPT_Data/Launcher/Patches/"));
+            return VFS.GetDirectories(VFS.Combine(GamePath, "SPT/SPT_Data/Launcher/Patches/"));
         }
 
         public ProgressReportingPatchRunner(string GamePath, string[] Patches = null)
