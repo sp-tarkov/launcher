@@ -10,8 +10,12 @@ namespace SPT.Launcher.Models.SPT
 
 
 /*
-        "author": "Boop",
-        "dateAdded": 1687150604114,
-        "name": "Boop's Quest Zone API",
-        "version": "1.0.0"
+[
+    {
+        "name": "Live Flea Prices",
+        "version": "2.0.0",
+        "author": "DrakiaXYZ",
+        "dateAdded": 1759888291
+    }
+]
 */
