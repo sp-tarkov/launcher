@@ -1,6 +1,6 @@
 ﻿$buildFolder = "..\Build"
 $SPTDataFolder = "..\Build\SPT_Data"
-$launcherExeFolder = "..\SPT.Launcher\bin\Release\net8.0\win-x64\publish"
+$launcherExeFolder = "..\SPT.Launcher\bin\Release\net9.0\win-x64\publish"
 $launcherAssetFolder = "..\SPT.Launcher\SPT_Data"
 $licenseFile = "..\..\LICENSE.md"
 

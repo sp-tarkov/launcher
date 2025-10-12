@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using SPT.Launcher.Utilities;
+using System.Threading.Tasks;
 
 namespace SPT.Launcher.Models.Launcher
 {
@@ -34,33 +35,36 @@ namespace SPT.Launcher.Models.Launcher
 
         public ModInfoCollection()
         {
-            var serverMods = ServerManager.GetLoadedServerMods().Values.ToList();
-            var profileMods = ServerManager.GetProfileMods().ToList();
-
-            ServerModsCount = serverMods?.Count() ?? 0;
-            ProfileModsCount = profileMods?.Count() ?? 0;
-
-            foreach (var activeMod in serverMods)
+            Task.Run(async () =>
             {
-                activeMod.InServer = true;
-                ActiveMods.Add(activeMod);
-            }
+                var serverMods = (await ServerManager.GetLoadedServerModsAsync()).Values;
+                var profileMods = (await ServerManager.GetProfileModsAsync()).ToList();
 
-            foreach (var inactiveMod in profileMods)
-            {
-                var existingMod = ActiveMods.FirstOrDefault(x => x.Name == inactiveMod.Name && x.Version == inactiveMod.Version && x.Author == inactiveMod.Author);
+                ServerModsCount = serverMods?.Count() ?? 0;
+                ProfileModsCount = profileMods?.Count() ?? 0;
 
-                if (existingMod != null)
+                foreach (var activeMod in serverMods)
                 {
-                    existingMod.InProfile = true;
-                    continue;
+                    activeMod.InServer = true;
+                    ActiveMods.Add(activeMod);
                 }
 
-                inactiveMod.InProfile = true;
-                InactiveMods.Add(inactiveMod);
-            }
+                foreach (var inactiveMod in profileMods)
+                {
+                    var existingMod = ActiveMods.FirstOrDefault(x => x.Name == inactiveMod.Name && x.Version == inactiveMod.Version && x.Author == inactiveMod.Author);
 
-            HasMods = ActiveMods.Count > 0 || InactiveMods.Count > 0;
+                    if (existingMod != null)
+                    {
+                        existingMod.InProfile = true;
+                        continue;
+                    }
+
+                    inactiveMod.InProfile = true;
+                    InactiveMods.Add(inactiveMod);
+                }
+
+                HasMods = ActiveMods.Count > 0 || InactiveMods.Count > 0;
+            });
         }
     }
 }

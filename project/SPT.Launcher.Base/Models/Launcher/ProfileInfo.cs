@@ -13,6 +13,7 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using SPT.Launcher.Utilities;
+using System.Threading.Tasks;
 
 namespace SPT.Launcher.Models.Launcher
 {
@@ -155,7 +156,10 @@ namespace SPT.Launcher.Models.Launcher
 
             if (SPT != null)
             {
-                VersionMismatch = !CompareVersions(SPT.version, ServerManager.GetVersion());
+                Task.Run(async () =>
+                {
+                    VersionMismatch = !CompareVersions(SPT.version, await ServerManager.GetVersionAsync());
+                });
             }
 
             SideImage = Path.Combine(ImageRequest.ImageCacheFolder, $"side_{Side.ToLower()}.png");

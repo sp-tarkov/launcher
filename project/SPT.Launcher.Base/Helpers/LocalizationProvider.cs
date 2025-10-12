@@ -7,17 +7,16 @@
  */
 
 
+using SPT.Launcher.Controllers;
 using SPT.Launcher.Extensions;
 using SPT.Launcher.MiniCommon;
+using SPT.Launcher.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using SPT.Launcher.Utilities;
-using SPT.Launcher.Controllers;
 
 namespace SPT.Launcher.Helpers
 {
@@ -101,7 +100,6 @@ namespace SPT.Launcher.Helpers
             englishLocale.back = "Back";
             englishLocale.wipe_profile = "Wipe Profile";
             englishLocale.username = "Username";
-            englishLocale.password = "Password";
             englishLocale.update = "Update";
             englishLocale.edit_account_update_error = "An issue occurred while updating your profile.";
             englishLocale.register = "Register";
@@ -111,7 +109,7 @@ namespace SPT.Launcher.Helpers
             englishLocale.login_or_register = "Login / Register";
             englishLocale.go_to_login = "Go to Login";
             englishLocale.login_automatically = "Login Automatically";
-            englishLocale.incorrect_login = "Username or password is incorrect";
+            englishLocale.incorrect_login = "Username is incorrect";
             englishLocale.login_failed = "Login Failed";
             englishLocale.edition = "Edition";
             englishLocale.id = "ID";
@@ -144,7 +142,6 @@ namespace SPT.Launcher.Helpers
             englishLocale.exit_action = "Close Launcher";
             englishLocale.on_game_start = "On Game Start";
             englishLocale.game = "Game";
-            englishLocale.new_password = "New Password";
             englishLocale.wipe_warning = "Changing your account edition requires a profile wipe. This will reset your game prgrogess.";
             englishLocale.cancel = "Cancel";
             englishLocale.need_an_account = "Don't have an account yet?";
@@ -371,15 +368,6 @@ namespace SPT.Launcher.Helpers
         {
             get => _username;
             set => SetProperty(ref _username, value);
-        }
-        #endregion
-
-        #region password
-        private string _password;
-        public string password
-        {
-            get => _password;
-            set => SetProperty(ref _password, value);
         }
         #endregion
 
@@ -758,15 +746,6 @@ namespace SPT.Launcher.Helpers
         {
             get => _game;
             set => SetProperty(ref _game, value);
-        }
-        #endregion
-
-        #region new_password
-        private string _new_password;
-        public string new_password
-        {
-            get => _new_password;
-            set => SetProperty(ref _new_password, value);
         }
         #endregion
 

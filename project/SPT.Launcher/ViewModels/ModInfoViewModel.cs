@@ -9,14 +9,10 @@ using ReactiveUI;
 
 namespace SPT.Launcher.ViewModels;
 
-public class ModInfoViewModel : ViewModelBase
+public class ModInfoViewModel(IScreen Host, ModInfoCollection mods) : ViewModelBase(Host)
 {
-    public ModInfoCollection ModsCollection { get; set; }
-    public ModInfoViewModel(IScreen Host, ModInfoCollection mods) : base(Host)
-    {
-        ModsCollection = mods;
-    }
-    
+    public ModInfoCollection ModsCollection { get; set; } = mods;
+
     public async Task OpenUrlCommand(string url)
     {
         if (!url.StartsWith("https://"))
@@ -25,7 +21,7 @@ public class ModInfoViewModel : ViewModelBase
             return;
         }
 
-        var question = String.Format(LocalizationProvider.Instance.open_link_question_format_1, url);
+        var question = string.Format(LocalizationProvider.Instance.open_link_question_format_1, url);
         var confirmText = LocalizationProvider.Instance.open_link;
         var cancelText = LocalizationProvider.Instance.cancel;
 

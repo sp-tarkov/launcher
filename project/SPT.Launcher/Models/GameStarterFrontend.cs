@@ -27,7 +27,7 @@ namespace SPT.Launcher.Models
                 {
                     if(info.Status == PatchResultType.InputChecksumMismatch)
                     {
-                        string serverVersion = ServerManager.GetVersion();
+                        string serverVersion = await ServerManager.GetVersionAsync();
 
                         var localeText = string.Format(LocalizationProvider.Instance.file_mismatch_dialog_message, serverVersion);
                         

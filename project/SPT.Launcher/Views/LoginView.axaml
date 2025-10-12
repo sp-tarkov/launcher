@@ -33,7 +33,6 @@
 		<cc:LoginBox Grid.Row="2" Grid.Column="2"
 		             Username="{Binding Login.Username, Mode=TwoWay}"
 		             LoginCommand="{Binding LoginCommand}"
-		             IsLoggedIn="{Binding IsLoggedIn}"
 		             />
 	</Grid>
 </UserControl>

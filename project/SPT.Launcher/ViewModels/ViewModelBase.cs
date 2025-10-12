@@ -22,6 +22,11 @@ namespace SPT.Launcher.ViewModels
 
         public IScreen HostScreen { get; }
 
+        public virtual Task OnCreateAsync()
+        {
+            return Task.CompletedTask;
+        }
+
         /// <summary>
         /// Delay the return of the viewmodel
         /// </summary>
@@ -41,7 +46,7 @@ namespace SPT.Launcher.ViewModels
         /// <param name="ViewModel"></param>
         /// <returns>The first failed precondition or a successful precondition if all tests pass</returns>
         /// <remarks>Execution of preconditions stops at the first failed condition</remarks>
-        private NavigationPreConditionResult TestPreConditions(ViewModelBase ViewModel)
+        private async Task<NavigationPreConditionResult> TestPreConditions(ViewModelBase ViewModel)
         {
             var attribs = ViewModel.GetType().GetCustomAttributes(typeof(NavigationPreCondition), true);
 
@@ -49,7 +54,7 @@ namespace SPT.Launcher.ViewModels
             {
                 if(attrib is NavigationPreCondition condition)
                 {
-                    NavigationPreConditionResult result = condition.TestPreCondition(HostScreen);
+                    NavigationPreConditionResult result = await condition.TestPreCondition(HostScreen);
 
                     if(!result.Succeeded)
                     {
@@ -69,9 +74,9 @@ namespace SPT.Launcher.ViewModels
         /// </summary>
         /// <param name="ViewModel"></param>
         /// <returns>The viewmodel that should be loaded</returns>
-        private ViewModelBase ProcessViewModelResults(ViewModelBase ViewModel)
+        private async Task<ViewModelBase> ProcessViewModelResults(ViewModelBase ViewModel)
         {
-            NavigationPreConditionResult result = TestPreConditions(ViewModel);
+            NavigationPreConditionResult result = await TestPreConditions(ViewModel);
 
             if (!result.Succeeded)
             {
@@ -89,7 +94,7 @@ namespace SPT.Launcher.ViewModels
         /// <returns></returns>
         public async Task NavigateToWithDelay(ViewModelBase ViewModel, int Milliseconds)
         {
-            ViewModel = ProcessViewModelResults(ViewModel);
+            ViewModel = await ProcessViewModelResults(ViewModel);
 
             if (ViewModel == null) return;
 
@@ -103,13 +108,13 @@ namespace SPT.Launcher.ViewModels
         /// Navigate to another viewmodel
         /// </summary>
         /// <param name="ViewModel"></param>
-        public void NavigateTo(ViewModelBase ViewModel)
+        public async Task NavigateTo(ViewModelBase ViewModel)
         {
-            ViewModel = ProcessViewModelResults(ViewModel);
+            ViewModel = await ProcessViewModelResults(ViewModel);
 
             if (ViewModel == null) return;
 
-            Dispatcher.UIThread.InvokeAsync(() =>
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 HostScreen.Router.Navigate.Execute(ViewModel);
             });
@@ -118,17 +123,17 @@ namespace SPT.Launcher.ViewModels
         /// <summary>
         /// Navigate to the previous viewmodel
         /// </summary>
-        public void NavigateBack()
+        public async Task NavigateBack()
         {
             var ViewModel = HostScreen.Router.NavigationStack[HostScreen.Router.NavigationStack.Count - 2];
 
             if(ViewModel is ViewModelBase vmBase)
             {
-                var result = TestPreConditions(vmBase);
+                var result = await TestPreConditions(vmBase);
 
                 if (!result.Succeeded)
                 {
-                    Dispatcher.UIThread.InvokeAsync(() =>
+                    await Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         if (result.ViewModel == null) return;
 
@@ -138,7 +143,7 @@ namespace SPT.Launcher.ViewModels
                 }
             }
 
-            Dispatcher.UIThread.InvokeAsync(() =>
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 HostScreen.Router.NavigateBack.Execute();
             });

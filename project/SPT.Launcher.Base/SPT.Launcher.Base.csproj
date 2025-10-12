@@ -1,15 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <RootNamespace>SPT.Launcher</RootNamespace>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Reference Include="zlib.net, Version=1.0.3.0, Culture=neutral, PublicKeyToken=null">
-        <HintPath>..\SPT.Launcher\References\zlib.net.dll</HintPath>
-      </Reference>
-    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />

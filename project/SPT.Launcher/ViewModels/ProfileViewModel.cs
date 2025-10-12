@@ -1,17 +1,18 @@
-﻿using SPT.Launcher.Helpers;
+﻿using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
+using ReactiveUI;
+using SPT.Launcher.Attributes;
+using SPT.Launcher.Helpers;
 using SPT.Launcher.MiniCommon;
 using SPT.Launcher.Models;
 using SPT.Launcher.Models.Launcher;
-using Avalonia;
-using ReactiveUI;
-using System.Threading.Tasks;
-using SPT.Launcher.Attributes;
+using SPT.Launcher.Models.SPT;
 using SPT.Launcher.ViewModels.Dialogs;
-using Avalonia.Threading;
+using System;
 using System.Diagnostics;
 using System.IO;
-using Avalonia.Controls.ApplicationLifetimes;
-using SPT.Launcher.Models.SPT;
+using System.Threading.Tasks;
 
 namespace SPT.Launcher.ViewModels
 {
@@ -49,18 +50,10 @@ namespace SPT.Launcher.ViewModels
 
         private readonly GameStarter _gameStarter = new GameStarter(new GameStarterFrontend());
 
-        private readonly ProcessMonitor _monitor;
+        private ProcessMonitor _monitor;
 
         public ProfileViewModel(IScreen Host) : base(Host)
         {
-            // cache and load side image if profile has a side
-            if(AccountManager.SelectedProfileInfo != null && AccountManager.SelectedProfileInfo.Side != null)
-            {
-                ImageRequest.CacheSideImage(AccountManager.SelectedProfileInfo.Side);
-                SideImage.Path = AccountManager.SelectedProfileInfo.SideImage;
-                SideImage.Touch();
-            }
-
             _monitor = new ProcessMonitor("EscapeFromTarkov", 1000, aliveCallback: GameAliveCallBack, exitCallback: GameExitCallback);
 
             CurrentEdition = AccountManager.SelectedAccount.edition;
@@ -68,9 +61,20 @@ namespace SPT.Launcher.ViewModels
             CurrentId = AccountManager.SelectedAccount.id;
         }
 
+        public override async Task OnCreateAsync()
+        {
+            // cache and load side image if profile has a side
+            if (AccountManager.SelectedProfileInfo != null && AccountManager.SelectedProfileInfo.Side != null)
+            {
+                await ImageRequest.CacheSideImage(AccountManager.SelectedProfileInfo.Side);
+                SideImage.Path = AccountManager.SelectedProfileInfo.SideImage;
+                SideImage.Touch();
+            }
+        }
+
         private async Task GameVersionCheck()
         {
-            string compatibleGameVersion = ServerManager.GetCompatibleGameVersion();
+            string compatibleGameVersion = await ServerManager.GetCompatibleGameVersionAsync();
 
             if (compatibleGameVersion == "") return;
 
@@ -85,21 +89,21 @@ namespace SPT.Launcher.ViewModels
                 WarningDialogViewModel warning = new WarningDialogViewModel(null,
                                                      string.Format(LocalizationProvider.Instance.game_version_mismatch_format_2, gameVersion, compatibleGameVersion),
                                                      LocalizationProvider.Instance.i_understand);
-                Dispatcher.UIThread.InvokeAsync(async() =>
+                
+                await Dispatcher.UIThread.InvokeAsync(async() =>
                 {
                     await ShowDialog(warning);
                 });
             }
         }
 
-        public void OpenModsInfoCommand() =>
-            NavigateTo(new ModInfoViewModel(HostScreen, ModInfoCollection));
+        public async Task OpenModsInfoCommand() => await NavigateTo(new ModInfoViewModel(HostScreen, ModInfoCollection));
 
-        public void LogoutCommand()
+        public async Task LogoutCommand()
         {
             AccountManager.Logout();
 
-            NavigateTo(new ConnectServerViewModel(HostScreen, true));
+            await NavigateTo(new ConnectServerViewModel(HostScreen, true));
         }
 
         public void ChangeWindowState(Avalonia.Controls.WindowState? State, bool Close = false)
@@ -125,14 +129,14 @@ namespace SPT.Launcher.ViewModels
         {
             LauncherSettingsProvider.Instance.AllowSettings = false;
 
-            AccountStatus status = await AccountManager.LoginAsync(AccountManager.SelectedAccount.username, AccountManager.SelectedAccount.password);
+            AccountStatus status = await AccountManager.LoginAsync(AccountManager.SelectedAccount.username);
 
             LauncherSettingsProvider.Instance.AllowSettings = true;
 
             switch (status)
             {
                 case AccountStatus.NoConnection:
-                    NavigateTo(new ConnectServerViewModel(HostScreen));
+                    await NavigateTo(new ConnectServerViewModel(HostScreen));
                     return;
             }
 
@@ -193,7 +197,7 @@ namespace SPT.Launcher.ViewModels
                     }
                 case AccountStatus.NoConnection:
                     {
-                        NavigateTo(new ConnectServerViewModel(HostScreen));
+                        await NavigateTo(new ConnectServerViewModel(HostScreen));
                         break;
                     }
                 default:
@@ -250,7 +254,7 @@ namespace SPT.Launcher.ViewModels
 
                         LauncherSettingsProvider.Instance.SaveSettings();
 
-                        NavigateTo(new ConnectServerViewModel(HostScreen));
+                        await NavigateTo(new ConnectServerViewModel(HostScreen));
                         break;
                     }
                 case AccountStatus.UpdateFailed:
@@ -261,16 +265,16 @@ namespace SPT.Launcher.ViewModels
                 case AccountStatus.NoConnection:
                     {
                         SendNotification("", LocalizationProvider.Instance.no_servers_available);
-                        NavigateTo(new ConnectServerViewModel(HostScreen));
+                        await NavigateTo(new ConnectServerViewModel(HostScreen));
                         break;
                     }
             }
         }
 
-        private void UpdateProfileInfo()
+        private async Task UpdateProfileInfo()
         {
-            AccountManager.UpdateProfileInfo();
-            ImageRequest.CacheSideImage(AccountManager.SelectedProfileInfo.Side);
+            await AccountManager.UpdateProfileInfoAsync();
+            await ImageRequest.CacheSideImage(AccountManager.SelectedProfileInfo.Side);
             ProfileInfo.UpdateDisplayedProfile(AccountManager.SelectedProfileInfo);
             if (ProfileInfo.SideImage != SideImage.Path)
             {
@@ -282,18 +286,18 @@ namespace SPT.Launcher.ViewModels
 
         //pull profile every x seconds
         private int aliveCallBackCountdown = 60;
-        private void GameAliveCallBack(ProcessMonitor monitor)
+        private async void GameAliveCallBack(ProcessMonitor monitor)
         {
             aliveCallBackCountdown--;
 
             if (aliveCallBackCountdown <= 0)
             {
                 aliveCallBackCountdown = 60;
-                UpdateProfileInfo();
+                await UpdateProfileInfo();
             }
         }
 
-        private void GameExitCallback(ProcessMonitor monitor)
+        private async void GameExitCallback(ProcessMonitor monitor)
         {
             monitor.Stop();
 
@@ -311,7 +315,12 @@ namespace SPT.Launcher.ViewModels
                     }
             }
 
-            UpdateProfileInfo();
+            try
+            {
+                await UpdateProfileInfo();
+            }
+            catch(Exception)
+            { }
         }
     }
 }

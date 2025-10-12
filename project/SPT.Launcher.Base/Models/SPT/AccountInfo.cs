@@ -13,7 +13,6 @@ namespace SPT.Launcher
         public string id;
         public string nickname;
         public string username;
-        public string password;
         public bool wipe;
         public string edition;
 
@@ -22,7 +21,6 @@ namespace SPT.Launcher
             id = "";
             nickname = "";
             username = "";
-            password = "";
             wipe = false;
             edition = "";
         }
