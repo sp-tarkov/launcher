@@ -1,31 +1,6 @@
-window.scrollToTopSmooth = function () {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-}
-
 window.reloadBrowser = function () {
     location.reload();
 }
-
-window.toggleScrollButton = function () {
-    const scrollButton = document.getElementById('scrollTopBtn');
-    if (!scrollButton) {
-        return;
-    }
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-        scrollButton.style.display = 'flex';
-    } else {
-        scrollButton.style.display = 'none';
-    }
-};
-
-window.onscroll = function () {
-    window.toggleScrollButton();
-};
-
-window.toggleScrollButton();
 
 // Because Photino starts links to external pages inside the app
 // Add this script to check a tag has a link to an external site and start it externally ourself.
