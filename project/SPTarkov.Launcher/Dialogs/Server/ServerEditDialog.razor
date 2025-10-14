@@ -6,7 +6,7 @@
         <MudContainer Class="py-4">
             <MudForm Model="Server" @bind-IsValid="@success" Class="gap-2 mt-3">
                 <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_edit_name"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
-                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense" Mask="@ipPortMask"/>
+                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
             </MudForm>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" @onclick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
@@ -19,6 +19,7 @@
 @code {
     private bool success;
 
+    // TODO: create mask that can be either IP or an actual address - Example: https://127.0.0.1:6969 or https://nerd.something.net:6969
     private readonly IMask ipPortMask = RegexMask.IPv4(true);
 
     [Parameter]
