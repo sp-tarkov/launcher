@@ -132,7 +132,7 @@ a.setting-on-hover:hover {
     }
 
     a {
-        color: var(--mud-palette-primary);
+        text-decoration: underline;
     }
 
     b, strong {
@@ -194,12 +194,10 @@ a.setting-on-hover:hover {
 
     ul {
         margin-bottom: 0.5rem;
-        /*list-disc*/
     }
 
     ol {
         margin-bottom: 0.5rem;
-        /*list-decimal*/
     }
 
     li {
@@ -252,8 +250,7 @@ a.setting-on-hover:hover {
 
             &.active {
                 font-weight: bold;
-                color: var(--mud-palette-primary);
-                border-bottom-color: var(--mud-palette-primary);
+                border-bottom-color: var(--mud-palette-text-primary);
             }
         }
     }
@@ -329,8 +326,8 @@ img.background-image-cover {
 }
 
 div.background-overlay {
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(3px);
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
 }
 
 div.overlay-container {
