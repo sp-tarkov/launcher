@@ -15,6 +15,7 @@ public class LocaleHelper
     private string _defaultLocale;
     private List<Dictionary<string, string>> _listOfLocales = [];
     private Dictionary<string, string> _selectedLocale = new();
+    private bool _logLocalesOne;
 
     public LocaleHelper(ILogger<LocaleHelper> logger, ConfigHelper configHelper)
     {
@@ -57,7 +58,11 @@ public class LocaleHelper
 
     public Dictionary<string, string> GetAvailableLocales()
     {
-        _logger.LogInformation("Available locales: {locales}", _listOfLocales.Select(x => x["ietf_tag"]));
+        if (!_logLocalesOne)
+        {
+            _logger.LogInformation("Available locales: {locales}", _listOfLocales.Select(x => x["ietf_tag"]));
+            _logLocalesOne = true;
+        }
 
         return _listOfLocales.ToDictionary(x => x["ietf_tag"], x => x["native_name"]);
     }

@@ -247,6 +247,7 @@ public class HttpHelper
 
     public void ClearApiKey()
     {
+        _logger.LogInformation("ClearApiKey");
         _token = "";
         _configHelper.SetApiKey(_token);
     }

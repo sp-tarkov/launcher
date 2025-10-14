@@ -15,20 +15,13 @@ public class StateHelper
     public Server? SelectedServer;
 
     public bool AllowNavigation { get; set; } = true;
-    public bool ShowBackground { get; set; }
     public event Action? OnStateChanged;
 
     public StateHelper(
-        ILogger<StateHelper> logger,
-        ConfigHelper configHelper
+        ILogger<StateHelper> logger
     )
     {
         _logger = logger;
-
-        if (configHelper.GetConfig().UseBackground)
-        {
-            SetBackground(true);
-        }
     }
 
     public void LogoutAndDispose()
@@ -56,9 +49,8 @@ public class StateHelper
         OnStateChanged?.Invoke();
     }
 
-    public void SetBackground(bool state)
+    public void SetBackground()
     {
-        ShowBackground = state;
         NotifyStateChanged();
     }
 
