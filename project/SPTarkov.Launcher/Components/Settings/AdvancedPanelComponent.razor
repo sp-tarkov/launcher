@@ -26,7 +26,7 @@
     private async Task SetBackgroundUsage()
     {
         showBackgroundSwitch = !showBackgroundSwitch;
-        StateHelper.SetBackground(showBackgroundSwitch);
         ConfigHelper.SetUseBackground(showBackgroundSwitch);
+        StateHelper.SetBackground();
     }
 }

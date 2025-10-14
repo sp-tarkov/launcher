@@ -2,20 +2,20 @@
     <MudGrid>
         <MudItem sm="6">
             <MudTextField @bind-Value="Search" Label="Search" Variant="Variant.Outlined" Adornment="Adornment.End"
-                          AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Clearable="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search"  Clearable="true"
                           DebounceInterval="500" OnDebounceIntervalElapsed="SearchFunc"/>
         </MudItem>
         <MudItem sm="2">
             <MudSelect @bind-Value="SortValue" Label="Sort" Variant="Variant.Outlined" Dense="true"
-                       AdornmentIcon="@Icons.Material.Filled.Sort" AdornmentColor="Color.Primary">
-                <MudSelectItem Value="@("-created_at")">Newest</MudSelectItem>
-                <MudSelectItem Value="@("-updated_at")">Recently Updated</MudSelectItem>
+                       AdornmentIcon="@Icons.Material.Filled.Sort" >
+                <MudSelectItem Value="@("created_at")">Newest</MudSelectItem>
+                <MudSelectItem Value="@("updated_at")">Recently Updated</MudSelectItem>
                 <MudSelectItem Value="@("-downloads")">Most Downloaded</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem sm="2">
             <MudSelect @bind-Value="FilterValue" Label="Featured" Variant="Variant.Outlined" Dense="true"
-                       AdornmentIcon="@Icons.Material.Filled.FilterAlt" AdornmentColor="Color.Primary">
+                       AdornmentIcon="@Icons.Material.Filled.FilterAlt" >
                 <MudSelectItem Value="@("Include")">Include</MudSelectItem>
                 <MudSelectItem Value="@("Exclude")">Exclude</MudSelectItem>
                 <MudSelectItem Value="@("Only")">Only</MudSelectItem>
@@ -23,7 +23,7 @@
         </MudItem>
         <MudItem sm="2">
             <MudSelect @bind-Value="AiValue" Label="AI Content" Variant="Variant.Outlined" Dense="true"
-                       AdornmentIcon="@Icons.Material.Filled.FilterAlt" AdornmentColor="Color.Primary">
+                       AdornmentIcon="@Icons.Material.Filled.FilterAlt" >
                 <MudSelectItem Value="@("Exclude")">Exclude</MudSelectItem>
                 <MudSelectItem Value="@("Include")">Include</MudSelectItem>
                 <MudSelectItem Value="@("Only")">Only</MudSelectItem>

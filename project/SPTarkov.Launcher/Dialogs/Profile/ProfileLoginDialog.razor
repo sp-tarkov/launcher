@@ -21,8 +21,8 @@
             }
 
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunLoginTask">@(LocaleHelper.Get("profile_login_confirm"))</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">@(LocaleHelper.Get("profile_login_cancel"))</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Medium" Class="ml-auto" @onclick="RunLoginTask">@(LocaleHelper.Get("profile_login_confirm"))</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Dark" @onclick="UserCancelled">@(LocaleHelper.Get("profile_login_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>

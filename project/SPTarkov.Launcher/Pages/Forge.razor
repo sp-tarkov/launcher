@@ -57,7 +57,7 @@
                 <MudText>This requires you to login via the button below.</MudText>
                 <MudAlert Dense="true" Severity="Severity.Info" Variant="Variant.Outlined" Class="my-2">None of your login details will be saved!</MudAlert>
                 <MudItem sm="12" Class="mt-4 d-flex justify-start">
-                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeLoginTask">Login</MudButton>
+                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeLoginTask">Login</MudButton>
                 </MudItem>
             </MudExpansionPanel>
             <MudExpansionPanel Text="Discord login">
@@ -71,7 +71,7 @@
                 <MudText>3. Under "Token Name" put "SPT Launcher Key" and click create.</MudText>
                 <MudText>4. Click the button below to save this Token and test it. if it worked you'll be moved to the Forge Section.</MudText>
                 <MudItem sm="12" Class="mt-4 d-flex justify-start">
-                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeDiscordTask" Disabled="true">Login</MudButton>
+                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeDiscordTask" Disabled="true">Login</MudButton>
                 </MudItem>
             </MudExpansionPanel>
         </MudExpansionPanels>
@@ -97,7 +97,7 @@
 </MudContainer>
 
 @code {
-    private readonly bool _forgeAvailable = false; // TODO remove once forge is implemented
+    private readonly bool _forgeAvailable = true; // TODO remove once forge is implemented
     private bool netAvailable { get; set; }
     private bool apiKeyAvailable { get; set; }
     private ForgeModsResponse searchResponse { get; set; }
@@ -105,7 +105,7 @@
 
     private int _selected = 1;
     private string _search = "";
-    private string _sortValue = "-created_at";
+    private string _sortValue = "created_at";
     private string _filterValue = "Include";
     private string _aiValue = "Exclude";
 
@@ -165,9 +165,9 @@
 
     protected override void OnInitialized()
     {
-        // netAvailable = HttpHelper.IsInternetAccessAvailable();
-        // apiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
-        // SearchForMods();
+        netAvailable = HttpHelper.IsInternetAccessAvailable();
+        apiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
+        SearchForMods();
         base.OnInitialized();
     }
 
@@ -202,7 +202,8 @@
 
         if (!searchResponse.Success)
         {
-            ConfigHelper.SetApiKey("");
+            // ConfigHelper.SetApiKey("");
+            Logger.LogError("Something failed, check logs");
             searchResponse = null;
             apiKeyAvailable = false;
         }

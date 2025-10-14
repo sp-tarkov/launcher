@@ -25,14 +25,16 @@
                     <MudCardHeader>
                         <MudGrid>
                             <MudItem>
-                                <MudImage Src="@($"https://forge-static.sp-tarkov.com/{ForgeMod.Thumbnail}")"
-                                          Class="mod-thumbnail" Style="background-color: transparent !important;"/>
+                                <MudImage Src="@($"https://forge-static.sp-tarkov.com/{ForgeMod.Thumbnail}")" Class="mod-thumbnail" Style="background-color: transparent !important;"/>
                             </MudItem>
                             <MudItem>
-                                <MudLink Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
+                                <MudItem Class="d-flex mud-width-full">
+                                    <MudLink Color="Color.Default" Underline="Underline.Always" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
+                                    <MudSpacer/>
+                                    <MudButton StartIcon="@Icons.Material.Filled.OpenInNew" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small" DropShadow="false" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}")">Forge</MudButton>
+                                </MudItem>
                                 <MudText Typo="Typo.body1" Class="no-pointers no-select">By @ForgeMod.GetModdersName()</MudText>
                                 <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Downloads Downloads</MudText>
-                                <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Id ID</MudText>
                             </MudItem>
                         </MudGrid>
                     </MudCardHeader>
@@ -47,7 +49,7 @@
                                 <MudText Typo="Typo.h6" Class="no-pointers no-select">Version @(latestVersion.Version)</MudText>
                                 @if (!string.IsNullOrEmpty(latestVersion.VirusTotalLink))
                                 {
-                                    <MudLink Href="@(latestVersion.VirusTotalLink)">Virus Total Results</MudLink>
+                                    <MudLink Color="Color.Default" Underline="Underline.Always" Href="@(latestVersion.VirusTotalLink)">Virus Total Results</MudLink>
                                 }
                             </MudItem>
                             <MudItem sm="4" Class="d-flex flex-column align-end">
@@ -64,21 +66,17 @@
             </MudItem>
             <MudItem sm="4">
                 <MudItem sm="12">
-                    <MudButton Color="Color.Primary" StartIcon="@Icons.Material.Filled.Download" Variant="Variant.Filled" Class="mb-4" Style="width: 100%">@($"Download Latest ({latestVersion.Version})")</MudButton>
+                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Class="mb-4" Style="width: 100% ">@($"Download Latest ({latestVersion.Version})")</MudButton>
                 </MudItem>
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start text-overflow">
-                        <MudItem Class="pb-4">
-                            <MudText Typo="Typo.h6" Class="no-pointers no-select">Details</MudText>
-                        </MudItem>
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2">@(ForgeMod.GetAdditionalAuthors())</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">@(ForgeMod.GetAdditionalAuthors())</MudText> @* TODO: Get aditional author page *@
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">License</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2">
                             @if (ForgeMod.License is not null)
                             {
-                                <MudLink Typo="Typo.caption"
-                                         Href="@ForgeMod.License.Link">@ForgeMod.License.Name</MudLink>
+                                <MudLink Typo="Typo.caption" Color="Color.Default" Underline="Underline.Always" Href="@ForgeMod.License.Link">@ForgeMod.License.Name</MudLink>
                             }
                             else
                             {
@@ -89,7 +87,7 @@
                         <MudText Typo="Typo.caption" Class="pb-2">
                             @if (!string.IsNullOrEmpty(ForgeMod.SourceCode))
                             {
-                                <MudLink Typo="Typo.caption" Href="@ForgeMod.SourceCode">@ForgeMod.SourceCode</MudLink>
+                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@ForgeMod.SourceCode">@ForgeMod.SourceCode</MudLink>
                             }
                             else
                             {
@@ -101,8 +99,7 @@
                         <MudText Typo="Typo.caption" Class="pb-2">
                             @if (!string.IsNullOrEmpty(latestVersion.VirusTotalLink))
                             {
-                                <MudLink Typo="Typo.caption"
-                                         Href="@latestVersion.VirusTotalLink">@latestVersion.VirusTotalLink</MudLink>
+                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@latestVersion.VirusTotalLink">@latestVersion.VirusTotalLink</MudLink>
                             }
                             else
                             {
@@ -120,10 +117,7 @@
     [Parameter] public bool IsSkeleton { get; set; }
     [Parameter] public ForgeBase ForgeMod { get; set; }
 
-    private ForgeModVersion latestVersion
-    {
-        get { return ForgeMod.Versions.FirstOrDefault(); }
-    }
+    private ForgeModVersion latestVersion => ForgeMod.Versions.FirstOrDefault();
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {

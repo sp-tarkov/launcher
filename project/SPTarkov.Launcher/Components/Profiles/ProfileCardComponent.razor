@@ -66,14 +66,28 @@
     private bool sideIsUnknown { get; set; }
     private bool loggedIn { get; set; }
 
+    private string GetSideAsString()
+    {
+        return MiniProfile.Side.ToLower() != "unknown"
+            ? MiniProfile.Side.ToLower()
+            : "usec";
+    }
+
     private string ImageClassNames()
     {
-        return $"no-pointers background-image-{(MiniProfile.Side.ToLower() != "unknown" ? MiniProfile.Side.ToLower() : "usec")}";
+        var side = GetSideAsString();
+
+        return new CssBuilder()
+            .AddClass("no-pointers")
+            .AddClass($"background-image-{side}")
+            .Build();
     }
 
     private string ImageName()
     {
-        return $"side_{(MiniProfile.Side.ToLower() != "unknown" ? MiniProfile.Side.ToLower() : "usec")}.png";
+        var side = GetSideAsString();
+
+        return $"side_{side}.png";
     }
 
     protected override void OnInitialized()
