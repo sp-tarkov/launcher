@@ -54,9 +54,9 @@ public class ConfigHelper
                 "LauncherSettings.json")));
 
             // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
-            // SetGamePath(Environment.CurrentDirectory);
+            SetGamePath(Directory.GetParent(Environment.CurrentDirectory).FullName);
             // Unless you are running the launcher from the IDE.
-            SetGamePath(@"C:\SPT\4.0.0");
+            // SetGamePath(@"C:\SPT\4.0.0");
         }
     }
 
