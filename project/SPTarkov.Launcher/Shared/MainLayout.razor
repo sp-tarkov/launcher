@@ -1,19 +1,25 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
 
-@inject IJSRuntime JsRuntime
 @inject StateHelper StateHelper
+@inject ConfigHelper ConfigHelper
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudPopoverProvider/>
 <MudSnackbarProvider/>
 <MudDialogProvider/>
-<MudFab id="scrollTopBtn" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Class="fixed z-90" Style="bottom: 10px; right: 10px; display: none;" @onclick="ScrollToTop" Size="Size.Small"/>
 
-<MudContainer Class=@(StateHelper.ShowBackground ? backgroundEnabled : backgroundDisabled) >
-    <MudImage Src="./bg.png" Class="no-select fixed mud-height-full mud-width-full background-image-cover"/>
-    <div class="no-select fixed mud-height-full mud-width-full background-overlay"></div>
-</MudContainer>
+<MudScrollToTop>
+    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small" />
+</MudScrollToTop>
+
+@if (ConfigHelper.GetConfig().UseBackground)
+{
+    <MudContainer Class="no-select overlay-container unset absolute" >
+        <MudImage Src="./bg.png" Class="no-select fixed mud-height-full mud-width-full background-image-cover"/>
+        <div class="no-select fixed mud-height-full mud-width-full background-overlay"></div>
+    </MudContainer>
+}
 
 <MudLayout>
     <MudDrawer Width="150px" ClipMode="DrawerClipMode.Never" Elevation="5" Variant="@DrawerVariant.Mini" OpenMiniOnHover="false" Breakpoint="Breakpoint.None" Class="mud-background-gray border-r-2 border-solid mud-border-lines-default">
@@ -26,9 +32,6 @@
 
 @code {
 
-    private readonly string backgroundDisabled = "no-select overlay-container unset absolute d-none";
-    private readonly string backgroundEnabled = "no-select overlay-container unset absolute";
-
     protected override void OnInitialized()
     {
         StateHelper.OnStateChanged += StateHasChanged;
@@ -38,10 +41,5 @@
     public void Dispose()
     {
         StateHelper.OnStateChanged -= StateHasChanged;
-    }
-
-    private async Task ScrollToTop()
-    {
-        await JsRuntime.InvokeVoidAsync("scrollToTopSmooth");
     }
 }
