@@ -62,10 +62,10 @@ public class Launcher
         _logger = App.Services.GetService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetService<ConfigHelper>();
 
-        // var http = App.Services.GetService<HttpHelper>();
+        var https = App.Services.GetService<HttpHelper>();
         // var modLoader = App.Services.GetService<ModHelper>();
         //
-        // http.IsInternetAccessAvailable();
+        https.IsInternetAccessAvailable();
         // _ = modLoader.GetClientMods();
         // _ = modLoader.GetServerMods();
 
