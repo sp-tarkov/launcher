@@ -204,7 +204,7 @@ public class GameHelper
 
     private List<string> GetCorePatches()
     {
-        return Directory.GetDirectories(Path.Combine(_configHelper.GetConfig().GamePath, "SPT_Data", "Launcher", "Patches")).ToList();
+        return Directory.GetDirectories(Path.Combine(_configHelper.GetConfig().GamePath, "SPT", "SPT_Data", "Launcher", "Patches")).ToList();
     }
 
     private async Task<bool> IsCoreDllVersionMismatched()
