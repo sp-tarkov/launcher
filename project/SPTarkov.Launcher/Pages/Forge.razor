@@ -163,12 +163,18 @@
         }
     }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         netAvailable = HttpHelper.IsInternetAccessAvailable();
         apiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
-        SearchForMods();
-        base.OnInitialized();
+
+        if (!apiKeyAvailable || !netAvailable)
+        {
+            return;
+        }
+
+        await SearchForMods();
     }
 
     private async Task CheckInternetAccess()
