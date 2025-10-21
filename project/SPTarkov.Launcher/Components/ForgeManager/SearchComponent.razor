@@ -8,9 +8,9 @@
         <MudItem sm="2">
             <MudSelect @bind-Value="SortValue" Label="Sort" Variant="Variant.Outlined" Dense="true"
                        AdornmentIcon="@Icons.Material.Filled.Sort" >
-                <MudSelectItem Value="@("created_at")">Newest</MudSelectItem>
-                <MudSelectItem Value="@("updated_at")">Recently Updated</MudSelectItem>
                 <MudSelectItem Value="@("-downloads")">Most Downloaded</MudSelectItem>
+                <MudSelectItem Value="@("-updated_at")">Recently Updated</MudSelectItem>
+                <MudSelectItem Value="@("-created_at")">Newest</MudSelectItem>
             </MudSelect>
         </MudItem>
         <MudItem sm="2">
@@ -68,7 +68,7 @@
             SortValueChanged.InvokeAsync(_sortValue);
         }
     }
-    private string _sortValue = "-created_at";
+    private string _sortValue = "-downloads";
     [Parameter]
     public EventCallback<string> SortValueChanged { get; set; }
 

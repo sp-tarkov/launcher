@@ -5,28 +5,31 @@
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     <MudGrid>
-        @if (searchResponse is null || searchInProgress)
+        @if (searchResponse is null || searchInProgress || versionResponse is null)
         {
             <DetailedModComponent IsSkeleton="true"/>
         }
         else if (searchResponse?.Data is not null)
         {
-            <DetailedModComponent ForgeMod="@searchResponse?.Data"/>
+            <DetailedModComponent ForgeMod="@searchResponse?.Data" ForgeModVersion="@versionResponse?.Data.FirstOrDefault()"/>
         }
     </MudGrid>
 </MudContainer>
 
 @code {
     private ForgeModResponse searchResponse { get; set; }
+    private ForgeVersionResponse versionResponse { get; set; }
     private bool searchInProgress { get; set; }
 
     [Parameter]
     public string ModId { get; set; }
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         await SearchForMod();
-        base.OnInitialized();
+        await SearchForModVersion(ModId, searchResponse.Data.Versions.FirstOrDefault().Id.ToString());
+
     }
 
     private async Task SearchForMod()
@@ -45,6 +48,22 @@
         }
 
         searchInProgress = false;
+        StateHasChanged();
+    }
+
+    private async Task SearchForModVersion(string modId, string versionId)
+    {
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            versionResponse = await HttpHelper.ForgeGetModVersion(modId, versionId, token.Token);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Exception thrown from ForgeHelper.SearchForModVersion {Exception}", e);
+            return;
+        }
+
         StateHasChanged();
     }
 }

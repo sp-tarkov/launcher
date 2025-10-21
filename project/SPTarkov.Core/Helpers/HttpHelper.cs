@@ -117,6 +117,31 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeModResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
+    public async Task<ForgeVersionResponse?> ForgeGetModVersion(string modId, string versionId, CancellationToken token)
+    {
+        _logger.LogInformation("forge GetModVersionFromForge");
+
+        if (string.IsNullOrWhiteSpace(_configHelper.GetConfig().ForgeApiKey))
+        {
+            _logger.LogWarning("GetMods - API Key is missing.");
+            return null;
+        }
+
+        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
+
+        var paramsToUse = GetParamsCollectionForVersions(versionId);
+        var message = new HttpRequestMessage(HttpMethod.Get, $"https://forge.sp-tarkov.com/api/v0/mod/{modId}/versions?{paramsToUse}")
+        {
+            Content = new StringContent("", Encoding.UTF8, "application/json")
+        };
+
+        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+        var task = await _httpClient?.SendAsync(message, token);
+        return JsonSerializer.Deserialize<ForgeVersionResponse>(await task.Content.ReadAsStringAsync(token));
+    }
+
     public async Task<ForgeModsResponse?> ForgeGetMods(
         CancellationToken token,
         string search = "",
@@ -226,6 +251,18 @@ public class HttpHelper
         return queryString;
     }
 
+    private NameValueCollection GetParamsCollectionForVersions(string? versionId = null)
+    {
+        var queryString = HttpUtility.ParseQueryString(string.Empty);
+
+        if (!string.IsNullOrEmpty(versionId))
+        {
+            queryString.Add("filter[id]", versionId);
+        }
+
+        return queryString;
+    }
+
     private bool? ConvertFeaturedToBool(string selected)
     {
         switch (selected.ToLower())
@@ -277,4 +314,6 @@ public class HttpHelper
         _logger.LogInformation("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
         return _internetAccess;
     }
+
+
 }

@@ -56,9 +56,11 @@
                                 <MudText Typo="Typo.body1" Class="no-pointers no-select">Created @(latestVersion.GetCreatedDateFormatted())</MudText>
                                 <MudText Typo="Typo.body1" Class="no-pointers no-select">Published @(latestVersion.GetPublishedDateFormatted())</MudText>
                             </MudItem>
+                            <MudItem sm="12" Class="user-markdown">
+                                @((MarkupString)ForgeModVersion.Description)
+                            </MudItem>
                         </MudGrid>
                     </MudCardHeader>
-                    <MudCardContent Class="">@((MarkupString)latestVersion.Description)</MudCardContent>
                 </MudCard>
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="user-markdown">@((MarkupString)ForgeMod.Description)</MudCardContent>
@@ -116,6 +118,7 @@
 @code {
     [Parameter] public bool IsSkeleton { get; set; }
     [Parameter] public ForgeBase ForgeMod { get; set; }
+    [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
 
     private ForgeModVersion latestVersion => ForgeMod.Versions.FirstOrDefault();
 
