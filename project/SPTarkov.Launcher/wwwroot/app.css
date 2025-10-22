@@ -336,3 +336,7 @@ div.overlay-container {
     max-width: 100% !important;
     max-height: 100% !important;
 }
+
+.disabled-switch {
+    opacity: 50%;
+}
