@@ -25,13 +25,13 @@
                     <MudCardHeader>
                         <MudGrid>
                             <MudItem>
-                                <MudImage Src=@(ForgeMod.Thumbnail) Class="mod-thumbnail" Style="background-color: transparent !important;"/>
+                                <MudImage Src=@(ForgeMod.GetThumbnail()) Class="mod-thumbnail" Style="background-color: transparent !important;"/>
                             </MudItem>
                             <MudItem>
                                 <MudItem Class="d-flex mud-width-full">
-                                    <MudLink Color="Color.Default" Underline="Underline.Always" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
-                                    <MudSpacer/>
-                                    <MudButton StartIcon="@Icons.Material.Filled.OpenInNew" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small" DropShadow="false" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}")">Forge</MudButton>
+                                    <MudTooltip Arrow="true" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" Text="Open in the Forge">
+                                        <MudLink Color="Color.Default" Underline="Underline.Always" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
+                                    </MudTooltip>
                                 </MudItem>
                                 <MudText Typo="Typo.body1" Class="no-pointers no-select">By @ForgeMod.GetModdersName()</MudText>
                                 <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Downloads Downloads</MudText>
@@ -67,9 +67,6 @@
                 </MudCard>
             </MudItem>
             <MudItem sm="4">
-                <MudItem sm="12">
-                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Class="mb-4" Style="width: 100% ">@($"Download Latest ({latestVersion.Version})")</MudButton>
-                </MudItem>
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start text-overflow">
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
@@ -110,6 +107,9 @@
                         </MudText>
                     </MudCardContent>
                 </MudCard>
+                <MudItem sm="12" Class="mt-4">
+                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% ">@($"Download Latest ({latestVersion.Version})")</MudButton>
+                </MudItem>
             </MudItem>
         </MudGrid>
     }
