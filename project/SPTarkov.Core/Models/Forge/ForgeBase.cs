@@ -99,4 +99,10 @@ public record ForgeBase
             ? Authors.Select(x => x.Name).Aggregate((i, j) => i + ", " + j)
             : "None";
     }
+
+    public string GetThumbnail()
+    {
+        return string.IsNullOrEmpty(Thumbnail)
+            ? $"https://placehold.co/144x144/31343C/EEE?font=source-sans-pro&text={Name}" : Thumbnail;
+    }
 }
