@@ -5,7 +5,7 @@
     <MudPaper Class="pa-5 mr-1 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
         <SettingSwitchComponent Switch="@closeToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="@SetCloseToTray"/>
         <SettingSwitchComponent Switch="@minimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="@SetMinimizeOnLaunch"/>
-        <SettingSwitchComponent Switch="@alwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="@SetAlwaysOnTop"/>
+        <SettingSwitchComponent Switch="@alwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="@SetAlwaysOnTop" Disabled="!IsWindows"/>
     </MudPaper>
 </MudItem>
 
@@ -14,6 +14,8 @@
     private bool closeToTraySwitch { get; set; }
     private bool minimizeOnLaunchSwitch { get; set; }
     private bool alwaysOnTopSwitch { get; set; }
+
+    private bool IsWindows => OperatingSystem.IsWindows();
 
     protected override void OnInitialized()
     {
@@ -39,6 +41,11 @@
 
     private async Task SetAlwaysOnTop()
     {
+        if (!IsWindows)
+        {
+            return;
+        }
+
         alwaysOnTopSwitch = !alwaysOnTopSwitch;
         Launcher.App.MainWindow.SetTopMost(alwaysOnTopSwitch);
         ConfigHelper.SetAlwaysOnTop(alwaysOnTopSwitch);

@@ -9,13 +9,13 @@
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
-    <MudButton Disabled="@IsWindows" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
+    <MudButton Disabled="!IsWindows" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
     <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">@(LocaleHelper.Get("setting_clear_api"))</MudButton>
 </MudContainer>
 
 @code {
 
-    private bool IsWindows => !OperatingSystem.IsWindows();
+    private bool IsWindows => OperatingSystem.IsWindows();
 
     private async Task LoadLiveSettings()
     {
@@ -163,7 +163,7 @@
 
     private void CopyFilePathsToClipboard(List<string> filePaths)
     {
-        if (!OperatingSystem.IsWindows())
+        if (!IsWindows)
         {
             // added this just incase for whatever reason disabling the button doesnt work.
             Logger.LogWarning("Clipboard.CopyFiles is not supported on this platform");
