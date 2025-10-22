@@ -1,11 +1,21 @@
-﻿@page "/ServerPageWrapper"
+﻿@page "/ServerPageWrapper/{LocaleChange}"
 
 @inject NavigationManager NavigationManager
 @inject StateHelper StateHelper
 
 @code {
+    [Parameter]
+    public string LocaleChange { get; set; }
+
     protected override void OnInitialized()
     {
+        // check if url comes in with extra for localeChange
+        if (LocaleChange == "true")
+        {
+            NavigationManager.NavigateTo("/Settings");
+            return;
+        }
+
         // check status of server in State Helper
         // if none, direct to Home page "/"
         if (StateHelper.SelectedServer is null)

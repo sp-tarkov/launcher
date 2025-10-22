@@ -1,6 +1,6 @@
 ﻿@inject LocaleHelper LocaleHelper
 @inject ConfigHelper ConfigHelper
-@inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
 
 <MudContainer Class="pa-0">
     <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 pl-5">
@@ -51,6 +51,6 @@
         ConfigHelper.SetLocale(_selectedOption);
 
         // reload page from JS side, this will change already loaded locales to the correct ones
-        JsRuntime.InvokeVoidAsync("reloadBrowser");
+        NavigationManager.NavigateTo("/ServerPageWrapper/true");
     }
 }
