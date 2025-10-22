@@ -31,40 +31,39 @@
     }
     else
     {
-        <MudCard Class="info-card-height mud-background-gray border-2 border-solid mud-border-lines-default">
-            <MudCardHeader>
-                <CardHeaderAvatar>
-                    @if (ForgeMod.TryGetProfileAvatar(out var url))
-                    {
-                        <MudAvatar Style="background-color: transparent !important;">
-                            <MudImage Src="@url"/>
-                        </MudAvatar>
-                    }
-                    else
-                    {
-                        <MudAvatar Color="Color.Secondary">@ForgeMod.GetAvatarLetter()</MudAvatar>
-                    }
-                </CardHeaderAvatar>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.body1">@ForgeMod.GetModName()</MudText>
-                    <MudText Typo="Typo.body2">By @ForgeMod.GetModdersName()</MudText>
-                </CardHeaderContent>
-                <CardHeaderActions>
-                    @if (ForgeMod.GetModFeatured())
-                    {
-                        <MudTooltip Placement="Placement.Left" Arrow="true" Text="Featured">
-                            <MudIconButton Icon="@Icons.Material.Filled.Favorite" />
-                        </MudTooltip>
-                    }
-                </CardHeaderActions>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudText Typo="Typo.body2">@ForgeMod.GetModTeaser()</MudText>
-            </MudCardContent>
-            <MudCardActions Class="pa-4">
-                <MudButton StartIcon="@Icons.Material.Filled.ReadMore" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Small" DropShadow="false" @onclick="() => NavigateToSingleMod(ForgeMod.Id)">Read More</MudButton>
-            </MudCardActions>
-        </MudCard>
+        <MudLink Color="Color.Default" Underline="Underline.Hover" Href="@($"/ForgeMod/{ForgeMod.Id}")">
+            <MudCard Class="info-card-height mud-background-gray border-2 border-solid mud-border-lines-default">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        @if (ForgeMod.TryGetProfileAvatar(out var url))
+                        {
+                            <MudAvatar Style="background-color: transparent !important;">
+                                <MudImage Src="@url"/>
+                            </MudAvatar>
+                        }
+                        else
+                        {
+                            <MudAvatar Color="Color.Secondary">@ForgeMod.GetAvatarLetter()</MudAvatar>
+                        }
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1">@ForgeMod.GetModName()</MudText>
+                        <MudText Typo="Typo.body2">By @ForgeMod.GetModdersName()</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        @if (ForgeMod.GetModFeatured())
+                        {
+                            <MudTooltip Placement="Placement.Left" Arrow="true" Text="Featured">
+                                <MudIconButton Icon="@Icons.Material.Filled.Favorite"/>
+                            </MudTooltip>
+                        }
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">@ForgeMod.GetModTeaser()</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudLink>
     }
 </MudItem>
 
