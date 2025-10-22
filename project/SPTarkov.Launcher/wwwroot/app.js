@@ -1,7 +1,3 @@
-window.reloadBrowser = function () {
-    location.reload();
-}
-
 // Because Photino starts links to external pages inside the app
 // Add this script to check a tag has a link to an external site and start it externally ourself.
 document.addEventListener('DOMContentLoaded', () => {
