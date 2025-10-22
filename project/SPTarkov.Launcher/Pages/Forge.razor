@@ -18,7 +18,7 @@
                 {
                     <MudItem sm="12" Class="d-flex justify-center">
                         <MudPagination Rectangular="true" Variant="Variant.Text" Count="@((int)searchResponse.Meta.LastPage)" Class="mb-4"
-                                       ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@paginationSelected"/>
+                                       ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@PaginationSelected"/>
                     </MudItem>
                 }
             </MudCard>
@@ -95,62 +95,77 @@
     private ForgeModsResponse searchResponse { get; set; }
     private bool searchInProgress { get; set; }
 
-    private int _selected = 1;
-    private string _search = "";
-    private string _sortValue = "-downloads";
-    private string _filterValue = "Include";
-    private string _aiValue = "Exclude";
-
-    private int paginationSelected
+    private int PaginationSelected
     {
-        get => _selected;
+        get => StateHelper.CurrentPagination;
         set
         {
-            if (_selected != value)
+            if (StateHelper.CurrentPagination == value)
             {
-                _ = SearchForMods(value);
-                _selected = value;
+                return;
             }
+
+            StateHelper.CurrentPagination = value;
+            _ = SearchForMods(value);
         }
     }
 
-    // search functionality
     public string Search
     {
-        get => _search;
+        get => StateHelper.CurrentSearch;
         set
         {
-            _search = value;
+            if (StateHelper.CurrentSearch == value)
+            {
+                return;
+            }
+
+            StateHelper.CurrentSearch = value;
             _ = SearchUpdate();
         }
     }
 
     public string SortValue
     {
-        get => _sortValue;
+        get => StateHelper.CurrentSort;
         set
         {
-            _sortValue = value;
+            if (StateHelper.CurrentSort == value)
+            {
+                return;
+            }
+
+            StateHelper.CurrentSort = value;
             _ = SearchUpdate();
         }
     }
 
     public string FilterValue
     {
-        get => _filterValue;
+        get => StateHelper.CurrentFilter;
         set
         {
-            _filterValue = value;
+            if (StateHelper.CurrentFilter == value)
+            {
+                return;
+            }
+
+            StateHelper.CurrentFilter = value;
             _ = SearchUpdate();
         }
     }
 
     public string AiValue
     {
-        get => _aiValue;
+        get => StateHelper.CurrentAi;
         set
         {
-            _aiValue = value;
+            if (StateHelper.CurrentAi == value)
+            {
+                return;
+            }
+
+            StateHelper.CurrentAi = value;
             _ = SearchUpdate();
         }
     }
@@ -202,8 +217,8 @@
             apiKeyAvailable = false;
         }
 
-        paginationSelected = page ?? 1;
-        StateHelper.CurrentPagination = paginationSelected;
+        PaginationSelected = page ?? 1;
+        StateHelper.CurrentPagination = PaginationSelected;
         searchInProgress = false;
         StateHasChanged();
     }

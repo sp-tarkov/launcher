@@ -7,12 +7,17 @@ namespace SPTarkov.Core.Helpers;
 public class StateHelper
 {
     private readonly ILogger<StateHelper> _logger;
-    public int? CurrentPagination;
     public Dictionary<string, SPTMod> ModList = [];
     public List<MiniProfile> ProfileList = [];
     public Dictionary<string, string> ProfileTypes = new();
     public MiniProfile? SelectedProfile;
     public Server? SelectedServer;
+
+    public int CurrentPagination = 1;
+    public string CurrentSearch = "";
+    public string CurrentSort = "-downloads";
+    public string CurrentFilter = "Include";
+    public string CurrentAi = "Exclude";
 
     public bool AllowNavigation { get; set; } = true;
     public event Action? OnStateChanged;
