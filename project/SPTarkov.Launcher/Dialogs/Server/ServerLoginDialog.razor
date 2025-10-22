@@ -20,17 +20,19 @@
 @code {
     private string _taskText = "";
 
-    [Parameter] public Server Server { get; set; }
+    [Parameter]
+    public Server Server { get; set; }
 
-    [CascadingParameter] private IMudDialogInstance mudDialog { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance mudDialog { get; set; }
 
     private CancellationTokenSource token { get; set; }
     private bool userCancel { get; set; }
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
-        _ = StartLoginTasks();
+        await base.OnInitializedAsync();
+        await StartLoginTasks();
     }
 
     private async Task StartLoginTasks()
@@ -68,12 +70,15 @@
         token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         _taskText = taskText;
         StateHasChanged();
-        await Task.Delay(20);
 
         switch (option)
         {
             case RequestTask.Ping:
             {
+                // Add artificial delay to get around opening and closing a dialog too fast
+                // Causes an exception that I cant fix.
+                // Do it only on Ping so its done once and doesnt look like a blank box
+                await Task.Delay(250);
                 var returnResult = await HttpHelper.GameServerGet<PingResponse>(RequestUrl.Ping, token.Token);
                 result = returnResult.Response == "Pong!";
                 break;
@@ -139,5 +144,4 @@
         token?.Cancel();
         mudDialog.Cancel();
     }
-
 }
