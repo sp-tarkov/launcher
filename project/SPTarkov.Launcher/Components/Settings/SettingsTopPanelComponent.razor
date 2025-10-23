@@ -6,11 +6,11 @@
 @inject WindowsClipboard Clipboard
 
 <MudContainer Class="pa-0 pb-4 d-flex justify-start gap-2">
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
-    <MudButton Disabled="!IsWindows" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
-    <MudButton Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">@(LocaleHelper.Get("setting_clear_api"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="!IsWindows" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">@(LocaleHelper.Get("setting_clear_api"))</MudButton>
 </MudContainer>
 
 @code {
@@ -165,7 +165,7 @@
     {
         if (!IsWindows)
         {
-            // added this just incase for whatever reason disabling the button doesnt work.
+            // added this just in case for whatever reason disabling the button doesnt work.
             Logger.LogWarning("Clipboard.CopyFiles is not supported on this platform");
             return;
         }

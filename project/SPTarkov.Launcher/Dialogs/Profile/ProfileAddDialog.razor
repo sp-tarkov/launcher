@@ -31,8 +31,8 @@
                     }
                 </MudForm>
                 <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" @onclick="RunAddTask">@(LocaleHelper.Get("profile_add_confirm"))</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">@(LocaleHelper.Get("profile_add_cancel"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Dark" Disabled="@(!_success)" OnClick="RunAddTask" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Success">@(LocaleHelper.Get("profile_add_confirm"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">@(LocaleHelper.Get("profile_add_cancel"))</MudButton>
                 </MudContainer>
             }
         </MudContainer>

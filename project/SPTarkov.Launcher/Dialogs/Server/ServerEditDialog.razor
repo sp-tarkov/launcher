@@ -9,8 +9,8 @@
                 <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
             </MudForm>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" @onclick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">@(LocaleHelper.Get("server_edit_cancel"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" OnClick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">@(LocaleHelper.Get("server_edit_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>

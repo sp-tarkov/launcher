@@ -11,7 +11,7 @@
                 <MudText>@_taskText</MudText>
             </MudContainer>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="UserCancelled">@(LocaleHelper.Get("server_login_cancel"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Error" OnClick="UserCancelled">@(LocaleHelper.Get("server_login_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>

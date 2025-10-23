@@ -6,8 +6,8 @@
         <MudContainer Class="py-4">
             <MudText>@(LocaleHelper.Get("server_remove_text"))</MudText>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="Submit">@(LocaleHelper.Get("server_remove_confirm"))</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">@(LocaleHelper.Get("server_remove_cancel"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Error" OnClick="Submit">@(LocaleHelper.Get("server_remove_confirm"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">@(LocaleHelper.Get("server_remove_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>

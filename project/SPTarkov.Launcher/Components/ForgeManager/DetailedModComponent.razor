@@ -24,10 +24,10 @@
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4">
                     <MudCardHeader>
                         <MudGrid>
-                            <MudItem>
+                            <MudItem sm="3">
                                 <MudImage Src=@(ForgeMod.GetThumbnail()) Class="mod-thumbnail" Style="background-color: transparent !important;"/>
                             </MudItem>
-                            <MudItem>
+                            <MudItem sm="9">
                                 <MudItem Class="d-flex mud-width-full">
                                     <MudTooltip Arrow="true" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" Text="Open in the Forge">
                                         <MudLink Color="Color.Default" Underline="Underline.Always" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
@@ -108,7 +108,7 @@
                     </MudCardContent>
                 </MudCard>
                 <MudItem sm="12" Class="mt-4">
-                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% ">@($"Download Latest ({latestVersion.Version})")</MudButton>
+                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% " Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy">@($"Download Latest ({latestVersion.Version})")</MudButton>
                 </MudItem>
             </MudItem>
         </MudGrid>

@@ -2,10 +2,10 @@
     <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height">
         <MudContainer Class="d-flex justify-space-between">
             <MudText>Your Level: @CurrentLevel</MudText>
-            <MudText>Needed EXP: @NeededExp EXP</MudText>
+            <MudText>Needed EXP: @NeededExp</MudText>
             <MudText>Next Level: @(CurrentLevel + 1)</MudText>
         </MudContainer>
-        <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="@CurrentExp" Min="0" Max="@NeededExp"/>
+        <MudProgressLinear Rounded="true" Color="Color.Default" Size="Size.Large" Value="@CurrentExp" Min="0" Max="@NeededExp"/>
     </MudPaper>
 </MudItem>
 

@@ -2,6 +2,28 @@
     scrollbar-width: none !important;
 }
 
+html body .mud-paper {
+    background-color: rgba(39, 39, 47, 0.6) !important;
+}
+html body .mud-button {
+    background-color: rgba(39, 39, 47, 0.6) !important;
+}
+html body .mud-dialog {
+    background-color: rgba(39, 39, 47, 0.6) !important;
+}
+html body .mud-drawer {
+    background-color: rgba(39, 39, 47, 0.6) !important;
+}
+html body .mud-tabs {
+    background-color: rgba(39, 39, 47, 0.6) !important;
+}
+html body .mud-tabs-tabbar {
+    background-color: rgba(39, 39, 47, 0.6) !important;
+}
+html body .mud-popover {
+    background-color: rgba(39, 39, 47, 0.96) !important;
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
@@ -339,4 +361,12 @@ div.overlay-container {
 
 .disabled-switch {
     opacity: 50%;
+}
+
+.mud-button-border-copy {
+    border-color: rgba(255, 255, 255, 0.118) !important;
+}
+
+.mud-button-inner-text-copy {
+    color: rgba(255, 255, 255, 0.698) !important;
 }
