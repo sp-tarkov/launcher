@@ -128,4 +128,17 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
+    private async Task StartForgeLoginTask()
+    {
+        var dialog = await DialogService.ShowAsync<ForgeLoginDialog>("ForgeLoginDialog", ConfigHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            apiKeyAvailable = true;
+            Logger.LogInformation("Saved Apikey");
+            await SearchForMods();
+        }
+    }
+
 }

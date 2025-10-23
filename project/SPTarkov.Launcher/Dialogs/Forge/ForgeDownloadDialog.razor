@@ -1,0 +1,102 @@
+@inject ISnackbar Snackbar
+@inject HttpHelper HttpHelper
+@inject ILogger<ForgeDownloadDialog> Logger
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+
+
+
+            <MudContainer Class="d-flex flex-column align-center gap-4">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                <MudText>Currently Testing downloads</MudText>
+            </MudContainer>
+            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton>
+            </MudContainer>
+
+
+
+
+
+            @* <MudContainer Class="d-flex flex-column align-center gap-4"> *@
+            @*     <MudText>Please make sure to read the mod page.</MudText> *@
+            @*     $1$ <MudText>@_taskText</MudText> Show latest patch notes for that mod #1# *@
+            @* </MudContainer> *@
+            @* <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2"> *@
+            @*     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton> *@
+            @*     <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton> *@
+            @* </MudContainer> *@
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    private bool _success;
+    private bool _requestInProgress;
+    private CancellationTokenSource token { get; set; }
+    private bool userCancel { get; set; }
+
+    private async Task RunDownloadTask()
+    {
+        // start thread and download there. store somewhere and have a way to see them.
+        _requestInProgress = true;
+        try
+        {
+
+        }
+        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        {
+            AbortOrFail("Request Timed out!");
+            return;
+        }
+        catch (HttpRequestException e)
+        {
+            AbortOrFail();
+            return;
+        }
+        catch (Exception e)
+        {
+            AbortOrFail();
+            return;
+        }
+
+        // if (result)
+        // {
+        //     _requestInProgress = false;
+        //     Submit();
+        // }
+    }
+
+    private void Submit()
+    {
+        Snackbar.Add($"Text to add", Severity.Success);
+        MudDialog.Close();
+    }
+
+    private void AbortOrFail(string message = "Cancelled download")
+    {
+        if (!userCancel)
+        {
+            Snackbar.Add(message, Severity.Error);
+        }
+
+        token?.Cancel();
+        MudDialog.Cancel();
+        _requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        userCancel = true;
+        _requestInProgress = false;
+        token?.Cancel();
+        MudDialog.Cancel();
+    }
+
+}
