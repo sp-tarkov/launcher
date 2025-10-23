@@ -127,7 +127,11 @@
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        JsRuntime.InvokeVoidAsync("setTabContent");
+        if (firstRender)
+        {
+            JsRuntime.InvokeVoidAsync("setTabContent");
+        }
+
         return base.OnAfterRenderAsync(firstRender);
     }
 
