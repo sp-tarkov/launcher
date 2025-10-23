@@ -35,7 +35,7 @@ public class Launcher
             .AddSingleton<ForgeHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
-            .AddSingleton<ModHelper>()
+            .AddSingleton<ModDownloadHelper>()
             .AddSingleton<StateHelper>()
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
@@ -61,13 +61,6 @@ public class Launcher
 
         _logger = App.Services.GetService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetService<ConfigHelper>();
-
-        var https = App.Services.GetService<HttpHelper>();
-        // var modLoader = App.Services.GetService<ModHelper>();
-        //
-        https.IsInternetAccessAvailable();
-        // _ = modLoader.GetClientMods();
-        // _ = modLoader.GetServerMods();
 
         CustomizeComponent();
 
