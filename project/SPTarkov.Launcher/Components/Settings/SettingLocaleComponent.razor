@@ -39,18 +39,16 @@
     [Parameter]
     public string OptionName { get; set; }
 
-    private string _selectedOption { get; set; }
+    private string _selectedOption;
 
     private void OnLocaleChange(string locale)
     {
         _selectedOption = locale;
-        // Set locale in helper
         LocaleHelper.SetLocale(_selectedOption);
-
-        // Set locale in config
         ConfigHelper.SetLocale(_selectedOption);
 
-        // reload page from JS side, this will change already loaded locales to the correct ones
+        // Reload page by navigating away and back
+        // Forcing with true doesnt work for some reason.
         NavigationManager.NavigateTo("/ServerPageWrapper/true");
     }
 }
