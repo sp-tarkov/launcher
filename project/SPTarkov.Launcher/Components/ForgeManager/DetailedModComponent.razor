@@ -1,5 +1,8 @@
 ﻿@inject IJSRuntime JsRuntime
 @inject LocaleHelper LocaleHelper
+@inject IDialogService DialogService
+@inject ConfigHelper ConfigHelper
+@inject ILogger<DetailedModComponent> Logger
 
 <MudItem sm="12">
     @if (IsSkeleton)
@@ -108,7 +111,7 @@
                     </MudCardContent>
                 </MudCard>
                 <MudItem sm="12" Class="mt-4">
-                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% " Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy">@($"Download Latest ({latestVersion.Version})")</MudButton>
+                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% " Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">@($"Download Latest ({latestVersion.Version})")</MudButton>
                 </MudItem>
             </MudItem>
         </MudGrid>
@@ -128,16 +131,14 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task StartForgeLoginTask()
+    private async Task StartDownloadModTask()
     {
-        var dialog = await DialogService.ShowAsync<ForgeLoginDialog>("ForgeLoginDialog", ConfigHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
         {
-            apiKeyAvailable = true;
             Logger.LogInformation("Saved Apikey");
-            await SearchForMods();
         }
     }
 
