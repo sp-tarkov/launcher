@@ -142,8 +142,11 @@
 
         if (result?.Canceled is false)
         {
-            Logger.LogInformation("Saved Apikey");
+            Logger.LogInformation("Started Download");
+            return;
         }
+
+        Logger.LogInformation("Download cancelled");
     }
 
 }

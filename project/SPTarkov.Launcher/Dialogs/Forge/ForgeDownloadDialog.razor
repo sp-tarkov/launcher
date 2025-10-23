@@ -66,16 +66,16 @@
             return;
         }
 
-        // if (result)
-        // {
-        //     _requestInProgress = false;
-        //     Submit();
-        // }
+        if (true)
+        {
+            _requestInProgress = false;
+            Submit();
+        }
     }
 
     private void Submit()
     {
-        Snackbar.Add($"Text to add", Severity.Success);
+        Snackbar.Add($"Download started for MODNAME", Severity.Success);
         MudDialog.Close();
     }
 
