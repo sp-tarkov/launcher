@@ -1,24 +1,21 @@
-﻿using System.Diagnostics;
-using System.Text.Json.Serialization;
+﻿namespace SPTarkov.Core.Models.Spt;
 
-namespace SPTarkov.Core.Models;
-
-public record SPTVersion
+public record SptVersion
 {
     public int Major { get; set; }
 
     public int Minor { get; set; }
 
     public int Build { get; set; }
-    private string tag { get; set; }
+    private string Tag { get; set; }
 
-    public SPTVersion(string version)
+    public SptVersion(string version)
     {
         if (version.Contains('-'))
         {
             var split = version.Split('-');
             version = split[0];
-            tag = split[1];
+            Tag = split[1];
         }
 
         var splitversion = version!.Split('.');
@@ -29,6 +26,6 @@ public record SPTVersion
 
     public override string ToString()
     {
-        return tag != null ? $"{Major}.{Minor}.{Build}-{tag}" : $"{Major}.{Minor}.{Build}";
+        return Tag != null ? $"{Major}.{Minor}.{Build}-{Tag}" : $"{Major}.{Minor}.{Build}";
     }
 }

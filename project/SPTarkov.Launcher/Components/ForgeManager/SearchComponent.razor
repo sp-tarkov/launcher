@@ -34,6 +34,7 @@
 </MudContainer>
 
 @code {
+#pragma warning disable BL0007
     [Parameter]
     public string Search
     {
@@ -75,19 +76,19 @@
     [Parameter]
     public string FilterValue
     {
-        get => filterValue;
+        get => _filterValue;
         set
         {
-            if (filterValue == value)
+            if (_filterValue == value)
             {
                 return;
             }
 
-            filterValue = value;
-            FilterValueChanged.InvokeAsync(filterValue);
+            _filterValue = value;
+            FilterValueChanged.InvokeAsync(_filterValue);
         }
     }
-    private string filterValue = "Include";
+    private string _filterValue = "Include";
     [Parameter]
     public EventCallback<string> FilterValueChanged { get; set; }
 

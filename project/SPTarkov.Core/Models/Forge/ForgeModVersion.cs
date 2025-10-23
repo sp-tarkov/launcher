@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.Models;
+namespace SPTarkov.Core.Models.Forge;
 
 public record ForgeModVersion
 {
@@ -37,24 +37,24 @@ public record ForgeModVersion
     [JsonPropertyName("updated_at")]
     public string? UpdatedAt { get; set; }
 
-    private string? GetDateString(string date)
+    private string GetDateString(string date)
     {
         var dated = DateTime.Parse(date);
         return dated.ToString("dd-MM-yy");
     }
 
-    public string? GetCreatedDateFormatted()
+    public string GetCreatedDateFormatted()
     {
-        return GetDateString(CreatedAt);
+        return GetDateString(CreatedAt!);
     }
 
-    public string? GetUpdatedDateFormatted()
+    public string GetUpdatedDateFormatted()
     {
-        return GetDateString(UpdatedAt);
+        return GetDateString(UpdatedAt!);
     }
 
-    public string? GetPublishedDateFormatted()
+    public string GetPublishedDateFormatted()
     {
-        return GetDateString(PublishedAt);
+        return GetDateString(PublishedAt!);
     }
 }

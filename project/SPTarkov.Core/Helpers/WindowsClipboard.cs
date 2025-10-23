@@ -33,11 +33,11 @@ public partial class WindowsClipboard(
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool GlobalUnlock(IntPtr hMem);
 
-    private const uint CF_HDROP = 15;
-    private const uint GMEM_MOVEABLE = 0x0002;
+    private const uint CfHdrop = 15;
+    private const uint GmemMoveable = 0x0002;
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct DROPFILES
+    private struct Dropfiles
     {
         public uint pFiles;
         public int ptX;
@@ -51,22 +51,22 @@ public partial class WindowsClipboard(
         var joined = string.Join("\0", files) + "\0\0";
         var data = Encoding.Unicode.GetBytes(joined);
 
-        var dropFiles = new DROPFILES
+        var dropFiles = new Dropfiles
         {
-            pFiles = (uint) Marshal.SizeOf<DROPFILES>(),
+            pFiles = (uint) Marshal.SizeOf<Dropfiles>(),
             ptX = 0,
             ptY = 0,
             fNC = 0,
             fWide = 1
         };
 
-        var totalSize = Marshal.SizeOf<DROPFILES>() + data.Length;
+        var totalSize = Marshal.SizeOf<Dropfiles>() + data.Length;
 
-        var hGlobal = GlobalAlloc(GMEM_MOVEABLE, (UIntPtr) totalSize);
+        var hGlobal = GlobalAlloc(GmemMoveable, (UIntPtr) totalSize);
         var ptr = GlobalLock(hGlobal);
 
         Marshal.StructureToPtr(dropFiles, ptr, false);
-        var dataPtr = IntPtr.Add(ptr, Marshal.SizeOf<DROPFILES>());
+        var dataPtr = IntPtr.Add(ptr, Marshal.SizeOf<Dropfiles>());
         Marshal.Copy(data, 0, dataPtr, data.Length);
 
         if (!GlobalUnlock(hGlobal))
@@ -83,7 +83,7 @@ public partial class WindowsClipboard(
         {
             logger.LogError("Failed to empty clipboard, error: {error}", Marshal.GetLastWin32Error());
         }
-        SetClipboardData(CF_HDROP, hGlobal);
+        _ = SetClipboardData(CfHdrop, hGlobal);
 
         if (!CloseClipboard())
         {

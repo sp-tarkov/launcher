@@ -1,103 +1,103 @@
-﻿@inject ISnackbar Snackbar
-
-<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
-    <DialogContent>
-        <MudContainer Class="py-4">
-            @if (_requestInProgress)
-            {
-                <MudContainer Class="d-flex flex-column align-center gap-4">
-                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
-                    <MudText>@_taskText</MudText>
-                </MudContainer>
-            }
-            else
-            {
-                <MudForm Model="request" @bind-IsValid="@_success" Class="gap-2 mt-3">
-                    <MudTextField Immediate="true" @bind-Value="request.Email" Label="Token" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true"/>
-                </MudForm>
-            }
-
-            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunLoginTask">Login</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton>
-            </MudContainer>
-        </MudContainer>
-    </DialogContent>
-</MudDialog>
-
-@code {
-    private bool _success;
-    private bool _requestInProgress;
-    private string _taskText = "";
-
-    [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
-
-    private ForgeLoginRequest request { get; } = new();
-    private CancellationTokenSource token { get; set; }
-    private bool userCancel { get; set; }
-
-    private async Task RunLoginTask()
-    {
-        var result = false;
-        _requestInProgress = true;
-        try
-        {
-            result = await CallForge("Trying to login", "Failed to login");
-        }
-        catch (TaskCanceledException e) when (token.IsCancellationRequested)
-        {
-            AbortOrFail("Request Timed out!");
-            return;
-        }
-        catch (HttpRequestException e)
-        {
-            AbortOrFail();
-            return;
-        }
-        catch (Exception e)
-        {
-            AbortOrFail();
-            return;
-        }
-
-        if (result)
-        {
-            Submit();
-            _requestInProgress = false;
-        }
-    }
-
-    private async Task<bool> CallForge(string taskText = "", string failString = "")
-    {
-        // Discord cant be authenticated via api, so do this to make sure its known
-        throw new NotImplementedException();
-    }
-
-    private void Submit()
-    {
-        Snackbar.Add($"Logged in to {request.Email}!", Severity.Success);
-        mudDialog.Close();
-    }
-
-    private void AbortOrFail(string message = "Error connecting to server!")
-    {
-        if (!userCancel)
-        {
-            Snackbar.Add(message, Severity.Error);
-        }
-
-        token?.Cancel();
-        mudDialog.Cancel();
-        _requestInProgress = false;
-    }
-
-    private void UserCancelled()
-    {
-        userCancel = true;
-        _requestInProgress = false;
-        token?.Cancel();
-        mudDialog.Cancel();
-    }
-
-}
+﻿@* @inject ISnackbar Snackbar *@
+@* *@
+@* <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default"> *@
+@*     <DialogContent> *@
+@*         <MudContainer Class="py-4"> *@
+@*             @if (_requestInProgress) *@
+@*             { *@
+@*                 <MudContainer Class="d-flex flex-column align-center gap-4"> *@
+@*                     <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/> *@
+@*                     <MudText>@_taskText</MudText> *@
+@*                 </MudContainer> *@
+@*             } *@
+@*             else *@
+@*             { *@
+@*                 <MudForm Model="request" @bind-IsValid="@_success" Class="gap-2 mt-3"> *@
+@*                     <MudTextField Immediate="true" @bind-Value="request.Email" Label="Token" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true"/> *@
+@*                 </MudForm> *@
+@*             } *@
+@* *@
+@*             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2"> *@
+@*                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunLoginTask">Login</MudButton> *@
+@*                 <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton> *@
+@*             </MudContainer> *@
+@*         </MudContainer> *@
+@*     </DialogContent> *@
+@* </MudDialog> *@
+@* *@
+@* @code { *@
+@*     private bool _success; *@
+@*     private bool _requestInProgress; *@
+@*     private string _taskText = ""; *@
+@* *@
+@*     [CascadingParameter] *@
+@*     private IMudDialogInstance mudDialog { get; set; } *@
+@* *@
+@*     private ForgeLoginRequest request { get; } = new(); *@
+@*     private CancellationTokenSource token { get; set; } *@
+@*     private bool userCancel { get; set; } *@
+@* *@
+@*     private async Task RunLoginTask() *@
+@*     { *@
+@*         var result = false; *@
+@*         _requestInProgress = true; *@
+@*         try *@
+@*         { *@
+@*             result = await CallForge("Trying to login", "Failed to login"); *@
+@*         } *@
+@*         catch (TaskCanceledException e) when (token.IsCancellationRequested) *@
+@*         { *@
+@*             AbortOrFail("Request Timed out!"); *@
+@*             return; *@
+@*         } *@
+@*         catch (HttpRequestException e) *@
+@*         { *@
+@*             AbortOrFail(); *@
+@*             return; *@
+@*         } *@
+@*         catch (Exception e) *@
+@*         { *@
+@*             AbortOrFail(); *@
+@*             return; *@
+@*         } *@
+@* *@
+@*         if (result) *@
+@*         { *@
+@*             Submit(); *@
+@*             _requestInProgress = false; *@
+@*         } *@
+@*     } *@
+@* *@
+@*     private async Task<bool> CallForge(string taskText = "", string failString = "") *@
+@*     { *@
+@*         // Discord cant be authenticated via api, so do this to make sure its known *@
+@*         throw new NotImplementedException(); *@
+@*     } *@
+@* *@
+@*     private void Submit() *@
+@*     { *@
+@*         Snackbar.Add($"Logged in to {request.Email}!", Severity.Success); *@
+@*         mudDialog.Close(); *@
+@*     } *@
+@* *@
+@*     private void AbortOrFail(string message = "Error connecting to server!") *@
+@*     { *@
+@*         if (!userCancel) *@
+@*         { *@
+@*             Snackbar.Add(message, Severity.Error); *@
+@*         } *@
+@* *@
+@*         token?.Cancel(); *@
+@*         mudDialog.Cancel(); *@
+@*         _requestInProgress = false; *@
+@*     } *@
+@* *@
+@*     private void UserCancelled() *@
+@*     { *@
+@*         userCancel = true; *@
+@*         _requestInProgress = false; *@
+@*         token?.Cancel(); *@
+@*         mudDialog.Cancel(); *@
+@*     } *@
+@* *@
+@* } *@

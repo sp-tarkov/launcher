@@ -1,4 +1,4 @@
-﻿namespace SPTarkov.Core.Models;
+﻿namespace SPTarkov.Core.Models.Enums;
 
 public record ForgeResponseMessage
 {

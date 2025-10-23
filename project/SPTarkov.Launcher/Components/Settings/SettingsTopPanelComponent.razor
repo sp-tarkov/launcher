@@ -1,4 +1,6 @@
-﻿@inject ILogger<SettingsTopPanelComponent> Logger
+﻿@using SPTarkov.Core.Models.Enums
+@using SPTarkov.Core.Models.Responses
+@inject ILogger<SettingsTopPanelComponent> Logger
 @inject ConfigHelper ConfigHelper
 @inject HttpHelper HttpHelper
 @inject ISnackbar Snackbar
@@ -17,7 +19,7 @@
 
     private bool IsWindows => OperatingSystem.IsWindows();
 
-    private async Task LoadLiveSettings()
+    private void LoadLiveSettings()
     {
         Logger.LogInformation("Loading Live Settings");
         var eftSettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape From Tarkov", "Settings");
@@ -55,7 +57,7 @@
         Snackbar.Add(LocaleHelper.Get("setting_load_live_success"), Severity.Success);
     }
 
-    private async Task ClearGameSettings()
+    private void ClearGameSettings()
     {
         Logger.LogInformation("clearing game settings");
         var sptSettings = new DirectoryInfo(Path.Combine(ConfigHelper.GetConfig().GamePath, "user", "sptsettings"));
@@ -83,7 +85,7 @@
         Snackbar.Add(LocaleHelper.Get("setting_clear_game_success"), Severity.Success);
     }
 
-    private async Task CleanTempFiles()
+    private void CleanTempFiles()
     {
         try
         {
@@ -107,7 +109,7 @@
         Snackbar.Add(LocaleHelper.Get("setting_clean_temp_success"), Severity.Success);
     }
 
-    private async Task CopyLogs()
+    private void CopyLogs()
     {
         var filesToCopy = new List<string>();
         var path = ConfigHelper.GetConfig().GamePath;

@@ -3,14 +3,15 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using SPTarkov.Core.Models;
+using SPTarkov.Core.Models.Responses;
+using SPTarkov.Core.Models.Spt;
 using SPTarkov.Core.Patching;
 
 namespace SPTarkov.Core.Helpers;
 
 public class GameHelper
 {
-    private const string registryInstall = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
+    private const string RegistryInstall = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
 
     private readonly ConfigHelper _configHelper;
     private readonly ILogger<GameHelper> _logger;
@@ -22,7 +23,7 @@ public class GameHelper
     private string? _originalGamePath;
     public string? ErrorMessage;
 
-    private List<string> patches
+    private List<string> Patches
     {
         get { return GetCorePatches(); }
     }
@@ -53,7 +54,7 @@ public class GameHelper
             return null;
         }
 
-        var installLocation = Registry.LocalMachine.OpenSubKey(registryInstall, false)?.GetValue("InstallLocation");
+        var installLocation = Registry.LocalMachine.OpenSubKey(RegistryInstall, false)?.GetValue("InstallLocation");
         var info = installLocation is string key ? new DirectoryInfo(key) : null;
         return info?.FullName;
     }
@@ -96,9 +97,9 @@ public class GameHelper
     {
         try
         {
-            await foreach (var patchResultInfo in PatchFiles())
+            await foreach (var _ in PatchFiles())
             {
-                var resultInfo = patchResultInfo;
+                // Do nothing with this
             }
         }
         catch (Exception e)
@@ -111,11 +112,11 @@ public class GameHelper
         return true;
     }
 
-    public async Task<bool> LaunchGame()
+    public Task<bool> LaunchGame()
     {
         _logger.LogInformation("Launching game");
-        _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile.Username);
-        _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer.IpAddress);
+        _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
+        _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
 
         // check game path
         var clientExecutable = Path.Combine(_configHelper.GetConfig().GamePath, "EscapeFromTarkov.exe");
@@ -124,14 +125,14 @@ public class GameHelper
         {
             _logger.LogError("Could not find {ClientExecutable}", clientExecutable);
             ErrorMessage = _localeHelper.Get("game_helper_error_5");
-            return false;
+            return Task.FromResult(false);
         }
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
 
         //start game
-        var args = $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile.ProfileID} -config=" +
-                   $"{{'BackendUrl':'https://{_stateHelper.SelectedServer.IpAddress}','Version':'live','MatchingVersion':'live'}}";
+        var args = $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config=" +
+                   $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";
 
         _logger.LogInformation($"args: {args}");
 
@@ -151,10 +152,10 @@ public class GameHelper
         {
             _logger.LogError($"Starting game process failed: {ex}");
             ErrorMessage = _localeHelper.Get("game_helper_error_6");
-            return false;
+            return Task.FromResult(false);
         }
 
-        return true;
+        return Task.FromResult(true);
     }
 
     private async IAsyncEnumerable<PatchResultInfo> PatchFiles()
@@ -163,7 +164,7 @@ public class GameHelper
         {
             yield return info;
 
-            if (info.OK)
+            if (info.Ok)
             {
                 continue;
             }
@@ -178,19 +179,17 @@ public class GameHelper
         }
     }
 
-    private async IAsyncEnumerable<PatchResultInfo> TryPatchFiles(bool IgnoreInputHashMismatch)
+    private async IAsyncEnumerable<PatchResultInfo> TryPatchFiles(bool ignoreInputHashMismatch)
     {
         _filePatcher.Restore(_configHelper.GetConfig().GamePath);
 
-        int processed = 0;
-        int countpatches = patches.Count;
+        var processed = 0;
+        var countpatches = Patches.Count;
 
-        var _patches = patches;
-        foreach (var patch in _patches)
+        foreach (var patch in Patches)
         {
-            var result =
-                await Task.Factory.StartNew(() => _filePatcher.Run(_configHelper.GetConfig().GamePath, patch, IgnoreInputHashMismatch));
-            if (!result.OK)
+            var result = await Task.Factory.StartNew(() => _filePatcher.Run(_configHelper.GetConfig().GamePath, patch, ignoreInputHashMismatch));
+            if (!result.Ok)
             {
                 yield return new PatchResultInfo(result.Status, processed, countpatches);
                 yield break;
@@ -212,11 +211,12 @@ public class GameHelper
         try
         {
             var call = await _httpHelper.GameServerGet<VersionResponse>(RequestUrl.Version, CancellationToken.None);
-            var serverVersion = new SPTVersion(call.Response);
+
+            var serverVersion = new SptVersion(call?.Response!);
 
             var coreDllVersionInfo =
                 FileVersionInfo.GetVersionInfo(Path.Combine(_configHelper.GetConfig().GamePath, "BepinEx", "plugins", "spt", "spt-core.dll"));
-            var dllVersion = new SPTVersion(coreDllVersionInfo.FileVersion);
+            var dllVersion = new SptVersion(coreDllVersionInfo.FileVersion!);
 
             _logger.LogInformation("server version: {serverVersion} - spt-core.dll version: {DllVersion}", serverVersion, dllVersion);
 
@@ -263,25 +263,25 @@ public class GameHelper
             List<FileInfo> files =
             [
                 // SPT files
-                new(Path.Combine(_originalGamePath, "SPT.Launcher.exe")),
-                new(Path.Combine(_originalGamePath, "SPT.Server.exe")),
+                new(Path.Combine(_originalGamePath!, "SPT.Launcher.exe")),
+                new(Path.Combine(_originalGamePath!, "SPT.Server.exe")),
 
                 // bepinex files
-                new(Path.Combine(_originalGamePath, "doorstep_config.ini")),
-                new(Path.Combine(_originalGamePath, "winhttp.dll")),
+                new(Path.Combine(_originalGamePath!, "doorstep_config.ini")),
+                new(Path.Combine(_originalGamePath!, "winhttp.dll")),
 
                 // licenses
-                new(Path.Combine(_originalGamePath, "LICENSE-BEPINEX.txt")),
-                new(Path.Combine(_originalGamePath, "LICENSE-ConfigurationManager.txt")),
-                new(Path.Combine(_originalGamePath, "LICENSE-Launcher.txt")),
-                new(Path.Combine(_originalGamePath, "LICENSE-Modules.txt")),
-                new(Path.Combine(_originalGamePath, "LICENSE-Server.txt"))
+                new(Path.Combine(_originalGamePath!, "LICENSE-BEPINEX.txt")),
+                new(Path.Combine(_originalGamePath!, "LICENSE-ConfigurationManager.txt")),
+                new(Path.Combine(_originalGamePath!, "LICENSE-Launcher.txt")),
+                new(Path.Combine(_originalGamePath!, "LICENSE-Modules.txt")),
+                new(Path.Combine(_originalGamePath!, "LICENSE-Server.txt"))
             ];
 
             List<DirectoryInfo> directories =
             [
-                new(Path.Combine(_originalGamePath, "SPT_Data")),
-                new(Path.Combine(_originalGamePath, "BepInEx"))
+                new(Path.Combine(_originalGamePath!, "SPT_Data")),
+                new(Path.Combine(_originalGamePath!, "BepInEx"))
             ];
 
             foreach (var file in files.Where(file => File.Exists(file.FullName)))
@@ -373,10 +373,10 @@ public class GameHelper
         var registryData = JsonSerializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(registryFile.FullName));
 
         // Find any property that has a key containing the profileId, and remove it
-        var propsToRemove = registryData.Where(prop => prop.Key.Contains(profileId, StringComparison.CurrentCultureIgnoreCase)).ToList();
-        propsToRemove.ForEach(prop => registryData.Remove(prop.Key));
+        var propsToRemove = registryData?.Where(prop => prop.Key.Contains(profileId, StringComparison.CurrentCultureIgnoreCase)).ToList();
+        propsToRemove?.ForEach(prop => registryData?.Remove(prop.Key));
 
-        File.WriteAllText(registryFile.FullName, registryData.ToString());
+        File.WriteAllText(registryFile.FullName, registryData?.ToString());
     }
 
     private bool TryRemoveFilesRecursively(DirectoryInfo basedir)
@@ -420,21 +420,23 @@ public class GameHelper
     public static bool Validate()
     {
         var c0 = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
-        var v0 = 0;
+        int v0;
 
         try
         {
-            var v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
+#pragma warning disable CA1416
+            var v1 = Registry.LocalMachine.OpenSubKey(c0, false)?.GetValue("InstallLocation");
+
             var v2 = (v1 != null) ? v1.ToString() : string.Empty;
-            var v3 = new DirectoryInfo(v2);
+            var v3 = new DirectoryInfo(v2!);
             var v4 = new FileSystemInfo[]
             {
                 v3,
-                new FileInfo(Path.Combine(v2, "BattlEye", "BEClient_x64.dll")),
-                new FileInfo(Path.Combine(v2, "BattlEye", "BEService_x64.dll")),
-                new FileInfo(Path.Combine(v2, "ConsistencyInfo")),
-                new FileInfo(Path.Combine(v2, "Uninstall.exe")),
-                new FileInfo(Path.Combine(v2, "UnityCrashHandler64.exe"))
+                new FileInfo(Path.Combine(v2!, "BattlEye", "BEClient_x64.dll")),
+                new FileInfo(Path.Combine(v2!, "BattlEye", "BEService_x64.dll")),
+                new FileInfo(Path.Combine(v2!, "ConsistencyInfo")),
+                new FileInfo(Path.Combine(v2!, "Uninstall.exe")),
+                new FileInfo(Path.Combine(v2!, "UnityCrashHandler64.exe"))
             };
 
             v0 = v4.Length - 1;
@@ -458,7 +460,7 @@ public class GameHelper
     public async Task<bool> MonitorGame()
     {
         var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
-        while (!process.HasExited)
+        while (!process!.HasExited)
         {
             await Task.Delay(3000);
         }

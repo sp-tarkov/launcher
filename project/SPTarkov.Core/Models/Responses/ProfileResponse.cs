@@ -1,4 +1,6 @@
-﻿namespace SPTarkov.Core.Models;
+﻿using SPTarkov.Core.Models.Spt;
+
+namespace SPTarkov.Core.Models.Responses;
 
 public record ProfileResponse : ISptResponse<MiniProfile>
 {

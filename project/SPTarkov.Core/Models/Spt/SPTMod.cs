@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.Models;
+namespace SPTarkov.Core.Models.Spt;
 
-public record SPTMod
+public record SptMod
 {
     [JsonPropertyName("author")]
     public string Author { get; set; } = "";

@@ -5,14 +5,14 @@ namespace SPTarkov.Core.Logging;
 
 public class FileLogger : ILogger
 {
-    private readonly string categoryName;
+    private readonly string _categoryName;
     private readonly SemaphoreSlim _lock;
     private readonly string _path;
-    private StringBuilder sb = new();
+    private StringBuilder _sb = new();
 
     public FileLogger(string name, string path, SemaphoreSlim locker)
     {
-        categoryName = name;
+        _categoryName = name;
         _path = path;
         _lock = locker;
     }
@@ -22,11 +22,11 @@ public class FileLogger : ILogger
         try
         {
             await _lock.WaitAsync();
-            sb.Clear();
-            sb.Append($"[{categoryName}]");
-            sb.Append(formatter(state, exception));
-            sb.Append(Environment.NewLine);
-            await File.AppendAllTextAsync(_path, sb.ToString(), Encoding.UTF8);
+            _sb.Clear();
+            _sb.Append($"[{_categoryName}]");
+            _sb.Append(formatter(state, exception));
+            _sb.Append(Environment.NewLine);
+            await File.AppendAllTextAsync(_path, _sb.ToString(), Encoding.UTF8);
         }
         finally
         {
@@ -44,7 +44,7 @@ public class FileLogger : ILogger
         return true;
     }
 
-    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull
     {
         throw new NotImplementedException();
     }

@@ -12,16 +12,16 @@
 
 @code {
     [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
     private void Submit()
     {
-        mudDialog.Close(DialogResult.Ok(true));
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private void Cancel()
     {
-        mudDialog.Cancel();
+        MudDialog.Cancel();
     }
 
 }

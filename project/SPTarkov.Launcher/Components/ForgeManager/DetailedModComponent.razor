@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime JsRuntime
+﻿@using SPTarkov.Core.Models.Forge
+@inject IJSRuntime JsRuntime
 @inject LocaleHelper LocaleHelper
 @inject IDialogService DialogService
 @inject ConfigHelper ConfigHelper
@@ -99,9 +100,9 @@
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result
                         </MudText>
                         <MudText Typo="Typo.caption" Class="pb-2">
-                            @if (!string.IsNullOrEmpty(latestVersion.VirusTotalLink))
+                            @if (!string.IsNullOrEmpty(LatestVersion.VirusTotalLink))
                             {
-                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@latestVersion.VirusTotalLink">@latestVersion.VirusTotalLink</MudLink>
+                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@LatestVersion.VirusTotalLink">@LatestVersion.VirusTotalLink</MudLink>
                             }
                             else
                             {
@@ -111,7 +112,7 @@
                     </MudCardContent>
                 </MudCard>
                 <MudItem sm="12" Class="mt-4">
-                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% " Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">@($"Download Latest ({latestVersion.Version})")</MudButton>
+                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% " Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">@($"Download Latest ({LatestVersion.Version})")</MudButton>
                 </MudItem>
             </MudItem>
         </MudGrid>
@@ -123,7 +124,7 @@
     [Parameter] public ForgeBase ForgeMod { get; set; }
     [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
 
-    private ForgeModVersion latestVersion => ForgeMod.Versions.FirstOrDefault();
+    private ForgeModVersion LatestVersion => ForgeMod.Versions?.FirstOrDefault();
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -137,7 +138,33 @@
 
     private async Task StartDownloadModTask()
     {
-        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", ConfigHelper.DialogOptions);
+        var option = new DialogOptions
+        {
+            Position = ConfigHelper.DialogOptions.Position,
+            MaxWidth = MaxWidth.Large,
+            BackdropClick = ConfigHelper.DialogOptions.BackdropClick,
+            CloseOnEscapeKey = ConfigHelper.DialogOptions.CloseOnEscapeKey,
+            NoHeader = ConfigHelper.DialogOptions.NoHeader,
+            CloseButton = ConfigHelper.DialogOptions.CloseButton,
+            FullScreen = ConfigHelper.DialogOptions.FullScreen,
+            FullWidth = ConfigHelper.DialogOptions.FullWidth,
+            BackgroundClass = ConfigHelper.DialogOptions.BackgroundClass
+        };
+
+        var param = new DialogParameters
+        {
+            {
+                "Name", ForgeMod.Name
+            },
+            {
+                "VersionDescription", ForgeModVersion.Description
+            },
+            {
+                "VersionLink", ForgeModVersion.Link
+            }
+        };
+
+        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", param, option);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)

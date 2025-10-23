@@ -1,4 +1,5 @@
 ﻿@page "/Forge"
+@using SPTarkov.Core.Models.Responses
 
 @inject IDialogService DialogService
 @inject HttpHelper HttpHelper
@@ -8,16 +9,16 @@
 @inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
-    @if (netAvailable && apiKeyAvailable)
+    @if (NetAvailable && ApiKeyAvailable)
     {
         <MudItem sm="12" Class="mb-6">
             <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
                 <SearchComponent @bind-Search="Search" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" SearchFunc="@SearchUpdate"/>
 
-                @if (searchResponse?.Meta?.LastPage is not null && searchResponse?.Data?.Count > 0)
+                @if (SearchResponse?.Meta?.LastPage is not null && SearchResponse?.Data?.Count > 0)
                 {
                     <MudItem sm="12" Class="d-flex justify-center">
-                        <MudPagination Rectangular="true" Variant="Variant.Text" Count="@((int)searchResponse.Meta.LastPage)" Class="mb-4"
+                        <MudPagination Rectangular="true" Variant="Variant.Text" Count="@((int)SearchResponse.Meta.LastPage)" Class="mb-4"
                                        ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@PaginationSelected"/>
                     </MudItem>
                 }
@@ -25,7 +26,7 @@
         </MudItem>
     }
 
-    @if (!netAvailable)
+    @if (!NetAvailable)
     {
         <MudItem sm="12">
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No Internet access found, please fix and refresh!</MudAlert>
@@ -34,7 +35,7 @@
             <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" @onclick="CheckInternetAccess">Refresh</MudButton>
         </MudItem>
     }
-    else if (!apiKeyAvailable)
+    else if (!ApiKeyAvailable)
     {
         <MudItem sm="12">
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">No API Key found, please follow the instructions below to be able to use Forge!</MudAlert>
@@ -70,17 +71,17 @@
             </MudExpansionPanel>
         </MudExpansionPanels>
     }
-    else if (searchResponse is null || searchInProgress)
+    else if (SearchResponse is null || SearchInProgress)
     {
         <MudGrid>
             <ModCardComponent IsSkeleton="true"/>
             <ModCardComponent IsSkeleton="true"/>
         </MudGrid>
     }
-    else if (searchResponse?.Data?.Count > 0)
+    else if (SearchResponse?.Data?.Count > 0)
     {
         <MudGrid>
-            @foreach (var mod in searchResponse.Data)
+            @foreach (var mod in SearchResponse.Data)
             {
                 <ModCardComponent ForgeMod="@mod"/>
             }
@@ -90,10 +91,10 @@
 </MudContainer>
 
 @code {
-    private bool netAvailable { get; set; }
-    private bool apiKeyAvailable { get; set; }
-    private ForgeModsResponse searchResponse { get; set; }
-    private bool searchInProgress { get; set; }
+    private bool NetAvailable { get; set; }
+    private bool ApiKeyAvailable { get; set; }
+    private ForgeModsResponse SearchResponse { get; set; }
+    private bool SearchInProgress { get; set; }
 
     private int PaginationSelected
     {
@@ -173,10 +174,10 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        netAvailable = HttpHelper.IsInternetAccessAvailable();
-        apiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
+        NetAvailable = HttpHelper.IsInternetAccessAvailable();
+        ApiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
 
-        if (!apiKeyAvailable || !netAvailable)
+        if (!ApiKeyAvailable || !NetAvailable)
         {
             return;
         }
@@ -186,7 +187,7 @@
 
     private void CheckInternetAccess()
     {
-        netAvailable = HttpHelper.IsInternetAccessAvailable();
+        NetAvailable = HttpHelper.IsInternetAccessAvailable();
     }
 
     private async Task SearchUpdate()
@@ -196,13 +197,13 @@
 
     private async Task SearchForMods(int? page = null)
     {
-        searchInProgress = true;
+        SearchInProgress = true;
         page ??= StateHelper.CurrentPagination;
 
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            searchResponse = await HttpHelper.ForgeGetMods(token.Token, Search, SortValue, page ?? 1, FilterValue, AiValue);
+            SearchResponse = await HttpHelper.ForgeGetMods(token.Token, Search, SortValue, (int) page, FilterValue, AiValue);
         }
         catch (Exception e)
         {
@@ -210,16 +211,16 @@
             return;
         }
 
-        if (!searchResponse!.Success)
+        if (!SearchResponse!.Success)
         {
             Logger.LogError("Something failed, check logs");
-            searchResponse = null;
-            apiKeyAvailable = false;
+            SearchResponse = null;
+            ApiKeyAvailable = false;
         }
 
         PaginationSelected = page ?? 1;
         StateHelper.CurrentPagination = PaginationSelected;
-        searchInProgress = false;
+        SearchInProgress = false;
         StateHasChanged();
     }
 
@@ -230,7 +231,7 @@
 
         if (result?.Canceled is false)
         {
-            apiKeyAvailable = true;
+            ApiKeyAvailable = true;
             Logger.LogInformation("Saved Apikey");
             await SearchForMods();
         }
@@ -245,7 +246,7 @@
 
         if (result?.Canceled is false)
         {
-            apiKeyAvailable = true;
+            ApiKeyAvailable = true;
             Logger.LogInformation("Saved Apikey");
             await SearchForMods();
         }

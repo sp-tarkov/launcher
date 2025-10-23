@@ -39,7 +39,7 @@ public class LocaleHelper
             {
                 var json = File.ReadAllText(file);
                 var localeDict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-                _listOfLocales.Add(localeDict);
+                _listOfLocales.Add(localeDict!);
             }
 
             SetLocale(_defaultLocale);
@@ -48,11 +48,12 @@ public class LocaleHelper
 
     public string Get(string key)
     {
-        if (!_selectedLocale.TryGetValue(key, out string value))
+        if (!_selectedLocale.TryGetValue(key, out var value))
         {
             _logger.LogError("Key {key} not found in locale {locale}", key, _selectedLocale["ietf_tag"]);
         }
 
+        value ??= "Value was null, Please report this for fixing";
         return value;
     }
 
@@ -69,7 +70,7 @@ public class LocaleHelper
 
     public void SetLocale(string locale)
     {
-        _selectedLocale = _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == locale) ?? _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == _defaultLocale);
+        _selectedLocale = _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == locale) ?? _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == _defaultLocale)!;
         _configHelper.SetLocale(_selectedLocale.GetValueOrDefault("ietf_tag", "en"));
     }
 }

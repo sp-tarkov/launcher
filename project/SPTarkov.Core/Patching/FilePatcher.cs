@@ -20,7 +20,7 @@ public class FilePatcher
         _logger = logger;
     }
 
-    private PatchResultInfo Patch(string targetfile, string patchfile, bool IgnoreInputHashMismatch = false)
+    private PatchResultInfo Patch(string targetfile, string patchfile, bool ignoreInputHashMismatch = false)
     {
         // Backup the original file if a backup doesn't exist yet
         var backupFile = $"{targetfile}.spt-bak";
@@ -30,7 +30,7 @@ public class FilePatcher
         }
 
         var result = ApplyPatch(patchfile, backupFile, targetfile);
-        if (result.Status == PatchResultEnum.InputChecksumMismatch && IgnoreInputHashMismatch)
+        if (result.Status == PatchResultEnum.InputChecksumMismatch && ignoreInputHashMismatch)
         {
             return new PatchResultInfo(PatchResultEnum.Success, 1, 1);
         }
@@ -38,7 +38,7 @@ public class FilePatcher
         return result;
     }
 
-    private PatchResultInfo PatchAll(string targetpath, string patchpath, bool IgnoreInputHashMismatch = false)
+    private PatchResultInfo PatchAll(string targetpath, string patchpath, bool ignoreInputHashMismatch = false)
     {
         var di = new DirectoryInfo(patchpath);
 
@@ -61,9 +61,9 @@ public class FilePatcher
             // create a target file from the relative patch file while utilizing targetpath as the root directory.
             target = new FileInfo(Path.Combine(targetpath, relativefile.Replace(".delta", "")));
 
-            var result = Patch(target.FullName, file.FullName, IgnoreInputHashMismatch);
+            var result = Patch(target.FullName, file.FullName, ignoreInputHashMismatch);
 
-            if (!result.OK)
+            if (!result.Ok)
             {
                 // patch failed
                 return result;
@@ -75,9 +75,9 @@ public class FilePatcher
         return new PatchResultInfo(PatchResultEnum.Success, processed, countfiles);
     }
 
-    public PatchResultInfo Run(string targetPath, string patchPath, bool IgnoreInputHashMismatch = false)
+    public PatchResultInfo Run(string targetPath, string patchPath, bool ignoreInputHashMismatch = false)
     {
-        return PatchAll(targetPath, patchPath, IgnoreInputHashMismatch);
+        return PatchAll(targetPath, patchPath, ignoreInputHashMismatch);
     }
 
     public void Restore(string filepath)
@@ -120,7 +120,7 @@ public class FilePatcher
         }
     }
 
-    private PatchResultInfo ApplyPatch(string PatchFilePath, string SourceFilePath, string TargetFilePath)
+    private PatchResultInfo ApplyPatch(string patchFilePath, string sourceFilePath, string targetFilePath)
     {
         // TODO: We should do checksum validation at some point
         try
@@ -128,8 +128,8 @@ public class FilePatcher
             var patcher = new HDiffPatch();
             HDiffPatch.LogVerbosity = Verbosity.Quiet;
 
-            patcher.Initialize(PatchFilePath);
-            patcher.Patch(SourceFilePath, TargetFilePath, false, default, false, false);
+            patcher.Initialize(patchFilePath);
+            patcher.Patch(sourceFilePath, targetFilePath, false, default, false, false);
         }
         catch (Exception ex)
         {

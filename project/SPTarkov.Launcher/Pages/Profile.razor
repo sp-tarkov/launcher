@@ -1,4 +1,5 @@
 ﻿@page "/Profile"
+@using SPTarkov.Core.Models.Spt
 
 @inject StateHelper StateHelper
 @inject GameHelper GameHelper
@@ -15,7 +16,7 @@
         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="Color.Success">@(LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
-        <ProfileLevelComponent CurrentExp="selectedMiniProfile.CurrentExp" CurrentLevel="selectedMiniProfile.CurrentLevel" NeededExp="selectedMiniProfile.NextLevel"/>
+        <ProfileLevelComponent CurrentExp="SelectedMiniProfile.CurrentExp" CurrentLevel="SelectedMiniProfile.CurrentLevel" NeededExp="SelectedMiniProfile.NextLevel"/>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4">
         <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
@@ -26,19 +27,19 @@
         </MudPaper>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
-        <ProfileCardComponent MiniProfile="selectedMiniProfile" HideButtons="true"/>
-        <ProfileStatsComponent MiniProfile="@selectedMiniProfile"/>
+        <ProfileCardComponent MiniProfile="SelectedMiniProfile" HideButtons="true"/>
+        <ProfileStatsComponent MiniProfile="SelectedMiniProfile"/>
     </MudContainer>
 </MudContainer>
 
 @code {
-    private MiniProfile selectedMiniProfile { get; set; }
+    private MiniProfile SelectedMiniProfile { get; set; }
     private bool _buttonDisabled;
 
     protected override void OnInitialized()
     {
-        selectedMiniProfile = StateHelper.SelectedProfile;
-        Logger.LogInformation("Selected profile: {Username}", selectedMiniProfile?.Username);
+        SelectedMiniProfile = StateHelper.SelectedProfile;
+        Logger.LogInformation("Selected profile: {Username}", SelectedMiniProfile?.Username);
         base.OnInitialized();
     }
 
@@ -98,7 +99,7 @@
         }
     }
 
-    private async Task ReturnToProfiles()
+    private void ReturnToProfiles()
     {
         StateHelper.SetSelectedProfile(null);
         NavigationManager.NavigateTo("/ServerPageWrapper/false");

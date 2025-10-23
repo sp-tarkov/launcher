@@ -1,4 +1,7 @@
-﻿@inject ISnackbar Snackbar
+﻿@using SPTarkov.Core.Models.Requests
+@using SPTarkov.Core.Models.Responses
+@using SPTarkov.Core.Models.Spt
+@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
 @inject HttpHelper HttpHelper
 @inject LocaleHelper LocaleHelper
@@ -31,18 +34,17 @@
     public MiniProfile MiniProfile { get; set; }
 
     [CascadingParameter]
-    private IMudDialogInstance _mudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
-    private bool _success;
     private bool _requestInProgress;
     private string _taskText = "";
-    private LoginRequest request { get; } = new();
-    private CancellationTokenSource token { get; set; }
-    private bool userCancel { get; set; }
+    private LoginRequest Request { get; } = new();
+    private CancellationTokenSource Token { get; set; }
+    private bool UserCancel { get; set; }
 
     protected override void OnInitialized()
     {
-        request.Username = MiniProfile.Username;
+        Request.Username = MiniProfile.Username;
         base.OnInitialized();
     }
 
@@ -54,17 +56,17 @@
         {
             result = await CallServer(LocaleHelper.Get("profile_remove_task_1"), LocaleHelper.Get("profile_remove_task_fail"));
         }
-        catch (TaskCanceledException _) when (token.IsCancellationRequested)
+        catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
             AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
-        catch (HttpRequestException _)
+        catch (HttpRequestException)
         {
             AbortOrFail();
             return;
         }
-        catch (Exception _)
+        catch (Exception)
         {
             AbortOrFail();
             return;
@@ -81,12 +83,12 @@
     {
         try
         {
-            token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             _taskText = taskText;
             StateHasChanged();
             await Task.Delay(20);
 
-            var returnResult = await HttpHelper.GameServerPut<RemoveResponse>(RequestUrl.Remove, request, token.Token);
+            var returnResult = await HttpHelper.GameServerPut<RemoveResponse>(RequestUrl.Remove, Request, Token.Token);
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 
@@ -96,10 +98,10 @@
                 return false;
             }
 
-            token?.Dispose();
+            Token?.Dispose();
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             AbortOrFail();
             return false;
@@ -109,29 +111,29 @@
     private void Submit()
     {
         Snackbar.Add($"{LocaleHelper.Get("profile_remove_task_success")}: {MiniProfile?.Username}!", Severity.Success);
-        _mudDialog.Close(DialogResult.Ok(MiniProfile));
+        MudDialog.Close(DialogResult.Ok(MiniProfile));
     }
 
     private void AbortOrFail(string message = null)
     {
         message ??= LocaleHelper.Get("profile_remove_task_default");
 
-        if (!userCancel)
+        if (!UserCancel)
         {
             Snackbar.Add(message, Severity.Error);
         }
 
-        token?.Cancel();
-        _mudDialog.Cancel();
+        Token?.Cancel();
+        MudDialog.Cancel();
         _requestInProgress = false;
     }
 
     private void UserCancelled()
     {
-        userCancel = true;
+        UserCancel = true;
         _requestInProgress = false;
-        token?.Cancel();
-        _mudDialog.Cancel();
+        Token?.Cancel();
+        MudDialog.Cancel();
     }
 
 }

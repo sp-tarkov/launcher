@@ -12,7 +12,7 @@ public class FileLoggerProvider : ILoggerProvider
         var path = Path.GetDirectoryName(_path);
         if (!Directory.Exists(path))
         {
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(path!);
         }
         File.Create(_path).Close();
     }

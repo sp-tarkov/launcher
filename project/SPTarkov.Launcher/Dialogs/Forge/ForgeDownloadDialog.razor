@@ -1,16 +1,19 @@
 @inject ISnackbar Snackbar
-@inject HttpHelper HttpHelper
-@inject ILogger<ForgeDownloadDialog> Logger
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="py-4">
-
-
-
             <MudContainer Class="d-flex flex-column align-center gap-4">
                 <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
                 <MudText>Currently Testing downloads</MudText>
+                <MudText>Mod Name: @(Name)</MudText>
+                <MudText>Download Url: @(VersionLink)</MudText>
+                <MudText>Version Desc:
+                    @if (VersionDescription != null)
+                    {
+                        @((MarkupString)VersionDescription)
+                    }
+                </MudText>
             </MudContainer>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
@@ -36,13 +39,18 @@
 @code {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string VersionDescription { get; set; }
+    [Parameter]
+    public string VersionLink { get; set; }
 
-    private bool _success;
     private bool _requestInProgress;
-    private CancellationTokenSource token { get; set; }
-    private bool userCancel { get; set; }
+    private CancellationTokenSource Token { get; set; }
+    private bool UserCancel { get; set; }
 
-    private async Task RunDownloadTask()
+    private Task RunDownloadTask()
     {
         // start thread and download there. store somewhere and have a way to see them.
         _requestInProgress = true;
@@ -50,20 +58,20 @@
         {
 
         }
-        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
             AbortOrFail("Request Timed out!");
-            return;
+            return Task.CompletedTask;
         }
-        catch (HttpRequestException e)
+        catch (HttpRequestException)
         {
             AbortOrFail();
-            return;
+            return Task.CompletedTask;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             AbortOrFail();
-            return;
+            return Task.CompletedTask;
         }
 
         if (true)
@@ -71,31 +79,33 @@
             _requestInProgress = false;
             Submit();
         }
+
+        return Task.CompletedTask;
     }
 
     private void Submit()
     {
-        Snackbar.Add($"Download started for MODNAME", Severity.Success);
+        Snackbar.Add($"Download started for {Name}", Severity.Success);
         MudDialog.Close();
     }
 
     private void AbortOrFail(string message = "Cancelled download")
     {
-        if (!userCancel)
+        if (!UserCancel)
         {
             Snackbar.Add(message, Severity.Error);
         }
 
-        token?.Cancel();
+        Token?.Cancel();
         MudDialog.Cancel();
         _requestInProgress = false;
     }
 
     private void UserCancelled()
     {
-        userCancel = true;
+        UserCancel = true;
         _requestInProgress = false;
-        token?.Cancel();
+        Token?.Cancel();
         MudDialog.Cancel();
     }
 

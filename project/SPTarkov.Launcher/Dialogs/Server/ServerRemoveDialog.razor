@@ -15,17 +15,17 @@
 
 @code {
     [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
     private void Submit()
     {
         Snackbar.Add(LocaleHelper.Get("server_remove_submit"));
-        mudDialog.Close(DialogResult.Ok(true));
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private void Cancel()
     {
-        mudDialog.Cancel();
+        MudDialog.Cancel();
     }
 
 }

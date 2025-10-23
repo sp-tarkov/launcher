@@ -1,4 +1,5 @@
-﻿@inject IDialogService DialogService
+﻿@using SPTarkov.Core.Models.App
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
@@ -13,14 +14,14 @@
         <MudText Typo="Typo.h6">@Server.IpAddress</MudText>
         <MudContainer Class="d-flex pa-0 flex-row">
 
-            <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Right" Text="@(isConnectedServer ? LocaleHelper.Get("server_card_connected") : LocaleHelper.Get("server_card_disconnected"))">
-                <MudIconButton Icon="@Icons.Material.Filled.Circle" Color="@(isConnectedServer ? Color.Success : Color.Error)" Size="Size.Small"/>
+            <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Right" Text="@(IsConnectedServer ? LocaleHelper.Get("server_card_connected") : LocaleHelper.Get("server_card_disconnected"))">
+                <MudIconButton Icon="@Icons.Material.Filled.Circle" Color="@(IsConnectedServer ? Color.Success : Color.Error)" Size="Size.Small"/>
             </MudTooltip>
 
             <MudSpacer/>
 
-            <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Left" Text="@(!isConnectedServer ? LocaleHelper.Get("server_card_login") : LocaleHelper.Get("server_card_logout"))">
-                <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!isConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" OnClick="RunLoginTask"/>
+            <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Left" Text="@(!IsConnectedServer ? LocaleHelper.Get("server_card_login") : LocaleHelper.Get("server_card_logout"))">
+                <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!IsConnectedServer ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" OnClick="RunLoginTask"/>
             </MudTooltip>
 
             @if (!Server.Locked)
@@ -54,11 +55,11 @@
 
     [Parameter] public EventCallback<List<Server>> ServerListChanged { get; set; }
 
-    private bool isConnectedServer { get; set; }
+    private bool IsConnectedServer { get; set; }
 
     protected override void OnInitialized()
     {
-        isConnectedServer = StateHelper.SelectedServer?.ServerId == Server.ServerId;
+        IsConnectedServer = StateHelper.SelectedServer?.ServerId == Server.ServerId;
         base.OnInitialized();
     }
 
@@ -67,7 +68,7 @@
         if (StateHelper.SelectedServer?.ServerId == Server.ServerId)
         {
             StateHelper.LogoutAndDispose();
-            isConnectedServer = false;
+            IsConnectedServer = false;
         }
 
         var param = new DialogParameters
@@ -102,12 +103,12 @@
             if (StateHelper.SelectedServer.ServerId == Server.ServerId)
             {
                 StateHelper.LogoutAndDispose();
-                isConnectedServer = false;
+                IsConnectedServer = false;
                 return;
             }
 
             StateHelper.LogoutAndDispose();
-            isConnectedServer = false;
+            IsConnectedServer = false;
         }
 
         var param = new DialogParameters
@@ -125,7 +126,7 @@
             StateHelper.SetSelectedServer(Server);
             if (StateHelper.SelectedServer != null)
             {
-                isConnectedServer = StateHelper.SelectedServer.ServerId == Server.ServerId;
+                IsConnectedServer = StateHelper.SelectedServer.ServerId == Server.ServerId;
             }
 
             NavigationManager.NavigateTo("/Profiles");
@@ -137,7 +138,7 @@
         if (StateHelper.SelectedServer != null)
         {
             StateHelper.LogoutAndDispose();
-            isConnectedServer = false;
+            IsConnectedServer = false;
         }
 
         var dialog = await DialogService.ShowAsync<ServerRemoveDialog>("ServerRemoveDialog", ConfigHelper.DialogOptions);

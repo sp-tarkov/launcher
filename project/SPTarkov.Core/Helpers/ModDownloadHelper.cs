@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Logging;
 
 namespace SPTarkov.Core.Helpers;
 

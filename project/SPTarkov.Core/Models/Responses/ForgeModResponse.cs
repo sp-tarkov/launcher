@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
+using SPTarkov.Core.Models.Forge;
 
-namespace SPTarkov.Core.Models;
+namespace SPTarkov.Core.Models.Responses;
 
 public record ForgeModResponse
 {

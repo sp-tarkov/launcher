@@ -1,15 +1,16 @@
-﻿@inject ISnackbar Snackbar
+﻿@using SPTarkov.Core.Models.App
+@inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="py-4">
-            <MudForm Model="Server" @bind-IsValid="@success" Class="gap-2 mt-3">
+            <MudForm Model="Server" @bind-IsValid="@_success" Class="gap-2 mt-3">
                 <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_edit_name"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
                 <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
             </MudForm>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" OnClick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" OnClick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">@(LocaleHelper.Get("server_edit_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
@@ -17,32 +18,32 @@
 </MudDialog>
 
 @code {
-    private bool success;
+    private bool _success;
 
     // TODO: create mask that can be either IP or an actual address - Example: https://127.0.0.1:6969 or https://nerd.something.net:6969
-    private readonly IMask ipPortMask = RegexMask.IPv4(true);
+    // private readonly IMask _ipPortMask = RegexMask.IPv4(true);
 
     [Parameter]
     public Server Server { get; set; }
 
     [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
     protected override void OnInitialized()
     {
-        success = !string.IsNullOrEmpty(Server.Name) && !string.IsNullOrEmpty(Server.IpAddress);
+        _success = !string.IsNullOrEmpty(Server.Name) && !string.IsNullOrEmpty(Server.IpAddress);
         base.OnInitialized();
     }
 
     private void Submit()
     {
         Snackbar.Add(LocaleHelper.Get("server_edit_success"), Severity.Success);
-        mudDialog.Close(DialogResult.Ok(Server));
+        MudDialog.Close(DialogResult.Ok(Server));
     }
 
     private void Cancel()
     {
-        mudDialog.Cancel();
+        MudDialog.Cancel();
     }
 
 }

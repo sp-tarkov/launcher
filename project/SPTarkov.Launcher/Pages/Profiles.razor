@@ -1,4 +1,5 @@
 ﻿@page "/Profiles"
+@using SPTarkov.Core.Models.Spt
 
 @inject IDialogService DialogService
 @inject StateHelper StateHelper
@@ -20,12 +21,12 @@
 
         @switch (ProfilesList.Count)
         {
-            case 0 when isConnected:
+            case 0 when IsConnected:
                 <MudItem sm="12">
                     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_empty_warning"))</MudAlert>
                 </MudItem>
                 break;
-            case 0 when !isConnected:
+            case 0 when !IsConnected:
                 <MudItem sm="12">
                     <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_connect_warning"))</MudAlert>
                 </MudItem>
@@ -35,14 +36,14 @@
 </MudContainer>
 
 @code {
-    private MiniProfile _partialProfile { get; set; }
+    private MiniProfile PartialProfile { get; set; }
     public List<MiniProfile> ProfilesList { get; set; }
-    private bool isConnected { get; set; }
+    private bool IsConnected { get; set; }
 
     protected override void OnInitialized()
     {
         ProfilesList = StateHelper.ProfileList;
-        isConnected = StateHelper.SelectedServer is not null;
+        IsConnected = StateHelper.SelectedServer is not null;
         base.OnInitialized();
     }
 
@@ -62,7 +63,7 @@
         var dialogParams = new DialogParameters
         {
             {
-                "MiniProfile", _partialProfile
+                "MiniProfile", PartialProfile
             }
         };
 
@@ -72,15 +73,17 @@
         if (result?.Canceled is false)
         {
             var objectToUse = result.Data as MiniProfile;
-            _partialProfile = objectToUse;
+            PartialProfile = objectToUse;
             StateHelper.SetSelectedProfile(objectToUse);
             NavigationManager.NavigateTo("/ServerPageWrapper/false");
         }
     }
 
-    private async Task ReturnToServers()
+    private Task ReturnToServers()
     {
         StateHelper.SetSelectedServer(null);
         NavigationManager.NavigateTo("/ServerPageWrapper/false");
+
+        return Task.CompletedTask;
     }
 }

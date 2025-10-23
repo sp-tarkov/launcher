@@ -1,4 +1,8 @@
-﻿@inject ISnackbar Snackbar
+﻿@using SPTarkov.Core.Models.App
+@using SPTarkov.Core.Models.Enums
+@using SPTarkov.Core.Models.Responses
+@using SPTarkov.Core.Models.Spt
+@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
 @inject HttpHelper HttpHelper
 @inject LocaleHelper LocaleHelper
@@ -24,10 +28,10 @@
     public Server Server { get; set; }
 
     [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
-    private CancellationTokenSource token { get; set; }
-    private bool userCancel { get; set; }
+    private CancellationTokenSource Token { get; set; }
+    private bool UserCancel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,17 +49,17 @@
             await CallServer(RequestTask.Types, LocaleHelper.Get("server_login_task_3"), LocaleHelper.Get("server_login_task_fail_2"));
             await CallServer(RequestTask.Mods, LocaleHelper.Get("server_login_task_4"), LocaleHelper.Get("server_login_task_fail_3"));
         }
-        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
             AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
-        catch (HttpRequestException e)
+        catch (HttpRequestException)
         {
             AbortOrFail();
             return;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             AbortOrFail();
             return;
@@ -67,7 +71,7 @@
     private async Task CallServer(RequestTask option, string taskText = "", string failString = "")
     {
         bool result;
-        token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         _taskText = taskText;
         StateHasChanged();
 
@@ -79,28 +83,28 @@
                 // Causes an exception that I cant fix.
                 // Do it only on Ping so its done once and doesnt look like a blank box
                 await Task.Delay(250);
-                var returnResult = await HttpHelper.GameServerGet<PingResponse>(RequestUrl.Ping, token.Token);
+                var returnResult = await HttpHelper.GameServerGet<PingResponse>(RequestUrl.Ping, Token.Token);
                 result = returnResult.Response == "Pong!";
                 break;
             }
             case RequestTask.Profiles:
             {
-                var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, token.Token);
-                StateHelper.ProfileList = returnResult.Response;
+                var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, Token.Token);
+                StateHelper.ProfileList = returnResult?.Response!;
                 result = true;
                 break;
             }
             case RequestTask.Types:
             {
-                var returnResult = await HttpHelper.GameServerGet<TypesResponse>(RequestUrl.Types, token.Token);
-                StateHelper.ProfileTypes = returnResult.Response;
+                var returnResult = await HttpHelper.GameServerGet<TypesResponse>(RequestUrl.Types, Token.Token);
+                StateHelper.ProfileTypes = returnResult?.Response!;
                 result = true;
                 break;
             }
             case RequestTask.Mods:
             {
-                var returnResult = await HttpHelper.GameServerGet<ModsResponse>(RequestUrl.Mods, token.Token);
-                StateHelper.ModList = returnResult.Response;
+                var returnResult = await HttpHelper.GameServerGet<ModsResponse>(RequestUrl.Mods, Token.Token);
+                StateHelper.ModList = returnResult?.Response!;
                 result = true;
                 break;
             }
@@ -115,33 +119,33 @@
             return;
         }
 
-        token?.Dispose();
+        Token?.Dispose();
     }
 
     private void AbortOrFail(string message = null)
     {
         message ??= LocaleHelper.Get("server_login_default");
 
-        if (!userCancel)
+        if (!UserCancel)
         {
             Snackbar.Add(message, Severity.Error);
         }
 
         StateHelper.LogoutAndDispose();
-        token?.Cancel();
-        mudDialog.Cancel();
+        Token?.Cancel();
+        MudDialog.Cancel();
     }
 
     private void Submit()
     {
-        mudDialog.Close(DialogResult.Ok(Server));
+        MudDialog.Close(DialogResult.Ok(Server));
         Snackbar.Add(LocaleHelper.Get("server_login_task_success"), Severity.Success);
     }
 
     private void UserCancelled()
     {
-        userCancel = true;
-        token?.Cancel();
-        mudDialog.Cancel();
+        UserCancel = true;
+        Token?.Cancel();
+        MudDialog.Cancel();
     }
 }

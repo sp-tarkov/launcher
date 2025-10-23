@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using SPTarkov.Core.Extensions;
 
-namespace SPTarkov.Core.Models;
+namespace SPTarkov.Core.Models.Forge;
 
 public record ForgeBase
 {
@@ -64,28 +64,28 @@ public record ForgeBase
 
     public char? GetAvatarLetter()
     {
-        return Owner.Name.ToUpper().FirstOrDefault();
+        return Owner?.Name?.ToUpper().FirstOrDefault();
     }
 
     public bool TryGetProfileAvatar(out string? url)
     {
-        url = Owner.ProfilePhotoUrl;
+        url = Owner?.ProfilePhotoUrl;
         return !string.IsNullOrEmpty(url);
     }
 
     public string? GetModName()
     {
-        return Name.UppercaseFirst();
+        return Name?.UppercaseFirst();
     }
 
     public string? GetModdersName()
     {
-        return Owner.Name.UppercaseFirst();
+        return Owner?.Name?.UppercaseFirst();
     }
 
     public string? GetModTeaser()
     {
-        return Teaser.UppercaseFirst();
+        return Teaser?.UppercaseFirst();
     }
 
     public bool GetModFeatured()
@@ -95,8 +95,8 @@ public record ForgeBase
 
     public string? GetAdditionalAuthors()
     {
-        return Authors.Any()
-            ? Authors.Select(x => x.Name).Aggregate((i, j) => i + ", " + j)
+        return Authors!.Any()
+            ? Authors!.Select(x => x.Name).Aggregate((i, j) => i + ", " + j)
             : "None";
     }
 

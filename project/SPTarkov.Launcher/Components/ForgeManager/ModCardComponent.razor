@@ -1,5 +1,4 @@
-﻿@inject NavigationManager NavigationManager
-@inject ILogger<ModCardComponent> Logger
+﻿@using SPTarkov.Core.Models.Forge
 
 <MudItem sm="6">
     @if (IsSkeleton)
@@ -68,15 +67,9 @@
 </MudItem>
 
 @code {
-    [Parameter] public bool IsSkeleton { get; set; }
+    [Parameter]
+    public bool IsSkeleton { get; set; }
 
-    [Parameter] public ForgeBase ForgeMod { get; set; }
-
-    private void NavigateToSingleMod(int? modId)
-    {
-        // navigate to mod page
-        Logger.LogInformation($"Navigating to mod page: {modId}");
-        NavigationManager.NavigateTo($"/ForgeMod/{modId}");
-    }
-
+    [Parameter]
+    public ForgeBase ForgeMod { get; set; }
 }

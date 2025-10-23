@@ -9,18 +9,18 @@
 @inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
-    @if (!_modLoaderAvailable)
+    @if (!ModLoaderAvailable)
     {
         <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("mod_page_coming"))</MudAlert>
     }
     else
     {
         <MudItem sm="12" Class="mb-4">
-            <MudButton OnClick="RevertChanges" Variant="Variant.Filled" Disabled="@(!unsavedData)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Undo" Size="Size.Large" Class="flex-grow-1">Undo Changes</MudButton>
-            <MudButton OnClick="SaveChanges" Variant="Variant.Filled" Disabled="@(!unsavedData)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="Size.Large" Class="flex-grow-1">Save Changes</MudButton>
+            <MudButton OnClick="RevertChanges" Variant="Variant.Filled" Disabled="@(!UnsavedData)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Undo" Size="Size.Large" Class="flex-grow-1">Undo Changes</MudButton>
+            <MudButton OnClick="SaveChanges" Variant="Variant.Filled" Disabled="@(!UnsavedData)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="Size.Large" Class="flex-grow-1">Save Changes</MudButton>
         </MudItem>
 
-        <MudDropContainer T="DropItem" @ref="container" Items="_items" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-column flex-grow-1" CanDropClass="mud-border-success">
+        <MudDropContainer T="DropItem" @ref="Container" Items="_items" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-column flex-grow-1" CanDropClass="mud-border-success">
             <ChildContent>
                 <MudGrid>
                     <MudItem sm="6">
@@ -61,25 +61,25 @@
 </MudContainer>
 
 @code {
-    private const bool _modLoaderAvailable = false; // TODO: remove once this page has been implemented
-    private MudDropContainer<DropItem> container { get; set; }
-    private bool unsavedData { get; set; }
+    private const bool ModLoaderAvailable = false; // TODO: remove once this page has been implemented
+    private MudDropContainer<DropItem> Container { get; set; }
+    private bool UnsavedData { get; set; }
     private List<DropItem> _items = new();
-    private IDisposable handler { get; set; }
+    private IDisposable LoaderHandler { get; set; }
 
     protected override void OnInitialized()
     {
-        handler = NavigationManager.RegisterLocationChangingHandler(Handler);
+        LoaderHandler = NavigationManager.RegisterLocationChangingHandler(Handler);
         _items = LoadData();
         base.OnInitialized();
     }
 
     private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
     {
-        unsavedData = true;
+        UnsavedData = true;
         dropItem.Item.Zone = dropItem.DropzoneIdentifier;
         _items = _items.OrderBy(x => x.Name).ToList();
-        container.Refresh();
+        Container.Refresh();
         StateHasChanged();
     }
 
@@ -91,7 +91,7 @@
 
     private async ValueTask Handler(LocationChangingContext context)
     {
-        if (!unsavedData)
+        if (!UnsavedData)
         {
             // no unsavedData
             return;
@@ -114,19 +114,19 @@
 
     private void SaveChanges()
     {
-        unsavedData = false;
+        UnsavedData = false;
     }
 
     private void RevertChanges()
     {
         _items = LoadData();
         StateHasChanged();
-        unsavedData = false;
+        UnsavedData = false;
     }
 
     public void Dispose()
     {
-        handler.Dispose();
+        LoaderHandler.Dispose();
     }
 
     private List<DropItem> LoadData()

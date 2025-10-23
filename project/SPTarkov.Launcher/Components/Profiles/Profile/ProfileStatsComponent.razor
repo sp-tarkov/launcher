@@ -1,50 +1,51 @@
-﻿<MudItem sm="8">
+﻿@using SPTarkov.Core.Models.Spt
+<MudItem sm="8">
     <MudTabs Centered="true" Color="Color.Dark" Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2" Class="mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height">
         <MudTabPanel Text="Overall">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Raids" P1value="2" P2="Run Through" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="Survived" P1value="2" P2="AWOL" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="KIA" P1value="2" P2="MIA" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="Kills" P1value="2" P2="KD" P2value="2"/>
+                    <ProfileStatsSubColComponent P1="Raids" P1Value="2" P2="Run Through" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Survived" P1Value="2" P2="AWOL" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="KIA" P1Value="2" P2="MIA" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Kills" P1Value="2" P2="KD" P2Value="2"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Survival Rate" P1value="100%" P2="Leave Rate" P2value="0%"/>
-                    <ProfileStatsSubColComponent P1="Average Life Span" P1value="00:00" P2="Survivals in a row" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="Online" P1value="0H00M" P2="Account Lifetime" P2value="0H48M"/>
+                    <ProfileStatsSubColComponent P1="Survival Rate" P1Value="100%" P2="Leave Rate" P2Value="0%"/>
+                    <ProfileStatsSubColComponent P1="Average Life Span" P1Value="00:00" P2="Survivals in a row" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Online" P1Value="0H00M" P2="Account Lifetime" P2Value="0H48M"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>
         <MudTabPanel Text="Pmc">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Raids" P1value="2" P2="Run Through" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="Survived" P1value="2" P2="Survival Rate" P2value="100%"/>
-                    <ProfileStatsSubColComponent P1="KIA" P1value="2" P2="Average Life Span" P2value="00:00"/>
-                    <ProfileStatsSubColComponent P1="Kills" P1value="2" P2="KD" P2value="2"/>
+                    <ProfileStatsSubColComponent P1="Raids" P1Value="2" P2="Run Through" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Survived" P1Value="2" P2="Survival Rate" P2Value="100%"/>
+                    <ProfileStatsSubColComponent P1="KIA" P1Value="2" P2="Average Life Span" P2Value="00:00"/>
+                    <ProfileStatsSubColComponent P1="Kills" P1Value="2" P2="KD" P2Value="2"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="AWOL" P1value="2" P2="Leave Rate" P2value="0%"/>
-                    <ProfileStatsSubColComponent P1="MIA" P1value="2" P2="Survivals in a row" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="Online" P1value="0H00M" P2="Account Lifetime" P2value="0H48M"/>
+                    <ProfileStatsSubColComponent P1="AWOL" P1Value="2" P2="Leave Rate" P2Value="0%"/>
+                    <ProfileStatsSubColComponent P1="MIA" P1Value="2" P2="Survivals in a row" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Online" P1Value="0H00M" P2="Account Lifetime" P2Value="0H48M"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>
         <MudTabPanel Text="Scav">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Raids" P1value="2" P2="Run Through" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="Survived" P1value="2" P2="Survival Rate" P2value="100%"/>
-                    <ProfileStatsSubColComponent P1="KIA" P1value="2" P2="Average Life Span" P2value="00:00"/>
-                    <ProfileStatsSubColComponent P1="Kills" P1value="2" P2="KD" P2value="2"/>
+                    <ProfileStatsSubColComponent P1="Raids" P1Value="2" P2="Run Through" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Survived" P1Value="2" P2="Survival Rate" P2Value="100%"/>
+                    <ProfileStatsSubColComponent P1="KIA" P1Value="2" P2="Average Life Span" P2Value="00:00"/>
+                    <ProfileStatsSubColComponent P1="Kills" P1Value="2" P2="KD" P2Value="2"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="AWOL" P1value="2" P2="Leave Rate" P2value="0%"/>
-                    <ProfileStatsSubColComponent P1="MIA" P1value="2" P2="Survivals in a row" P2value="2"/>
-                    <ProfileStatsSubColComponent P1="Online" P1value="0H00M" P2="Account Lifetime" P2value="0H48M"/>
+                    <ProfileStatsSubColComponent P1="AWOL" P1Value="2" P2="Leave Rate" P2Value="0%"/>
+                    <ProfileStatsSubColComponent P1="MIA" P1Value="2" P2="Survivals in a row" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Online" P1Value="0H00M" P2="Account Lifetime" P2Value="0H48M"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>

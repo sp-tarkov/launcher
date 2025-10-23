@@ -8,8 +8,7 @@ using System.Text.Json;
 using System.Web;
 using ComponentAce.Compression.Libs.zlib;
 using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Logging;
-using SPTarkov.Core.Models;
+using SPTarkov.Core.Models.Responses;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -55,13 +54,13 @@ public class HttpHelper
 
     private string BuildGameUrl(string url)
     {
-        return "https://" + _stateHelper.SelectedServer.IpAddress + url;
+        return "https://" + _stateHelper.SelectedServer?.IpAddress + url;
     }
 
     public async Task<T?> GameServerGet<T>(string url, CancellationToken token)
     {
         _logger.LogInformation("GET: {Url}", url);
-        var task = await _httpClient?.GetAsync(BuildGameUrl(url), token);
+        var task = await _httpClient.GetAsync(BuildGameUrl(url), token);
 
         var json = SimpleZlib.Decompress(
             await task.Content.ReadAsByteArrayAsync(token)
@@ -83,7 +82,7 @@ public class HttpHelper
             )
         );
 
-        var task = await _httpClient?.PutAsync(BuildGameUrl(url), content, token);
+        var task = await _httpClient.PutAsync(BuildGameUrl(url), content, token);
 
         return JsonSerializer.Deserialize<T>(
             SimpleZlib.Decompress(
@@ -113,7 +112,7 @@ public class HttpHelper
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-        var task = await _httpClient?.SendAsync(message, token);
+        var task = await _httpClient.SendAsync(message, token);
         return JsonSerializer.Deserialize<ForgeModResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
@@ -138,7 +137,7 @@ public class HttpHelper
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-        var task = await _httpClient?.SendAsync(message, token);
+        var task = await _httpClient.SendAsync(message, token);
         return JsonSerializer.Deserialize<ForgeVersionResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
@@ -170,7 +169,7 @@ public class HttpHelper
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-        var task = await _httpClient?.SendAsync(message, token);
+        var task = await _httpClient.SendAsync(message, token);
 
         if (!task.IsSuccessStatusCode)
         {
@@ -202,7 +201,7 @@ public class HttpHelper
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
 
-        var task = await _httpClient?.SendAsync(message, token);
+        var task = await _httpClient.SendAsync(message, token);
         return JsonSerializer.Deserialize<ForgeLogoutResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
@@ -217,7 +216,7 @@ public class HttpHelper
 
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var task = await _httpClient?.SendAsync(message, token);
+        var task = await _httpClient.SendAsync(message, token);
         return JsonSerializer.Deserialize<ForgeLoginResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
@@ -263,15 +262,14 @@ public class HttpHelper
         return queryString;
     }
 
-    private bool? ConvertFeaturedToBool(string selected)
+    private bool? ConvertFeaturedToBool(string? selected)
     {
-        switch (selected.ToLower())
+        switch (selected?.ToLower())
         {
             case "exclude":
                 return false;
             case "only":
                 return true;
-            case "include":
             default:
                 return null;
         }

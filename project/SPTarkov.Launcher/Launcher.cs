@@ -32,7 +32,7 @@ public class Launcher
 
         appBuilder.Services
             .AddSingleton<ConfigHelper>()
-            .AddSingleton<ForgeHelper>()
+            // .AddSingleton<ForgeHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
             .AddSingleton<ModDownloadHelper>()

@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Logging;
-using SPTarkov.Core.Models;
+using SPTarkov.Core.Models.App;
+using SPTarkov.Core.Models.Spt;
 
 namespace SPTarkov.Core.Helpers;
 
 public class StateHelper
 {
     private readonly ILogger<StateHelper> _logger;
-    public Dictionary<string, SPTMod> ModList = [];
+    public Dictionary<string, SptMod> ModList = [];
     public List<MiniProfile> ProfileList = [];
     public Dictionary<string, string> ProfileTypes = new();
     public MiniProfile? SelectedProfile;

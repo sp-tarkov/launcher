@@ -1,5 +1,7 @@
-﻿@inject ISnackbar Snackbar
-@inject ILogger<ProfileLoginDialog> Logger
+﻿@using SPTarkov.Core.Models.Requests
+@using SPTarkov.Core.Models.Responses
+@using SPTarkov.Core.Models.Spt
+@inject ISnackbar Snackbar
 @inject HttpHelper HttpHelper
 @inject LocaleHelper LocaleHelper
 
@@ -15,8 +17,8 @@
             }
             else
             {
-                <MudForm Model="request" @bind-IsValid="@_success" Class="gap-2 mt-3">
-                    <MudTextField Immediate="true" @bind-Value="request.Username" Label="@(LocaleHelper.Get("profile_login_username"))" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="false" Required="true"/>
+                <MudForm Model="Request" @bind-IsValid="@_success" Class="gap-2 mt-3">
+                    <MudTextField Immediate="true" @bind-Value="Request.Username" Label="@(LocaleHelper.Get("profile_login_username"))" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="false" Required="true"/>
                 </MudForm>
             }
 
@@ -32,14 +34,14 @@
     [Parameter]
     public MiniProfile MiniProfile { get; set; }
     [CascadingParameter]
-    private IMudDialogInstance mudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; }
 
     private bool _success;
     private bool _requestInProgress;
     private string _taskText = "";
-    private LoginRequest request { get; } = new();
-    private CancellationTokenSource token { get; set; }
-    private bool userCancel { get; set; }
+    private LoginRequest Request { get; } = new();
+    private CancellationTokenSource Token { get; set; }
+    private bool UserCancel { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,7 +52,7 @@
 
         if (MiniProfile != null)
         {
-            request.Username = MiniProfile.Username;
+            Request.Username = MiniProfile.Username;
         }
 
         await RunLoginTask();
@@ -66,17 +68,17 @@
         {
             result = await CallServer(LocaleHelper.Get("profile_login_task_1"), LocaleHelper.Get("profile_login_task_fail"));
         }
-        catch (TaskCanceledException e) when (token.IsCancellationRequested)
+        catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
             AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
-        catch (HttpRequestException e)
+        catch (HttpRequestException)
         {
             AbortOrFail();
             return;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             AbortOrFail();
             return;
@@ -93,12 +95,12 @@
     {
         try
         {
-            token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             _taskText = taskText;
             StateHasChanged();
-            await Task.Delay(20);
+            await Task.Delay(250);
 
-            var returnResult = await HttpHelper.GameServerPut<LoginResponse>(RequestUrl.Login, request, token.Token);
+            var returnResult = await HttpHelper.GameServerPut<LoginResponse>(RequestUrl.Login, Request, Token.Token);
             var result = returnResult.Response;
 
             if (!result)
@@ -109,7 +111,7 @@
 
             if (MiniProfile is null) // manual login
             {
-                var returnResult2 = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrl.Profile, request, token.Token);
+                var returnResult2 = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrl.Profile, Request, Token.Token);
                 var result2 = returnResult2.Response;
 
                 if (result2 is null)
@@ -121,10 +123,10 @@
                 MiniProfile = result2;
             }
 
-            token?.Dispose();
+            Token?.Dispose();
             return true;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             AbortOrFail();
             return false;
@@ -134,29 +136,29 @@
     private void Submit()
     {
         Snackbar.Add($"{LocaleHelper.Get("profile_login_task_success")} {MiniProfile?.Username}!", Severity.Success);
-        mudDialog.Close(DialogResult.Ok(MiniProfile));
+        MudDialog.Close(DialogResult.Ok(MiniProfile));
     }
 
     private void AbortOrFail(string message = null)
     {
         message ??= LocaleHelper.Get("profile_login_task_default");
 
-        if (!userCancel)
+        if (!UserCancel)
         {
             Snackbar.Add(message, Severity.Error);
         }
 
-        token?.Cancel();
-        mudDialog.Cancel();
+        Token?.Cancel();
+        MudDialog.Cancel();
         _requestInProgress = false;
     }
 
     private void UserCancelled()
     {
-        userCancel = true;
+        UserCancel = true;
         _requestInProgress = false;
-        token?.Cancel();
-        mudDialog.Cancel();
+        Token?.Cancel();
+        MudDialog.Cancel();
     }
 
 }

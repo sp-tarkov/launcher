@@ -1,4 +1,5 @@
-﻿@inject IDialogService DialogService
+﻿@using SPTarkov.Core.Models.Spt
+@inject IDialogService DialogService
 @inject ConfigHelper ConfigHelper
 @inject StateHelper StateHelper
 @inject NavigationManager NavigationManager
@@ -8,7 +9,7 @@
 <MudItem sm="4">
     <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height">
         <div class="card-overflow">
-            @if (!sideIsUnknown)
+            @if (!SideIsUnknown)
             {
                 <MudImage Src=@(ImageName()) Elevation="0" Class=@(ImageClassNames())/>
             }
@@ -23,15 +24,15 @@
         <MudText Typo="Typo.h6">@MiniProfile.Edition</MudText>
         <MudDivider DividerType="DividerType.Middle"/>
         <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_id")):</MudText>
-        <MudText Typo="Typo.body1">@MiniProfile.ProfileID</MudText>
+        <MudText Typo="Typo.body1">@MiniProfile.ProfileId</MudText>
         @if (!HideButtons)
         {
             <MudContainer Class="justify-end d-flex pa-0">
 
                 @if (!MiniProfile.InvalidOrUnloadableProfile)
                 {
-                    <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Left" Text="@(loggedIn ? LocaleHelper.Get("profile_card_logout") : LocaleHelper.Get("profile_card_login"))">
-                        <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!loggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
+                    <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Left" Text="@(LoggedIn ? LocaleHelper.Get("profile_card_logout") : LocaleHelper.Get("profile_card_login"))">
+                        <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!LoggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
                     </MudTooltip>
                 }
                 else
@@ -63,8 +64,8 @@
     [Parameter]
     public EventCallback<List<MiniProfile>> ProfileListChanged { get; set; }
 
-    private bool sideIsUnknown { get; set; }
-    private bool loggedIn { get; set; }
+    private bool SideIsUnknown { get; set; }
+    private bool LoggedIn { get; set; }
 
     private string GetSideAsString()
     {
@@ -94,10 +95,10 @@
     {
         base.OnInitialized();
 
-        loggedIn = StateHelper.SelectedProfile != null && StateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID;
+        LoggedIn = StateHelper.SelectedProfile != null && StateHelper.SelectedProfile.ProfileId == MiniProfile.ProfileId;
         if (MiniProfile.Side.ToLower() == "unknown")
         {
-            sideIsUnknown = true;
+            SideIsUnknown = true;
         }
     }
 
@@ -105,10 +106,10 @@
     {
         if (StateHelper.SelectedProfile != null)
         {
-            if (StateHelper.SelectedProfile.ProfileID == MiniProfile.ProfileID)
+            if (StateHelper.SelectedProfile.ProfileId == MiniProfile.ProfileId)
             {
                 StateHelper.SelectedProfile = null;
-                loggedIn = false;
+                LoggedIn = false;
                 return;
             }
         }
@@ -126,7 +127,7 @@
         if (result?.Canceled is false)
         {
             StateHelper.SetSelectedProfile(MiniProfile);
-            loggedIn = StateHelper.SelectedProfile != null;
+            LoggedIn = StateHelper.SelectedProfile != null;
 
             Logger.LogInformation("Navigating to /ServerPageWrapper/false");
             NavigationManager.NavigateTo("/ServerPageWrapper/false");

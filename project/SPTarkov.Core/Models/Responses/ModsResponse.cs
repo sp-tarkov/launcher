@@ -1,6 +1,8 @@
-﻿namespace SPTarkov.Core.Models;
+﻿using SPTarkov.Core.Models.Spt;
 
-public record ModsResponse : ISptResponse<Dictionary<string, SPTMod>>
+namespace SPTarkov.Core.Models.Responses;
+
+public record ModsResponse : ISptResponse<Dictionary<string, SptMod>>
 {
-    public Dictionary<string, SPTMod> Response { get; set; } = new();
+    public Dictionary<string, SptMod>? Response { get; set; } = new();
 }

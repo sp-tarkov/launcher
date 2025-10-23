@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.Models;
+namespace SPTarkov.Core.Models.Forge.Meta;
 
 public record ForgeMeta
 {

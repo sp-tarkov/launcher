@@ -1,4 +1,4 @@
-﻿namespace SPTarkov.Core.Models;
+﻿namespace SPTarkov.Core.Models.App;
 
 public record LauncherSettings
 {

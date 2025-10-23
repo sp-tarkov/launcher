@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using SPTarkov.Core.Models.App
 
 @inject IDialogService DialogService
 @inject ConfigHelper ConfigHelper
@@ -9,11 +10,11 @@
         <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.AddToQueue" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy">@(LocaleHelper.Get("home_add_server"))</MudButton>
     </MudContainer>
     <MudGrid>
-        @if (serverList.Any())
+        @if (_serverList.Any())
         {
-            @foreach (var server in serverList)
+            @foreach (var server in _serverList)
             {
-                <ServerCardComponent Server="@server" @bind-ServerList="serverList"/>
+                <ServerCardComponent Server="@server" @bind-ServerList="_serverList"/>
             }
         }
         else
@@ -26,11 +27,11 @@
 </MudContainer>
 
 @code {
-    private List<Server> serverList;
+    private List<Server> _serverList;
 
     protected override void OnInitialized()
     {
-        serverList = ConfigHelper.GetConfig().Servers;
+        _serverList = ConfigHelper.GetConfig().Servers;
         Launcher.App.MainWindow.SetMinimized(false);
         base.OnInitialized();
     }
@@ -42,8 +43,8 @@
 
         if (result?.Canceled is false)
         {
-            serverList.Add(result.Data as Server);
-            ConfigHelper.SetServers(serverList);
+            _serverList.Add(result.Data as Server);
+            ConfigHelper.SetServers(_serverList);
         }
     }
 }

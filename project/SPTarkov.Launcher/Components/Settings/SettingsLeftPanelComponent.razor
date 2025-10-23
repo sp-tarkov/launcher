@@ -3,51 +3,57 @@
 
 <MudItem sm="6">
     <MudPaper Class="pa-5 mr-1 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
-        <SettingSwitchComponent Switch="@closeToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="@SetCloseToTray"/>
-        <SettingSwitchComponent Switch="@minimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="@SetMinimizeOnLaunch"/>
-        <SettingSwitchComponent Switch="@alwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="@SetAlwaysOnTop" Disabled="!IsWindows"/>
+        <SettingSwitchComponent Switch="@CloseToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="SetCloseToTray"/>
+        <SettingSwitchComponent Switch="@MinimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="SetMinimizeOnLaunch"/>
+        <SettingSwitchComponent Switch="@AlwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="SetAlwaysOnTop" Disabled="!IsWindows"/>
     </MudPaper>
 </MudItem>
 
 @code
 {
-    private bool closeToTraySwitch { get; set; }
-    private bool minimizeOnLaunchSwitch { get; set; }
-    private bool alwaysOnTopSwitch { get; set; }
+    private bool CloseToTraySwitch { get; set; }
+    private bool MinimizeOnLaunchSwitch { get; set; }
+    private bool AlwaysOnTopSwitch { get; set; }
 
     private bool IsWindows => OperatingSystem.IsWindows();
 
     protected override void OnInitialized()
     {
         var settings = ConfigHelper.GetConfig();
-        closeToTraySwitch = settings.CloseToTray;
-        minimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
-        alwaysOnTopSwitch = settings.AlwaysTop;
+        CloseToTraySwitch = settings.CloseToTray;
+        MinimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
+        AlwaysOnTopSwitch = settings.AlwaysTop;
 
         base.OnInitialized();
     }
 
-    private async Task SetCloseToTray()
+    private Task SetCloseToTray()
     {
-        closeToTraySwitch = !closeToTraySwitch;
-        ConfigHelper.SetCloseToTray(closeToTraySwitch);
+        CloseToTraySwitch = !CloseToTraySwitch;
+        ConfigHelper.SetCloseToTray(CloseToTraySwitch);
+
+        return Task.CompletedTask;
     }
 
-    private async Task SetMinimizeOnLaunch()
+    private Task SetMinimizeOnLaunch()
     {
-        minimizeOnLaunchSwitch = !minimizeOnLaunchSwitch;
-        ConfigHelper.SetMinimizeOnLaunch(minimizeOnLaunchSwitch);
+        MinimizeOnLaunchSwitch = !MinimizeOnLaunchSwitch;
+        ConfigHelper.SetMinimizeOnLaunch(MinimizeOnLaunchSwitch);
+
+        return Task.CompletedTask;
     }
 
-    private async Task SetAlwaysOnTop()
+    private Task SetAlwaysOnTop()
     {
         if (!IsWindows)
         {
-            return;
+            return Task.CompletedTask;
         }
 
-        alwaysOnTopSwitch = !alwaysOnTopSwitch;
-        Launcher.App.MainWindow.SetTopMost(alwaysOnTopSwitch);
-        ConfigHelper.SetAlwaysOnTop(alwaysOnTopSwitch);
+        AlwaysOnTopSwitch = !AlwaysOnTopSwitch;
+        Launcher.App.MainWindow.SetTopMost(AlwaysOnTopSwitch);
+        ConfigHelper.SetAlwaysOnTop(AlwaysOnTopSwitch);
+
+        return Task.CompletedTask;
     }
 }
