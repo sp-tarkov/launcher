@@ -1,0 +1,73 @@
+﻿<MudItem sm="6">
+    @if (IsSkeleton)
+    {
+        <MudCard Class="info-card-height mud-background-gray border-2 border-solid mud-border-lines-default">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudSkeleton SkeletonType="SkeletonType.Circle" Height="40px" Width="40px"/>
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudSkeleton Width="40%"/>
+                    <MudSkeleton Width="60%"/>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudSkeleton SkeletonType="SkeletonType.Circle" Height="30px" Width="30px" Class="ml-2 mb-2"/>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="150px"/>
+            </MudCardContent>
+            <MudCardActions>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="30px" Width="80px"
+                             Class="ml-2 mb-2 rounded-pill"/>
+                <MudSpacer/>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="30px" Width="80px"
+                             Class="mr-2 mb-2 rounded-pill"/>
+            </MudCardActions>
+        </MudCard>
+    }
+    else
+    {
+        <MudLink Color="Color.Default" Underline="Underline.Hover" Href="@($"/ForgeMod/{ForgeMod.Id}")">
+            <MudCard Class="info-card-height mud-background-gray border-2 border-solid mud-border-lines-default">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        @if (ForgeMod.TryGetProfileAvatar(out var url))
+                        {
+                            <MudAvatar Style="background-color: transparent !important;">
+                                <MudImage Src="@url"/>
+                            </MudAvatar>
+                        }
+                        else
+                        {
+                            <MudAvatar Color="Color.Secondary">@ForgeMod.GetAvatarLetter()</MudAvatar>
+                        }
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1">@ForgeMod.GetModName()</MudText>
+                        <MudText Typo="Typo.body2">By @ForgeMod.GetModdersName()</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        @if (ForgeMod.GetModFeatured())
+                        {
+                            <MudTooltip Placement="Placement.Left" Arrow="true" Text="Featured">
+                                <MudIconButton Icon="@Icons.Material.Filled.Favorite"/>
+                            </MudTooltip>
+                        }
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">@ForgeMod.GetModTeaser()</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudLink>
+    }
+</MudItem>
+
+@code {
+    [Parameter]
+    public bool IsSkeleton { get; set; }
+
+    [Parameter]
+    public ForgeBase ForgeMod { get; set; }
+}

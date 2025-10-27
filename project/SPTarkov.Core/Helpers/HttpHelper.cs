@@ -8,7 +8,8 @@ using System.Text.Json;
 using System.Web;
 using ComponentAce.Compression.Libs.zlib;
 using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Models.Responses;
+using SPTarkov.Core.Configuration;
+using SPTarkov.Core.Forge;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -218,6 +219,23 @@ public class HttpHelper
 
         var task = await _httpClient.SendAsync(message, token);
         return JsonSerializer.Deserialize<ForgeLoginResponse>(await task.Content.ReadAsStringAsync(token));
+    }
+
+    public async Task<ForgeAbilityReponse?> ForgeApiAbility(CancellationToken token)
+    {
+        _logger.LogInformation("Forge ForgeApiAbility");
+
+        var message = new HttpRequestMessage(HttpMethod.Get, "https://forge.sp-tarkov.com/api/v0/auth/abilities")
+        {
+            Content = new StringContent("", Encoding.UTF8, "application/json")
+        };
+
+        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+        var task = await _httpClient.SendAsync(message, token);
+        var showString = await task.Content.ReadAsStringAsync(token);
+        return JsonSerializer.Deserialize<ForgeAbilityReponse>(showString);
     }
 
     private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null)

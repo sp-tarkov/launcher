@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using Photino.Blazor;
+using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
 using SPTarkov.Core.Patching;

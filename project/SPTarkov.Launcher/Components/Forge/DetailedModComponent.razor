@@ -1,0 +1,178 @@
+﻿@inject IJSRuntime JsRuntime
+@inject LocaleHelper LocaleHelper
+@inject IDialogService DialogService
+@inject ConfigHelper ConfigHelper
+@inject ILogger<DetailedModComponent> Logger
+
+<MudItem sm="12">
+    @if (IsSkeleton)
+    {
+        // Create replica of Below layout as a skeleton
+        <MudGrid>
+            <MudItem sm="8">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="200px" Class="mb-4"/>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Class="mb-4"/>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="300px"/>
+            </MudItem>
+            <MudItem sm="4">
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="300px" Class="mb-4"/>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px"/>
+            </MudItem>
+        </MudGrid>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem sm="8">
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4">
+                    <MudCardHeader>
+                        <MudGrid>
+                            <MudItem sm="3">
+                                <MudImage Src=@(ForgeMod.GetThumbnail()) Class="mod-thumbnail" Style="background-color: transparent !important;"/>
+                            </MudItem>
+                            <MudItem sm="9">
+                                <MudItem Class="d-flex mud-width-full">
+                                    <MudTooltip Arrow="true" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" Text="Open in the Forge">
+                                        <MudLink Color="Color.Default" Underline="Underline.Always" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
+                                    </MudTooltip>
+                                </MudItem>
+                                <MudText Typo="Typo.body1" Class="no-pointers no-select">By @ForgeMod.GetModdersName()</MudText>
+                                <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Downloads Downloads</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>@ForgeMod.Teaser</MudText>
+                    </MudCardContent>
+                </MudCard>
+                @* <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4"> *@
+                @*     <MudCardHeader> *@
+                @*         <MudGrid> *@
+                @*             <MudItem sm="8"> *@
+                @*                 <MudText Typo="Typo.h6" Class="no-pointers no-select">Version @(latestVersion.Version)</MudText> *@
+                @*                 @if (!string.IsNullOrEmpty(latestVersion.VirusTotalLink)) *@
+                @*                 { *@
+                @*                     <MudLink Color="Color.Default" Underline="Underline.Always" Href="@(latestVersion.VirusTotalLink)">Virus Total Results</MudLink> *@
+                @*                 } *@
+                @*             </MudItem> *@
+                @*             <MudItem sm="4" Class="d-flex flex-column align-end"> *@
+                @*                 <MudText Typo="Typo.body1" Class="no-pointers no-select">Created @(latestVersion.GetCreatedDateFormatted())</MudText> *@
+                @*                 <MudText Typo="Typo.body1" Class="no-pointers no-select">Published @(latestVersion.GetPublishedDateFormatted())</MudText> *@
+                @*             </MudItem> *@
+                @*             <MudItem sm="12" Class="user-markdown"> *@
+                @*                 @((MarkupString)ForgeModVersion.Description) *@
+                @*             </MudItem> *@
+                @*         </MudGrid> *@
+                @*     </MudCardHeader> *@
+                @* </MudCard> *@
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+                    <MudCardContent Class="user-markdown">@((MarkupString)ForgeMod.Description)</MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem sm="4">
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+                    <MudCardContent Class="d-flex flex-column align-start text-overflow">
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">@(ForgeMod.GetAdditionalAuthors())</MudText> @* TODO: Get aditional author page *@
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">License</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">
+                            @if (ForgeMod.License is not null)
+                            {
+                                <MudLink Typo="Typo.caption" Color="Color.Default" Underline="Underline.Always" Href="@ForgeMod.License.Link">@ForgeMod.License.Name</MudLink>
+                            }
+                            else
+                            {
+                                @("None")
+                            }
+                        </MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Source Code</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">
+                            @if (!string.IsNullOrEmpty(ForgeMod.SourceCode))
+                            {
+                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@ForgeMod.SourceCode">@ForgeMod.SourceCode</MudLink>
+                            }
+                            else
+                            {
+                                @("None")
+                            }
+                        </MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result
+                        </MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2">
+                            @if (!string.IsNullOrEmpty(LatestVersion.VirusTotalLink))
+                            {
+                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@LatestVersion.VirusTotalLink">@LatestVersion.VirusTotalLink</MudLink>
+                            }
+                            else
+                            {
+                                @("None")
+                            }
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+                <MudItem sm="12" Class="mt-4">
+                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% " Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">@($"Download Latest ({LatestVersion.Version})")</MudButton>
+                </MudItem>
+            </MudItem>
+        </MudGrid>
+    }
+</MudItem>
+
+@code {
+    [Parameter] public bool IsSkeleton { get; set; }
+    [Parameter] public ForgeBase ForgeMod { get; set; }
+    [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
+
+    private ForgeModVersion LatestVersion => ForgeMod.Versions?.FirstOrDefault();
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JsRuntime.InvokeVoidAsync("setTabContent");
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task StartDownloadModTask()
+    {
+        var option = new DialogOptions
+        {
+            Position = ConfigHelper.DialogOptions.Position,
+            MaxWidth = MaxWidth.Large,
+            BackdropClick = ConfigHelper.DialogOptions.BackdropClick,
+            CloseOnEscapeKey = ConfigHelper.DialogOptions.CloseOnEscapeKey,
+            NoHeader = ConfigHelper.DialogOptions.NoHeader,
+            CloseButton = ConfigHelper.DialogOptions.CloseButton,
+            FullScreen = ConfigHelper.DialogOptions.FullScreen,
+            FullWidth = ConfigHelper.DialogOptions.FullWidth,
+            BackgroundClass = ConfigHelper.DialogOptions.BackgroundClass
+        };
+
+        var param = new DialogParameters
+        {
+            {
+                "Name", ForgeMod.Name
+            },
+            {
+                "VersionDescription", ForgeModVersion.Description
+            },
+            {
+                "VersionLink", ForgeModVersion.Link
+            }
+        };
+
+        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", param, option);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            Logger.LogInformation("Started Download");
+            return;
+        }
+
+        Logger.LogInformation("Download cancelled");
+    }
+
+}

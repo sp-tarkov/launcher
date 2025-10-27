@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+
 @implements IDisposable
 
 @inject StateHelper StateHelper
@@ -10,7 +11,7 @@
 <MudDialogProvider/>
 
 <MudScrollToTop>
-    <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small" />
+    <MudFab Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small" />
 </MudScrollToTop>
 
 @if (ConfigHelper.GetConfig().UseBackground)

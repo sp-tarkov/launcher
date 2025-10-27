@@ -1,5 +1,4 @@
 ﻿@page "/Profiles"
-@using SPTarkov.Core.Models.Spt
 
 @inject IDialogService DialogService
 @inject StateHelper StateHelper
@@ -9,9 +8,12 @@
 
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 d-flex justify-start gap-2 pb-4">
-        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" OnClick="ReturnToServers" Variant="Variant.Filled" IconColor="Color.Error">@(LocaleHelper.Get("profiles_disconnect"))</MudButton>
-        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" StartIcon="@Icons.Material.Filled.PersonAdd" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success">@(LocaleHelper.Get("profiles_create"))</MudButton>
-        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" Size="Size.Medium" OnClick="RunLoginTaskWithDetails" Variant="Variant.Filled" IconColor="Color.Success">@(LocaleHelper.Get("profiles_login"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" OnClick="ReturnToServers" Variant="Variant.Filled"
+                   IconColor="Color.Error">@(LocaleHelper.Get("profiles_disconnect"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" StartIcon="@Icons.Material.Filled.PersonAdd" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled"
+                   IconColor="Color.Success">@(LocaleHelper.Get("profiles_create"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" Size="Size.Medium" OnClick="RunLoginTaskWithDetails" Variant="Variant.Filled"
+                   IconColor="Color.Success">@(LocaleHelper.Get("profiles_login"))</MudButton>
     </MudContainer>
     <MudGrid>
         @foreach (var profile in ProfilesList)
@@ -23,12 +25,16 @@
         {
             case 0 when IsConnected:
                 <MudItem sm="12">
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_empty_warning"))</MudAlert>
+                    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_empty_warning"))</MudAlert>
+                    </MudPaper>
                 </MudItem>
                 break;
             case 0 when !IsConnected:
                 <MudItem sm="12">
-                    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_connect_warning"))</MudAlert>
+                    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
+                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_connect_warning"))</MudAlert>
+                    </MudPaper>
                 </MudItem>
                 break;
         }
@@ -86,4 +92,5 @@
 
         return Task.CompletedTask;
     }
+
 }

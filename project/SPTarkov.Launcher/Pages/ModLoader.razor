@@ -11,7 +11,9 @@
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
     @if (!ModLoaderAvailable)
     {
-        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("mod_page_coming"))</MudAlert>
+        <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
+            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("mod_page_coming"))</MudAlert>
+        </MudPaper>
     }
     else
     {

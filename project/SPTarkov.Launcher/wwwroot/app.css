@@ -3,25 +3,55 @@
 }
 
 html body .mud-paper {
-    background-color: rgba(39, 39, 47, 0.6) !important;
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
 }
 html body .mud-button {
-    background-color: rgba(39, 39, 47, 0.6) !important;
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
 }
 html body .mud-dialog {
-    background-color: rgba(39, 39, 47, 0.6) !important;
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
 }
 html body .mud-drawer {
-    background-color: rgba(39, 39, 47, 0.6) !important;
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
 }
 html body .mud-tabs {
-    background-color: rgba(39, 39, 47, 0.6) !important;
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
 }
 html body .mud-tabs-tabbar {
-    background-color: rgba(39, 39, 47, 0.6) !important;
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
 }
 html body .mud-popover {
-    background-color: rgba(39, 39, 47, 0.96) !important;
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
+}
+html body .mud-tooltip {
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
+}
+html body .mud-tooltip-arrow {
+    background-color: rgba(39, 39, 47, 0.9) !important;
+    backdrop-filter: blur(20px);
+}
+html body .mud-expansion-panels {
+    background-color: rgba(39, 39, 47, 0) !important;
+    /*backdrop-filter: blur(20px);*/
+}
+html body .mud-expand-panel {
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
+}
+html body .mud-scroll-to-top .mud-fab {
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.118) !important;
+    border-width: 2px;
+    border-style: solid;
 }
 
 #blazor-error-ui {
@@ -268,7 +298,8 @@ a.setting-on-hover:hover {
             border-bottom-width: 2px !important;
             border-bottom-color: transparent;
             border-bottom-style: solid;
-            background-color: var(--mud-palette-surface);
+            background-color: rgba(39, 39, 47, 0.8) !important;
+            backdrop-filter: blur(20px);
 
             &.active {
                 font-weight: bold;
@@ -288,7 +319,8 @@ a.setting-on-hover:hover {
         border-bottom-left-radius: 0.2rem;
         border-bottom-right-radius: 0.2rem;
         padding: 1rem;
-        background-color: var(--mud-palette-surface);
+        background-color: rgba(39, 39, 47, 0.5) !important;
+        backdrop-filter: blur(20px);
     }
 
     .hidden {

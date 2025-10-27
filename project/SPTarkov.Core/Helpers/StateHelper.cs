@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Models.App;
-using SPTarkov.Core.Models.Spt;
+using SPTarkov.Core.Configuration;
+using SPTarkov.Core.Spt;
 
 namespace SPTarkov.Core.Helpers;
 

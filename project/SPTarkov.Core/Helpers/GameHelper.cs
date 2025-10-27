@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using SPTarkov.Core.Models.Responses;
-using SPTarkov.Core.Models.Spt;
+using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Patching;
+using SPTarkov.Core.Spt;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -426,6 +426,7 @@ public class GameHelper
         {
 #pragma warning disable CA1416
             var v1 = Registry.LocalMachine.OpenSubKey(c0, false)?.GetValue("InstallLocation");
+#pragma warning restore CA1416
 
             var v2 = (v1 != null) ? v1.ToString() : string.Empty;
             var v3 = new DirectoryInfo(v2!);
