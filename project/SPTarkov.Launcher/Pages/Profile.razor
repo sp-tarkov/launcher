@@ -69,7 +69,6 @@
         StateHelper.SetAllowNavigation(false);
 
         await StartGame();
-        // When this method comes back done, ask server for an update of the profile
         await RefreshProfiles();
 
         _buttonDisabled = false;

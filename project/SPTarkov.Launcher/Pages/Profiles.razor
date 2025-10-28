@@ -18,7 +18,7 @@
     <MudGrid>
         @foreach (var profile in ProfilesList)
         {
-            <ProfileCardComponent MiniProfile="@profile" @bind-ProfileList="ProfilesList"/>
+            <ProfileCardComponent MiniProfile="@profile" @bind-ProfileList="ProfilesList" HideSideImage="true"/>
         }
 
         @switch (ProfilesList.Count)

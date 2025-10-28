@@ -35,6 +35,7 @@ public partial class WindowsClipboard(
 
     private const uint CfHdrop = 15;
     private const uint GmemMoveable = 0x0002;
+    private const uint CfUnicodetext = 13;
 
     [StructLayout(LayoutKind.Sequential)]
     private struct Dropfiles
@@ -84,6 +85,63 @@ public partial class WindowsClipboard(
             logger.LogError("Failed to empty clipboard, error: {error}", Marshal.GetLastWin32Error());
         }
         _ = SetClipboardData(CfHdrop, hGlobal);
+
+        if (!CloseClipboard())
+        {
+            logger.LogError("Failed to close clipboard, error: {error}", Marshal.GetLastWin32Error());
+        }
+    }
+
+    public void CopyText(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            logger.LogWarning("CopyText called with empty string.");
+            return;
+        }
+
+        // Add a null terminator for Windows clipboard format
+        var bytes = Encoding.Unicode.GetBytes(text + '\0');
+
+        // Allocate global memory for the string
+        var hGlobal = GlobalAlloc(GmemMoveable, (UIntPtr)bytes.Length);
+        if (hGlobal == IntPtr.Zero)
+        {
+            logger.LogError("GlobalAlloc failed, error: {error}", Marshal.GetLastWin32Error());
+            return;
+        }
+
+        var ptr = GlobalLock(hGlobal);
+        if (ptr == IntPtr.Zero)
+        {
+            logger.LogError("GlobalLock failed, error: {error}", Marshal.GetLastWin32Error());
+            return;
+        }
+
+        // Copy the text into the allocated memory
+        Marshal.Copy(bytes, 0, ptr, bytes.Length);
+        GlobalUnlock(hGlobal);
+
+        if (!OpenClipboard(IntPtr.Zero))
+        {
+            logger.LogError("Failed to open clipboard, error: {error}", Marshal.GetLastWin32Error());
+            return;
+        }
+
+        if (!EmptyClipboard())
+        {
+            logger.LogError("Failed to empty clipboard, error: {error}", Marshal.GetLastWin32Error());
+            CloseClipboard();
+            return;
+        }
+
+        if (SetClipboardData(CfUnicodetext, hGlobal) == IntPtr.Zero)
+        {
+            logger.LogError("SetClipboardData failed, error: {error}", Marshal.GetLastWin32Error());
+            // You shouldn’t free hGlobal here because ownership transfers to the clipboard if successful.
+            // But if SetClipboardData fails, free the memory.
+            return;
+        }
 
         if (!CloseClipboard())
         {
