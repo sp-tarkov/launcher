@@ -142,7 +142,7 @@
                 Username = SelectedMiniProfile.Username
             };
 
-            var returnResult = await HttpHelper.GameServerPut<WipeResponse>(RequestUrl.Register, wipeRequest, token.Token);
+            var returnResult = await HttpHelper.GameServerPut<WipeResponse>(RequestUrl.Wipe, wipeRequest, token.Token);
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 

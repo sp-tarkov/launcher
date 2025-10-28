@@ -29,11 +29,9 @@ public record LauncherSettings
 
     public bool AlwaysTop { get; set; }
 
-    public bool AdvancedUser { get; set; }
-
     public string ForgeApiKey { get; set; } = "";
 
-    public bool UseBackground { get; set; }
+    public bool UseBackground { get; set; } = true;
 
     public List<string> ExcludeFromCleanup { get; set; } = new();
 
