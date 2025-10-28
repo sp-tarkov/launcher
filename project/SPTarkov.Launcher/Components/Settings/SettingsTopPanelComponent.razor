@@ -205,7 +205,7 @@
         if (result.Success)
         {
             Logger.LogInformation("Forge ForgeLogout Successful");
-            Snackbar.Add(LocaleHelper.Get("setting_clear_api_success"), Severity.Error);
+            Snackbar.Add(LocaleHelper.Get("setting_clear_api_success"), Severity.Success);
             HttpHelper.ClearApiKey();
         }
     }

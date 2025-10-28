@@ -8,7 +8,7 @@
 
 <MudItem sm="4">
     <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height">
-        <div class="card-overflow">
+        <div class="card-overflow no-select no-pointers">
             @if (!SideIsUnknown && !HideSideImage)
             {
                 <MudImage Src=@(ImageName()) Elevation="0" Class=@(ImageClassNames())/>
@@ -58,20 +58,15 @@
 </MudItem>
 
 @code {
-    [Parameter]
-    public bool HideButtons { get; set; }
+    [Parameter] public bool HideButtons { get; set; }
 
-    [Parameter]
-    public bool HideSideImage { get; set; }
+    [Parameter] public bool HideSideImage { get; set; }
 
-    [Parameter]
-    public MiniProfile MiniProfile { get; set; }
+    [Parameter] public MiniProfile MiniProfile { get; set; }
 
-    [Parameter]
-    public List<MiniProfile> ProfileList { get; set; }
+    [Parameter] public List<MiniProfile> ProfileList { get; set; }
 
-    [Parameter]
-    public EventCallback<List<MiniProfile>> ProfileListChanged { get; set; }
+    [Parameter] public EventCallback<List<MiniProfile>> ProfileListChanged { get; set; }
 
     private bool IsWindows => OperatingSystem.IsWindows();
 
@@ -89,6 +84,7 @@
 
         return new CssBuilder()
             .AddClass("no-pointers")
+            .AddClass("no-select")
             .AddClass($"background-image-{side}")
             .Build();
     }
@@ -167,7 +163,7 @@
         }
     }
 
-    private async Task CopyProfileId()
+    private void CopyProfileId()
     {
         if (!IsWindows)
         {
@@ -177,4 +173,5 @@
         WindowsClipboard.CopyText(MiniProfile.ProfileId);
         Logger.LogInformation("Copied profile id to clipboard: {id}", MiniProfile.ProfileId);
     }
+
 }

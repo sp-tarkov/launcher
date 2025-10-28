@@ -1,54 +1,44 @@
 @inject ISnackbar Snackbar
+@inject IJSRuntime JsRuntime
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
-        <MudContainer Class="py-4">
-            <MudContainer Class="d-flex flex-column align-center gap-4">
-                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
-                <MudText>Currently Testing downloads</MudText>
-                <MudText>Mod Name: @(Name)</MudText>
-                <MudText>Download Url: @(VersionLink)</MudText>
-                <MudText>Version Desc:
-                    @if (VersionDescription != null)
-                    {
-                        @((MarkupString)VersionDescription)
-                    }
+        <MudContainer Class="d-flex flex-column gap-1 mt-4">
+            <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+                <MudText>Please make sure to read the mod page and this version changes!</MudText>
+            </MudPaper>
+            <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+                <MudText Class="user-markdown">
+                    @((MarkupString)VersionDescription)
                 </MudText>
+            </MudPaper>
+            <MudContainer Class="mb-4 pa-0">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Close</MudButton>
             </MudContainer>
-            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton>
-            </MudContainer>
-
-
-
-
-
-            @* <MudContainer Class="d-flex flex-column align-center gap-4"> *@
-            @*     <MudText>Please make sure to read the mod page.</MudText> *@
-            @*     $1$ <MudText>@_taskText</MudText> Show latest patch notes for that mod #1# *@
-            @* </MudContainer> *@
-            @* <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2"> *@
-            @*     <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" @onclick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton> *@
-            @*     <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">Close</MudButton> *@
-            @* </MudContainer> *@
         </MudContainer>
     </DialogContent>
 </MudDialog>
 
 @code {
-    [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; }
-    [Parameter]
-    public string Name { get; set; }
-    [Parameter]
-    public string VersionDescription { get; set; }
-    [Parameter]
-    public string VersionLink { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [Parameter] public string Name { get; set; }
+    [Parameter] public string VersionDescription { get; set; }
+    [Parameter] public string VersionLink { get; set; }
 
     private bool _requestInProgress;
     private CancellationTokenSource Token { get; set; }
     private bool UserCancel { get; set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JsRuntime.InvokeVoidAsync("setTabContent");
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
 
     private Task RunDownloadTask()
     {
@@ -56,7 +46,6 @@
         _requestInProgress = true;
         try
         {
-
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {

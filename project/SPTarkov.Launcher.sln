@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPTarkov.Launcher", "SPTark
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPTarkov.Core", "SPTarkov.Core\SPTarkov.Core.csproj", "{4053E7B6-17C0-4773-9393-90AF1F557D5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadTest", "DownloadTest\DownloadTest.csproj", "{C7C8994E-2157-4BED-88FF-6A095E189FE4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{4053E7B6-17C0-4773-9393-90AF1F557D5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4053E7B6-17C0-4773-9393-90AF1F557D5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4053E7B6-17C0-4773-9393-90AF1F557D5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C7C8994E-2157-4BED-88FF-6A095E189FE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7C8994E-2157-4BED-88FF-6A095E189FE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C7C8994E-2157-4BED-88FF-6A095E189FE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C7C8994E-2157-4BED-88FF-6A095E189FE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
