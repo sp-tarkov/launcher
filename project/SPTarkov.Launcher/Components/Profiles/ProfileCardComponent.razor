@@ -68,9 +68,7 @@
 
     private string GetSideAsString()
     {
-        return MiniProfile.Side.ToLower() != "unknown"
-            ? MiniProfile.Side.ToLower()
-            : "usec";
+        return string.IsNullOrEmpty(MiniProfile.Side.ToLower()) ? "unknown" : MiniProfile.Side.ToLower();
     }
 
     private string ImageClassNames()
@@ -86,6 +84,11 @@
     private string ImageName()
     {
         var side = GetSideAsString();
+
+        if (side == "unknown")
+        {
+            return "";
+        }
 
         return $"side_{side}.png";
     }
