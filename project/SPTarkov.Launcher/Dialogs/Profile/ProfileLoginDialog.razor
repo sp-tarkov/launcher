@@ -20,7 +20,10 @@
             }
 
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" StartIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Medium" @onclick="RunLoginTask">@(LocaleHelper.Get("profile_login_confirm"))</MudButton>
+                @if (MiniProfile is null && !_requestInProgress)
+                {
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" StartIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Medium" @onclick="RunLoginTask">@(LocaleHelper.Get("profile_login_confirm"))</MudButton>
+                }
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" @onclick="UserCancelled">@(LocaleHelper.Get("profile_login_cancel"))</MudButton>
             </MudContainer>
         </MudContainer>
