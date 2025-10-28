@@ -4,22 +4,22 @@
 @inject StateHelper StateHelper
 
 <MudNavMenu Class="mud-typography-nowrap">
-    <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Right" ShowOnHover="true" Text="@(LocaleHelper.Get("home"))" Inline="false">
+    <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="@(LocaleHelper.Get("home"))" Inline="false">
         <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.ConnectedTv" Match="NavLinkMatch.All" Href="/ServerPageWrapper/false"/>
     </MudTooltip>
 </MudNavMenu>
 <MudSpacer/>
 <MudNavMenu Class="mud-typography-nowrap">
-    <MudTooltip Color="Color.Dark" Arrow="true" Text="@(LocaleHelper.Get("mod_loader"))" Placement="Placement.Right" Inline="false">
+    <MudTooltip Color="Color.Dark" Arrow="false" Text="@(LocaleHelper.Get("mod_loader"))" Placement="Placement.Right" Inline="false">
         <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.Reorder" Match="NavLinkMatch.All" Href="/ModLoader"/>
     </MudTooltip>
-    <MudTooltip Color="Color.Dark" Arrow="true" Text="Forge" Placement="Placement.Right" Inline="false">
+    <MudTooltip Color="Color.Dark" Arrow="false" Text="Forge" Placement="Placement.Right" Inline="false">
         <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.FolderZip" Match="NavLinkMatch.All" Href="/Forge"/>
     </MudTooltip>
-    <MudTooltip Color="Color.Dark" Arrow="true" Text="@(LocaleHelper.Get("settings"))" Placement="Placement.Right" Inline="false">
+    <MudTooltip Color="Color.Dark" Arrow="false" Text="@(LocaleHelper.Get("settings"))" Placement="Placement.Right" Inline="false">
         <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.Settings" Match="NavLinkMatch.All" Href="/Settings"/>
     </MudTooltip>
-    <MudTooltip Color="Color.Dark" Arrow="true" Text="@(LocaleHelper.Get("info"))" Placement="Placement.Right" Inline="false">
+    <MudTooltip Color="Color.Dark" Arrow="false" Text="@(LocaleHelper.Get("info"))" Placement="Placement.Right" Inline="false">
         <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.Info" Match="NavLinkMatch.All" Href="/Info"/>
     </MudTooltip>
 </MudNavMenu>

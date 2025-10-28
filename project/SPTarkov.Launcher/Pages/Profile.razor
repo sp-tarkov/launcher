@@ -7,11 +7,28 @@
 @inject LocaleHelper LocaleHelper
 @inject ConfigHelper ConfigHelper
 @inject ISnackbar Snackbar
+@inject HttpHelper HttpHelper
 
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 pb-4 d-flex flex-row justify-space-between">
         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
         <MudSpacer/>
+        <MudTooltip Arrow="false" Placement="Placement.Bottom" ShowOnHover="true">
+            <ChildContent>
+                <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container mr-2">
+                    <MudCheckBox @bind-Value="CheckboxForWipe" Class="wipe-checkbox" Disabled="@_buttonDisabled">Wipe?</MudCheckBox>
+                </MudPaper>
+            </ChildContent>
+            <TooltipContent>
+                <MudContainer Class="d-flex flex-column align-start justify-start">
+                    <MudText>The below will NOT be wiped;</MudText>
+                    <MudText>- Achievements.</MudText>
+                    <MudText>- Prestige.</MudText>
+                    <MudText>- Rewards from those.</MudText>
+                    <MudText>- Some Account level stats.</MudText>
+                </MudContainer>
+            </TooltipContent>
+        </MudTooltip>
         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="Color.Success">@(LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
@@ -32,6 +49,7 @@
 </MudContainer>
 
 @code {
+    private bool CheckboxForWipe { get; set; }
     private MiniProfile SelectedMiniProfile { get; set; }
     private bool _buttonDisabled;
 
@@ -71,6 +89,14 @@
             return;
         }
 
+        // initial snackbar.add is inside wipeprofile for this one
+        if (CheckboxForWipe && !await WipeProfile())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"CHANGE ME TO USE LOCALE SYSTEM unable to wipe profile: {message}", Severity.Error);
+            return;
+        }
+
         Snackbar.Add(LocaleHelper.Get("profile_page_task_2"));
         if (!await GameHelper.PatchGame())
         {
@@ -102,6 +128,37 @@
     {
         StateHelper.SetSelectedProfile(null);
         NavigationManager.NavigateTo("/ServerPageWrapper/false");
+    }
+
+    public async Task<bool> WipeProfile()
+    {
+        Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Wiping profile with server");
+        var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        try
+        {
+            var wipeRequest = new RegisterRequest()
+            {
+                Edition = SelectedMiniProfile.Edition,
+                Username = SelectedMiniProfile.Username
+            };
+
+            var returnResult = await HttpHelper.GameServerPut<WipeResponse>(RequestUrl.Register, wipeRequest, token.Token);
+            StateHelper.ProfileList = returnResult.Profiles;
+            var result = returnResult.Response;
+
+            if (!result)
+            {
+                return false;
+            }
+
+            token?.Dispose();
+            return true;
+        }
+        catch (Exception)
+        {
+            token?.Cancel();
+            return false;
+        }
     }
 
 }

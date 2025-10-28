@@ -30,18 +30,18 @@
 
                 @if (!MiniProfile.InvalidOrUnloadableProfile)
                 {
-                    <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Left" Text="@(LoggedIn ? LocaleHelper.Get("profile_card_logout") : LocaleHelper.Get("profile_card_login"))">
+                    <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Left" Text="@(LoggedIn ? LocaleHelper.Get("profile_card_logout") : LocaleHelper.Get("profile_card_login"))">
                         <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!LoggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" @onclick="RunLoginTask"/>
                     </MudTooltip>
                 }
                 else
                 {
-                    <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_invalid"))">
+                    <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_invalid"))">
                         <MudIconButton Class="mr-1" Color="Color.Error" Icon="@Icons.Material.Filled.Recycling" Size="Size.Small"/>
                     </MudTooltip>
                 }
 
-                <MudTooltip Color="Color.Dark" Arrow="true" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_delete"))">
+                <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_delete"))">
                     <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" @onclick="RunDeleteTask"/>
                 </MudTooltip>
 
