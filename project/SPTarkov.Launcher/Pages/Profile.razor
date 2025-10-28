@@ -69,6 +69,8 @@
         StateHelper.SetAllowNavigation(false);
 
         await StartGame();
+        // When this method comes back done, ask server for an update of the profile
+        await RefreshProfiles();
 
         _buttonDisabled = false;
         if (ConfigHelper.GetConfig().MinimizeOnLaunch)
@@ -77,6 +79,81 @@
         }
 
         StateHelper.SetAllowNavigation(true);
+    }
+
+    private async Task RefreshProfiles()
+    {
+        Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Requesting Profile Updates");
+        if (await GetUpdatedProfiles())
+        {
+            // if this succeeded, we dont need to go further
+            StateHasChanged();
+            return;
+        }
+
+        if (await GetUpdatedProfile())
+        {
+            // if this succeeded, we dont need to go further
+            StateHasChanged();
+            return;
+        }
+
+        // if we get here, something fucked up
+    }
+
+    private async Task<bool> GetUpdatedProfile()
+    {
+        var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        try
+        {
+            var returnResult = await HttpHelper.GameServerGet<ProfileResponse>(RequestUrl.Profile, token.Token);
+            StateHelper.SelectedProfile = returnResult.Response;
+            var result = returnResult.Response;
+
+            if (result is null)
+            {
+                return false;
+            }
+
+            SelectedMiniProfile = StateHelper.SelectedProfile;
+
+            token?.Dispose();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.LogInformation("Exception occured in updating profile: {e}", e);
+            token?.Cancel();
+            return false;
+        }
+    }
+
+    private async Task<bool> GetUpdatedProfiles()
+    {
+        var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        try
+        {
+            var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, token.Token);
+            StateHelper.ProfileList = returnResult.Response;
+            var result = returnResult.Response;
+
+            if (result is null || !result.Any())
+            {
+                return false;
+            }
+
+            StateHelper.SelectedProfile = StateHelper.ProfileList?.FirstOrDefault(x => x.ProfileId == SelectedMiniProfile.ProfileId);
+            SelectedMiniProfile = StateHelper.SelectedProfile;
+
+            token?.Dispose();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.LogInformation("Exception occured in updating profiles: {e}", e);
+            token?.Cancel();
+            return false;
+        }
     }
 
     private async Task StartGame()
