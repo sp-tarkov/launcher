@@ -11,16 +11,16 @@
 <MudDialogProvider/>
 
 <MudScrollToTop>
-    <MudFab Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small" />
+    <MudFab Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small"/>
 </MudScrollToTop>
 
-@if (ConfigHelper.GetConfig().UseBackground)
-{
-    <MudContainer Class="no-select overlay-container unset absolute" >
+<MudContainer Class="no-select overlay-container unset absolute">
+    @if (ConfigHelper.GetConfig().UseBackground)
+    {
         <MudImage Src="./bg.png" Class="no-select fixed mud-height-full mud-width-full background-image-cover"/>
-        <div class="no-select fixed mud-height-full mud-width-full background-overlay"></div>
-    </MudContainer>
-}
+    }
+    <div class="no-select fixed mud-height-full mud-width-full background-overlay"></div>
+</MudContainer>
 
 <MudLayout>
     <MudDrawer Width="150px" ClipMode="DrawerClipMode.Never" Elevation="5" Variant="@DrawerVariant.Mini" OpenMiniOnHover="false" Breakpoint="Breakpoint.None" Class="mud-background-gray border-r-2 border-solid mud-border-lines-default">
@@ -43,4 +43,5 @@
     {
         StateHelper.OnStateChanged -= StateHasChanged;
     }
+
 }

@@ -1,37 +1,40 @@
 ﻿:root {
     scrollbar-width: none !important;
 }
+html body {
+    background-color: rgba(39, 39, 47, 1) !important;
+}
 
 html body .mud-paper {
-    background-color: rgba(39, 39, 47, 0.5) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
 }
 html body .mud-button {
-    background-color: rgba(39, 39, 47, 0.5) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
 }
 html body .mud-dialog {
-    background-color: rgba(39, 39, 47, 0.5) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
 }
 html body .mud-drawer {
-    background-color: rgba(39, 39, 47, 0.5) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
 }
 html body .mud-tabs {
-    background-color: rgba(39, 39, 47, 0.5) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
 }
 html body .mud-tabs-tabbar {
-    background-color: rgba(39, 39, 47, 0.5) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
 }
 html body .mud-popover {
-    background-color: rgba(39, 39, 47, 0.5) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
 }
 html body .mud-tooltip {
-    background-color: rgba(39, 39, 47, 0.7) !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
     border-color: rgba(255, 255, 255, 0.118) !important;
     border-width: 2px;
@@ -379,8 +382,8 @@ img.background-image-cover {
 }
 
 div.background-overlay {
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
 }
 
 div.overlay-container {
