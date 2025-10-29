@@ -2,146 +2,71 @@
 
 @implements IDisposable
 
-@inject ConfigHelper ConfigHelper
-@inject IDialogService DialogService
-@inject NavigationManager NavigationManager
-@inject ILogger<ModLoader> Logger
-@inject LocaleHelper LocaleHelper
+@inject DownloadHelper DownloadHelper
 
-<MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
-    @if (!ModLoaderAvailable)
-    {
-        <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
-            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("mod_page_coming"))</MudAlert>
-        </MudPaper>
-    }
-    else
-    {
-        <MudItem sm="12" Class="mb-4">
-            <MudButton OnClick="RevertChanges" Variant="Variant.Filled" Disabled="@(!UnsavedData)" Color="Color.Error" StartIcon="@Icons.Material.Filled.Undo" Size="Size.Large" Class="flex-grow-1">Undo Changes</MudButton>
-            <MudButton OnClick="SaveChanges" Variant="Variant.Filled" Disabled="@(!UnsavedData)" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save" Size="Size.Large" Class="flex-grow-1">Save Changes</MudButton>
+<MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large" Style="height: 96vh;">
+    <MudGrid Spacing="4" Justify="Justify.SpaceEvenly" Class=" mud-height-full">
+        <MudItem sm="4" Class="downloads mud-height-full">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
+                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default" Class="">Downloads</MudText>
+                @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
+                {
+                    <MudLink Class="setting-on-hover pa-1" Underline="Underline.None" Color="Color.Default">
+                        <MudContainer Class="pa-0 d-flex flex-row justify-space-between">
+                            <MudItem sm="10" Class="pa-2">
+                                <MudText Class="pb-2">@name</MudText>
+                                <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100">
+                                    <ChildContent>
+                                        <MudText  Color="Color.Default">@item.Progress%</MudText>
+                                    </ChildContent>
+                                </MudProgressLinear>
+                            </MudItem>
+                            <MudItem sm="2" Class="d-flex justify-center align-items-center align-center">
+                                @if (item.Complete)
+                                {
+                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Close" Placement="Placement.Left">
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => DownloadHelper.CloseDownloadTask(name)" />
+                                    </MudTooltip>
+                                }
+                                else
+                                {
+                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelDownloadTask(name)" />
+                                    </MudTooltip>
+                                }
+                            </MudItem>
+                        </MudContainer>
+                    </MudLink>
+                }
+            </MudPaper>
         </MudItem>
+        <MudItem sm="4" Class="uninstalled mud-height-full">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
+                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
 
-        <MudDropContainer T="DropItem" @ref="Container" Items="_items" ItemsSelector="@((item, dropzone) => item.Zone == dropzone)" ItemDropped="ItemUpdated" Class="d-flex flex-column flex-grow-1" CanDropClass="mud-border-success">
-            <ChildContent>
-                <MudGrid>
-                    <MudItem sm="6">
-                        <MudDropZone T="DropItem" Identifier="1" Class="rounded pa-4 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default mud-height-full" CanDrop="@((item) => item.Zone == "2")">
-                            <MudText Typo="Typo.h6" Color="Color.Success" Class="no-pointers no-select">Unloaded Server Mods</MudText>
-                            @if (_items.All(x => x.Zone != "1"))
-                            {
-                                <div class="mud-drop-item no-select no-pointers">
-                                    <MudPaper Elevation="25" Class="pa-4 my-1 flex-grow-1 d-flex justify-space-between">
-                                        <MudText Inline="true" Class="no-pointers no-select" Color="Color.Primary">Drag a mod here to unload it!</MudText>
-                                    </MudPaper>
-                                </div>
-                            }
-                        </MudDropZone>
-                    </MudItem>
-                    <MudItem sm="6">
-                        <MudDropZone T="DropItem" Identifier="2" Class="rounded pa-4 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default mud-height-full" CanDrop="@((item) => item.Zone == "1")">
-                            <MudText Typo="Typo.h6" Color="Color.Success" Class="no-pointers no-select">Loaded Server Mods</MudText>
-                            @if (_items.All(x => x.Zone != "2"))
-                            {
-                                <div class="mud-drop-item no-select no-pointers">
-                                    <MudPaper Elevation="25" Class="pa-4 my-1 flex-grow-1 d-flex justify-space-between">
-                                        <MudText Inline="true" Class="no-pointers no-select" Color="Color.Primary">Drag a mod here to load it!</MudText>
-                                    </MudPaper>
-                                </div>
-                            }
-                        </MudDropZone>
-                    </MudItem>
-                </MudGrid>
-            </ChildContent>
-            <ItemRenderer>
-                <MudPaper Elevation="25" Class="pa-4 my-1 flex-grow-1 d-flex justify-space-between">
-                    <MudText Inline="true" Class="no-pointers no-select">@context.Name</MudText>
-                </MudPaper>
-            </ItemRenderer>
-        </MudDropContainer>
-    }
+            </MudPaper>
+        </MudItem>
+        <MudItem sm="4" Class="installed mud-height-full">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
+                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Installed Mods</MudText>
+
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 </MudContainer>
 
 @code {
-    private const bool ModLoaderAvailable = false; // TODO: remove once this page has been implemented
-    private MudDropContainer<DropItem> Container { get; set; }
-    private bool UnsavedData { get; set; }
-    private List<DropItem> _items = new();
-    private IDisposable LoaderHandler { get; set; }
+    private Timer _progressTimer;
 
-    protected override void OnInitialized()
+    protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        LoaderHandler = NavigationManager.RegisterLocationChangingHandler(Handler);
-        _items = LoadData();
-        base.OnInitialized();
-    }
-
-    private void ItemUpdated(MudItemDropInfo<DropItem> dropItem)
-    {
-        UnsavedData = true;
-        dropItem.Item.Zone = dropItem.DropzoneIdentifier;
-        _items = _items.OrderBy(x => x.Name).ToList();
-        Container.Refresh();
-        StateHasChanged();
-    }
-
-    public class DropItem
-    {
-        public string Name { get; set; }
-        public string Zone { get; set; }
-    }
-
-    private async ValueTask Handler(LocationChangingContext context)
-    {
-        if (!UnsavedData)
-        {
-            // no unsavedData
-            return;
-        }
-
-        Logger.LogInformation("Check user wants to navigate with unsaved data");
-
-        var dialog = await DialogService.ShowAsync<UnsavedDataDialog>("UnsavedDataDialog", ConfigHelper.DialogOptions);
-        var result = await dialog.Result;
-
-        if (result?.Canceled is false)
-        {
-            Logger.LogInformation($"User did not want to save data, navigating to: {context.TargetLocation}");
-            return;
-        }
-
-        Logger.LogInformation("User cancelled navigation");
-        context.PreventNavigation();
-    }
-
-    private void SaveChanges()
-    {
-        UnsavedData = false;
-    }
-
-    private void RevertChanges()
-    {
-        _items = LoadData();
-        StateHasChanged();
-        UnsavedData = false;
+        _progressTimer = new Timer((_) => { InvokeAsync(StateHasChanged); }, default, TimeSpan.FromSeconds(2), TimeSpan.Zero);
+        return base.OnAfterRenderAsync(firstRender);
     }
 
     public void Dispose()
     {
-        LoaderHandler.Dispose();
-    }
-
-    private List<DropItem> LoadData()
-    {
-        return new List<DropItem>
-        {
-            new() { Name = "a", Zone = "2" },
-            new() { Name = "b", Zone = "1" },
-            new() { Name = "c", Zone = "2" },
-            new() { Name = "d", Zone = "1" },
-            new() { Name = "e", Zone = "2" },
-            new() { Name = "f", Zone = "1" }
-        };
+        _progressTimer?.Dispose();
     }
 
 }
