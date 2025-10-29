@@ -1,5 +1,7 @@
 @inject ISnackbar Snackbar
 @inject IJSRuntime JsRuntime
+@inject DownloadHelper DownloadHelper
+@inject ILogger<ForgeDownloadDialog> Logger
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -25,7 +27,6 @@
     [Parameter] public string Name { get; set; }
     [Parameter] public string VersionDescription { get; set; }
     [Parameter] public string VersionLink { get; set; }
-
     private bool _requestInProgress;
     private CancellationTokenSource Token { get; set; }
     private bool UserCancel { get; set; }
@@ -40,27 +41,33 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private Task RunDownloadTask()
+    private void RunDownloadTask()
     {
-        // start thread and download there. store somewhere and have a way to see them.
         _requestInProgress = true;
+        Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
         try
         {
+            // TODO: atm we dont do anything with cancellationToken.
+            if (!DownloadHelper.AddDownloadTask(Name, VersionLink, Token))
+            {
+                Logger.LogError("Unable to add download task, name: {name}, url: {url}", Name, VersionLink);
+                Snackbar.Add($"Unable to download {Name}", Severity.Error);
+            }
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
             AbortOrFail("Request Timed out!");
-            return Task.CompletedTask;
+            return;
         }
         catch (HttpRequestException)
         {
             AbortOrFail();
-            return Task.CompletedTask;
+            return;
         }
         catch (Exception)
         {
             AbortOrFail();
-            return Task.CompletedTask;
+            return;
         }
 
         if (true)
@@ -68,8 +75,6 @@
             _requestInProgress = false;
             Submit();
         }
-
-        return Task.CompletedTask;
     }
 
     private void Submit()
@@ -97,5 +102,4 @@
         Token?.Cancel();
         MudDialog.Cancel();
     }
-
 }
