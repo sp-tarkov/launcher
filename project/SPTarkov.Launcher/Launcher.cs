@@ -36,7 +36,7 @@ public class Launcher
             // .AddSingleton<ForgeHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
-            .AddSingleton<ModDownloadHelper>()
+            .AddSingleton<DownloadHelper>()
             .AddSingleton<StateHelper>()
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
@@ -84,13 +84,16 @@ public class Launcher
     private static void CustomizeComponent()
     {
         App.MainWindow.SetTitle("SPTarkov Launcher");
-        App.MainWindow.DevToolsEnabled = true;
         App.MainWindow.LogVerbosity = 0;
 
+#if !DEBUG
         // use this to disable bottom left status bar like in a browser
-        // TODO: comment out to gain devtools - this flag disables it.
-        // App.MainWindow.BrowserControlInitParameters = "--kiosk";
-        // App.MainWindow.ContextMenuEnabled = false;
+        App.MainWindow.DevToolsEnabled = true;
+        App.MainWindow.BrowserControlInitParameters = "--kiosk";
+        App.MainWindow.ContextMenuEnabled = false;
+#else
+        App.MainWindow.DevToolsEnabled = true;
+#endif
 
         App.MainWindow.Topmost = ConfigHelper.GetConfig().AlwaysTop;
         App.MainWindow.MinHeight = 550;
