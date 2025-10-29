@@ -8,14 +8,20 @@ public class PatchResultInfo
 
     public int NumTotal { get; }
 
-    public bool Ok => (Status == PatchResultEnum.Success);
+    public bool Ok
+    {
+        get { return (Status == PatchResultEnum.Success); }
+    }
 
-    public int PercentComplete => (NumCompleted * 100) / NumTotal;
+    public int PercentComplete
+    {
+        get { return (NumCompleted * 100) / NumTotal; }
+    }
 
     public PatchResultInfo(PatchResultEnum status, int numCompleted, int numTotal)
     {
-        this.Status = status;
-        this.NumCompleted = numCompleted;
-        this.NumTotal = numTotal;
+        Status = status;
+        NumCompleted = numCompleted;
+        NumTotal = numTotal;
     }
 }
