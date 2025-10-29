@@ -26,8 +26,10 @@ html body .mud-tabs {
     backdrop-filter: blur(20px);
 }
 html body .mud-tabs-tabbar {
-    background-color: rgba(25, 25, 31, 0.7) !important;
-    backdrop-filter: blur(20px);
+    background-color: rgba(25, 25, 31, 0) !important;
+}
+html body .mud-tabs-tabbar-content {
+    background-color: rgba(25, 25, 31, 0) !important;
 }
 html body .mud-popover {
     background-color: rgba(25, 25, 31, 0.7) !important;
@@ -54,6 +56,21 @@ html body .mud-scroll-to-top .mud-fab {
     border-color: rgba(255, 255, 255, 0.118) !important;
     border-width: 2px;
     border-style: solid;
+}
+html body .mud-pagination-item {
+    background-color: rgba(25, 25, 31, 0.7) !important;
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.118) !important;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 5px;
+}
+html body .mud-pagination-item.mud-pagination-item-selected {
+    border-color: rgba(255, 255, 255, 0.6) !important;
+}
+html body .mud-pagination-item:hover {
+    transition: border-color 0.2s ease-in-out;
+    border-color: rgba(255, 255, 255, 0.6) !important;
 }
 
 #blazor-error-ui {
@@ -143,9 +160,15 @@ html body .mud-scroll-to-top .mud-fab {
     padding: 0 !important;
 }
 
+a.setting-on-hover {
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+
 a.setting-on-hover:hover {
     background-color: rgba(170, 170, 170, 0.2);
     border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
 }
 
 .setting-on-hover-container {
