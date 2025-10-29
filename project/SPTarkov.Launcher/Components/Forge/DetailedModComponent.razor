@@ -27,7 +27,7 @@
             <MudItem sm="12">
                 <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" IconColor="Color.Error" Color="Color.Dark" Size="Size.Medium" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="ReturnToForge">Back</MudButton>
             </MudItem>
-            <MudItem sm="8">
+            <MudItem sm="8" Class="pt-4">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4">
                     <MudCardHeader>
                         <MudGrid>
@@ -53,7 +53,7 @@
                     <MudCardContent Class="user-markdown">@((MarkupString)ForgeMod.Description)</MudCardContent>
                 </MudCard>
             </MudItem>
-            <MudItem sm="4">
+            <MudItem sm="4" Class="pt-4">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start text-overflow">
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
@@ -157,11 +157,11 @@
 
         if (result?.Canceled is false)
         {
-            Logger.LogInformation("Started Download");
+            Logger.LogInformation("Started Download for {mod}", ForgeMod.Name);
             return;
         }
 
-        Logger.LogInformation("Download cancelled");
+        Logger.LogInformation("Download cancelled for {mod}", ForgeMod.Name);
     }
 
     private void ReturnToForge()
