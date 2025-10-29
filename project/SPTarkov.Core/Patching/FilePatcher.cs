@@ -53,8 +53,6 @@ public class FilePatcher
         {
             FileInfo target;
 
-            var progress = (int) Math.Floor((double) processed / countfiles * 100);
-
             // get the relative portion of the patch file that will be appended to targetpath in order to create an official target file.
             var relativefile = file.FullName.Substring(patchpath.Length).TrimStart('\\', '/');
 
@@ -129,7 +127,7 @@ public class FilePatcher
             HDiffPatch.LogVerbosity = Verbosity.Quiet;
 
             patcher.Initialize(patchFilePath);
-            patcher.Patch(sourceFilePath, targetFilePath, false, default, false, false);
+            patcher.Patch(sourceFilePath, targetFilePath, false);
         }
         catch (Exception ex)
         {
