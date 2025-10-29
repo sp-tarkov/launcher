@@ -1,13 +1,14 @@
+// ReSharper disable CompareOfFloatsByEqualityOperator
 namespace SPTarkov.Core.Forge;
 
 public class ForgeDownloadTask
 {
     private string Url { get; init; }
     private HttpClient Client { get; set; }
-    private string PathToMod { get; set; } = Path.Combine(Environment.CurrentDirectory, "Mod");
-    private string ModName { get; set; } = "";
-    private float? TotalToDownload { get; set; }
-    private IProgress<float>? Progress { get; set; }
+    private string PathToMod { get; set; } = Path.Combine(Environment.CurrentDirectory, "user", "Launcher", "ModCache");
+    private string ModName { get; set; }
+    private float TotalToDownload { get; set; }
+    public float Progress { get; set; }
 
     public CancellationTokenSource CancellationToken { get; init; }
     public bool CanShowProgress { get; set; }
@@ -18,16 +19,13 @@ public class ForgeDownloadTask
         string modName,
         string url,
         CancellationTokenSource token,
-        HttpClient client,
-        IProgress<float>? progress = null
+        HttpClient client
     )
     {
         Url = url;
         ModName = modName;
         CancellationToken = token;
         Client = client;
-        Progress = progress;
-        Start();
     }
 
     public async Task<bool> Start()
@@ -49,7 +47,7 @@ public class ForgeDownloadTask
             response.EnsureSuccessStatusCode();
 
             TotalToDownload = response.Content.Headers.ContentLength ?? -1;
-            CanShowProgress = TotalToDownload != -1 && Progress != null;
+            CanShowProgress = TotalToDownload != -1;
 
             var contentStream = await response.Content.ReadAsStreamAsync(CancellationToken.Token);
             var fileStream = File.Create(modFilePath);
@@ -71,8 +69,7 @@ public class ForgeDownloadTask
 
                     if ((now - lastReportTime).TotalSeconds >= 1 || totalRead == TotalToDownload)
                     {
-                        var progressValue = totalRead / TotalToDownload * 100;
-                        Progress?.Report(progressValue ?? 0f);
+                        Progress = totalRead / TotalToDownload * 100;
                         lastReportTime = now;
                     }
                 }
@@ -93,5 +90,24 @@ public class ForgeDownloadTask
 
         Complete = true;
         return Complete;
+    }
+
+    public async Task<bool> Cancel()
+    {
+        try
+        {
+            if (File.Exists(Path.Combine(PathToMod, ModName)))
+            {
+                File.Delete(Path.Combine(PathToMod, ModName));
+            }
+
+            await CancellationToken.CancelAsync();
+
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }
