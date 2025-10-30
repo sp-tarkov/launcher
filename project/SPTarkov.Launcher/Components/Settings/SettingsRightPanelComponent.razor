@@ -1,5 +1,9 @@
 ﻿<MudItem sm="6">
     <MudGrid>
         <AdvancedPanelComponent/>
+        @if (OperatingSystem.IsLinux())
+        {
+            <LinuxPanelComponent/>
+        }
     </MudGrid>
 </MudItem>

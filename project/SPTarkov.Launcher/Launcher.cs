@@ -41,6 +41,7 @@ public class Launcher
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
             .AddSingleton<WindowsClipboard>()
+            .AddSingleton<WineHelper>()
             .AddLogging(builder =>
             {
                 builder.ClearProviders();
