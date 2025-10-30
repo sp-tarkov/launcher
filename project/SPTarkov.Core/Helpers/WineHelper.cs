@@ -19,36 +19,30 @@ public class WineHelper
     }
 
     // Vibe-coded wine registry file parser :D from MadByte, To test and check
-    public static string? FindWineRegValue(string file, string key, string valueName)
+    public string? FindWineRegValue(string file, string key, string valueName)
     {
-        using var reader = new StreamReader(file);
+        var reader = new StreamReader(file);
         string? line;
-        var inSection = false;
+        string? secondLine;
+        var foundIt = false;
 
         while ((line = reader.ReadLine()) != null)
         {
             line = line.Trim();
 
-            if (line.StartsWith("[") && line.EndsWith("]"))
+            if (line.StartsWith("["))
             {
-                inSection = string.Equals(line.Substring(1, line.Length - 2), key, StringComparison.OrdinalIgnoreCase);
-                continue;
+                foundIt = line.Contains(key);
             }
 
-            if (inSection)
+            if (foundIt)
             {
-                if (line.StartsWith("["))
-                    break; // new section, stop looking
-
-                if (line.StartsWith($"\"{valueName}\""))
+                while ((secondLine = reader.ReadLine()) != null)
                 {
-                    int eq = line.IndexOf('=');
-                    if (eq >= 0)
-                        return line.Substring(eq + 1).Trim();
-                }
-                if (valueName == "@" && line.StartsWith("@="))
-                {
-                    return line.Substring(2).Trim();
+                    if (secondLine.Contains(valueName))
+                    {
+                        return secondLine.Substring(19, secondLine.Length - 19 - 1);
+                    }
                 }
             }
         }
@@ -60,12 +54,13 @@ public class WineHelper
     {
         var prefixPath = _configHelper.GetConfig().LinuxSettings.PrefixPath;
         var regFilePath = Path.Combine(prefixPath, "system.reg");
-        var key = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
-        //var v1 = Registry.LocalMachine.OpenSubKey(c0, false)?.GetValue("InstallLocation"); maybe this works under the prefix
+        // must contain \\ for windows reg key when looking on linux/wine
+        var key = @"Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\EscapeFromTarkov";
 
         try
         {
-            return FindWineRegValue(regFilePath, key, "InstallLocation");
+            var windowsLikePath = FindWineRegValue(regFilePath, key, "InstallLocation");
+            return FixWithPrefix(windowsLikePath);
         }
         catch (Exception ex)
         {
@@ -74,49 +69,71 @@ public class WineHelper
         }
     }
 
+    private string FixWithPrefix(string? windowsLikePath)
+    {
+        var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
+        _logger.LogDebug("pathWithoutDrive: {0}", pathWithoutDrive);
+        return string.Concat(_configHelper.GetConfig().LinuxSettings.PrefixPath, pathWithoutDrive);
+    }
+
     // Example commands (to explain what would be possible using umu-run):
     // _wineHelper.RunInPrefix("EscapeFromTarkov.exe", args) -- Launch any executable in the current working dir
     // _wineHelper.RunInPrefix("winecfg", args) -- Launch the winecfg menu
     // _wineHelper.RunInPrefix("winetricks", "-q win11") -- To set the windows version of the prefix to Windows 11
     // _wineHelper.RunInPrefix("winetricks", "-q dotnetdesktop9") -- To install .NET Desktop 9 automatically
     // _wineHelper.RunInPrefix("regedit") -- To launch the regedit tool (Pretty much the same as on windows)
-    public async Task<bool> RunInPrefix(string cmd = "", string args = "")
+    public async Task<bool> RunInPrefix(string cmd = "", List<string>? args = null)
     {
-        // Linux SPT install will have a prefix where everything is installed.
         // This looks something like: "/home/{username}/Games/tarkov"
         // However this could be anything the user sets it too when they use MadBytes script.
-        var prefixPath = _configHelper.GetConfig().LinuxSettings.PrefixPath; // these could be null
+        var prefixPath = _configHelper.GetConfig().LinuxSettings.PrefixPath;
 
-        // We'll assume Umu is already installed for now as its required for MadBytes script.
         // This looks something like this: "/home/{username}/.local/bin/umu-run"
-        var umuPath = _configHelper.GetConfig().LinuxSettings.UmuPath; // these could be null
+        var umuPath = _configHelper.GetConfig().LinuxSettings.UmuPath;
 
-        // We'll assume its prefix + the usual for now.
+        if (string.IsNullOrEmpty(prefixPath) || string.IsNullOrEmpty(umuPath))
+        {
+            _logger.LogError("Prefix path or umu path are required");
+            return false;
+        }
+
         // this looks something like: "/home/{username}/Games/tarkov/drive_c/SPTarkov"
-        var sptPath = Path.Combine(prefixPath, "drive_c", "SPTarkov");
+        var sptPath = _configHelper.GetConfig().GamePath;
 
-        Environment.SetEnvironmentVariable("WINEPREFIX", prefixPath);
-        Directory.SetCurrentDirectory(sptPath);
-
-        // We can run umu-run either by doing `python $SCRIPT_PATH` or `bash -c '$SCRIPT_PATH'`
         var process = new ProcessStartInfo
         {
-            FileName = "/bin/bash",
+            FileName = "python3",
             UseShellExecute = false,
             CreateNoWindow = true,
+            WorkingDirectory = sptPath,
+            Environment =
+            {
+                { "WINEPREFIX", prefixPath },
+                { "DOTNET_ROOT", ""},
+                { "DOTNET_BUNDLE_EXTRACT_BASE_DIR", ""},
+                { "PROTON_USE_XALIA", "0"},
+                { "PROTONPATH", "GE-Proton10-24"},
+            },
             ArgumentList =
             {
-                "-c",
                 umuPath,
-                cmd,
-                args
+                cmd
             }
         };
+
+        // Add these individually so they are not wrapped in ""
+        if (args != null)
+        {
+            foreach (var arg in args)
+            {
+                process.ArgumentList.Add(arg);
+            }
+        }
 
         try
         {
             Process.Start(process);
-            _logger.LogInformation("Game process started");
+            _logger.LogInformation("Game process started on linux");
         }
         catch (Exception ex)
         {
