@@ -54,7 +54,18 @@ public class ConfigHelper
             // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
             SetGamePath(Directory.GetParent(Environment.CurrentDirectory)!.FullName);
             // Unless you are running the launcher from the IDE.
-            // SetGamePath(@"C:\SPT\4.0.0");
+            // SetGamePath(@"/home/cwx/Games/tarkov/drive_c/SPTarkov");
+        }
+    }
+
+    private void SaveDefaults()
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SaveDefaults.");
+            Directory.CreateDirectory(_launcherAssetsPath);
+            File.WriteAllText(Path.Combine(_launcherAssetsPath, "LauncherSettings.json"),
+                JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
         }
     }
 
@@ -176,23 +187,32 @@ public class ConfigHelper
         }
     }
 
-    private void SaveDefaults()
-    {
-        lock (_lock)
-        {
-            _logger.LogInformation("SaveDefaults.");
-            Directory.CreateDirectory(_launcherAssetsPath);
-            File.WriteAllText(Path.Combine(_launcherAssetsPath, "LauncherSettings.json"),
-                JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
-        }
-    }
-
     public void SetLocale(string locale)
     {
         lock (_lock)
         {
             _logger.LogInformation("SetLocale: {Locale}", locale);
             _settings!.Language = locale;
+            SaveConfig();
+        }
+    }
+
+    public void SetLinuxPrefixPath(string linuxPrefixPath)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetLinuxPrefixPath: {LinuxPrefixPath}", linuxPrefixPath);
+            _settings!.LinuxSettings.PrefixPath = linuxPrefixPath;
+            SaveConfig();
+        }
+    }
+
+    public void SetLinuxUmuPath(string linuxUmuPath)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetLinuxUmuPath: {UmuPath}", linuxUmuPath);
+            _settings!.LinuxSettings.UmuPath = linuxUmuPath;
             SaveConfig();
         }
     }
