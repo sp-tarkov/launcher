@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -173,12 +172,15 @@ public class GameHelper
         _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
 
         //start game
-        var args = $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config=" +
-                   $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";
+        List<string> argsList =
+        [
+            "-force-gfx-jobs",
+            "native",
+            $"-token={_stateHelper.SelectedProfile?.ProfileId}",
+            $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}"
+        ];
 
-        _logger.LogInformation($"args: {args}");
-
-        if (!await _wineHelper.RunInPrefix("EscapeFromTarkov.exe", args))
+        if (!await _wineHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
         {
             return false;
         }
@@ -241,9 +243,13 @@ public class GameHelper
             var call = await _httpHelper.GameServerGet<VersionResponse>(RequestUrl.Version, CancellationToken.None);
 
             var serverVersion = new SptVersion(call?.Response!);
+            var coreDllPath = Path.Combine(_configHelper.GetConfig().GamePath, "BepInEx", "plugins", "spt", "spt-core.dll");
+            if (!File.Exists(coreDllPath))
+            {
+                _logger.LogError("spt-core.dll missing: {coreDllPath}", coreDllPath);
+            }
 
-            var coreDllVersionInfo =
-                FileVersionInfo.GetVersionInfo(Path.Combine(_configHelper.GetConfig().GamePath, "BepinEx", "plugins", "spt", "spt-core.dll"));
+            var coreDllVersionInfo = FileVersionInfo.GetVersionInfo(coreDllPath);
             var dllVersion = new SptVersion(coreDllVersionInfo.FileVersion!);
 
             _logger.LogInformation("server version: {serverVersion} - spt-core.dll version: {DllVersion}", serverVersion, dllVersion);
@@ -447,6 +453,12 @@ public class GameHelper
 
     public static bool Validate()
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            // skip validation for anything other than windows
+            return true;
+        }
+
         var c0 = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
         int v0;
 
@@ -487,15 +499,25 @@ public class GameHelper
     }
 
     /// <summary>
-    /// TODO: this might not be usable on linux
     /// </summary>
     /// <returns></returns>
     public async Task<bool> MonitorGame()
     {
-        var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
-        while (!process!.HasExited)
+        // if (!OperatingSystem.IsWindows())
+        // {
+        //     return false;
+        // }
+
+        // As wine can take some time to start the game, we'll just delay 12seconds,
+        await Task.Delay(12000);
+        var process = Process.GetProcessesByName("EscapeFromTarko").FirstOrDefault();
+
+        if (process != null)
         {
-            await Task.Delay(3000);
+            while (!process.HasExited)
+            {
+                await Task.Delay(3000);
+            }
         }
 
         return false;
