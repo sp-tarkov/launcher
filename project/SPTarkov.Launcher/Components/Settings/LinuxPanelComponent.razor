@@ -1,0 +1,37 @@
+@inject ConfigHelper ConfigHelper
+@inject StateHelper StateHelper
+@inject LocaleHelper LocaleHelper
+
+<MudItem sm="12">
+    <MudPaper Class="pa-5 ml-1 gap-2 d-flex flex-column setting-on-hover-container mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="3">
+        @* need text field to change PrefixDir *@
+        @* need text field to change UmuDir *@
+        @* need text field to add additional args for things like mangohud *@
+        <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Bottom" Text="Image cannot be changed for now">
+            <SettingSwitchComponent Switch="@ShowBackgroundSwitch" OptionName="@(LocaleHelper.Get("setting_option_background"))" SwitchFunc="SetBackgroundUsage"/>
+        </MudTooltip>
+        <SettingLocaleComponent Options="@LocaleOptions" OptionName="@(LocaleHelper.Get("setting_option_language"))"/>
+    </MudPaper>
+</MudItem>
+
+@code
+{
+    private bool ShowBackgroundSwitch { get; set; }
+    private Dictionary<string, string> LocaleOptions { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ShowBackgroundSwitch = ConfigHelper.GetConfig().UseBackground;
+        LocaleOptions = LocaleHelper.GetAvailableLocales();
+        base.OnInitialized();
+    }
+
+    private Task SetBackgroundUsage()
+    {
+        ShowBackgroundSwitch = !ShowBackgroundSwitch;
+        ConfigHelper.SetUseBackground(ShowBackgroundSwitch);
+        StateHelper.SetBackground();
+
+        return Task.CompletedTask;
+    }
+}
