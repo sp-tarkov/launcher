@@ -182,11 +182,24 @@
         }
 
         Snackbar.Add(LocaleHelper.Get("profile_page_task_3"));
-        if (!await GameHelper.LaunchGame())
+        if (OperatingSystem.IsWindows())
         {
-            var message = GameHelper.ErrorMessage;
-            Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
-            return;
+
+            if (!await GameHelper.LaunchGame())
+            {
+                var message = GameHelper.ErrorMessage;
+                Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
+                return;
+            }
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            if (!await GameHelper.LaunchGameLinux())
+            {
+                var message = GameHelper.ErrorMessage;
+                Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
+                return;
+            }
         }
 
         if (ConfigHelper.GetConfig().MinimizeOnLaunch)

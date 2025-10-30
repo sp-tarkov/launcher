@@ -19,6 +19,7 @@ public class GameHelper
     private readonly HttpHelper _httpHelper;
     private readonly FilePatcher _filePatcher;
     private readonly LocaleHelper _localeHelper;
+    private readonly WineHelper _wineHelper;
 
     private string? _originalGamePath;
     public string? ErrorMessage;
@@ -34,7 +35,8 @@ public class GameHelper
         ConfigHelper configHelper,
         FilePatcher filePatcher,
         HttpHelper httpHelper,
-        LocaleHelper localeHelper
+        LocaleHelper localeHelper,
+        WineHelper wineHelper
     )
     {
         _stateHelper = stateHelper;
@@ -43,20 +45,26 @@ public class GameHelper
         _filePatcher = filePatcher;
         _httpHelper = httpHelper;
         _localeHelper = localeHelper;
+        _wineHelper = wineHelper;
         _originalGamePath = DetectOriginalGamePath();
     }
 
     private string? DetectOriginalGamePath()
     {
-        // We can't detect the installed path on non-Windows
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (OperatingSystem.IsWindows())
         {
-            return null;
+            var installLocation = Registry.LocalMachine.OpenSubKey(RegistryInstall, false)?.GetValue("InstallLocation");
+            var info = installLocation is string key ? new DirectoryInfo(key) : null;
+            return info?.FullName;
         }
 
-        var installLocation = Registry.LocalMachine.OpenSubKey(RegistryInstall, false)?.GetValue("InstallLocation");
-        var info = installLocation is string key ? new DirectoryInfo(key) : null;
-        return info?.FullName;
+        // as running with linux requires wine, we can now
+        if (OperatingSystem.IsLinux())
+        {
+            return _wineHelper.GetOriginalGamePath();
+        }
+
+        throw new Exception("Unsupported operating system");
     }
 
     public async Task<bool> CheckGame()
@@ -112,7 +120,7 @@ public class GameHelper
         return true;
     }
 
-    public Task<bool> LaunchGame()
+    public async Task<bool> LaunchGame()
     {
         _logger.LogInformation("Launching game");
         _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
@@ -125,7 +133,7 @@ public class GameHelper
         {
             _logger.LogError("Could not find {ClientExecutable}", clientExecutable);
             ErrorMessage = _localeHelper.Get("game_helper_error_5");
-            return Task.FromResult(false);
+            return false;
         }
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
@@ -152,10 +160,30 @@ public class GameHelper
         {
             _logger.LogError($"Starting game process failed: {ex}");
             ErrorMessage = _localeHelper.Get("game_helper_error_6");
-            return Task.FromResult(false);
+            return false;
         }
 
-        return Task.FromResult(true);
+        return true;
+    }
+
+    public async Task<bool> LaunchGameLinux()
+    {
+        _logger.LogInformation("Launching game on linux");
+        _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
+        _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
+
+        //start game
+        var args = $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config=" +
+                   $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";
+
+        _logger.LogInformation($"args: {args}");
+
+        if (!await _wineHelper.RunInPrefix("EscapeFromTarkov.exe", args))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private async IAsyncEnumerable<PatchResultInfo> PatchFiles()
@@ -458,6 +486,10 @@ public class GameHelper
         return v0 == 0;
     }
 
+    /// <summary>
+    /// TODO: this might not be usable on linux
+    /// </summary>
+    /// <returns></returns>
     public async Task<bool> MonitorGame()
     {
         var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();

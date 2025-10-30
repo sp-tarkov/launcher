@@ -36,4 +36,6 @@ public record LauncherSettings
     public List<string> ExcludeFromCleanup { get; set; } = new();
 
     public string Language { get; set; } = "en";
+
+    public LinuxSettings LinuxSettings { get; set; } = new();
 }
