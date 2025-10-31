@@ -1,59 +1,9 @@
-﻿@inject ConfigHelper ConfigHelper
-@inject LocaleHelper LocaleHelper
-
-<MudItem sm="6">
-    <MudPaper Class="pa-5 mr-1 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
-        <SettingSwitchComponent Switch="@CloseToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="SetCloseToTray"/>
-        <SettingSwitchComponent Switch="@MinimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="SetMinimizeOnLaunch"/>
-        <SettingSwitchComponent Switch="@AlwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="SetAlwaysOnTop" Disabled="!IsWindows"/>
-    </MudPaper>
-</MudItem>
-
-@code
-{
-    private bool CloseToTraySwitch { get; set; }
-    private bool MinimizeOnLaunchSwitch { get; set; }
-    private bool AlwaysOnTopSwitch { get; set; }
-
-    private bool IsWindows => OperatingSystem.IsWindows();
-
-    protected override void OnInitialized()
-    {
-        var settings = ConfigHelper.GetConfig();
-        CloseToTraySwitch = settings.CloseToTray;
-        MinimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
-        AlwaysOnTopSwitch = settings.AlwaysTop;
-
-        base.OnInitialized();
-    }
-
-    private Task SetCloseToTray()
-    {
-        CloseToTraySwitch = !CloseToTraySwitch;
-        ConfigHelper.SetCloseToTray(CloseToTraySwitch);
-
-        return Task.CompletedTask;
-    }
-
-    private Task SetMinimizeOnLaunch()
-    {
-        MinimizeOnLaunchSwitch = !MinimizeOnLaunchSwitch;
-        ConfigHelper.SetMinimizeOnLaunch(MinimizeOnLaunchSwitch);
-
-        return Task.CompletedTask;
-    }
-
-    private Task SetAlwaysOnTop()
-    {
-        if (!IsWindows)
+﻿<MudItem sm="6">
+    <MudGrid>
+        <BasicPanelComponent/>
+        @if (OperatingSystem.IsLinux())
         {
-            return Task.CompletedTask;
+            <LinuxPanel2Component/>
         }
-
-        AlwaysOnTopSwitch = !AlwaysOnTopSwitch;
-        Launcher.App.MainWindow.SetTopMost(AlwaysOnTopSwitch);
-        ConfigHelper.SetAlwaysOnTop(AlwaysOnTopSwitch);
-
-        return Task.CompletedTask;
-    }
-}
+    </MudGrid>
+</MudItem>
