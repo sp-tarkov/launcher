@@ -226,4 +226,14 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void SetLinuxProtonVersion(string linuxProtonVersion)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetLinuxProtonVersion: {ProtonVersion}", linuxProtonVersion);
+            _settings!.LinuxSettings.ProtonVersion = linuxProtonVersion;
+            SaveConfig();
+        }
+    }
 }
