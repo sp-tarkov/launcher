@@ -10,4 +10,6 @@ public record LinuxSettings
 
     // ENVVAR1=1 ENVVAR2=2 %command% -Arg1=arg1 -Arg2=arg2 - similar system to steam
     public string LaunchSettings { get; set; } = "";
+
+    public string ProtonVersion { get; set; } = "GE-Proton10-24";
 }
