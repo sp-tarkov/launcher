@@ -216,4 +216,14 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void SetLinuxLaunchSettings(string linuxLaunchSettings)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetLinuxLaunchSettings: {LaunchSettings}", linuxLaunchSettings);
+            _settings!.LinuxSettings.LaunchSettings = linuxLaunchSettings;
+            SaveConfig();
+        }
+    }
 }
