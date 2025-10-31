@@ -53,6 +53,12 @@ public class WineHelper
     public string? GetOriginalGamePath()
     {
         var prefixPath = _configHelper.GetConfig().LinuxSettings.PrefixPath;
+        if (string.IsNullOrEmpty(prefixPath))
+        {
+            _logger.LogError("Prefix path is required");
+            return null;
+        }
+
         var regFilePath = Path.Combine(prefixPath, "system.reg");
         // must contain \\ for windows reg key when looking on linux/wine
         var key = @"Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\EscapeFromTarkov";
