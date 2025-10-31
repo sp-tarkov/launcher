@@ -2,7 +2,7 @@
 
 <MudContainer Class="pa-0">
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
-        <MudTextField @bind-Value="NewValue" Label="Launch Settings" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" Placeholder="MANGOHUD=1 %command%"/>
+        <MudTextField @bind-Value="NewValue" Label="Launch Settings" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" Placeholder="MANGOHUD=1"/>
         <MudIconButton Color="@(NewValue == OldValue ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save" Disabled="@(NewValue == OldValue)" OnClick="OnTextSaved" />
     </MudLink>
 </MudContainer>
