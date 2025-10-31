@@ -1,0 +1,47 @@
+@inject LocaleHelper LocaleHelper
+@inject ConfigHelper ConfigHelper
+@inject WineHelper WineHelper
+
+<MudContainer Class="pa-0">
+    <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 pl-5">
+        <MudText Class="no-select">@OptionName</MudText>
+        <MudSpacer/>
+        <MudSelect T="string" Value="_selectedOption" Disabled="@Disabled" Clearable="false" ValueChanged="(v) => OnValueChanged(v)">
+            @foreach (var item in Options)
+            {
+                <MudSelectItem Value="@item">@item</MudSelectItem>
+            }
+        </MudSelect>
+    </a>
+</MudContainer>
+@if (AddDiv)
+{
+    <MudDivider DividerType="DividerType.Middle" Class="ma-0"/>
+}
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        _selectedOption = ConfigHelper.GetConfig().LinuxSettings.ProtonVersion;
+        OptionName = "Proton Version";
+        Options = await WineHelper.GetProtonVersions();
+        await base.OnInitializedAsync();
+    }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+    [Parameter]
+    public bool AddDiv { get; set; }
+
+    private List<string> Options { get; set; }
+    private string OptionName { get; set; }
+    private string _selectedOption;
+
+    private void OnValueChanged(string value)
+    {
+        _selectedOption = value;
+        ConfigHelper.SetLinuxProtonVersion(value);
+        StateHasChanged();
+    }
+}
