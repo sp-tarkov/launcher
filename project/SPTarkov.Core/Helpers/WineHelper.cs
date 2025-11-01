@@ -98,6 +98,7 @@ public class WineHelper
         // This looks something like this: "/home/{username}/.local/bin/umu-run"
         var umuPath = _configHelper.GetConfig().LinuxSettings.UmuPath;
 
+        // this looks something like this: "GE-Proton10-24"
         var proton = _configHelper.GetConfig().LinuxSettings.ProtonVersion;
 
         if (string.IsNullOrEmpty(prefixPath) || string.IsNullOrEmpty(umuPath) || string.IsNullOrEmpty(proton))
