@@ -282,24 +282,23 @@ public class WineHelper
 
     public Task<List<string>> GetProtonVersions()
     {
+        // Should contain things like "GE-Proton10-24" or "GE-Proton10-21"
+        // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
         var directoryContents = Directory.GetDirectories(_protonPath);
         var listStripped = new List<string>();
 
         foreach (var directory in directoryContents)
         {
+            // remove LegacyRuntime
             if (directory.Contains("LegacyRuntime"))
             {
                 continue;
             }
 
+            // split on / and get last
             listStripped.Add(directory.Split("/").Last());
         }
 
-        // Should contain things like "Proton10-24" or "Proton10-21" generally prefixed with GE
-        // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
-        // However we shouldnt have to care and showing that name is fine?
-        // remove LegacyRuntime
-        // split on / and get last
         return Task.FromResult(listStripped);
     }
 }
