@@ -260,6 +260,13 @@ public class WineHelper
 
                 stringBuilder.Append(charFromStr);
             }
+
+            // check if the name and value have anything at the end, if so, last arg/env had no space or " so add whats there
+            if (!string.IsNullOrEmpty(name))
+            {
+                value = stringBuilder.ToString();
+                result.Add((string) name.Clone(), (string) value.Clone());
+            }
         }
         catch (Exception e)
         {

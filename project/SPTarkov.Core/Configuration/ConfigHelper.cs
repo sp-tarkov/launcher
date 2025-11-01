@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
 
@@ -8,7 +9,8 @@ public class ConfigHelper
 {
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
-        WriteIndented = true
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     private readonly Lock _lock = new();
@@ -52,9 +54,9 @@ public class ConfigHelper
                 "LauncherSettings.json")));
 
             // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
-            SetGamePath(Directory.GetParent(Environment.CurrentDirectory)!.FullName);
+            // SetGamePath(Directory.GetParent(Environment.CurrentDirectory)!.FullName);
             // Unless you are running the launcher from the IDE.
-            // SetGamePath(@"/home/cwx/Games/tarkov/drive_c/SPTarkov");
+            SetGamePath(@"/home/cwx/Games/tarkov/drive_c/SPTarkov");
         }
     }
 
