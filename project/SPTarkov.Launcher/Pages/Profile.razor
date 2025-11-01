@@ -72,6 +72,8 @@
         await RefreshProfiles();
 
         _buttonDisabled = false;
+
+        // This is currently not working on Linux - Photino Bug
         if (ConfigHelper.GetConfig().MinimizeOnLaunch)
         {
             Launcher.App.MainWindow.SetMinimized(false);
@@ -116,13 +118,13 @@
 
             SelectedMiniProfile = StateHelper.SelectedProfile;
 
-            token?.Dispose();
+            token.Dispose();
             return true;
         }
         catch (Exception e)
         {
             Logger.LogInformation("Exception occured in updating profile: {e}", e);
-            token?.Cancel();
+            token.Cancel();
             return false;
         }
     }

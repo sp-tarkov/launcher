@@ -110,6 +110,29 @@ public class WineHelper
         // this looks something like: "/home/{username}/Games/tarkov/drive_c/SPTarkov"
         var sptPath = _configHelper.GetConfig().GamePath;
 
+        // this is what needs to be done for GameScope to work.
+        // var process = new ProcessStartInfo
+        // {
+        //     FileName = "gamescope",
+        //     UseShellExecute = false,
+        //     CreateNoWindow = false,
+        //     WorkingDirectory = sptPath,
+        //     Environment =
+        //     {
+        //         { "WINEPREFIX", prefixPath },
+        //         { "PROTONPATH", proton }
+        //     },
+        //     ArgumentList =
+        //     {
+        //         "-W2560",
+        //         "-H1440",
+        //         "--mangoapp",
+        //         "--",
+        //         umuPath,
+        //         cmd
+        //     }
+        // };
+
         var process = new ProcessStartInfo
         {
             FileName = "python3",
@@ -226,7 +249,7 @@ public class WineHelper
                 {
                     // this should be the end of the quoted string
                     stringBuilder.Append("\"");
-                    value =  stringBuilder.ToString();
+                    value = stringBuilder.ToString();
                     reset = true;
                 }
 
@@ -271,14 +294,15 @@ public class WineHelper
         }
         catch (Exception e)
         {
-            _logger.LogWarning("unable to parse launch Settings of: {setting}, please format correctly: {e}",  launchSettings, e);
+            _logger.LogWarning("unable to parse launch Settings of: {setting}, please format correctly: {e}", launchSettings, e);
             return new Dictionary<string, string>();
         }
 
         return result;
     }
 
-    private readonly string _protonPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".local/share/Steam/compatibilitytools.d");
+    private readonly string _protonPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+        @".local/share/Steam/compatibilitytools.d");
 
     public Task<List<string>> GetProtonVersions()
     {

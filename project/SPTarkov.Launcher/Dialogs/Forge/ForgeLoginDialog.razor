@@ -102,20 +102,18 @@
             {
                 case ForgeResponseMessage.Unauthenticated:
                     Logger.LogWarning("Forge ForgeLogin failed to authenticate");
-                    AbortOrFail(failString);
-                    return false;
+                    break;
                 case ForgeResponseMessage.InvalidCredentials:
                     Logger.LogWarning("Forge ForgeLogin failed, Invalid Credentials");
-                    AbortOrFail(failString);
-                    return false;
+                    break;
                 case ForgeResponseMessage.InvalidEmail:
                     Logger.LogWarning("Forge ForgeLogin failed due to invalid email");
-                    AbortOrFail(failString);
-                    return false;
+                    break;
                 default:
                     Logger.LogWarning($"Forge ForgeLogin ?? {result.Message}");
-                    AbortOrFail(failString);
-                    return false;
+
+                AbortOrFail(failString);
+                return false;
             }
         }
         catch (Exception)
@@ -123,6 +121,8 @@
             AbortOrFail();
             return false;
         }
+
+        return false;
     }
 
     private void Submit()
