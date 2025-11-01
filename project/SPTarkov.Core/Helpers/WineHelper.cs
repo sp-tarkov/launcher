@@ -205,7 +205,7 @@ public class WineHelper
             {
                 // Go through the string till we hit a =
                 // we now want to deal with the value
-                if (charFromStr == '=')
+                if (isName && charFromStr == '=')
                 {
                     isName = false;
                     isValue = true;
@@ -278,13 +278,11 @@ public class WineHelper
         return result;
     }
 
-    private readonly string ProtonPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @"/.local/share/Steam/compatibilitytools.d");
+    private readonly string _protonPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), @".local/share/Steam/compatibilitytools.d");
 
     public Task<List<string>> GetProtonVersions()
     {
-        var userPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        var path = Path.Combine(userPath, @".local/share/Steam/compatibilitytools.d");
-        var directoryContents = Directory.GetDirectories(path);
+        var directoryContents = Directory.GetDirectories(_protonPath);
         var listStripped = new List<string>();
 
         foreach (var directory in directoryContents)
