@@ -89,7 +89,7 @@ public class Launcher
 
 #if !DEBUG
         // use this to disable bottom left status bar like in a browser
-        App.MainWindow.DevToolsEnabled = true;
+        App.MainWindow.DevToolsEnabled = false;
         App.MainWindow.BrowserControlInitParameters = "--kiosk";
         App.MainWindow.ContextMenuEnabled = false;
 #else
