@@ -56,7 +56,7 @@ public class ConfigHelper
             // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
             SetGamePath(Directory.GetParent(Environment.CurrentDirectory)!.FullName);
             // Unless you are running the launcher from the IDE.
-            // SetGamePath(@"/home/cwx/Games/tarkov/drive_c/SPTarkov");
+            // Uncomment this and type your own dir of spt
         }
     }
 

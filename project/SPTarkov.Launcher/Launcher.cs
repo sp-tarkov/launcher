@@ -151,11 +151,12 @@ public class Launcher
         ConfigHelper.SetClientSize(App.MainWindow.Height, App.MainWindow.Width);
         ConfigHelper.SetFirstRun(false);
 
-        if (ConfigHelper.GetConfig().CloseToTray)
-        {
-            App.MainWindow.SetMinimized(true);
-            return true;
-        }
+        // See notes in BasicPanelComponent
+        // if (ConfigHelper.GetConfig().CloseToTray)
+        // {
+        //     App.MainWindow.SetMinimized(true);
+        //     return true;
+        // }
 
         return false;
     }

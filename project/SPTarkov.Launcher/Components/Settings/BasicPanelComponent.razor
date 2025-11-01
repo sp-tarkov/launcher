@@ -3,7 +3,7 @@
 
 <MudItem sm="12">
     <MudPaper Class="pa-5 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
-        <SettingSwitchComponent Switch="@CloseToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="SetCloseToTray"/>
+        @* <SettingSwitchComponent Switch="@CloseToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="SetCloseToTray"/> *@
         <SettingSwitchComponent Switch="@MinimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="SetMinimizeOnLaunch"/>
         <SettingSwitchComponent Switch="@AlwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="SetAlwaysOnTop" Disabled="!IsWindows"/>
     </MudPaper>
@@ -11,7 +11,7 @@
 
 @code
 {
-    private bool CloseToTraySwitch { get; set; }
+    // private bool CloseToTraySwitch { get; set; }
     private bool MinimizeOnLaunchSwitch { get; set; }
     private bool AlwaysOnTopSwitch { get; set; }
 
@@ -20,20 +20,23 @@
     protected override void OnInitialized()
     {
         var settings = ConfigHelper.GetConfig();
-        CloseToTraySwitch = settings.CloseToTray;
+        // CloseToTraySwitch = settings.CloseToTray;
         MinimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
         AlwaysOnTopSwitch = settings.AlwaysTop;
 
         base.OnInitialized();
     }
 
-    private Task SetCloseToTray()
-    {
-        CloseToTraySwitch = !CloseToTraySwitch;
-        ConfigHelper.SetCloseToTray(CloseToTraySwitch);
-
-        return Task.CompletedTask;
-    }
+    // Currently Commented out as MadByte pointed out, without force closing the app with alt-f4 or dev exit or task manager.
+    // there is no real way to close the app. (thats what i get for forgetting exit task isnt on by default)
+    // I want to implement a notification Area Icon, but no libs are properly X-plat and fuck implementing it
+    // private Task SetCloseToTray()
+    // {
+    //     CloseToTraySwitch = !CloseToTraySwitch;
+    //     ConfigHelper.SetCloseToTray(CloseToTraySwitch);
+    //
+    //     return Task.CompletedTask;
+    // }
 
     private Task SetMinimizeOnLaunch()
     {
