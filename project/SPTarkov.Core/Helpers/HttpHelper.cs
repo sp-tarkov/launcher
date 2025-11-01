@@ -221,7 +221,7 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeLoginResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
-    public async Task<ForgeAbilityReponse?> ForgeApiAbility(CancellationToken token)
+    public async Task<ForgeAbilityReponse?> ForgeApiAbility(string apiKey, CancellationToken token)
     {
         _logger.LogInformation("Forge ForgeApiAbility");
 
@@ -231,7 +231,7 @@ public class HttpHelper
         };
 
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
         var task = await _httpClient.SendAsync(message, token);
         var showString = await task.Content.ReadAsStringAsync(token);
