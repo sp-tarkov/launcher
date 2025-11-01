@@ -211,7 +211,10 @@
 
         if (!SearchResponse!.Success)
         {
-            Logger.LogError("Something failed, check logs");
+            Logger.LogError("Something failed");
+            Logger.LogError("request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", Search, SortValue, page, FilterValue, AiValue);
+            Logger.LogError("response: {SearchResponse}", SearchResponse);
+
             SearchResponse = null;
             ApiKeyAvailable = false;
         }
