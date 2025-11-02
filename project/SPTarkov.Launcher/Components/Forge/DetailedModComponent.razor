@@ -24,8 +24,14 @@
     else
     {
         <MudGrid>
-            <MudItem sm="12">
-                <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" IconColor="Color.Error" Color="Color.Dark" Size="Size.Medium" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="ReturnToForge">Back</MudButton>
+            <MudItem sm="12" Class="d-flex flex-row">
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" IconColor="Color.Error" Color="Color.Dark" Size="Size.Medium" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="ReturnToForge">
+                    Back
+                </MudButton>
+                <MudSpacer/>
+                <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">
+                    @($"Download Latest ({LatestVersion.Version})")
+                </MudButton>
             </MudItem>
             <MudItem sm="8" Class="pt-4">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4">
@@ -94,24 +100,15 @@
                         </MudText>
                     </MudCardContent>
                 </MudCard>
-                <MudItem sm="12" Class="mt-4">
-                    <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Style="width: 100% "
-                               Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">
-                        @($"Download Latest ({LatestVersion.Version})")
-                    </MudButton>
-                </MudItem>
             </MudItem>
         </MudGrid>
     }
 </MudItem>
 
 @code {
-    [Parameter]
-    public bool IsSkeleton { get; set; }
-    [Parameter]
-    public ForgeBase ForgeMod { get; set; }
-    [Parameter]
-    public ForgeModVersion ForgeModVersion { get; set; }
+    [Parameter] public bool IsSkeleton { get; set; }
+    [Parameter] public ForgeBase ForgeMod { get; set; }
+    [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
 
     private ForgeModVersion LatestVersion => ForgeMod.Versions?.FirstOrDefault();
 
@@ -168,4 +165,5 @@
     {
         NavigationManager.NavigateTo("/Forge");
     }
+
 }
