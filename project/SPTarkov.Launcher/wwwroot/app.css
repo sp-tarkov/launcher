@@ -431,3 +431,28 @@ div.overlay-container {
 .wipe-checkbox .mud-icon-button {
     padding: 0;
 }
+
+/* has issues with items inside the page having a flash when changing to be blurred and see through */
+/*.page-animation-switch {*/
+/*    opacity: 0;*/
+/*    animation: fadeIn 0.1s ease-in-out forwards;*/
+/*}*/
+
+/*@keyframes fadeIn {*/
+/*    to { opacity: 1; }*/
+/*}*/
+
+.download-box {
+    position: absolute !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.118) !important;
+    border-width: 2px;
+    border-style: solid;
+    z-index: 100 !important;
+    top: 50% !important;
+    left: 80px !important;
+    height: 90% !important;
+    width: 300px !important;
+    transform: translateY(-50%) !important;
+}
