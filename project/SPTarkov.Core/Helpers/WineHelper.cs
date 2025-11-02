@@ -9,6 +9,7 @@ public class WineHelper
 {
     private readonly ILogger<WineHelper> _logger;
     private readonly ConfigHelper _configHelper;
+    private readonly string _keyStartingCharacter = "[";
 
     public WineHelper(
         ILogger<WineHelper> logger,
@@ -19,7 +20,6 @@ public class WineHelper
         _configHelper = configHelper;
     }
 
-    // Vibe-coded wine registry file parser :D from MadByte, To test and check
     public string? FindWineRegValue(string file, string key, string valueName)
     {
         var reader = new StreamReader(file);
@@ -31,7 +31,7 @@ public class WineHelper
         {
             line = line.Trim();
 
-            if (line.StartsWith("["))
+            if (line.StartsWith(_keyStartingCharacter))
             {
                 foundIt = line.Contains(key);
             }
@@ -42,7 +42,11 @@ public class WineHelper
                 {
                     if (secondLine.Contains(valueName))
                     {
-                        return secondLine.Substring(19, secondLine.Length - 19 - 1);
+                        // Example value to get "InstallLocation"="C:\\Battlestate Games\\Escape from Tarkov"
+                        var keyWrapped = $"\"{valueName}\"=\""; // example: "InstallLocation"=" which is 19
+
+                        // remove the keyWrapped and the ending "
+                        return secondLine.Substring(keyWrapped.Length, secondLine.Length - keyWrapped.Length - 1); // -1 is for the ending "
                     }
                 }
             }
