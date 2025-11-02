@@ -20,6 +20,7 @@ public class StateHelper
     public string CurrentAi = "Exclude";
 
     public bool AllowNavigation { get; set; } = true;
+    public bool ShowDownloads { get; set; } = false;
     public event Action? OnStateChanged;
 
     public StateHelper(
@@ -62,6 +63,17 @@ public class StateHelper
     public void SetAllowNavigation(bool state)
     {
         AllowNavigation = state;
+        NotifyStateChanged();
+    }
+
+    public void SetHasDownloads()
+    {
+        NotifyStateChanged();
+    }
+
+    public void SetShowDownloads(bool state)
+    {
+        ShowDownloads = state;
         NotifyStateChanged();
     }
 }
