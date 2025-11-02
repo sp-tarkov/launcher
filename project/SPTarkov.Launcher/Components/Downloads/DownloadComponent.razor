@@ -1,0 +1,44 @@
+@inject DownloadHelper DownloadHelper
+
+<MudContainer Class="download-box px-0">
+    <MudGrid>
+        <MudItem sm="12" Class="d-flex flex-row justify-end align-content-end">
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default" />
+        </MudItem>
+        <MudItem sm="12" Class="py-0">
+            @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
+            {
+                <MudContainer Class="pa-2 d-flex flex-row justify-space-between border-solid mud-border-lines-default border-y-2 border-x-0">
+                    <MudItem sm="10" Class="pa-2">
+                        <MudText Class="pb-2">@name</MudText>
+                        <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100">
+                            <ChildContent>
+                                <MudText Color="Color.Default">@item.Progress%</MudText>
+                            </ChildContent>
+                        </MudProgressLinear>
+                    </MudItem>
+                    <MudItem sm="2" Class="d-flex justify-center align-items-center align-center">
+                        @if (item.Complete)
+                        {
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Close" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => DownloadHelper.CloseDownloadTask(name)"/>
+                            </MudTooltip>
+                        }
+                        else
+                        {
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelDownloadTask(name)"/>
+                            </MudTooltip>
+                        }
+                    </MudItem>
+                </MudContainer>
+            }
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+
+}
+@* <MudLink Class="setting-on-hover pa-1" Underline="Underline.None" Color="Color.Default"> *@
+@* </MudLink> *@
