@@ -9,13 +9,16 @@ public class DownloadHelper
     private ILogger<DownloadHelper> _logger;
     private HttpClient _httpClient;
     private ConcurrentDictionary<string, ForgeDownloadTask> _downloadDict = new();
+    private StateHelper _stateHelper;
 
     public DownloadHelper
     (
-        ILogger<DownloadHelper> logger
+        ILogger<DownloadHelper> logger,
+        StateHelper stateHelper
     )
     {
         _logger = logger;
+        _stateHelper = stateHelper;
 
         // leaving default atm, this will be making requests to unknown servers.
         var handler = new HttpClientHandler();
@@ -33,6 +36,7 @@ public class DownloadHelper
         }
 
         Task.Factory.StartNew(taskToAdd.Start);
+        _stateHelper.SetHasDownloads();
         return true;
     }
 
@@ -43,8 +47,9 @@ public class DownloadHelper
             _logger.LogWarning("Download with modName {modName} did not exist in Dict", modName);
             return false;
         }
-
-        return await value.Cancel();
+        var result = await value.Cancel();
+        _stateHelper.SetHasDownloads();
+        return result;
     }
 
     public bool CloseDownloadTask(string modName)
@@ -55,6 +60,7 @@ public class DownloadHelper
             return false;
         }
 
+        _stateHelper.SetHasDownloads();
         return true;
     }
 
