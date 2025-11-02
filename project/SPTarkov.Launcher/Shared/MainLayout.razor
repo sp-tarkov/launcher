@@ -4,6 +4,7 @@
 
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
+@inject DownloadHelper DownloadHelper
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudPopoverProvider/>
@@ -13,6 +14,11 @@
 <MudScrollToTop>
     <MudFab Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small"/>
 </MudScrollToTop>
+
+@if (DownloadHelper.GetDownloadTasks().Any() && StateHelper.ShowDownloads)
+{
+    <DownloadComponent/>
+}
 
 <MudContainer Class="no-select overlay-container unset absolute">
     @if (ConfigHelper.GetConfig().UseBackground)
