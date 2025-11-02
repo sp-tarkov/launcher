@@ -107,7 +107,12 @@
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            var returnResult = await HttpHelper.GameServerGet<ProfileResponse>(RequestUrl.Profile, token.Token);
+            var requestObject = new LoginRequest()
+            {
+                Username = SelectedMiniProfile.Username
+            };
+
+            var returnResult = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrl.Profile, requestObject, token.Token);
             StateHelper.SelectedProfile = returnResult.Response;
             var result = returnResult.Response;
 
@@ -135,8 +140,8 @@
         try
         {
             var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrl.Profiles, token.Token);
-            StateHelper.ProfileList = returnResult.Response;
-            var result = returnResult.Response;
+            StateHelper.ProfileList = returnResult?.Response!;
+            var result = returnResult?.Response;
 
             if (result is null || !result.Any())
             {
