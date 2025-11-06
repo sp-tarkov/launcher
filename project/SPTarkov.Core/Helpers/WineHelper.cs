@@ -137,6 +137,25 @@ public class WineHelper
         //     }
         // };
 
+        // Example of GameMode
+        // var process = new ProcessStartInfo
+        // {
+        //     FileName = "gamemoderun",
+        //     UseShellExecute = false,
+        //     CreateNoWindow = true,
+        //     WorkingDirectory = sptPath,
+        //     Environment =
+        //     {
+        //         { "WINEPREFIX", prefixPath },
+        //         { "PROTONPATH", proton },
+        //     },
+        //     ArgumentList =
+        //     {
+        //         umuPath,
+        //         cmd
+        //     }
+        // };
+
         var process = new ProcessStartInfo
         {
             FileName = "python3",
