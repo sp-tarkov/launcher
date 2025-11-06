@@ -238,4 +238,14 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void SetLinuxGameMode(bool linuxGameMode)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetLinuxGameMode: {GameMode}", linuxGameMode);
+            _settings!.LinuxSettings.GameMode = linuxGameMode;
+            SaveConfig();
+        }
+    }
 }
