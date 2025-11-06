@@ -1,7 +1,5 @@
 ﻿@page "/ModLoader"
 
-@implements IDisposable
-
 @inject DownloadHelper DownloadHelper
 
 <MudContainer Class="px-4 my-2 page-animation-switch" MaxWidth="MaxWidth.Large" Style="height: 96vh;">
@@ -9,35 +7,7 @@
         <MudItem sm="6" Class="uninstalled mud-height-full">
             <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
                 <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
-                @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
-                {
-                    <MudLink Class="setting-on-hover pa-1" Underline="Underline.None" Color="Color.Default">
-                        <MudContainer Class="pa-0 d-flex flex-row justify-space-between">
-                            <MudItem sm="10" Class="pa-2">
-                                <MudText Class="pb-2">@name</MudText>
-                                <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100">
-                                    <ChildContent>
-                                        <MudText Color="Color.Default">@item.Progress%</MudText>
-                                    </ChildContent>
-                                </MudProgressLinear>
-                            </MudItem>
-                            <MudItem sm="2" Class="d-flex justify-center align-items-center align-center">
-                                @if (item.Complete)
-                                {
-                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Close" Placement="Placement.Left">
-                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => DownloadHelper.CloseDownloadTask(name)"/>
-                                    </MudTooltip>
-                                }
-                                else
-                                {
-                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelDownloadTask(name)"/>
-                                    </MudTooltip>
-                                }
-                            </MudItem>
-                        </MudContainer>
-                    </MudLink>
-                }
+
             </MudPaper>
         </MudItem>
         <MudItem sm="6" Class="installed mud-height-full">
@@ -50,16 +20,5 @@
 </MudContainer>
 
 @code {
-    private Timer _progressTimer;
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        _progressTimer = new Timer((_) => { InvokeAsync(StateHasChanged); }, default, TimeSpan.FromSeconds(2), TimeSpan.Zero);
-        return base.OnAfterRenderAsync(firstRender);
-    }
-
-    public void Dispose()
-    {
-        _progressTimer?.Dispose();
-    }
 }
