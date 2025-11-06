@@ -1,17 +1,20 @@
 @inject DownloadHelper DownloadHelper
 
-<MudContainer Class="download-box px-0">
-    <MudGrid>
+@implements IDisposable
+
+
+<MudContainer Class="download-box px-0 border-2 border-solid mud-border-lines-default mud-elevation-1" MaxWidth="MaxWidth.Small">
+    <MudGrid Class="relative" Style="left: 80px !important;">
         <MudItem sm="12" Class="d-flex flex-row justify-end align-content-end">
-            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default" />
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default"/>
         </MudItem>
-        <MudItem sm="12" Class="py-0">
-            @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
-            {
-                <MudContainer Class="pa-2 d-flex flex-row justify-space-between border-solid mud-border-lines-default border-y-2 border-x-0">
-                    <MudItem sm="10" Class="pa-2">
-                        <MudText Class="pb-2">@name</MudText>
-                        <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100">
+        @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
+        {
+            <MudLink Class="setting-on-hover" Style="display: inline-block;" Underline="Underline.None" Color="Color.Default">
+                <MudGrid Class="d-flex flex-row pa-0">
+                    <MudItem sm="10" Class="text-overflow pa-2">
+                        <MudText HtmlTag="span">@name</MudText>
+                        <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
                             <ChildContent>
                                 <MudText Color="Color.Default">@item.Progress%</MudText>
                             </ChildContent>
@@ -31,14 +34,29 @@
                             </MudTooltip>
                         }
                     </MudItem>
-                </MudContainer>
-            }
-        </MudItem>
+                </MudGrid>
+            </MudLink>
+        }
     </MudGrid>
 </MudContainer>
 
+
 @code {
 
+    private Timer _progressTimer;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        _progressTimer = new Timer((_) => { InvokeAsync(StateHasChanged); }, default, TimeSpan.FromSeconds(2), TimeSpan.Zero);
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        _progressTimer?.Dispose();
+    }
+
 }
+
 @* <MudLink Class="setting-on-hover pa-1" Underline="Underline.None" Color="Color.Default"> *@
 @* </MudLink> *@

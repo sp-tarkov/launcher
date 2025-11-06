@@ -61,11 +61,11 @@
             </MudItem>
             <MudItem sm="4" Class="pt-4">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
-                    <MudCardContent Class="d-flex flex-column align-start text-overflow">
+                    <MudCardContent Class="d-flex flex-column align-start">
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2">@(ForgeMod.GetAdditionalAuthors())</MudText> @* TODO: Get aditional author page *@
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">License</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2">
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
                             @if (ForgeMod.License is not null)
                             {
                                 <MudLink Typo="Typo.caption" Color="Color.Default" Underline="Underline.Always" Href="@ForgeMod.License.Link">@ForgeMod.License.Name</MudLink>
@@ -76,7 +76,7 @@
                             }
                         </MudText>
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Source Code</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2">
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
                             @if (!string.IsNullOrEmpty(ForgeMod.SourceCode))
                             {
                                 <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@ForgeMod.SourceCode">@ForgeMod.SourceCode</MudLink>
@@ -88,7 +88,7 @@
                         </MudText>
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result
                         </MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2">
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
                             @if (!string.IsNullOrEmpty(LatestVersion.VirusTotalLink))
                             {
                                 <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@LatestVersion.VirusTotalLink">@LatestVersion.VirusTotalLink</MudLink>

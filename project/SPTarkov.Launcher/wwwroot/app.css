@@ -190,7 +190,7 @@ a.setting-on-hover:hover {
     background-color: #303038;
 }
 
-.text-overflow span {
+.text-overflow {
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -446,9 +446,8 @@ div.overlay-container {
     position: absolute !important;
     background-color: rgba(25, 25, 31, 0.7) !important;
     backdrop-filter: blur(20px);
-    border-color: rgba(255, 255, 255, 0.118) !important;
-    border-width: 2px;
-    border-style: solid;
+    overflow: hidden;
+    border-radius: 4px;
     z-index: 100 !important;
     top: 50% !important;
     left: 80px !important;

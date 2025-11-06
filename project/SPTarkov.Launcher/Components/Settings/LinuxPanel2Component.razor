@@ -1,5 +1,27 @@
+@inject ConfigHelper ConfigHelper
+
 <MudItem sm="12">
     <MudPaper Class="pa-5 gap-2 d-flex flex-column setting-on-hover-container mud-background-gray border-2 border-solid mud-border-lines-default" Elevation="3">
+        <SettingSwitchComponent AddDiv="false" Disabled="false" OptionName="GameMode" Switch="@GameModeSwitch" SwitchFunc="SetGameMode" />
         <SettingLinuxLaunchComponent Disabled="false" AddDiv="false" />
     </MudPaper>
 </MudItem>
+
+@code
+{
+    private bool GameModeSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        GameModeSwitch = ConfigHelper.GetConfig().LinuxSettings.GameMode;
+        base.OnInitialized();
+    }
+
+    private Task SetGameMode()
+    {
+        GameModeSwitch = !GameModeSwitch;
+        ConfigHelper.SetLinuxGameMode(GameModeSwitch);
+
+        return Task.CompletedTask;
+    }
+}
