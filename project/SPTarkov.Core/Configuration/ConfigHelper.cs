@@ -83,7 +83,8 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            File.WriteAllText(Path.Combine(_launcherAssetsPath, "LauncherSettings.json"), JsonSerializer.Serialize(_settings, _jsonOptions));
+            File.WriteAllText(Path.Combine(_launcherAssetsPath, "LauncherSettings.json"),
+                JsonSerializer.Serialize(_settings, _jsonOptions));
         }
     }
 

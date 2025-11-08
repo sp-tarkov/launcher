@@ -171,6 +171,15 @@ a.setting-on-hover:hover {
     transition: background-color 0.2s ease-in-out;
 }
 
+a.download-on-hover {
+    transition: background-color 0.2s ease-in-out;
+}
+
+a.download-on-hover:hover {
+    background-color: rgba(170, 170, 170, 0.2);
+    transition: background-color 0.2s ease-in-out;
+}
+
 .setting-on-hover-container {
     position: relative;
     overflow: hidden;
@@ -454,4 +463,9 @@ div.overlay-container {
     height: 90% !important;
     width: 300px !important;
     transform: translateY(-50%) !important;
+}
+
+p.progress-bar {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 4px;
 }

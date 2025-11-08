@@ -4,40 +4,39 @@
 
 
 <MudContainer Class="download-box px-0 border-2 border-solid mud-border-lines-default mud-elevation-1" MaxWidth="MaxWidth.Small">
-    <MudGrid Class="relative" Style="left: 80px !important;">
-        <MudItem sm="12" Class="d-flex flex-row justify-end align-content-end">
-            <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Default"/>
-        </MudItem>
+    <MudContainer Class="relative pa-1">
         @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
         {
-            <MudLink Class="setting-on-hover" Style="display: inline-block;" Underline="Underline.None" Color="Color.Default">
-                <MudGrid Class="d-flex flex-row pa-0">
-                    <MudItem sm="10" Class="text-overflow pa-2">
-                        <MudText HtmlTag="span">@name</MudText>
+            <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
+
+                <MudContainer Class="d-flex flex-row pa-0">
+                    <MudContainer Class="text-overflow py-2 px-1">
+                        <MudText HtmlTag="span">
+                            @name
+                        </MudText>
                         <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
                             <ChildContent>
-                                <MudText Color="Color.Default">@item.Progress%</MudText>
+                                <MudText Color="Color.Default" Class="progress-bar">@item.Progress%</MudText>
                             </ChildContent>
                         </MudProgressLinear>
-                    </MudItem>
-                    <MudItem sm="2" Class="d-flex justify-center align-items-center align-center">
-                        @if (item.Complete)
-                        {
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Close" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => DownloadHelper.CloseDownloadTask(name)"/>
-                            </MudTooltip>
-                        }
-                        else
-                        {
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelDownloadTask(name)"/>
-                            </MudTooltip>
-                        }
-                    </MudItem>
-                </MudGrid>
+                    </MudContainer>
+                    @if (item.Complete)
+                    {
+                        <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Close" Placement="Placement.Left">
+                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => DownloadHelper.CloseDownloadTask(name)"/>
+                        </MudTooltip>
+                    }
+                    else
+                    {
+                        <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
+                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelDownloadTask(name)"/>
+                        </MudTooltip>
+                    }
+                </MudContainer>
+
             </MudLink>
         }
-    </MudGrid>
+    </MudContainer>
 </MudContainer>
 
 
