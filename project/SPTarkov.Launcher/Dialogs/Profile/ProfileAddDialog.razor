@@ -16,7 +16,7 @@
             else
             {
                 <MudForm Model="Request" @bind-IsValid="@_success" Class="gap-2 mt-3">
-                    <MudSelect @bind-Value="Request.Edition" Variant="Variant.Outlined" Label="@(LocaleHelper.Get("profile_add_edition"))" Margin="Margin.Dense" Dense="true" Required="true">
+                    <MudSelect @bind-Value="Request.Edition" Variant="Variant.Outlined" Label="@(LocaleHelper.Get("profile_add_edition"))" Margin="Margin.Dense" Dense="true" Required="true" MaxHeight="200">
                         @foreach (var edition in ServerEditions)
                         {
                             <MudSelectItem Value="@edition"/>
