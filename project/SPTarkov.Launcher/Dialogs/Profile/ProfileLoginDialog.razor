@@ -100,7 +100,7 @@
             StateHasChanged();
             await Task.Delay(250);
 
-            var returnResult = await HttpHelper.GameServerPut<LoginResponse>(RequestUrl.Login, Request, Token.Token);
+            var returnResult = await HttpHelper.GameServerPut<LoginResponse>(RequestUrls.Login, Request, Token.Token);
             var result = returnResult.Response;
 
             if (!result)
@@ -111,7 +111,7 @@
 
             if (MiniProfile is null) // manual login
             {
-                var returnResult2 = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrl.Profile, Request, Token.Token);
+                var returnResult2 = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrls.Profile, Request, Token.Token);
                 var result2 = returnResult2.Response;
 
                 if (result2 is null)

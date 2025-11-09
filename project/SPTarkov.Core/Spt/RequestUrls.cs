@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Spt;
 
-public record RequestUrl
+public record RequestUrls
 {
     public const string Ping = "/launcher/v2/ping";
     public const string Types = "/launcher/v2/types";

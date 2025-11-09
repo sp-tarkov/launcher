@@ -98,7 +98,7 @@
             StateHasChanged();
             await Task.Delay(20);
 
-            var returnResult = await HttpHelper.GameServerPut<RegisterResponse>(RequestUrl.Register, Request, Token.Token);
+            var returnResult = await HttpHelper.GameServerPut<RegisterResponse>(RequestUrls.Register, Request, Token.Token);
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 
