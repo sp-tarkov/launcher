@@ -1,8 +1,9 @@
-﻿@implements IDisposable
+﻿@using SPTarkov.Core.Mods
+@implements IDisposable
 
 @inject LocaleHelper LocaleHelper
 @inject StateHelper StateHelper
-@inject DownloadHelper DownloadHelper
+@inject ModManager ModManager
 
 <MudNavMenu Class="mud-typography-nowrap">
     <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="@(LocaleHelper.Get("home"))" Inline="false">
@@ -11,7 +12,7 @@
 </MudNavMenu>
 <MudSpacer/>
 <MudNavMenu Class="mud-typography-nowrap">
-    @if (DownloadHelper.GetDownloadTasks().Any())
+    @if (ModManager.GetDownloadTasks().Any())
     {
         <MudTooltip Color="Color.Dark" Arrow="false" Text="Downloads" Placement="Placement.Right" Inline="false">
             <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.Downloading" OnClick="ToggleComponent"/>

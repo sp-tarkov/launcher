@@ -1,4 +1,5 @@
-﻿@inject ISnackbar Snackbar
+﻿@using SPTarkov.Core.SPT
+@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
 @inject HttpHelper HttpHelper
 @inject LocaleHelper LocaleHelper
@@ -46,7 +47,7 @@
     private bool _success;
     private bool _requestInProgress;
     private string _taskText = "";
-    public RegisterRequest Request = new();
+    public SPTRegisterRequest Request = new();
     private List<string> ServerEditions { get; set; }
     private CancellationTokenSource Token { get; set; }
     private bool UserCancel { get; set; }
@@ -98,7 +99,7 @@
             StateHasChanged();
             await Task.Delay(20);
 
-            var returnResult = await HttpHelper.GameServerPut<RegisterResponse>(RequestUrls.Register, Request, Token.Token);
+            var returnResult = await HttpHelper.GameServerPut<SPTRegisterResponse>(RequestUrls.Register, Request, Token.Token);
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 

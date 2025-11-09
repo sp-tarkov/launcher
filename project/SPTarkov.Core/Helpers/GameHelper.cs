@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Patching;
-using SPTarkov.Core.Spt;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -240,7 +240,7 @@ public class GameHelper
     {
         try
         {
-            var call = await _httpHelper.GameServerGet<VersionResponse>(RequestUrls.Version, CancellationToken.None);
+            var call = await _httpHelper.GameServerGet<SPTVersionResponse>(RequestUrls.Version, CancellationToken.None);
 
             var serverVersion = new SptVersion(call?.Response!);
             var coreDllPath = Path.Combine(_configHelper.GetConfig().GamePath, "BepInEx", "plugins", "spt", "spt-core.dll");

@@ -1,4 +1,5 @@
-﻿@inject ISnackbar Snackbar
+﻿@using SPTarkov.Core.SPT
+@inject ISnackbar Snackbar
 @inject HttpHelper HttpHelper
 @inject LocaleHelper LocaleHelper
 
@@ -39,7 +40,7 @@
     private bool _success;
     private bool _requestInProgress;
     private string _taskText = "";
-    private LoginRequest Request { get; } = new();
+    private SPTLoginRequest Request { get; } = new();
     private CancellationTokenSource Token { get; set; }
     private bool UserCancel { get; set; }
 
@@ -100,7 +101,7 @@
             StateHasChanged();
             await Task.Delay(250);
 
-            var returnResult = await HttpHelper.GameServerPut<LoginResponse>(RequestUrls.Login, Request, Token.Token);
+            var returnResult = await HttpHelper.GameServerPut<SPTLoginResponse>(RequestUrls.Login, Request, Token.Token);
             var result = returnResult.Response;
 
             if (!result)
@@ -111,7 +112,7 @@
 
             if (MiniProfile is null) // manual login
             {
-                var returnResult2 = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrls.Profile, Request, Token.Token);
+                var returnResult2 = await HttpHelper.GameServerPut<SPTProfileResponse>(RequestUrls.Profile, Request, Token.Token);
                 var result2 = returnResult2.Response;
 
                 if (result2 is null)

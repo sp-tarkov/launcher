@@ -1,6 +1,7 @@
+@using SPTarkov.Core.Mods
 @inject ISnackbar Snackbar
 @inject IJSRuntime JsRuntime
-@inject DownloadHelper DownloadHelper
+@inject ModManager ModManager
 @inject ILogger<ForgeDownloadDialog> Logger
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
@@ -48,7 +49,7 @@
         try
         {
             // TODO: atm we dont do anything with cancellationToken.
-            if (!DownloadHelper.AddDownloadTask(Name, VersionLink, Token))
+            if (!ModManager.AddDownloadTask(Name, VersionLink, Token))
             {
                 Logger.LogError("Unable to add download task, name: {name}, url: {url}", Name, VersionLink);
                 Snackbar.Add($"Unable to download {Name}", Severity.Error);

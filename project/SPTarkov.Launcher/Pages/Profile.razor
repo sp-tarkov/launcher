@@ -1,4 +1,5 @@
 ﻿@page "/Profile"
+@using SPTarkov.Core.SPT
 
 @inject StateHelper StateHelper
 @inject GameHelper GameHelper
@@ -107,12 +108,12 @@
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            var requestObject = new LoginRequest()
+            var requestObject = new SPTLoginRequest()
             {
                 Username = SelectedMiniProfile.Username
             };
 
-            var returnResult = await HttpHelper.GameServerPut<ProfileResponse>(RequestUrls.Profile, requestObject, token.Token);
+            var returnResult = await HttpHelper.GameServerPut<SPTProfileResponse>(RequestUrls.Profile, requestObject, token.Token);
             StateHelper.SelectedProfile = returnResult.Response;
             var result = returnResult.Response;
 
@@ -139,7 +140,7 @@
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrls.Profiles, token.Token);
+            var returnResult = await HttpHelper.GameServerGet<SPTProfilesResponse>(RequestUrls.Profiles, token.Token);
             StateHelper.ProfileList = returnResult?.Response!;
             var result = returnResult?.Response;
 
@@ -232,13 +233,13 @@
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            var wipeRequest = new RegisterRequest()
+            var wipeRequest = new SPTRegisterRequest()
             {
                 Edition = SelectedMiniProfile.Edition,
                 Username = SelectedMiniProfile.Username
             };
 
-            var returnResult = await HttpHelper.GameServerPut<WipeResponse>(RequestUrls.Wipe, wipeRequest, token.Token);
+            var returnResult = await HttpHelper.GameServerPut<SPTWipeResponse>(RequestUrls.Wipe, wipeRequest, token.Token);
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 

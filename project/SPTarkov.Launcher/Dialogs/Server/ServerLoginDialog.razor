@@ -1,4 +1,5 @@
-﻿@inject ISnackbar Snackbar
+﻿@using SPTarkov.Core.SPT
+@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
 @inject HttpHelper HttpHelper
 @inject LocaleHelper LocaleHelper
@@ -79,27 +80,27 @@
                 // Causes an exception that I cant fix.
                 // Do it only on Ping so its done once and doesnt look like a blank box
                 await Task.Delay(250);
-                var returnResult = await HttpHelper.GameServerGet<PingResponse>(RequestUrls.Ping, Token.Token);
+                var returnResult = await HttpHelper.GameServerGet<SPTPingResponse>(RequestUrls.Ping, Token.Token);
                 result = returnResult.Response == "Pong!";
                 break;
             }
             case RequestTask.Profiles:
             {
-                var returnResult = await HttpHelper.GameServerGet<ProfilesResponse>(RequestUrls.Profiles, Token.Token);
+                var returnResult = await HttpHelper.GameServerGet<SPTProfilesResponse>(RequestUrls.Profiles, Token.Token);
                 StateHelper.ProfileList = returnResult?.Response!;
                 result = true;
                 break;
             }
             case RequestTask.Types:
             {
-                var returnResult = await HttpHelper.GameServerGet<TypesResponse>(RequestUrls.Types, Token.Token);
+                var returnResult = await HttpHelper.GameServerGet<SPTTypesResponse>(RequestUrls.Types, Token.Token);
                 StateHelper.ProfileTypes = returnResult?.Response!;
                 result = true;
                 break;
             }
             case RequestTask.Mods:
             {
-                var returnResult = await HttpHelper.GameServerGet<ModsResponse>(RequestUrls.Mods, Token.Token);
+                var returnResult = await HttpHelper.GameServerGet<SPTModsResponse>(RequestUrls.Mods, Token.Token);
                 StateHelper.ModList = returnResult?.Response!;
                 result = true;
                 break;

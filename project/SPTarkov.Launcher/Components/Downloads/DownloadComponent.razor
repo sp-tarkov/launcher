@@ -1,11 +1,12 @@
-@inject DownloadHelper DownloadHelper
+@inject ModManager ModManager
 
+@using SPTarkov.Core.Mods
 @implements IDisposable
 
 
 <MudContainer Class="download-box px-0 border-2 border-solid mud-border-lines-default mud-elevation-1" MaxWidth="MaxWidth.Small">
     <MudContainer Class="relative pa-1">
-        @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
+        @foreach (var (name, item) in ModManager.GetDownloadTasks())
         {
             <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
 
@@ -23,13 +24,13 @@
                     @if (item.Complete)
                     {
                         <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Close" Placement="Placement.Left">
-                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => DownloadHelper.CloseDownloadTask(name)"/>
+                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => ModManager.CloseDownloadTask(name)"/>
                         </MudTooltip>
                     }
                     else
                     {
                         <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelDownloadTask(name)"/>
+                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => ModManager.CancelDownloadTask(name)"/>
                         </MudTooltip>
                     }
                 </MudContainer>
