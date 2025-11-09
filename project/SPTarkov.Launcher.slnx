@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SPTarkov.Core/SPTarkov.Core.csproj" />
+  <Project Path="SPTarkov.Launcher/SPTarkov.Launcher.csproj" />
+</Solution>
