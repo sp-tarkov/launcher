@@ -1,4 +1,4 @@
-﻿namespace SPTarkov.Core.Spt;
+﻿namespace SPTarkov.Core.SPT;
 
 public record ServerInfo
 {

@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.Spt;
+namespace SPTarkov.Core.SPT;
 
-public record LoginRequest
+public record SPTLoginRequest
 {
     [Required]
     [JsonPropertyName("username")]

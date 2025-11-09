@@ -1,6 +1,6 @@
-﻿namespace SPTarkov.Core.Spt;
+﻿namespace SPTarkov.Core.SPT;
 
-public record RegisterResponse : IResponse<bool>
+public record SPTRegisterResponse : IResponse<bool>
 {
     public List<MiniProfile> Profiles { get; set; } = [];
 

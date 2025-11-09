@@ -1,6 +1,6 @@
-namespace SPTarkov.Core.Spt;
+namespace SPTarkov.Core.SPT;
 
-public record WipeResponse : IResponse<bool>
+public record SPTWipeResponse : IResponse<bool>
 {
     public bool Response { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.Spt;
+namespace SPTarkov.Core.SPT;
 
 public record MiniProfile
 {
