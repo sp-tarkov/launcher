@@ -1,21 +1,21 @@
 // ReSharper disable CompareOfFloatsByEqualityOperator
-namespace SPTarkov.Core.Forge;
+namespace SPTarkov.Core.Mods;
 
-public class ForgeDownloadTask
+public class Mod
 {
-    private string Url { get; init; }
-    private HttpClient Client { get; set; }
-    private string PathToMod { get; set; } = Path.Combine(Environment.CurrentDirectory, "user", "Launcher", "ModCache");
-    private string ModName { get; set; }
+    private string Url { get; }
+    private HttpClient Client { get; }
+    private string PathToModInCache { get; } = Path.Combine(Environment.CurrentDirectory, "user", "Launcher", "ModCache");
+    private string ModName { get; }
     private float TotalToDownload { get; set; }
-    public float Progress { get; set; }
+    public float Progress { get; private set; }
 
-    public CancellationTokenSource CancellationToken { get; init; }
+    public CancellationTokenSource CancellationToken { get; }
     public bool CanShowProgress { get; set; }
     public Exception? Error { get; set; }
-    public bool Complete { get; set; }
+    public bool Complete { get; private set; }
 
-    public ForgeDownloadTask(
+    public Mod(
         string modName,
         string url,
         CancellationTokenSource token,
@@ -28,14 +28,14 @@ public class ForgeDownloadTask
         Client = client;
     }
 
-    public async Task<bool> Start()
+    public async Task<bool> StartModDownload()
     {
-        var modFilePath = Path.Combine(PathToMod, ModName);
+        var modFilePath = Path.Combine(PathToModInCache, ModName);
         try
         {
-            if (!Directory.Exists(PathToMod))
+            if (!Directory.Exists(PathToModInCache))
             {
-                Directory.CreateDirectory(PathToMod);
+                Directory.CreateDirectory(PathToModInCache);
             }
 
             if (File.Exists(modFilePath))
@@ -92,16 +92,16 @@ public class ForgeDownloadTask
         return Complete;
     }
 
-    public async Task<bool> Cancel()
+    public async Task<bool> CancelModDownload()
     {
         try
         {
-            if (File.Exists(Path.Combine(PathToMod, ModName)))
-            {
-                File.Delete(Path.Combine(PathToMod, ModName));
-            }
-
             await CancellationToken.CancelAsync();
+
+            if (File.Exists(Path.Combine(PathToModInCache, ModName)))
+            {
+                File.Delete(Path.Combine(PathToModInCache, ModName));
+            }
 
             return true;
         }
@@ -109,5 +109,15 @@ public class ForgeDownloadTask
         {
             return false;
         }
+    }
+
+    public async Task<bool> UpdateMod()
+    {
+        return true;
+    }
+
+    public async Task<bool> RemoveMod()
+    {
+        return true;
     }
 }

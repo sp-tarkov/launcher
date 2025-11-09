@@ -1,19 +1,19 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Forge;
+using SPTarkov.Core.Helpers;
 
-namespace SPTarkov.Core.Helpers;
+namespace SPTarkov.Core.Mods;
 
-public class DownloadHelper
+public class ModManager
 {
-    private ILogger<DownloadHelper> _logger;
+    private ILogger<ModManager> _logger;
     private HttpClient _httpClient;
-    private ConcurrentDictionary<string, ForgeDownloadTask> _downloadDict = new();
+    private ConcurrentDictionary<string, Mod> _downloadDict = new();
     private StateHelper _stateHelper;
 
-    public DownloadHelper
+    public ModManager
     (
-        ILogger<DownloadHelper> logger,
+        ILogger<ModManager> logger,
         StateHelper stateHelper
     )
     {
@@ -28,14 +28,14 @@ public class DownloadHelper
 
     public bool AddDownloadTask(string modName, string url, CancellationTokenSource token)
     {
-        var taskToAdd = new ForgeDownloadTask(modName, url, token, _httpClient);
+        var taskToAdd = new Mod(modName, url, token, _httpClient);
         if (!_downloadDict.TryAdd(modName, taskToAdd))
         {
             _logger.LogWarning("Download with modName: {modName} already exists", modName);
             return false;
         }
 
-        Task.Factory.StartNew(taskToAdd.Start);
+        Task.Factory.StartNew(taskToAdd.StartModDownload);
         _stateHelper.SetHasDownloads();
         return true;
     }
@@ -47,7 +47,7 @@ public class DownloadHelper
             _logger.LogWarning("Download with modName {modName} did not exist in Dict", modName);
             return false;
         }
-        var result = await value.Cancel();
+        var result = await value.CancelModDownload();
         _stateHelper.SetHasDownloads();
         return result;
     }
@@ -64,12 +64,12 @@ public class DownloadHelper
         return true;
     }
 
-    public ConcurrentDictionary<string, ForgeDownloadTask> GetDownloadTasks()
+    public ConcurrentDictionary<string, Mod> GetDownloadTasks()
     {
         return _downloadDict;
     }
 
-    public ForgeDownloadTask? GetDownloadTask(string modName)
+    public Mod? GetDownloadTask(string modName)
     {
         if (!_downloadDict.TryGetValue(modName, out var value))
         {
