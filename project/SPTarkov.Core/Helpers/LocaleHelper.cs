@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Configuration;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -12,7 +13,6 @@ public class LocaleHelper
     private readonly Lock _lock = new();
     private readonly ILogger<LocaleHelper> _logger;
     private readonly ConfigHelper _configHelper;
-    private readonly string _dirPath = Path.Combine(Directory.GetCurrentDirectory(), "SPT_Data", "Launcher", "Locales");
     private string _defaultLocale;
     private List<Dictionary<string, string>> _listOfLocales = [];
     private Dictionary<string, string> _selectedLocale = new();
@@ -27,15 +27,15 @@ public class LocaleHelper
 
         lock (_lock)
         {
-            _logger.LogInformation("Loading locales from {dirPath}", _dirPath);
+            _logger.LogInformation("Loading locales from {dirPath}", Paths.LocalesPath);
 
-            if (!Directory.Exists(_dirPath))
+            if (!Directory.Exists(Paths.LocalesPath))
             {
-                _logger.LogCritical("Directory {dirPath} does not exist", _dirPath);
+                _logger.LogCritical("Directory {dirPath} does not exist", Paths.LocalesPath);
                 throw new Exception("Directory does not exist");
             }
 
-            var files = Directory.GetFiles(_dirPath, "*.json");
+            var files = Directory.GetFiles(Paths.LocalesPath, "*.json");
             foreach (var file in files)
             {
                 var json = File.ReadAllText(file);

@@ -12,6 +12,7 @@ using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
 using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Launcher;
 
@@ -25,6 +26,7 @@ public class Launcher
     private static int _showTransitionDuration = 100;
     private static int _hideTransitionDuration = 100;
     private static string _openExternalString = "open-external:";
+    private static string _appTitle = "SPTarkov Launcher";
     private static ILogger<Launcher> _logger;
 
     [STAThread]
@@ -32,7 +34,7 @@ public class Launcher
     {
         EmbedProvider = new ManifestEmbeddedFileProvider(typeof(Launcher).Assembly, "wwwroot");
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(EmbedProvider, args);
-        SevenZipBase.SetLibraryPath(Path.Combine(Directory.GetCurrentDirectory(), @"SPT_Data\Launcher\Dependency\7z.dll"));
+        SevenZipBase.SetLibraryPath(Paths.SevenZipDllPath);
 
         appBuilder.Services
             .AddSingleton<ConfigHelper>()
@@ -87,7 +89,7 @@ public class Launcher
 
     private static void CustomizeComponent()
     {
-        App.MainWindow.SetTitle("SPTarkov Launcher");
+        App.MainWindow.SetTitle(_appTitle);
         App.MainWindow.LogVerbosity = 0;
 
 #if !DEBUG

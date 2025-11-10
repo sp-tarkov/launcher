@@ -20,12 +20,11 @@
     private void LoadLiveSettings()
     {
         Logger.LogInformation("Loading Live Settings");
-        var eftSettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape From Tarkov", "Settings");
-        var sptSettingsFolder = Path.Combine(ConfigHelper.GetConfig().GamePath, "user", "sptsettings");
+        var sptSettingsFolder = Path.Combine(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder);
 
-        if (!Directory.Exists(eftSettingsFolder))
+        if (!Directory.Exists(Paths.EFTSettingsFolder))
         {
-            Logger.LogWarning("Settings can not be loaded from live, path given: {EftSettingsFolder}", eftSettingsFolder);
+            Logger.LogWarning("Settings can not be loaded from live, path given: {EftSettingsFolder}", Paths.EFTSettingsFolder);
             Snackbar.Add(LocaleHelper.Get("setting_load_live_error_1"), Severity.Error);
             return;
         }
@@ -34,14 +33,14 @@
         {
             Directory.CreateDirectory(sptSettingsFolder);
 
-            foreach (var path in Directory.GetDirectories(eftSettingsFolder, "*", SearchOption.AllDirectories))
+            foreach (var path in Directory.GetDirectories(Paths.EFTSettingsFolder, "*", SearchOption.AllDirectories))
             {
-                Directory.CreateDirectory(path.Replace(eftSettingsFolder, sptSettingsFolder));
+                Directory.CreateDirectory(path.Replace(Paths.EFTSettingsFolder, sptSettingsFolder));
             }
 
-            foreach (var file in Directory.GetFiles(eftSettingsFolder, "*.*", SearchOption.AllDirectories))
+            foreach (var file in Directory.GetFiles(Paths.EFTSettingsFolder, "*.*", SearchOption.AllDirectories))
             {
-                File.Copy(file, file.Replace(eftSettingsFolder, sptSettingsFolder), true);
+                File.Copy(file, file.Replace(Paths.EFTSettingsFolder, sptSettingsFolder), true);
             }
         }
         catch (Exception e)
@@ -58,7 +57,7 @@
     private void ClearGameSettings()
     {
         Logger.LogInformation("clearing game settings");
-        var sptSettings = new DirectoryInfo(Path.Combine(ConfigHelper.GetConfig().GamePath, "user", "sptsettings"));
+        var sptSettings = new DirectoryInfo(Path.Combine(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder));
 
         try
         {
@@ -87,7 +86,7 @@
     {
         try
         {
-            var tempFolder = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, "user", "sptappdata"));
+            var tempFolder = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SPTAppDataFolder));
             tempFolder.Delete(true);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)

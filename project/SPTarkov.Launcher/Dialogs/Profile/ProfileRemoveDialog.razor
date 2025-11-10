@@ -85,7 +85,7 @@
             StateHasChanged();
             await Task.Delay(20);
 
-            var returnResult = await HttpHelper.GameServerPut<SPTRemoveResponse>(RequestUrls.Remove, Request, Token.Token);
+            var returnResult = await HttpHelper.GameServerPut<SPTRemoveResponse>(Urls.Remove, Request, Token.Token);
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 

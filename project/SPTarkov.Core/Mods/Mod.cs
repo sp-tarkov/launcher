@@ -1,11 +1,14 @@
 // ReSharper disable CompareOfFloatsByEqualityOperator
+
+using SPTarkov.Core.SPT;
+
 namespace SPTarkov.Core.Mods;
 
 public class Mod
 {
     private string Url { get; }
     private HttpClient Client { get; }
-    private string PathToModInCache { get; } = Path.Combine(Environment.CurrentDirectory, "user", "Launcher", "ModCache");
+    private string PathToModInCache { get; } = Path.Combine(Environment.CurrentDirectory, Paths.ModCache);
     private string ModName { get; }
     private float TotalToDownload { get; set; }
     public float Progress { get; private set; }

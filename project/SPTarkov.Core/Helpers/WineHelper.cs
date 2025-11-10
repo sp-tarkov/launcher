@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Configuration;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -65,12 +66,11 @@ public class WineHelper
         }
 
         var regFilePath = Path.Combine(prefixPath, "system.reg");
-        // must contain \\ for windows reg key when looking on linux/wine
-        var key = @"Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\EscapeFromTarkov";
+        var RegValueToLookFor = "InstallLocation";
 
         try
         {
-            var windowsLikePath = FindWineRegValue(regFilePath, key, "InstallLocation");
+            var windowsLikePath = FindWineRegValue(regFilePath, Paths.UninstallEftRegKey, RegValueToLookFor);
             return FixWithPrefix(windowsLikePath);
         }
         catch (Exception ex)
@@ -324,14 +324,11 @@ public class WineHelper
         return result;
     }
 
-    private readonly string _protonPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-        @".local/share/Steam/compatibilitytools.d");
-
     public Task<List<string>> GetProtonVersions()
     {
         // Should contain things like "GE-Proton10-24" or "GE-Proton10-21"
         // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
-        var directoryContents = Directory.GetDirectories(_protonPath);
+        var directoryContents = Directory.GetDirectories(Paths.ProtonPath);
         var listStripped = new List<string>();
 
         foreach (var directory in directoryContents)

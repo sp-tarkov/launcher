@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.Forge;
+namespace SPTarkov.Core.Forge.Responses;
 
 public record ForgeLoginResponse
 {

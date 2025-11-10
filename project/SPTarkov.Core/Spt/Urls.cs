@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.SPT;
 
-public record RequestUrls
+public class Urls
 {
     public const string Ping = "/launcher/v2/ping";
     public const string Types = "/launcher/v2/types";
@@ -13,5 +13,9 @@ public record RequestUrls
     public const string Profile = "/launcher/v2/profile";
     public const string Wipe = "/launcher/v2/wipe";
 
-    public const string ForgeMods = "/api/v0/mods";
+    public const string ForgeMods = "https://forge.sp-tarkov.com/api/v0/mods";
+    public const string ForgeMod = "https://forge.sp-tarkov.com/api/v0/mod";
+    public const string ForgeLogout = "https://forge.sp-tarkov.com/api/v0/auth/logout";
+    public const string ForgeLogin = "https://forge.sp-tarkov.com/api/v0/auth/login";
+    public const string ForgeAbilities = "https://forge.sp-tarkov.com/api/v0/auth/abilities";
 }

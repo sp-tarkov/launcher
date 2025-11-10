@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.SPT;
+namespace SPTarkov.Core.SPT.Requests;
 
 public record SPTPasswordChangeRequest : SPTLoginRequest
 {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace SPTarkov.Core.Forge;
+namespace SPTarkov.Core.Forge.Requests;
 
 public record ForgeLoginRequest
 {

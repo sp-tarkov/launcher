@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Configuration;
 
@@ -27,8 +28,6 @@ public class ConfigHelper
         BackgroundClass = "dialog-backdrop-class"
     };
 
-    private readonly string _launcherAssetsPath = Path.Combine(Environment.CurrentDirectory, "user", "Launcher");
-
     private LauncherSettings? _settings;
 
     public ConfigHelper(
@@ -45,13 +44,12 @@ public class ConfigHelper
         {
             _logger.LogInformation("LoadSettingsFromFile.");
 
-            if (!File.Exists(Path.Combine(_launcherAssetsPath, "LauncherSettings.json")))
+            if (!File.Exists(Paths.LauncherSettingsPath))
             {
                 SaveDefaults();
             }
 
-            _settings = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(Path.Combine(_launcherAssetsPath,
-                "LauncherSettings.json")));
+            _settings = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(Paths.LauncherSettingsPath));
 
             // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
             SetGamePath(Directory.GetParent(Environment.CurrentDirectory)!.FullName);
@@ -65,8 +63,8 @@ public class ConfigHelper
         lock (_lock)
         {
             _logger.LogInformation("SaveDefaults.");
-            Directory.CreateDirectory(_launcherAssetsPath);
-            File.WriteAllText(Path.Combine(_launcherAssetsPath, "LauncherSettings.json"),
+            Directory.CreateDirectory(Paths.LauncherAssetsPath);
+            File.WriteAllText(Paths.LauncherSettingsPath,
                 JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
         }
     }
@@ -83,8 +81,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            File.WriteAllText(Path.Combine(_launcherAssetsPath, "LauncherSettings.json"),
-                JsonSerializer.Serialize(_settings, _jsonOptions));
+            File.WriteAllText(Paths.LauncherSettingsPath, JsonSerializer.Serialize(_settings, _jsonOptions));
         }
     }
 

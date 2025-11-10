@@ -5,13 +5,12 @@ using Microsoft.Win32;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Patching;
 using SPTarkov.Core.SPT;
+using SPTarkov.Core.SPT.Responses;
 
 namespace SPTarkov.Core.Helpers;
 
 public class GameHelper
 {
-    private const string RegistryInstall = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
-
     private readonly ConfigHelper _configHelper;
     private readonly ILogger<GameHelper> _logger;
     private readonly StateHelper _stateHelper;
@@ -52,7 +51,7 @@ public class GameHelper
     {
         if (OperatingSystem.IsWindows())
         {
-            var installLocation = Registry.LocalMachine.OpenSubKey(RegistryInstall, false)?.GetValue("InstallLocation");
+            var installLocation = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)?.GetValue("InstallLocation");
             var info = installLocation is string key ? new DirectoryInfo(key) : null;
             return info?.FullName;
         }
@@ -171,7 +170,6 @@ public class GameHelper
         _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
         _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
 
-        //start game
         List<string> argsList =
         [
             "-force-gfx-jobs",
@@ -233,17 +231,17 @@ public class GameHelper
 
     private List<string> GetCorePatches()
     {
-        return Directory.GetDirectories(Path.Combine(_configHelper.GetConfig().GamePath, "SPT", "SPT_Data", "Launcher", "Patches")).ToList();
+        return Directory.GetDirectories(Path.Combine(_configHelper.GetConfig().GamePath, Paths.PatchPath)).ToList();
     }
 
     private async Task<bool> IsCoreDllVersionMismatched()
     {
         try
         {
-            var call = await _httpHelper.GameServerGet<SPTVersionResponse>(RequestUrls.Version, CancellationToken.None);
+            var call = await _httpHelper.GameServerGet<SPTVersionResponse>(Urls.Version, CancellationToken.None);
 
             var serverVersion = new SptVersion(call?.Response!);
-            var coreDllPath = Path.Combine(_configHelper.GetConfig().GamePath, "BepInEx", "plugins", "spt", "spt-core.dll");
+            var coreDllPath = Path.Combine(_configHelper.GetConfig().GamePath, Paths.CoreDllPath);
             if (!File.Exists(coreDllPath))
             {
                 _logger.LogError("spt-core.dll missing: {coreDllPath}", coreDllPath);
@@ -358,7 +356,7 @@ public class GameHelper
             GetFileForCleanup("WinPixEventRuntime.dll"),
 
             // Don't allow excluding this from cleanup ever
-            Path.Combine(_configHelper.GetConfig().GamePath, "EscapeFromTarkov_Data", "Plugins", "x86_64", "hwecho.dll")
+            Path.Combine(_configHelper.GetConfig().GamePath, Paths.HwechoDllPath)
         };
 
         foreach (var file in files)
@@ -397,7 +395,7 @@ public class GameHelper
     /// </summary>
     public void RemoveProfileRegistryKeys(string profileId)
     {
-        var registryFile = new FileInfo(Path.Combine(Environment.CurrentDirectory, "user", "sptRegistry", "registry.json"));
+        var registryFile = new FileInfo(Path.Combine(Environment.CurrentDirectory, Paths.SptRegJson));
 
         if (!registryFile.Exists)
         {
@@ -458,14 +456,12 @@ public class GameHelper
             // skip validation for anything other than windows
             return true;
         }
-
-        var c0 = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
         int v0;
 
         try
         {
 #pragma warning disable CA1416
-            var v1 = Registry.LocalMachine.OpenSubKey(c0, false)?.GetValue("InstallLocation");
+            var v1 = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)?.GetValue("InstallLocation");
 #pragma warning restore CA1416
 
             var v2 = (v1 != null) ? v1.ToString() : string.Empty;

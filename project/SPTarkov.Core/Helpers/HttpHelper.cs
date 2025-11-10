@@ -9,7 +9,8 @@ using System.Web;
 using ComponentAce.Compression.Libs.zlib;
 using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Configuration;
-using SPTarkov.Core.Forge;
+using SPTarkov.Core.Forge.Responses;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -105,7 +106,7 @@ public class HttpHelper
         _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
         var paramsToUse = GetParamsCollection();
-        var message = new HttpRequestMessage(HttpMethod.Get, $"https://forge.sp-tarkov.com/api/v0/mod/{modId}?{paramsToUse}")
+        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}?{paramsToUse}")
         {
             Content = new StringContent("", Encoding.UTF8, "application/json")
         };
@@ -130,7 +131,7 @@ public class HttpHelper
         _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
         var paramsToUse = GetParamsCollectionForVersions(versionId);
-        var message = new HttpRequestMessage(HttpMethod.Get, $"https://forge.sp-tarkov.com/api/v0/mod/{modId}/versions?{paramsToUse}")
+        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}")
         {
             Content = new StringContent("", Encoding.UTF8, "application/json")
         };
@@ -161,8 +162,8 @@ public class HttpHelper
 
         _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
-        var paramsToUse = GetParamsCollection(search, sort, ConvertFeaturedToBool(includeFeatured), ConvertFeaturedToBool(includeAi));
-        var message = new HttpRequestMessage(HttpMethod.Get, $"https://forge.sp-tarkov.com/api/v0/mods?page={page}&{paramsToUse}")
+        var paramsToUse = GetParamsCollection(search, sort, ConvertOptionToBool(includeFeatured), ConvertOptionToBool(includeAi));
+        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMods}?page={page}&{paramsToUse}")
         {
             Content = new StringContent("", Encoding.UTF8, "application/json")
         };
@@ -194,7 +195,7 @@ public class HttpHelper
             return null;
         }
 
-        var message = new HttpRequestMessage(HttpMethod.Post, "https://forge.sp-tarkov.com/api/v0/auth/logout")
+        var message = new HttpRequestMessage(HttpMethod.Post, Urls.ForgeLogout)
         {
             Content = new StringContent("", Encoding.UTF8, "application/json")
         };
@@ -210,7 +211,7 @@ public class HttpHelper
     {
         _logger.LogInformation("Forge ForgeLogin");
 
-        var message = new HttpRequestMessage(HttpMethod.Post, "https://forge.sp-tarkov.com/api/v0/auth/login")
+        var message = new HttpRequestMessage(HttpMethod.Post, Urls.ForgeLogin)
         {
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -225,7 +226,7 @@ public class HttpHelper
     {
         _logger.LogInformation("Forge ForgeApiAbility");
 
-        var message = new HttpRequestMessage(HttpMethod.Get, "https://forge.sp-tarkov.com/api/v0/auth/abilities")
+        var message = new HttpRequestMessage(HttpMethod.Get, Urls.ForgeAbilities)
         {
             Content = new StringContent("", Encoding.UTF8, "application/json")
         };
@@ -280,7 +281,7 @@ public class HttpHelper
         return queryString;
     }
 
-    private bool? ConvertFeaturedToBool(string? selected)
+    private bool? ConvertOptionToBool(string? selected)
     {
         switch (selected?.ToLower())
         {
@@ -313,7 +314,7 @@ public class HttpHelper
 
     public bool IsInternetAccessAvailable()
     {
-        // change to just pinging forge https://forge.sp-tarkov.com/api/v0/ping?
+        // TODO: change to just pinging forge https://forge.sp-tarkov.com/api/v0/ping?
         try
         {
             using (var ping = new Ping())

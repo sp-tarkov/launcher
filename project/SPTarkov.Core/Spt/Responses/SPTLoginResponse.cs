@@ -1,4 +1,4 @@
-﻿namespace SPTarkov.Core.SPT;
+﻿namespace SPTarkov.Core.SPT.Responses;
 
 public record SPTLoginResponse : IResponse<bool>
 {

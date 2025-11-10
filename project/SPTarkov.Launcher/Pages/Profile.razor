@@ -112,7 +112,7 @@
                 Username = SelectedMiniProfile.Username
             };
 
-            var returnResult = await HttpHelper.GameServerPut<SPTProfileResponse>(RequestUrls.Profile, requestObject, token.Token);
+            var returnResult = await HttpHelper.GameServerPut<SPTProfileResponse>(Urls.Profile, requestObject, token.Token);
             StateHelper.SelectedProfile = returnResult.Response;
             var result = returnResult.Response;
 
@@ -139,7 +139,7 @@
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            var returnResult = await HttpHelper.GameServerGet<SPTProfilesResponse>(RequestUrls.Profiles, token.Token);
+            var returnResult = await HttpHelper.GameServerGet<SPTProfilesResponse>(Urls.Profiles, token.Token);
             StateHelper.ProfileList = returnResult?.Response!;
             var result = returnResult?.Response;
 
@@ -238,7 +238,7 @@
                 Username = SelectedMiniProfile.Username
             };
 
-            var returnResult = await HttpHelper.GameServerPut<SPTWipeResponse>(RequestUrls.Wipe, wipeRequest, token.Token);
+            var returnResult = await HttpHelper.GameServerPut<SPTWipeResponse>(Urls.Wipe, wipeRequest, token.Token);
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 

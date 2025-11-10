@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Helpers;
 using SevenZip;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Mods;
 
@@ -48,6 +49,7 @@ public class ModManager
             _logger.LogWarning("Download with modName {modName} did not exist in Dict", modName);
             return false;
         }
+
         var result = await value.CancelModDownload();
         _stateHelper.SetHasDownloads();
         return result;
@@ -85,7 +87,7 @@ public class ModManager
     {
         try
         {
-            var location = Path.Combine(Environment.CurrentDirectory, @"user\Launcher\ModCache", modName);
+            var location = Path.Combine(Paths.ModCache, modName);
             if (!File.Exists(location))
             {
                 _logger.LogError("File {location} doesn't exist", location);
@@ -93,13 +95,27 @@ public class ModManager
 
             var extractor = new SevenZipExtractor(location);
 
-            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, @"user\Launcher\UnZipped")))
+            // TODO: do i need to check if its password protected?
+
+            var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
+                !x.ToLower().Contains("bepinex") ||
+                !x.ToLower().Contains("spt")
+            );
+
+            if (!checkForCorrectFilePath)
             {
-                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, @"user\Launcher\UnZipped"));
+                _logger.LogError("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+                return false;
+            }
+
+            if (!Directory.Exists(Paths.UnZipped))
+            {
+                Directory.CreateDirectory(Paths.UnZipped);
             }
 
             _logger.LogInformation("Unzipping mod {modName}", modName);
-            await extractor.ExtractArchiveAsync(Path.Combine(Environment.CurrentDirectory, @"user\Launcher\UnZipped", modName));
+
+            await extractor.ExtractArchiveAsync(Path.Combine(Paths.UnZipped, modName));
         }
         catch (Exception e)
         {
