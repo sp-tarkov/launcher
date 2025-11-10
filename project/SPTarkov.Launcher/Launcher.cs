@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using Photino.Blazor;
+using SevenZip;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
@@ -31,6 +32,7 @@ public class Launcher
     {
         EmbedProvider = new ManifestEmbeddedFileProvider(typeof(Launcher).Assembly, "wwwroot");
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(EmbedProvider, args);
+        SevenZipBase.SetLibraryPath(Path.Combine(Directory.GetCurrentDirectory(), @"SPT_Data\Launcher\Dependency\7z.dll"));
 
         appBuilder.Services
             .AddSingleton<ConfigHelper>()
