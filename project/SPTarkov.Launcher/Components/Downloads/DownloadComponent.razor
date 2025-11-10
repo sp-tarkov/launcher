@@ -23,7 +23,10 @@
                     @if (item.Complete)
                     {
                         <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Close" Placement="Placement.Left">
-                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Info" OnClick="() => ModManager.CloseDownloadTask(name)"/>
+                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Remove" Color="Color.Success" OnClick="() => ModManager.CloseDownloadTask(name)"/>
+                        </MudTooltip>
+                        <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Unzip" Placement="Placement.Left">
+                            <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Info" Color="Color.Info" OnClick="() => CallUnzip(name)"/>
                         </MudTooltip>
                     }
                     else
@@ -53,6 +56,11 @@
     public void Dispose()
     {
         _progressTimer?.Dispose();
+    }
+
+    private async Task CallUnzip(string name)
+    {
+        await ModManager.UnzipMod(name);
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Helpers;
+using SevenZip;
 
 namespace SPTarkov.Core.Mods;
 
@@ -78,5 +79,35 @@ public class ModManager
         }
 
         return value;
+    }
+
+    public async Task<bool> UnzipMod(string modName)
+    {
+        try
+        {
+            var location = Path.Combine(Environment.CurrentDirectory, @"user\Launcher\ModCache", modName);
+            if (!File.Exists(location))
+            {
+                _logger.LogError("File {location} doesn't exist", location);
+            }
+
+            var extractor = new SevenZipExtractor(location);
+
+            if (!Directory.Exists(Path.Combine(Environment.CurrentDirectory, @"user\Launcher\UnZipped")))
+            {
+                Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, @"user\Launcher\UnZipped"));
+            }
+
+            _logger.LogInformation("Unzipping mod {modName}", modName);
+            await extractor.ExtractArchiveAsync(Path.Combine(Environment.CurrentDirectory, @"user\Launcher\UnZipped", modName));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Exception {exception}", e);
+            return false;
+        }
+
+        _logger.LogInformation("Unzipped mod {modName}", modName);
+        return true;
     }
 }
