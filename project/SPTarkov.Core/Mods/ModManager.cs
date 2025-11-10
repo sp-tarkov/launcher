@@ -116,6 +116,8 @@ public class ModManager
             _logger.LogInformation("Unzipping mod {modName}", modName);
 
             await extractor.ExtractArchiveAsync(Path.Combine(Paths.UnZipped, modName));
+
+            var files =  Directory.GetFiles(Path.Combine(Paths.UnZipped, modName),  "*", SearchOption.AllDirectories);
         }
         catch (Exception e)
         {

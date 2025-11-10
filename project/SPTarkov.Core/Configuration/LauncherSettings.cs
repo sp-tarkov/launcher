@@ -38,4 +38,7 @@ public record LauncherSettings
     public string Language { get; set; } = "en";
 
     public LinuxSettings LinuxSettings { get; set; } = new();
+
+    /// String is the mods GUID
+    public Dictionary<string, ConfigMod>  Mods { get; set; } = new();
 }
