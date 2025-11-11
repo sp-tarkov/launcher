@@ -96,15 +96,15 @@ public class Launcher
         // use this to disable bottom left status bar like in a browser
         App.MainWindow.DevToolsEnabled = false;
 
-        // this was originally to remove the bottom left Browser status indicator
-        // Breaks on some linux systems. this may not even be needed on linux
-        // TODO: Double check if this is still needed on windows
-        // App.MainWindow.BrowserControlInitParameters = "--kiosk";
+        // This is not needed and will break on linux
+        if (OperatingSystem.IsWindows())
+        {
+            App.MainWindow.BrowserControlInitParameters = "--kiosk";
+        }
         App.MainWindow.ContextMenuEnabled = false;
 #else
         App.MainWindow.DevToolsEnabled = true;
 #endif
-
         App.MainWindow.Topmost = ConfigHelper.GetConfig().AlwaysTop;
         App.MainWindow.MinHeight = 550;
         App.MainWindow.MinWidth = 1070;
