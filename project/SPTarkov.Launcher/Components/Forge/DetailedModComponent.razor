@@ -202,4 +202,9 @@
         NavigationManager.NavigateTo("/Forge");
     }
 
+    private void NavigateToDependency(int? depId)
+    {
+        NavigationManager.NavigateTo("/ForgeMod/" + depId, true);
+    }
+
 }
