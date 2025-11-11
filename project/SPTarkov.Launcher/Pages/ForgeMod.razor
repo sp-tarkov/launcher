@@ -64,6 +64,11 @@
             return;
         }
 
+        if (!VersionResponse!.Success)
+        {
+            Logger.LogError("Getting Mod version failed {modId}:{versionId} for reason: {code}:{message}", modId, versionId, VersionResponse.Code, VersionResponse.Message);
+        }
+
         StateHasChanged();
     }
 }
