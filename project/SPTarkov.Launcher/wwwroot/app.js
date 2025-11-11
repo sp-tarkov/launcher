@@ -15,4 +15,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Stop allowing middle mouse click from opening windows etc,
+// it didnt open them in desktop browser,
+// it was a webview that cant connect to the app
+document.addEventListener('auxclick', function(e) {
+    if (e.button === 1) { // 1 = middle mouse button
+        e.preventDefault();
+        e.stopPropagation();
+    }
+}, true);
 
+
+function navigateBack() {
+    window.history.back(); // navigates to the previous page in history
+}

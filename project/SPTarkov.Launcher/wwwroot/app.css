@@ -354,7 +354,7 @@ a.download-on-hover:hover {
         border-bottom-right-radius: 0.2rem;
         padding: 1rem;
         background-color: rgba(39, 39, 47, 0.5) !important;
-        backdrop-filter: blur(20px);
+        /*backdrop-filter: blur(20px);*/
     }
 
     .hidden {
