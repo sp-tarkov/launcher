@@ -22,9 +22,6 @@ public record ForgeModVersion
     [JsonPropertyName("spt_version_constraint")]
     public string? SptVersionConstraint { get; set; }
 
-    [JsonPropertyName("virus_total_link")]
-    public string? VirusTotalLink { get; set; }
-
     [JsonPropertyName("downloads")]
     public int? Downloads { get; set; }
 
@@ -36,6 +33,15 @@ public record ForgeModVersion
 
     [JsonPropertyName("updated_at")]
     public string? UpdatedAt { get; set; }
+
+    [JsonPropertyName("fika_compatibility")]
+    public string? FikaCompatible { get; set; }
+
+    [JsonPropertyName("virus_total_links")]
+    public List<ForgeListOfLinks>? VirusTotalLinks { get; set; }
+
+    [JsonPropertyName("dependencies")]
+    public List<ForgeBase>? Dependencies { get; set; }
 
     private string GetDateString(string date)
     {

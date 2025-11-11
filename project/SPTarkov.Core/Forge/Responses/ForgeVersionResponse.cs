@@ -7,6 +7,12 @@ public record ForgeVersionResponse
     [JsonPropertyName("success")]
     public bool Success { get; set; }
 
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
+
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
+
     [JsonPropertyName("data")]
     public List<ForgeModVersion>? Data { get; set; }
 

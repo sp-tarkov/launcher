@@ -11,6 +11,9 @@ public record ForgeBase
     [JsonPropertyName("hub_id")]
     public int? HubId { get; set; }
 
+    [JsonPropertyName("guid")]
+    public string? Guid { get; set; }
+
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 
@@ -29,8 +32,11 @@ public record ForgeBase
     [JsonPropertyName("description")]
     public string? Description { get; set; }
 
-    [JsonPropertyName("source_code_url")]
-    public string? SourceCode { get; set; }
+    [JsonPropertyName("detail_url")]
+    public string? DetailUrl { get; set; }
+
+    [JsonPropertyName("fika_compatibility")]
+    public bool? FikaCompatible { get; set; }
 
     [JsonPropertyName("featured")]
     public bool? Featured { get; set; }
@@ -40,6 +46,9 @@ public record ForgeBase
 
     [JsonPropertyName("contains_ai_content")]
     public bool? ContainsAiContent { get; set; }
+
+    [JsonPropertyName("category_id")]
+    public int? CategoryId { get; set; }
 
     [JsonPropertyName("published_at")]
     public string? PublishedAt { get; set; }
@@ -61,6 +70,9 @@ public record ForgeBase
 
     [JsonPropertyName("license")]
     public ForgeLicense? License { get; set; }
+
+    [JsonPropertyName("source_code_links")]
+    public List<ForgeListOfLinks>? SourceCodeLinks { get; set; }
 
     public char? GetAvatarLetter()
     {
