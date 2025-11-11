@@ -25,7 +25,7 @@
     {
         <MudGrid>
             <MudItem sm="12" Class="d-flex flex-row">
-                <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" IconColor="Color.Error" Color="Color.Dark" Size="Size.Medium" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="ReturnToForge">
+                <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" IconColor="Color.Error" Color="Color.Dark" Size="Size.Medium" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="NavigateBack">
                     Back
                 </MudButton>
                 <MudSpacer/>
@@ -115,13 +115,15 @@
                             </MudText>
                         }
 
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Dependencies</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Fika Compatible</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.FikaCompatible ?? false ? "Yes" : "No")</MudText>
 
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Dependencies</MudText>
                         @if (ForgeModVersion?.Dependencies?.Any() ?? false)
                         {
                             @foreach (var dep in ForgeModVersion.Dependencies)
                             {
-                                <MudLink Color="Color.Default" Underline="Underline.None" Href="@($"/ForgeMod/{dep.Id}")" Class="d-flex align-center cursor-pointer setting-on-hover pa-2">
+                                <MudLink Color="Color.Default" Underline="Underline.None" OnClick="() => NavigateToDependency(dep.Id)" Class="d-flex align-center cursor-pointer setting-on-hover pa-2">
                                     <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@dep.GetThumbnail()"/>
                                     <MudContainer Class="flex-1 gap-3">
                                         <MudText Class="no-select text-overflow" Typo="Typo.h6">@dep.Name</MudText>
@@ -178,10 +180,10 @@
                 "Name", ForgeMod.Name
             },
             {
-                "VersionDescription", ForgeModVersion.Description
+                "VersionDescription", ForgeModVersion?.Description
             },
             {
-                "VersionLink", ForgeModVersion.Link
+                "VersionLink", ForgeModVersion?.Link
             }
         };
 
@@ -197,13 +199,14 @@
         Logger.LogInformation("Download cancelled for {mod}", ForgeMod.Name);
     }
 
-    private void ReturnToForge()
+    private void NavigateBack()
     {
-        NavigationManager.NavigateTo("/Forge");
+        JsRuntime.InvokeVoidAsync("navigateBack");
     }
 
     private void NavigateToDependency(int? depId)
     {
+        // TODO: reloading looks awful, but navigating to the same page (different mod) doesnt seem to get blazor to update
         NavigationManager.NavigateTo("/ForgeMod/" + depId, true);
     }
 
