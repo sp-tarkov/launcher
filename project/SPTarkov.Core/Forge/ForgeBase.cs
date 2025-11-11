@@ -6,16 +6,16 @@ namespace SPTarkov.Core.Forge;
 public record ForgeBase
 {
     [JsonPropertyName("id")]
-    public int? Id { get; set; }
+    public required int Id { get; set; }
+
+    [JsonPropertyName("guid")]
+    public required string Guid { get; set; }
+
+    [JsonPropertyName("name")]
+    public required string Name { get; set; }
 
     [JsonPropertyName("hub_id")]
     public int? HubId { get; set; }
-
-    [JsonPropertyName("guid")]
-    public string? Guid { get; set; }
-
-    [JsonPropertyName("name")]
-    public string? Name { get; set; }
 
     [JsonPropertyName("slug")]
     public string? Slug { get; set; }
