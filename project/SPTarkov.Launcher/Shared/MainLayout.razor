@@ -14,11 +14,6 @@
     <MudFab Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small"/>
 </MudScrollToTop>
 
-@if (ModManager.GetDownloadTasks().Any() && StateHelper.ShowDownloads)
-{
-    <DownloadComponent/>
-}
-
 <MudContainer Class="no-select overlay-container unset absolute">
     @if (ConfigHelper.GetConfig().UseBackground)
     {
