@@ -242,7 +242,7 @@ public class HttpHelper
     private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
-        queryString.Add("include", "versions,owner,authors,license");
+        queryString.Add("include", "versions,owner,authors,license,source_code_links");
         if (!string.IsNullOrWhiteSpace(search))
         {
             queryString.Add("query", search);
@@ -259,7 +259,7 @@ public class HttpHelper
         }
 
         // make this dynamic later
-        queryString.Add("filter[spt_version]", "4.0.0");
+        queryString.Add("filter[spt_version]", "4.0.*");
 
         if (!string.IsNullOrWhiteSpace(sort))
         {
@@ -269,9 +269,15 @@ public class HttpHelper
         return queryString;
     }
 
+    /// <summary>
+    /// Valid Parameters are: dependencies,virus_total_links
+    /// </summary>
+    /// <param name="versionId"></param>
+    /// <returns></returns>
     private NameValueCollection GetParamsCollectionForVersions(string? versionId = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
+        queryString.Add("include", "dependencies,virus_total_links");
 
         if (!string.IsNullOrEmpty(versionId))
         {

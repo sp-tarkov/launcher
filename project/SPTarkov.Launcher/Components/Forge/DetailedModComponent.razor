@@ -30,7 +30,7 @@
                 </MudButton>
                 <MudSpacer/>
                 <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">
-                    @($"Download Latest ({LatestVersion.Version})")
+                    @($"Download Latest ({ForgeModVersion?.Version})")
                 </MudButton>
             </MudItem>
             <MudItem sm="8" Class="pt-4">
@@ -62,8 +62,13 @@
             <MudItem sm="4" Class="pt-4">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start">
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">GUID</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@ForgeMod.Guid</MudText>
+
+
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2">@(ForgeMod.GetAdditionalAuthors())</MudText> @* TODO: Get aditional author page *@
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.GetAdditionalAuthors())</MudText> @* TODO: Get aditional author page *@
+
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">License</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
                             @if (ForgeMod.License is not null)
@@ -75,29 +80,62 @@
                                 @("None")
                             }
                         </MudText>
+
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Source Code</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
-                            @if (!string.IsNullOrEmpty(ForgeMod.SourceCode))
+                        @if (ForgeMod.SourceCodeLinks?.Any() ?? false)
+                        {
+                            @foreach (var link in ForgeMod.SourceCodeLinks)
                             {
-                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@ForgeMod.SourceCode">@ForgeMod.SourceCode</MudLink>
+                                <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
+                                    <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@link.Url">@(string.IsNullOrEmpty(link.Label) ? link.Url : link.Label)</MudLink>
+                                </MudText>
                             }
-                            else
-                            {
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
                                 @("None")
-                            }
-                        </MudText>
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result
-                        </MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
-                            @if (!string.IsNullOrEmpty(LatestVersion.VirusTotalLink))
+                            </MudText>
+                        }
+
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result</MudText>
+                        @if (ForgeModVersion?.VirusTotalLinks?.Any() ?? false)
+                        {
+                            @foreach (var link in ForgeModVersion.VirusTotalLinks)
                             {
-                                <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@LatestVersion.VirusTotalLink">@LatestVersion.VirusTotalLink</MudLink>
+                                <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
+                                    <MudLink Color="Color.Default" Underline="Underline.Always" Typo="Typo.caption" Href="@link.Url">@(string.IsNullOrEmpty(link.Label) ? link.Url : link.Label)</MudLink>
+                                </MudText>
                             }
-                            else
-                            {
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
                                 @("None")
+                            </MudText>
+                        }
+
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Dependencies</MudText>
+
+                        @if (ForgeModVersion?.Dependencies?.Any() ?? false)
+                        {
+                            @foreach (var dep in ForgeModVersion.Dependencies)
+                            {
+                                <MudLink Color="Color.Default" Underline="Underline.None" Href="@($"/ForgeMod/{dep.Id}")" Class="d-flex align-center cursor-pointer setting-on-hover pa-2">
+                                    <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@dep.GetThumbnail()"/>
+                                    <MudContainer Class="flex-1 gap-3">
+                                        <MudText Class="no-select text-overflow" Typo="Typo.h6">@dep.Name</MudText>
+                                        <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {dep.Versions?.First().Version} - {dep.Owner?.Name}")</MudText>
+                                    </MudContainer>
+                                </MudLink>
                             }
-                        </MudText>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
+                                @("None")
+                            </MudText>
+                        }
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -108,9 +146,7 @@
 @code {
     [Parameter] public bool IsSkeleton { get; set; }
     [Parameter] public ForgeBase ForgeMod { get; set; }
-    [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
-
-    private ForgeModVersion LatestVersion => ForgeMod.Versions?.FirstOrDefault();
+    [Parameter] public ForgeModVersion? ForgeModVersion { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {

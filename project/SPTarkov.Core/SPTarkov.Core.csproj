@@ -35,7 +35,7 @@
       <HintPath>SharedDependencies\zlib.net.dll</HintPath>
     </Reference>
     <Reference Include="7z">
-      <HintPath>SPT_Data\Launcher\Dependecy\7z.dll</HintPath>
+      <HintPath>SPT_Data\Launcher\Dependency\7z.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
