@@ -247,4 +247,14 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void AddMod(ConfigMod mod)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("AddMod: {Mod}", mod);
+            _settings!.Mods.Add(mod.GUID, mod);
+            SaveConfig();
+        }
+    }
 }
