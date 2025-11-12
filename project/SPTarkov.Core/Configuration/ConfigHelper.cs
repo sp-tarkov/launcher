@@ -256,9 +256,26 @@ public class ConfigHelper
             if (_settings!.Mods.ContainsKey(mod.GUID))
             {
                 _settings!.Mods[mod.GUID] = mod;
+                SaveConfig();
+                return;
             }
 
             _settings!.Mods.Add(mod.GUID, mod);
+            SaveConfig();
+        }
+    }
+
+    public void RemoveMod(string guid)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("RemoveMod: {Mod}", guid);
+            if (!_settings!.Mods.ContainsKey(guid))
+            {
+                _logger.LogError("key {key} not found", guid);
+            }
+
+            _settings!.Mods.Remove(guid);
             SaveConfig();
         }
     }
