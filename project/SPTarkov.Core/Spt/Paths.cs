@@ -3,8 +3,8 @@
 public class Paths
 {
     public static readonly string ModCache = Path.Combine(Directory.GetCurrentDirectory(), "user", "Launcher", "ModCache");
+    public static readonly string ModTemp = Path.Combine(Directory.GetCurrentDirectory(), "user", "Launcher", "ModTemp");
     public static readonly string SPTBasePath = Directory.GetParent(Environment.CurrentDirectory)!.FullName;
-    public static readonly string UnZipped = Path.Combine(Directory.GetCurrentDirectory(), "user", "Launcher", "UnZipped");
     // must contain \\ for windows reg key when looking on linux/wine
     public static readonly string UninstallEftRegKey = @"Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\EscapeFromTarkov";
     public static readonly string ProtonPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share", "Steam", "compatibilitytools.d");

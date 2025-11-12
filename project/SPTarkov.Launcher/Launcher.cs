@@ -90,6 +90,15 @@ public class Launcher
     private static void CustomizeComponent()
     {
         App.MainWindow.SetTitle(_appTitle);
+
+        // Use extension method to get icon from embedded resource
+        App.MainWindow.SetIconFile(
+            EmbedProvider.GetDirectoryContents("/")
+                .FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))?
+                .CreateReadStream()!,
+            "spt-logo.ico"
+        );
+
         App.MainWindow.LogVerbosity = 0;
 
 #if !DEBUG
