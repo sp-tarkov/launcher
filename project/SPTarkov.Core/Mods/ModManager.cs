@@ -109,6 +109,7 @@ public class ModManager
 
         var extractor = new SevenZipExtractor(modFilePath);
 
+        // com.skitles.profile.editor this should have failed.
         var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
             !x.ToLower().Contains("bepinex") ||
             !x.ToLower().Contains("spt")
@@ -131,6 +132,51 @@ public class ModManager
         return true;
     }
 
+    /// <summary>
+    /// TODO: folders are risidual, and configs dont get saved. if its even worth doing
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <returns></returns>
+    public async Task<bool> UninstallMod(string guid)
+    {
+        if (!_configHelper.GetConfig().Mods.ContainsKey(guid))
+        {
+            _logger.LogError("key not found: {key}", guid);
+            return false;
+        }
+
+        if (!_configHelper.GetConfig().Mods.TryGetValue(guid, out var mod))
+        {
+            _logger.LogError("unable to get key: {key}", guid);
+            return false;
+        }
+
+        foreach (var file in mod.Files)
+        {
+            var modFilePath = Path.Combine(Paths.SPTBasePath, file);
+            // if this is a directory, it should return false
+            if (!File.Exists(modFilePath))
+            {
+                continue;
+            }
+
+            File.Delete(modFilePath);
+        }
+
+        _logger.LogInformation("uninstalled mod: {guid}", guid);
+
+        var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
+        configMod.IsInstalled = false;
+
+        _configHelper.AddMod(configMod);
+        return true;
+    }
+
+    /// <summary>
+    /// TODO: folders are risidual, and configs dont get saved. if its even worth doing
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <returns></returns>
     public async Task<bool> DeleteMod(string guid)
     {
         if (!_configHelper.GetConfig().Mods.ContainsKey(guid))
@@ -155,6 +201,14 @@ public class ModManager
             }
 
             File.Delete(modFilePath);
+        }
+
+        _logger.LogInformation("Deleted mod: {guid}", guid);
+
+        if (File.Exists(Path.Combine(Paths.ModCache, guid)))
+        {
+            _logger.LogInformation("deleted zip for mod {guid}", guid);
+            File.Delete(Path.Combine(Paths.ModCache, guid));
         }
 
         _configHelper.RemoveMod(guid);

@@ -5,10 +5,10 @@
 @inject ModManager ModManager
 @inject DownloadHelper DownloadHelper
 
-<MudContainer Class="px-4 my-2 page-animation-switch" MaxWidth="MaxWidth.Large" Style="height: 96vh;">
-    <MudGrid Spacing="4" Justify="Justify.SpaceEvenly" Class=" mud-height-full">
-        <MudItem sm="6" Class="uninstalled mud-height-full">
-            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
+<MudContainer Class="px-4 my-2 page-animation-switch" MaxWidth="MaxWidth.Large">
+    <MudGrid Spacing="4" Justify="Justify.SpaceEvenly">
+        <MudItem sm="6" Class="uninstalled">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
                 <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
                 @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
                 {
@@ -51,24 +51,22 @@
                         continue;
                     }
                     <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
-
                         <MudContainer Class="d-flex flex-row pa-0">
                             <MudContainer Class="text-overflow py-2 px-1">
                                 <MudText HtmlTag="span">
-                                    @guid
+                                    @mod.ModName
                                 </MudText>
                             </MudContainer>
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Error" OnClick="() => ModManager.InstallMod(guid)" /> @*  OnClick="() => ModManager.InstallMod(name)" *@
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)" />
                             </MudTooltip>
                         </MudContainer>
-
                     </MudLink>
                 }
             </MudPaper>
         </MudItem>
-        <MudItem sm="6" Class="installed mud-height-full">
-            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
+        <MudItem sm="6" Class="installed">
+            <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
                 <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Installed Mods</MudText>
                 @foreach (var (guid, mod) in ModManager.GetMods())
                 {
@@ -77,18 +75,19 @@
                         continue;
                     }
                     <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
-
                         <MudContainer Class="d-flex flex-row pa-0">
                             <MudContainer Class="text-overflow py-2 px-1">
                                 <MudText HtmlTag="span">
-                                    @guid
+                                    @mod.ModName
                                 </MudText>
                             </MudContainer>
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.DeleteMod(guid)" />
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Uninstall Mod" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Info" OnClick="() => ModManager.UninstallMod(guid)" />
+                            </MudTooltip>
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" />
                             </MudTooltip>
                         </MudContainer>
-
                     </MudLink>
                 }
             </MudPaper>
