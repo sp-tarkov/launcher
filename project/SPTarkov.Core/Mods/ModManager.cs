@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Helpers;
 using SevenZip;
+using SPTarkov.Core.Configuration;
+using SPTarkov.Core.Forge;
 using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Mods;
@@ -9,123 +11,90 @@ namespace SPTarkov.Core.Mods;
 public class ModManager
 {
     private ILogger<ModManager> _logger;
-    private HttpClient _httpClient;
-    private ConcurrentDictionary<string, Mod> _downloadDict = new();
-    private StateHelper _stateHelper;
+    private ConfigHelper _configHelper;
+    private DownloadHelper _downloadHelper;
 
     public ModManager
     (
         ILogger<ModManager> logger,
-        StateHelper stateHelper
+        ConfigHelper configHelper,
+        DownloadHelper downloadHelper
     )
     {
         _logger = logger;
-        _stateHelper = stateHelper;
-
-        // leaving default atm, this will be making requests to unknown servers.
-        var handler = new HttpClientHandler();
-        handler.UseCookies = false;
-        _httpClient = new HttpClient(handler);
+        _configHelper = configHelper;
+        _downloadHelper = downloadHelper;
+        // LoadMods();
     }
 
-    public bool AddDownloadTask(string modName, string url, CancellationTokenSource token)
+    public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationTokenSource cancellationToken)
     {
-        var taskToAdd = new Mod(modName, url, token, _httpClient);
-        if (!_downloadDict.TryAdd(modName, taskToAdd))
+        // start the download
+        var downloadTask = await _downloadHelper.StartDownloadTask(forgeMod, version, cancellationToken);
+
+        if (!downloadTask.Complete)
         {
-            _logger.LogWarning("Download with modName: {modName} already exists", modName);
+            _logger.LogError("Download task failed for mod {mod}: {e}", forgeMod.Name, downloadTask.Error);
             return false;
         }
 
-        Task.Factory.StartNew(taskToAdd.StartModDownload);
-        _stateHelper.SetHasDownloads();
+        var configMod = await ConvertToConfigMod(downloadTask);
+
+        if (configMod == null)
+        {
+            _logger.LogError("configMod is null, download task: {downloadTask}", downloadTask.ToString());
+            return false;
+        }
+
+        await _downloadHelper.RemoveDownloadTask(downloadTask);
+        _configHelper.AddMod(configMod);
+
+        _logger.LogDebug("Download task completed");
         return true;
     }
 
-    public async Task<bool> CancelDownloadTask(string modName)
+    private async Task<ConfigMod?> ConvertToConfigMod(DownloadTask downloadTask)
     {
-        if (!_downloadDict.TryRemove(modName, out var value))
+        var modFilePath = Path.Combine(Paths.ModCache, downloadTask.ForgeMod.Guid);
+        if (!File.Exists(modFilePath))
         {
-            _logger.LogWarning("Download with modName {modName} did not exist in Dict", modName);
-            return false;
-        }
-
-        var result = await value.CancelModDownload();
-        _stateHelper.SetHasDownloads();
-        return result;
-    }
-
-    public bool CloseDownloadTask(string modName)
-    {
-        if (!_downloadDict.TryRemove(modName, out _))
-        {
-            _logger.LogWarning("Download with modName {modName} did not exist in Dict", modName);
-            return false;
-        }
-
-        _stateHelper.SetHasDownloads();
-        return true;
-    }
-
-    public ConcurrentDictionary<string, Mod> GetDownloadTasks()
-    {
-        return _downloadDict;
-    }
-
-    public Mod? GetDownloadTask(string modName)
-    {
-        if (!_downloadDict.TryGetValue(modName, out var value))
-        {
-            _logger.LogWarning("Download with modName: {modName} did not exist in Dict", modName);
+            downloadTask.Error = new FileNotFoundException("file not found", modFilePath);
+            downloadTask.CancellationToken.Cancel();
             return null;
         }
 
-        return value;
+        var extractor = new SevenZipExtractor(modFilePath);
+
+        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
+            !x.ToLower().Contains("bepinex") ||
+            !x.ToLower().Contains("spt")
+        );
+
+        if (!checkForCorrectFilePath)
+        {
+            downloadTask.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            return null;
+        }
+
+        var files = extractor.ArchiveFileNames.ToList();
+
+        foreach (var file in files)
+        {
+            Console.WriteLine(file);
+        }
+
+        return new ConfigMod
+        {
+            ModName = downloadTask.ForgeMod.Name,
+            GUID = downloadTask.ForgeMod.Guid,
+            IsInstalled = false,
+            CanBeUpdated = false,
+            Files = files
+        };
     }
 
-    public async Task<bool> UnzipMod(string modName)
+    public Dictionary<string, ConfigMod> GetMods()
     {
-        try
-        {
-            var location = Path.Combine(Paths.ModCache, modName);
-            if (!File.Exists(location))
-            {
-                _logger.LogError("File {location} doesn't exist", location);
-            }
-
-            var extractor = new SevenZipExtractor(location);
-
-            // TODO: do i need to check if its password protected?
-
-            var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
-                !x.ToLower().Contains("bepinex") ||
-                !x.ToLower().Contains("spt")
-            );
-
-            if (!checkForCorrectFilePath)
-            {
-                _logger.LogError("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
-                return false;
-            }
-
-            if (!Directory.Exists(Paths.UnZipped))
-            {
-                Directory.CreateDirectory(Paths.UnZipped);
-            }
-
-            _logger.LogInformation("Unzipping mod {modName}", modName);
-
-            await extractor.ExtractArchiveAsync(Path.Combine(Paths.UnZipped, modName));
-
-            var files =  Directory.GetFiles(Path.Combine(Paths.UnZipped, modName),  "*", SearchOption.AllDirectories);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError("Exception {exception}", e);
-            return false;
-        }
-
-        _logger.LogInformation("Unzipped mod {modName}", modName);
-        return true;
+        return _configHelper.GetConfig().Mods;
     }
 }
