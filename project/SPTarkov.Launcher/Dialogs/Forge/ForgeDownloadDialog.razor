@@ -40,18 +40,13 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private void RunDownloadTask()
+    private async Task RunDownloadTask()
     {
         _requestInProgress = true;
         Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
         try
         {
-            // TODO: atm we dont do anything with cancellationToken.
-            if (!ModManager.StartModDownload(Mod, Version, Token))
-            {
-                Logger.LogError("Unable to add download task, name: {name}, url: {url}", Mod.Name, Version.Link);
-                Snackbar.Add($"Unable to download {Mod.Name}", Severity.Error);
-            }
+            ModManager.DownloadMod(Mod, Version, Token);
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
@@ -79,7 +74,7 @@
     private void Submit()
     {
         Snackbar.Add($"Download started for {Mod.Name}", Severity.Success);
-        MudDialog.Close();
+        MudDialog.Close(DialogResult.Ok(true));
     }
 
     private void AbortOrFail(string message = "Cancelled download")
