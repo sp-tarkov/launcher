@@ -6,6 +6,5 @@ public class ConfigMod
     public string GUID { get; set; } = "";
     public bool IsInstalled { get; set; } = false;
     public bool CanBeUpdated { get; set; } = false;
-    public bool IsDownloading { get; set; } = false;
-    public List<string> Files { get; set; } = new List<string>();
+    public List<string>? Files { get; set; } = new List<string>();
 }
