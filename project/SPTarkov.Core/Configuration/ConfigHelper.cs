@@ -252,7 +252,12 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logger.LogInformation("AddMod: {Mod}", mod);
+            _logger.LogInformation("AddMod: {Mod}", mod.ModName);
+            if (_settings!.Mods.ContainsKey(mod.GUID))
+            {
+                _settings!.Mods[mod.GUID] = mod;
+            }
+
             _settings!.Mods.Add(mod.GUID, mod);
             SaveConfig();
         }
