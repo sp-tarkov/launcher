@@ -97,4 +97,67 @@ public class ModManager
     {
         return _configHelper.GetConfig().Mods;
     }
+
+    public async Task<bool> InstallMod(string guid)
+    {
+        var modFilePath = Path.Combine(Paths.ModCache, guid);
+        if (!File.Exists(modFilePath))
+        {
+            _logger.LogError("file not found: {file}", modFilePath);
+            return false;
+        }
+
+        var extractor = new SevenZipExtractor(modFilePath);
+
+        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
+            !x.ToLower().Contains("bepinex") ||
+            !x.ToLower().Contains("spt")
+        );
+
+        // we checked this before, but to be sure
+        if (!checkForCorrectFilePath)
+        {
+            _logger.LogError("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            return false;
+        }
+
+        await extractor.ExtractArchiveAsync(Paths.SPTBasePath);
+        _logger.LogInformation("Installed mod: {guid}", guid);
+
+        var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
+        configMod.IsInstalled = true;
+
+        _configHelper.AddMod(configMod);
+        return true;
+    }
+
+    public async Task<bool> DeleteMod(string guid)
+    {
+        if (!_configHelper.GetConfig().Mods.ContainsKey(guid))
+        {
+            _logger.LogError("key not found: {key}", guid);
+            return false;
+        }
+
+        if (!_configHelper.GetConfig().Mods.TryGetValue(guid, out var mod))
+        {
+            _logger.LogError("unable to get key: {key}", guid);
+            return false;
+        }
+
+        foreach (var file in mod.Files)
+        {
+            var modFilePath = Path.Combine(Paths.SPTBasePath, file);
+            // if this is a directory, it should return false
+            if (!File.Exists(modFilePath))
+            {
+                continue;
+            }
+
+            File.Delete(modFilePath);
+        }
+
+        _configHelper.RemoveMod(guid);
+        return true;
+    }
 }
