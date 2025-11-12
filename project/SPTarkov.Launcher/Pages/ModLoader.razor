@@ -1,5 +1,7 @@
 ﻿@page "/ModLoader"
 
+@implements IDisposable
+
 @inject ModManager ModManager
 
 <MudContainer Class="px-4 my-2 page-animation-switch" MaxWidth="MaxWidth.Large" Style="height: 96vh;">
@@ -7,7 +9,35 @@
         <MudItem sm="6" Class="uninstalled mud-height-full">
             <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
                 <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
+                @foreach (var (name, item) in ModManager.GetMods())
+                {
+                    <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
 
+                        <MudContainer Class="d-flex flex-row pa-0">
+                            <MudContainer Class="text-overflow py-2 px-1">
+                                <MudText HtmlTag="span">
+                                    @name
+                                </MudText>
+                                <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
+                                    <ChildContent>
+                                        <MudText Color="Color.Default" Class="progress-bar">@item.Progress%</MudText>
+                                    </ChildContent>
+                                </MudProgressLinear>
+                            </MudContainer>
+                            @if (!item.Complete)
+                            {
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => ModManager.CancelModDownload(name)"/>
+                                </MudTooltip>
+                            }
+                            else
+                            {
+                                // button to install
+                            }
+                        </MudContainer>
+
+                    </MudLink>
+                }
             </MudPaper>
         </MudItem>
         <MudItem sm="6" Class="installed mud-height-full">
@@ -20,5 +50,22 @@
 </MudContainer>
 
 @code {
+    private Timer _progressTimer;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        _progressTimer = new Timer((_) => { InvokeAsync(StateHasChanged); }, default, TimeSpan.FromSeconds(2), TimeSpan.Zero);
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        _progressTimer?.Dispose();
+    }
+
+    private async Task CallUnzip(DownloadTask downloadTask)
+    {
+        await ModManager.UnzipMod(downloadTask);
+    }
 
 }
