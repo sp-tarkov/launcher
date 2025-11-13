@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -50,8 +51,9 @@ namespace SPT.Launcher.ViewModels
 
                 var filesToCopy = new List<string> { LogManager.Instance.LogFile };
                 
-                var serverLog = Path.Join(Environment.CurrentDirectory, @"\user\logs",
-                    $"server-{DateTime.Now:yyyy-MM-dd}.log");
+                var serverLog = Path.Join(Environment.CurrentDirectory, @"\user\logs\spt",
+                    $"spt{DateTime.Now:yyyyMMdd}.log");
+                
                 var bepinexLog = Path.Join(LauncherSettingsProvider.Instance.GamePath, @"BepInEx\LogOutput.log");
 
                 if (AccountManager.SelectedAccount?.id != null)
@@ -73,14 +75,19 @@ namespace SPT.Launcher.ViewModels
                 var logsPath = Path.Join(LauncherSettingsProvider.Instance.GamePath, "Logs");
                 if (Directory.Exists(logsPath))
                 {
-                    var traceLogs = Directory.GetFiles(logsPath, $"{DateTime.Now:yyyy.MM.dd}_* traces.log",
-                        SearchOption.AllDirectories);
-
-                    var log = traceLogs.Length > 0 ? traceLogs[0] : "";
-
-                    if (!string.IsNullOrWhiteSpace(log))
+                    var newestLogDir = Directory.GetDirectories(logsPath).OrderByDescending(d => d).FirstOrDefault();
+                    
+                    if (!string.IsNullOrWhiteSpace(newestLogDir))
                     {
-                        filesToCopy.Add(log);
+                        var traceLogs = Directory.GetFiles(newestLogDir, $"{DateTime.Now:yyyy.MM.dd}_* traces.log",
+                            SearchOption.TopDirectoryOnly);
+                        
+                        var log = traceLogs.Length > 0 ? traceLogs[0] : "";
+
+                        if (!string.IsNullOrWhiteSpace(log))
+                        {
+                            filesToCopy.Add(log);
+                        }
                     }
                 }
                 
