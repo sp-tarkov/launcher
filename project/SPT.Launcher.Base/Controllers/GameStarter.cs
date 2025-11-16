@@ -31,9 +31,8 @@ namespace SPT.Launcher
         private readonly bool _showOnly;
         private readonly string _originalGamePath;
         private readonly string[] _excludeFromCleanup;
+        private const string steamRegistryInstall = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 3932890";
         private const string registryInstall = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
-
-        private const string registrySettings = @"Software\Battlestate Games\EscapeFromTarkov";
 
         public GameStarter(IGameStarterFrontend frontend, string gamePath = null, string originalGamePath = null,
             bool showOnly = false, string[] excludeFromCleanup = null)
@@ -44,16 +43,34 @@ namespace SPT.Launcher
             _excludeFromCleanup = excludeFromCleanup ?? LauncherSettingsProvider.Instance.ExcludeFromCleanup;
         }
 
-        private static string DetectOriginalGamePath()
+        public static string DetectOriginalGamePath()
         {
             // We can't detect the installed path on non-Windows
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return null;
 
-            var installLocation = Registry.LocalMachine.OpenSubKey(registryInstall, false)
+            // We prioritize the Steam version, as the Steam CDN is faster for updates, and if someone
+            // owns it on both platforms, there's a better chance their Steam version is up to date
+            var steamUninstallValue = Registry.LocalMachine.OpenSubKey(steamRegistryInstall, false)
                 ?.GetValue("InstallLocation");
-            var info = (installLocation is string key) ? new DirectoryInfo(key) : null;
-            return info?.FullName;
+            if (steamUninstallValue != null &&
+                steamUninstallValue is string steamUninstallStringValue &&
+                Path.Exists(Path.Combine(steamUninstallStringValue, "build")))
+            {
+                var steamDirInfo = new DirectoryInfo(steamUninstallStringValue);
+                var steamBuildDir = Path.Combine(steamDirInfo.FullName, "build");
+                return Path.TrimEndingDirectorySeparator(steamBuildDir);
+            }
+
+            // Fall back to the BSG Launcher registry key if Steam isn't being used
+            var uninstallStringValue = Registry.LocalMachine.OpenSubKey(registryInstall, false)
+                ?.GetValue("InstallLocation");
+            var info = (uninstallStringValue is string key) ? new DirectoryInfo(key) : null;
+
+            if (info == null)
+                return null;
+
+            return Path.TrimEndingDirectorySeparator(info.FullName);
         }
 
         public async Task<GameStarterResult> LaunchGame(ServerInfo server, AccountInfo account, string gamePath)

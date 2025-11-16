@@ -7,13 +7,22 @@ namespace SPT.Launcher.Helpers
     {
         public static bool Validate()
         {
+            var b1 = true;
             var c0 = @"Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\EscapeFromTarkov";
+            var c1 = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 3932890";
+            var c2 = "build";
             var v0 = 0;
 
             try
             {
-                var v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
+                var v1 = Registry.LocalMachine.OpenSubKey(c1, false).GetValue("InstallLocation");
+                if (v1 == null || !Path.Exists(Path.Combine(v1.ToString(), c2)))
+                {
+                    b1 = false;
+                    v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
+                }
                 var v2 = (v1 != null) ? v1.ToString() : string.Empty;
+                v2 = b1 ? Path.Combine(v2, c2) : v2;
                 var v3 = new DirectoryInfo(v2);
                 var v4 = new FileSystemInfo[]
                 {
