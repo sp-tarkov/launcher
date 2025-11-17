@@ -15,7 +15,7 @@ namespace SPT.Launcher.Helpers
 
             try
             {
-                var v1 = Registry.LocalMachine.OpenSubKey(c1, false).GetValue("InstallLocation");
+                var v1 = Registry.LocalMachine.OpenSubKey(c1, false)?.GetValue("InstallLocation");
                 if (v1 == null || !Path.Exists(Path.Combine(v1.ToString(), c2)))
                 {
                     b1 = false;
