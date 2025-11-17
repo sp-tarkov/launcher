@@ -43,6 +43,9 @@ namespace SPT.Launcher.ViewModels
 
                     LocalizationProvider.TryAutoSetLocale();
 
+                    /* 
+                     * Temporarily disabled due to live settings not being compatible
+                     * 
                     var viewModel = new ConfirmationDialogViewModel(this,
                         LocalizationProvider.Instance.copy_live_settings_question,
                         LocalizationProvider.Instance.yes,
@@ -56,6 +59,7 @@ namespace SPT.Launcher.ViewModels
 
                         await settingsVm.ResetGameSettingsCommand();
                     }
+                    */
                     
                     LauncherSettingsProvider.Instance.SaveSettings();
                 });
