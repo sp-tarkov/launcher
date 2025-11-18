@@ -1,4 +1,5 @@
 using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -92,6 +93,7 @@ namespace SPT.Launcher.Helpers
 
         private static string[] d(string l, string k)
         {
+            if (!File.Exists(l)) Array.Empty<string>();
             var q = new List<string>();
             var s = $@"""{k}""\s+""(.*)""";
             foreach (var r in File.ReadLines(l))
