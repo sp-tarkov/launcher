@@ -51,14 +51,10 @@ namespace SPT.Launcher
 
             // We prioritize the Steam version, as the Steam CDN is faster for updates, and if someone
             // owns it on both platforms, there's a better chance their Steam version is up to date
-            var steamUninstallValue = Registry.LocalMachine.OpenSubKey(steamRegistryInstall, false)
-                ?.GetValue("InstallLocation");
-            if (steamUninstallValue != null &&
-                steamUninstallValue is string steamUninstallStringValue &&
-                Path.Exists(Path.Combine(steamUninstallStringValue, "build")))
+            var steamInstallPath = ValidationUtil.a();
+            if (steamInstallPath != null && Path.Exists(Path.Combine(steamInstallPath, "build")))
             {
-                var steamDirInfo = new DirectoryInfo(steamUninstallStringValue);
-                var steamBuildDir = Path.Combine(steamDirInfo.FullName, "build");
+                var steamBuildDir = Path.Combine(steamInstallPath, "build");
                 return Path.TrimEndingDirectorySeparator(steamBuildDir);
             }
 
