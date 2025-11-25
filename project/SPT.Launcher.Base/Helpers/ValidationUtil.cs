@@ -35,7 +35,7 @@ namespace SPT.Launcher.Helpers
                     new FileInfo(Path.Join(v2, @"BattlEye\BEClient_x64.dll")),
                     new FileInfo(Path.Join(v2, @"BattlEye\BEService_x64.dll")),
                     new FileInfo(Path.Join(v2, "ConsistencyInfo")),
-                    new FileInfo(Path.Join(v2, "Uninstall.exe")),
+                    new FileInfo(Path.Join(v2, "UnityPlayer.dll")),
                     new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
                 };
 
