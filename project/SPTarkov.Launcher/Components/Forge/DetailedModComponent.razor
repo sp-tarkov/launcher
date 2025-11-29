@@ -123,9 +123,9 @@
                         {
                             @foreach (var dep in ForgeModVersion.Dependencies)
                             {
-                                <MudLink Color="Color.Default" Underline="Underline.None" OnClick="() => NavigateToDependency(dep.Id)" Class="d-flex align-center cursor-pointer setting-on-hover pa-2">
+                                <MudLink Color="Color.Default" Underline="Underline.None" OnClick="() => NavigateToDependency(dep.Id)" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
                                     <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@dep.GetThumbnail()"/>
-                                    <MudContainer Class="flex-1 gap-3">
+                                    <MudContainer Class="flex-1 gap-3 px-2">
                                         <MudText Class="no-select text-overflow" Typo="Typo.h6">@dep.Name</MudText>
                                         <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {dep.Versions?.First().Version} - {dep.Owner?.Name}")</MudText>
                                     </MudContainer>
