@@ -62,8 +62,8 @@ public record ForgeBase
     [JsonPropertyName("owner")]
     public ForgeUser? Owner { get; set; }
 
-    [JsonPropertyName("authors")]
-    public List<ForgeUser>? Authors { get; set; }
+    [JsonPropertyName("additional_authors")]
+    public List<ForgeUser>? AdditionalAuthors { get; set; }
 
     [JsonPropertyName("versions")]
     public List<ForgeModVersion>? Versions { get; set; }
@@ -107,8 +107,8 @@ public record ForgeBase
 
     public string? GetAdditionalAuthors()
     {
-        return Authors!.Any()
-            ? Authors!.Select(x => x.Name).Aggregate((i, j) => i + ", " + j)
+        return AdditionalAuthors!.Any()
+            ? AdditionalAuthors!.Select(x => x.Name).Aggregate((i, j) => i + ", " + j)
             : "None";
     }
 
