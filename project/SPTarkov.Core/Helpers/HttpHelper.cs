@@ -242,7 +242,7 @@ public class HttpHelper
     private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
-        queryString.Add("include", "versions,owner,authors,license,source_code_links");
+        queryString.Add("include", "versions,license,category,source_code_links");
         if (!string.IsNullOrWhiteSpace(search))
         {
             queryString.Add("query", search);

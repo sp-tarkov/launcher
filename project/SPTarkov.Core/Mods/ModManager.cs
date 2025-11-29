@@ -122,7 +122,7 @@ public class ModManager
             return false;
         }
 
-        await extractor.ExtractArchiveAsync(Paths.SPTBasePath);
+        await extractor.ExtractArchiveAsync(_configHelper.GetConfig().GamePath);
         _logger.LogInformation("Installed mod: {guid}", guid);
 
         var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
@@ -153,7 +153,7 @@ public class ModManager
 
         foreach (var file in mod.Files)
         {
-            var modFilePath = Path.Combine(Paths.SPTBasePath, file);
+            var modFilePath = Path.Combine(_configHelper.GetConfig().GamePath, file);
             // if this is a directory, it should return false
             if (!File.Exists(modFilePath))
             {
@@ -193,7 +193,7 @@ public class ModManager
 
         foreach (var file in mod.Files)
         {
-            var modFilePath = Path.Combine(Paths.SPTBasePath, file);
+            var modFilePath = Path.Combine(_configHelper.GetConfig().GamePath, file);
             // if this is a directory, it should return false
             if (!File.Exists(modFilePath))
             {
