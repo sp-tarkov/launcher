@@ -50,12 +50,6 @@ public class ConfigHelper
             }
 
             _settings = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(Paths.LauncherSettingsPath));
-
-            // Set the base game path to the launcher directory, there's no reason to have this outside of the game directory
-            SetGamePath(Paths.SPTBasePath);
-            // Unless you are running the launcher from the IDE.
-            // Uncomment this and type your own dir of spt
-            // SetGamePath(@"C:\SPT\4.0.3");
         }
     }
 
