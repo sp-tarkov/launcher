@@ -60,6 +60,9 @@
                             <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
                                 <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)" />
                             </MudTooltip>
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" />
+                            </MudTooltip>
                         </MudContainer>
                     </MudLink>
                 }

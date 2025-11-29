@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using MudBlazor;
 using SPTarkov.Core.Helpers;
 using SevenZip;
 using SPTarkov.Core.Configuration;
@@ -42,7 +43,7 @@ public class ModManager
 
         if (configMod == null)
         {
-            _logger.LogError("configMod is null, download task: {downloadTask}", downloadTask.ToString());
+            _logger.LogError("configMod is null, download error: {downloadTask}", downloadTask.Error);
             return false;
         }
 
@@ -65,12 +66,12 @@ public class ModManager
 
         var extractor = new SevenZipExtractor(modFilePath);
 
-        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
+        var checkForCorrectFilePath = extractor.ArchiveFileNames.All(x =>
             !x.ToLower().Contains("bepinex") ||
             !x.ToLower().Contains("spt")
         );
 
-        if (!checkForCorrectFilePath)
+        if (checkForCorrectFilePath)
         {
             downloadTask.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
             return null;

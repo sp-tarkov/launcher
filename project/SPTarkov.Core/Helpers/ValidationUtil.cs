@@ -1,8 +1,12 @@
-﻿using System.Text.RegularExpressions;
+﻿
+
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
 namespace SPTarkov.Core.Helpers;
 
+[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
 public class ValidationUtil
 {
     bool b1 = true;
