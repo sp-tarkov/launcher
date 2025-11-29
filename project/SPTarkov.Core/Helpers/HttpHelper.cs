@@ -185,6 +185,41 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeModsResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
+    public async Task<ForgeUpdateResponse?> ForgeGetUpdate(string modGuid, string versionId, string sptVersion, CancellationToken token)
+    {
+        _logger.LogInformation("forge GetModsFromForge");
+
+        if (string.IsNullOrWhiteSpace(_configHelper.GetConfig().ForgeApiKey))
+        {
+            _logger.LogWarning("GetMods - API Key is missing.");
+            return null;
+        }
+
+        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
+
+        var paramsToUse = GetParamsCollectionForUpdates(modGuid,  versionId, sptVersion);
+        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeUpdate}?{paramsToUse}")
+        {
+            Content = new StringContent("", Encoding.UTF8, "application/json")
+        };
+
+        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+        var task = await _httpClient.SendAsync(message, token);
+
+        if (!task.IsSuccessStatusCode)
+        {
+            // remove any api keys and get them to log back in.
+            return new ForgeUpdateResponse()
+            {
+                Success = false
+            };
+        }
+
+        return JsonSerializer.Deserialize<ForgeUpdateResponse>(await task.Content.ReadAsStringAsync(token));
+    }
+
     public async Task<ForgeLogoutResponse?> ForgeLogout(CancellationToken token)
     {
         _logger.LogInformation("Forge ForgeLogout");
@@ -283,6 +318,15 @@ public class HttpHelper
         {
             queryString.Add("filter[id]", versionId);
         }
+
+        return queryString;
+    }
+
+    private NameValueCollection GetParamsCollectionForUpdates(string guid, string version, string sptVersion)
+    {
+        var queryString = HttpUtility.ParseQueryString(string.Empty);
+        queryString.Add("mods", $"{guid}:{version}");
+        queryString.Add("spt_version", sptVersion);
 
         return queryString;
     }
