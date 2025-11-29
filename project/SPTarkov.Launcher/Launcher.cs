@@ -48,6 +48,7 @@ public class Launcher
             .AddSingleton<FilePatcher>()
             .AddSingleton<WindowsClipboard>()
             .AddSingleton<WineHelper>()
+            .AddSingleton<ValidationUtil>()
             .AddLogging(builder =>
             {
                 builder.ClearProviders();

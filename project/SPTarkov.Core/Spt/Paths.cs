@@ -6,6 +6,7 @@ public class Paths
     public static readonly string ModTemp = Path.Combine(Directory.GetCurrentDirectory(), "user", "Launcher", "ModTemp");
     // must contain \\ for windows reg key when looking on linux/wine
     public static readonly string UninstallEftRegKey = @"Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\EscapeFromTarkov";
+    public static readonly string SteamRegistryInstallKey = @"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 3932890";
     public static readonly string ProtonPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share", "Steam", "compatibilitytools.d");
     public static readonly string SevenZipDllPath = Path.Combine(Directory.GetCurrentDirectory(), "SPT_Data", "Launcher", "Dependency", "7z.dll");
     public static readonly string PatchPath = Path.Combine("SPT", "SPT_Data", "Launcher", "Patches");

@@ -18,6 +18,7 @@ public class GameHelper
     private readonly FilePatcher _filePatcher;
     private readonly LocaleHelper _localeHelper;
     private readonly WineHelper _wineHelper;
+    private readonly ValidationUtil _validationUtil;
 
     private string? _originalGamePath;
     public string? ErrorMessage;
@@ -34,7 +35,8 @@ public class GameHelper
         FilePatcher filePatcher,
         HttpHelper httpHelper,
         LocaleHelper localeHelper,
-        WineHelper wineHelper
+        WineHelper wineHelper,
+        ValidationUtil validationUtil
     )
     {
         _stateHelper = stateHelper;
@@ -44,16 +46,34 @@ public class GameHelper
         _httpHelper = httpHelper;
         _localeHelper = localeHelper;
         _wineHelper = wineHelper;
+        _validationUtil = validationUtil;
         _originalGamePath = DetectOriginalGamePath();
     }
 
-    private string? DetectOriginalGamePath()
+    public string? DetectOriginalGamePath()
     {
         if (OperatingSystem.IsWindows())
         {
-            var installLocation = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)?.GetValue("InstallLocation");
-            var info = installLocation is string key ? new DirectoryInfo(key) : null;
-            return info?.FullName;
+            // We prioritize the Steam version, as the Steam CDN is faster for updates, and if someone
+            // owns it on both platforms, there's a better chance their Steam version is up to date
+            var steamInstallPath = _validationUtil.a();
+            if (steamInstallPath != null && Path.Exists(Path.Combine(steamInstallPath, "build")))
+            {
+                var steamBuildDir = Path.Combine(steamInstallPath, "build");
+                return Path.TrimEndingDirectorySeparator(steamBuildDir);
+            }
+
+            // Fall back to the BSG Launcher registry key if Steam isn't being used
+            var uninstallStringValue = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)
+                ?.GetValue("InstallLocation");
+            var info = (uninstallStringValue is string key) ? new DirectoryInfo(key) : null;
+
+            if (info == null)
+            {
+                return null;
+            }
+
+            return Path.TrimEndingDirectorySeparator(info.FullName);
         }
 
         // as running with linux requires wine, we can now
@@ -87,7 +107,7 @@ public class GameHelper
 
         SetupGameFiles();
 
-        if (!Validate())
+        if (!_validationUtil.Validate())
         {
             _logger.LogError("Game Validation Failed");
             ErrorMessage = _localeHelper.Get("game_helper_error_3");
@@ -447,51 +467,6 @@ public class GameHelper
         }
 
         return true;
-    }
-
-    public static bool Validate()
-    {
-        if (!OperatingSystem.IsWindows())
-        {
-            // skip validation for anything other than windows
-            return true;
-        }
-        int v0;
-
-        try
-        {
-#pragma warning disable CA1416
-            var v1 = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)?.GetValue("InstallLocation");
-#pragma warning restore CA1416
-
-            var v2 = (v1 != null) ? v1.ToString() : string.Empty;
-            var v3 = new DirectoryInfo(v2!);
-            var v4 = new FileSystemInfo[]
-            {
-                v3,
-                new FileInfo(Path.Combine(v2!, "BattlEye", "BEClient_x64.dll")),
-                new FileInfo(Path.Combine(v2!, "BattlEye", "BEService_x64.dll")),
-                new FileInfo(Path.Combine(v2!, "ConsistencyInfo")),
-                new FileInfo(Path.Combine(v2!, "Uninstall.exe")),
-                new FileInfo(Path.Combine(v2!, "UnityCrashHandler64.exe"))
-            };
-
-            v0 = v4.Length - 1;
-
-            foreach (var value in v4)
-            {
-                if (value.Exists)
-                {
-                    --v0;
-                }
-            }
-        }
-        catch
-        {
-            v0 = -1;
-        }
-
-        return v0 == 0;
     }
 
     /// <summary>
