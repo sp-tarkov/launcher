@@ -5,19 +5,19 @@ namespace SPTarkov.Core.Forge;
 public record ForgeModVersion
 {
     [JsonPropertyName("id")]
-    public int? Id { get; set; }
+    public required int Id { get; set; }
 
     [JsonPropertyName("hub_id")]
     public int? HubId { get; set; }
 
     [JsonPropertyName("version")]
-    public string? Version { get; set; }
+    public required string Version { get; set; }
 
     [JsonPropertyName("description")]
     public string? Description { get; set; }
 
     [JsonPropertyName("link")]
-    public string? Link { get; set; }
+    public required string Link { get; set; }
 
     [JsonPropertyName("spt_version_constraint")]
     public string? SptVersionConstraint { get; set; }
