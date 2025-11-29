@@ -57,6 +57,9 @@
                                     @mod.ModName
                                 </MudText>
                             </MudContainer>
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Update Mod" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Update" Color="Color.Info" OnClick="() => ModManager.UpdateMod(guid)" />
+                            </MudTooltip>
                             <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
                                 <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)" />
                             </MudTooltip>

@@ -66,22 +66,14 @@ public class ModManager
 
         var extractor = new SevenZipExtractor(modFilePath);
 
-        var checkForCorrectFilePath = extractor.ArchiveFileNames.All(x =>
-            !x.ToLower().Contains("bepinex") ||
-            !x.ToLower().Contains("spt")
-        );
+        // check if zip contains bepinex or spt folder for correct starting structure
+        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
 
-        if (checkForCorrectFilePath)
+        if (!checkForCorrectFilePath)
         {
             downloadTask.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            downloadTask.CancellationToken.Cancel();
             return null;
-        }
-
-        var files = extractor.ArchiveFileNames.ToList();
-
-        foreach (var file in files)
-        {
-            Console.WriteLine(file);
         }
 
         return new ConfigMod
@@ -90,7 +82,7 @@ public class ModManager
             GUID = downloadTask.ForgeMod.Guid,
             IsInstalled = false,
             CanBeUpdated = false,
-            Files = files
+            Files = extractor.ArchiveFileNames.ToList()
         };
     }
 
@@ -214,5 +206,10 @@ public class ModManager
 
         _configHelper.RemoveMod(guid);
         return true;
+    }
+
+    public async Task<bool> UpdateMod(string guid)
+    {
+        throw new NotImplementedException();
     }
 }
