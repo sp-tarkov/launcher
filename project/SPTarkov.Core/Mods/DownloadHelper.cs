@@ -145,4 +145,27 @@ public class DownloadHelper
     {
         return _downloadDict;
     }
+
+    public Task<UpdateTask?> UpdateMod(string guid, string version)
+    {
+
+
+
+
+
+
+
+        var updateTask = new UpdateTask
+        {
+            ModName = null,
+            Version = null,
+            GUID = null,
+            Link = null,
+            Progress = 0,
+            TotalToDownload = 0,
+            CancellationToken = null,
+            Complete = false,
+            Error = null
+        }
+    }
 }

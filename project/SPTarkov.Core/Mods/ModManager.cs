@@ -79,6 +79,7 @@ public class ModManager
         return new ConfigMod
         {
             ModName = downloadTask.ForgeMod.Name,
+            ModVersion = downloadTask.Version.Version,
             GUID = downloadTask.ForgeMod.Guid,
             IsInstalled = false,
             CanBeUpdated = false,
