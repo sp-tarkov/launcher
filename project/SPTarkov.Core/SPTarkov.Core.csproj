@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MudBlazor" Version="8.14.0" />
+    <PackageReference Include="MudBlazor" Version="8.15.0" />
     <PackageReference Include="Photino.Blazor" Version="4.0.13"/>
     <PackageReference Include="SharpHDiffPatch.Core" Version="2.3.4" />
     <!-- Used the same as the installer does -->
@@ -22,10 +22,10 @@
 
   <ItemGroup>
     <!-- Update version number when needed -->
-    <Content Include="$(NuGetPackageRoot)mudblazor\8.14.0\staticwebassets\MudBlazor.min.css">
+    <Content Include="$(NuGetPackageRoot)mudblazor\8.15.0\staticwebassets\MudBlazor.min.css">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(NuGetPackageRoot)mudblazor\8.14.0\staticwebassets\MudBlazor.min.js">
+    <Content Include="$(NuGetPackageRoot)mudblazor\8.15.0\staticwebassets\MudBlazor.min.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
