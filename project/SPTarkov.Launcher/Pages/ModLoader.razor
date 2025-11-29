@@ -12,8 +12,29 @@
                 <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
                 @foreach (var (name, item) in DownloadHelper.GetDownloadTasks())
                 {
-                    @if (item.Complete)
+                    @if (item.Complete && item.Error is null)
                     {
+                        continue;
+                    }
+
+                    @if (item.Error is not null)
+                    {
+                        <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
+                            <MudTooltip Text="@item.Error.ToString()" >
+                                <MudContainer Class="d-flex flex-row pa-0">
+                                    <MudContainer Class="text-overflow py-2 px-1">
+                                        <MudText HtmlTag="span">
+                                            @item.ForgeMod.Name
+                                        </MudText>
+                                    </MudContainer>
+                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelModDownload(name)"/>
+                                    </MudTooltip>
+                                </MudContainer>
+
+                            </MudTooltip>
+                        </MudLink>
+
                         continue;
                     }
 
@@ -30,16 +51,9 @@
                                     </ChildContent>
                                 </MudProgressLinear>
                             </MudContainer>
-                            @if (!item.Complete)
-                            {
-                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelModDownload(name)"/>
-                                </MudTooltip>
-                            }
-                            else
-                            {
-                                // button to install
-                            }
+                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelModDownload(name)"/>
+                            </MudTooltip>
                         </MudContainer>
 
                     </MudLink>
