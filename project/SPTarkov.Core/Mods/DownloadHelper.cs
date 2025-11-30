@@ -9,7 +9,7 @@ public class DownloadHelper
 {
     private ILogger<DownloadHelper> _logger;
     private HttpClient _httpClient;
-    private ConcurrentDictionary<string, DownloadTask> _downloadDict = new();
+    private ConcurrentDictionary<string, IModTask> _modDict = new();
 
     public DownloadHelper(
         ILogger<DownloadHelper> logger
@@ -23,7 +23,7 @@ public class DownloadHelper
         _httpClient = new HttpClient(handler);
     }
 
-    public async Task<DownloadTask> StartDownloadTask(ForgeBase mod, ForgeModVersion version, CancellationTokenSource cancellationToken)
+    public async Task<DownloadTask?> StartDownloadTask(ForgeBase mod, ForgeModVersion version, CancellationTokenSource cancellationToken)
     {
         var downloadTask = new DownloadTask
         {
@@ -31,14 +31,15 @@ public class DownloadHelper
             Version = version,
             TotalToDownload = 0,
             Progress = 0,
-            CancellationToken = cancellationToken,
+            CancellationTokenSource = cancellationToken,
             Complete = false,
             Error = null
         };
 
-        if (!_downloadDict.TryAdd(mod.Guid, downloadTask))
+        if (!_modDict.TryAdd(mod.Guid, downloadTask))
         {
             _logger.LogError("Unable to add download task for {name}:{guid}", mod.Name, mod.Guid);
+            return null;
         }
 
         var modFilePath = Path.Combine(Paths.ModCache, mod.Guid);
@@ -101,29 +102,43 @@ public class DownloadHelper
         return downloadTask;
     }
 
-    public async Task<DownloadTask?> RemoveDownloadTask(DownloadTask downloadTask)
+    public async Task<IModTask?> RemoveModTask(IModTask task)
     {
-        if (!_downloadDict.TryRemove(downloadTask.ForgeMod.Guid, out DownloadTask? mod))
+        string guid = "";
+        string name = "";
+
+        if (task is DownloadTask downloadTask)
         {
-            _logger.LogError("Unable to remove mod from download Dictionary for {name}:{guid}", downloadTask.ForgeMod.Name,
-                downloadTask.ForgeMod.Guid);
+            guid = downloadTask.ForgeMod.Guid;
+            name = downloadTask.ForgeMod.Name;
+        }
+        else if (task is UpdateTask updateTask)
+        {
+            guid = updateTask.GUID;
+            name = updateTask.ModName;
+        }
+
+        if (!_modDict.TryRemove(guid, out IModTask? mod))
+        {
+            _logger.LogError("Unable to remove mod from download Dictionary for {name}:{guid}", name,
+                guid);
             return null;
         }
 
         return mod;
     }
 
-    public async Task<bool> CancelModDownload(string guid)
+    public async Task<bool> CancelModTask(string guid)
     {
         try
         {
-            if (!_downloadDict.TryRemove(guid, out DownloadTask? downloadTask))
+            if (!_modDict.TryRemove(guid, out IModTask? downloadTask))
             {
                 _logger.LogError("Couldn't remove download task for {guid}", guid);
                 return false;
             }
 
-            await downloadTask.CancellationToken.CancelAsync();
+            await downloadTask.CancellationTokenSource.CancelAsync();
 
             if (File.Exists(Path.Combine(Paths.ModCache, guid)))
             {
@@ -141,31 +156,84 @@ public class DownloadHelper
         }
     }
 
-    public ConcurrentDictionary<string, DownloadTask> GetDownloadTasks()
+    public ConcurrentDictionary<string, IModTask> GetModTasks()
     {
-        return _downloadDict;
+        return _modDict;
     }
 
-    public Task<UpdateTask?> UpdateMod(string guid, string version)
+    public async Task<UpdateTask?> StartUpdateTask(ForgeModUpdate mod, CancellationTokenSource cancellationToken)
     {
-
-
-
-
-
-
-
         var updateTask = new UpdateTask
         {
-            ModName = null,
-            Version = null,
-            GUID = null,
-            Link = null,
+            ModName = mod.CurrentVersion.Name,
+            Version = mod.RecommendedVersion.Version,
+            GUID = mod.CurrentVersion.GUID,
+            Link = mod.RecommendedVersion.Link,
             Progress = 0,
             TotalToDownload = 0,
-            CancellationToken = null,
+            CancellationTokenSource = cancellationToken,
             Complete = false,
             Error = null
+        };
+
+        if (!_modDict.TryAdd(updateTask.GUID, updateTask))
+        {
+            _logger.LogError("Unable to add update task for {name}:{guid}", updateTask.ModName, updateTask.GUID);
+            return null;
         }
+
+        var modFilePath = Path.Combine(Paths.ModCache, updateTask.GUID);
+
+        try
+        {
+            if (File.Exists(modFilePath))
+            {
+                File.Delete(modFilePath);
+            }
+
+            // Use a download to EFT client to test a long download
+            using var response = await _httpClient.GetAsync(updateTask.Link, HttpCompletionOption.ResponseHeadersRead, cancellationToken.Token);
+            response.EnsureSuccessStatusCode();
+
+            updateTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
+
+            var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken.Token);
+            var fileStream = File.Create(modFilePath);
+
+            var buffer = new byte[8192];
+            float totalRead = 0;
+            int bytesRead;
+
+            var lastReportTime = DateTime.UtcNow;
+
+            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken.Token)) > 0)
+            {
+                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken.Token);
+                totalRead += bytesRead;
+
+                var now = DateTime.UtcNow;
+
+                if ((now - lastReportTime).TotalSeconds >= 1 || totalRead == updateTask.TotalToDownload)
+                {
+                    updateTask.Progress = totalRead / updateTask.TotalToDownload * 100;
+                    lastReportTime = now;
+                }
+            }
+
+            await contentStream.FlushAsync();
+            contentStream.Close();
+
+            await fileStream.FlushAsync();
+            fileStream.Close();
+        }
+        catch (Exception e)
+        {
+            updateTask.Error = e;
+            cancellationToken.Cancel();
+            return updateTask;
+        }
+
+        updateTask.Complete = true;
+        return updateTask;
     }
 }

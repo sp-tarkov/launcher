@@ -1,6 +1,6 @@
 ﻿namespace SPTarkov.Core.Mods;
 
-public class UpdateTask
+public class UpdateTask : IModTask
 {
     public string ModName { get; set; }
     public string Version { get; set; }
@@ -8,7 +8,7 @@ public class UpdateTask
     public string Link { get; set; }
     public float Progress { get; set; }
     public float TotalToDownload { get; set; }
-    public required CancellationTokenSource CancellationToken { get; set; }
+    public required CancellationTokenSource CancellationTokenSource { get; set; }
     public bool Complete { get; set; }
     public Exception Error { get; set; }
 }

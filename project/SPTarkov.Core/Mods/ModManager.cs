@@ -47,7 +47,7 @@ public class ModManager
             return false;
         }
 
-        await _downloadHelper.RemoveDownloadTask(downloadTask);
+        await _downloadHelper.RemoveModTask(downloadTask);
         _configHelper.AddMod(configMod);
 
         _logger.LogDebug("Download task completed");
@@ -60,7 +60,7 @@ public class ModManager
         if (!File.Exists(modFilePath))
         {
             downloadTask.Error = new FileNotFoundException("file not found", modFilePath);
-            downloadTask.CancellationToken.Cancel();
+            downloadTask.CancellationTokenSource.Cancel();
             return null;
         }
 
@@ -72,7 +72,7 @@ public class ModManager
         if (!checkForCorrectFilePath)
         {
             downloadTask.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
-            downloadTask.CancellationToken.Cancel();
+            downloadTask.CancellationTokenSource.Cancel();
             return null;
         }
 
@@ -103,7 +103,6 @@ public class ModManager
 
         var extractor = new SevenZipExtractor(modFilePath);
 
-        // com.skitles.profile.editor this should have failed.
         var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
             !x.ToLower().Contains("bepinex") ||
             !x.ToLower().Contains("spt")
@@ -209,8 +208,53 @@ public class ModManager
         return true;
     }
 
-    public async Task<bool> UpdateMod(string guid)
+    public async Task<bool> UpdateMod(ForgeModUpdate mod, CancellationTokenSource cancellationToken)
     {
-        throw new NotImplementedException();
+        // copy current version to be .bak
+        if (!_configHelper.GetConfig().Mods.ContainsKey(mod.CurrentVersion.GUID))
+        {
+            _logger.LogError("key not found: {key}", mod.CurrentVersion.GUID);
+            return false;
+        }
+
+        if (!_configHelper.GetConfig().Mods.TryGetValue(mod.CurrentVersion.GUID, out var configMod))
+        {
+            _logger.LogError("unable to get key: {key}", mod.CurrentVersion.GUID);
+            return false;
+        }
+
+        var ogPath = Path.Combine(Paths.ModCache, mod.CurrentVersion.GUID);
+
+        File.Copy(ogPath, ogPath + ".bak", true);
+
+        if (!File.Exists(ogPath + ".bak"))
+        {
+            _logger.LogError("unable to find: {file} after copy", ogPath + ".bak");
+            return false;
+        }
+
+        var task = await _downloadHelper.StartUpdateTask(mod, cancellationToken);
+
+        var extractor = new SevenZipExtractor(ogPath);
+
+        // check if zip contains bepinex or spt folder for correct starting structure
+        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+
+        if (!checkForCorrectFilePath)
+        {
+            task.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            task.CancellationTokenSource.Cancel();
+            return false;
+        }
+
+        // update config for latest version
+        configMod.ModVersion = mod.RecommendedVersion.Version;
+        configMod.Files = extractor.ArchiveFileNames.ToList();
+        _configHelper.AddMod(configMod);
+
+        // delete old zip with .bak
+        File.Delete(ogPath + ".bak");
+
+        return task.Complete;
     }
 }
