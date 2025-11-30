@@ -1,0 +1,135 @@
+﻿@inject ISnackbar Snackbar
+@inject IJSRuntime JsRuntime
+@inject ModManager ModManager
+@inject ILogger<ForgeDownloadDialog> Logger
+@inject HttpHelper HttpHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="d-flex flex-column gap-1 mt-4">
+            <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+                <MudText>@_taskText</MudText>
+            </MudPaper>
+            <MudContainer Class="mb-4 pa-0">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunUpdateTask" Disabled="@_requestInProgress">Update</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Close</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [Parameter] public ConfigMod Mod { get; set; }
+    private bool _requestInProgress;
+    private CancellationTokenSource Token { get; set; }
+    private bool UserCancel { get; set; }
+    private string _taskText = "Check for updates?";
+
+    private async Task<ForgeUpdateResponse?> CallForge(string taskText = "", string failString = "")
+    {
+        try
+        {
+            Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            _taskText = taskText;
+            StateHasChanged();
+            await Task.Delay(20);
+
+            var result = await HttpHelper.ForgeGetUpdate(Mod.GUID, Mod.ModVersion, "4.0.7", Token.Token);
+
+            if (result is null)
+            {
+                Logger.LogError("Forge ForgeGetUpdate result is null");
+                return null;
+            }
+
+            if (result.Success)
+            {
+                Logger.LogInformation("Forge ForgeGetUpdate Authenticated");
+                return result;
+            }
+
+            if (!result.Success)
+            {
+                Logger.LogInformation("Forge ForgeGetUpdate NOT - Authenticated");
+                Token?.Dispose();
+                AbortOrFail(failString);
+                return null;
+            }
+        }
+        catch (Exception)
+        {
+            AbortOrFail(failString);
+            return null;
+        }
+
+        return null;
+    }
+
+    private async Task RunUpdateTask()
+    {
+        _requestInProgress = true;
+        Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
+        try
+        {
+            var result = await CallForge("Checking for updates", "Failed to check for updates");
+            // we abort if failed so no need to check result
+            if (!result.Data.Updates.Any())
+            {
+                Snackbar.Add("No update detected", Severity.Info);
+                return;
+            }
+
+            var check = await ModManager.UpdateMod(result.Data.Updates.FirstOrDefault(), Token);
+
+            if (!check)
+            {
+                AbortOrFail("Failed to check for updates");
+            }
+        }
+        catch (TaskCanceledException) when (Token.IsCancellationRequested)
+        {
+            AbortOrFail("Request Timed out!");
+            return;
+        }
+        catch (HttpRequestException)
+        {
+            AbortOrFail();
+            return;
+        }
+        catch (Exception)
+        {
+            AbortOrFail();
+            return;
+        }
+
+        _requestInProgress = false;
+        Submit();
+    }
+
+    private void Submit()
+    {
+        Snackbar.Add($"Update started for {Mod.ModName}", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void AbortOrFail(string message = "Cancelled Update")
+    {
+        if (!UserCancel)
+        {
+            Snackbar.Add(message, Severity.Error);
+        }
+
+        Token?.Cancel();
+        MudDialog.Cancel();
+        _requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        _requestInProgress = false;
+        Token?.Cancel();
+        MudDialog.Cancel();
+    }
+}
