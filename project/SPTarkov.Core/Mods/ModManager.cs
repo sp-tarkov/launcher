@@ -83,7 +83,7 @@ public class ModManager
             GUID = downloadTask.ForgeMod.Guid,
             IsInstalled = false,
             CanBeUpdated = false,
-            Files = extractor.ArchiveFileNames.ToList()
+            Files = RemoveBasePaths(extractor.ArchiveFileNames.ToList())
         };
     }
 
@@ -103,10 +103,8 @@ public class ModManager
 
         var extractor = new SevenZipExtractor(modFilePath);
 
-        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x =>
-            !x.ToLower().Contains("bepinex") ||
-            !x.ToLower().Contains("spt")
-        );
+        // check if zip contains bepinex or spt folder for correct starting structure
+        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
 
         // we checked this before, but to be sure
         if (!checkForCorrectFilePath)
@@ -147,13 +145,18 @@ public class ModManager
         foreach (var file in mod.Files)
         {
             var modFilePath = Path.Combine(_configHelper.GetConfig().GamePath, file);
-            // if this is a directory, it should return false
-            if (!File.Exists(modFilePath))
+
+            // first one will likely delete most but do all to be sure
+            if (Directory.Exists(modFilePath))
             {
-                continue;
+                Directory.Delete(modFilePath, true);
             }
 
-            File.Delete(modFilePath);
+            // this will return false on directories
+            if (File.Exists(modFilePath))
+            {
+                File.Delete(modFilePath);
+            }
         }
 
         _logger.LogInformation("uninstalled mod: {guid}", guid);
@@ -187,13 +190,17 @@ public class ModManager
         foreach (var file in mod.Files)
         {
             var modFilePath = Path.Combine(_configHelper.GetConfig().GamePath, file);
-            // if this is a directory, it should return false
-            if (!File.Exists(modFilePath))
+
+            // first one will likely delete most but do all to be sure
+            if (Directory.Exists(modFilePath))
             {
-                continue;
+                Directory.Delete(modFilePath, true);
             }
 
-            File.Delete(modFilePath);
+            if (File.Exists(modFilePath))
+            {
+                File.Delete(modFilePath);
+            }
         }
 
         _logger.LogInformation("Deleted mod: {guid}", guid);
@@ -249,12 +256,26 @@ public class ModManager
 
         // update config for latest version
         configMod.ModVersion = mod.RecommendedVersion.Version;
-        configMod.Files = extractor.ArchiveFileNames.ToList();
+        configMod.Files = RemoveBasePaths(extractor.ArchiveFileNames.ToList());
         _configHelper.AddMod(configMod);
 
         // delete old zip with .bak
         File.Delete(ogPath + ".bak");
 
         return task.Complete;
+    }
+
+    private List<string> RemoveBasePaths(List<string> originalPaths)
+    {
+        return originalPaths.Where((x) =>
+        {
+            var lowered = x.ToLower();
+            if (Paths.ArchiveFileInfoToIgnore.Contains(lowered))
+            {
+                return false;
+            }
+
+            return true;
+        }).ToList();
     }
 }
