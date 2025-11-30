@@ -14,7 +14,7 @@ public class ForgeModUpdates
     public required List<ForgeModUpdate> BlockedUpdates { get; set; }
 
     [JsonPropertyName("up_to_date")]
-    public required List<ForgeModUpdate> UpToDate { get; set; }
+    public required List<UpdateMod> UpToDate { get; set; }
 
     [JsonPropertyName("incompatible_with_spt")]
     public required List<ForgeModUpdate> IncompatibleWithSpt { get; set; }
