@@ -14,6 +14,17 @@
                     @((MarkupString)Version.Description)
                 </MudText>
             </MudPaper>
+            @if (Version.Dependencies.Any())
+            {
+                <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+                    <MudText Class="pb-2">This mod has a dependency on another mod. this will also be downloaded.</MudText>
+                    <MudDivider DividerType="DividerType.Middle" Class="pb-2" />
+                        @foreach (var dep in Version.Dependencies)
+                        {
+                            <MudText Typo="Typo.caption">@($"{@dep.Name} - {@dep.Versions.FirstOrDefault().Version}")</MudText>
+                        }
+                </MudPaper>
+            }
             <MudContainer Class="mb-4 pa-0">
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Close</MudButton>
@@ -44,9 +55,23 @@
     {
         _requestInProgress = true;
         Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
+        var dictOfDeps = new Dictionary<string, Version>();
         try
         {
-            ModManager.DownloadMod(Mod, Version, Token);
+            if (Version.Dependencies.Any())
+            {
+                foreach (var dep in Version.Dependencies)
+                {
+                    var depVersion = dep.Versions.FirstOrDefault();
+                    dictOfDeps.Add(dep.Guid, depVersion.Version);
+                    if (ModManager.GetMods().TryGetValue(dep.Guid, out var mod) && mod.ModVersion < depVersion.Version)
+                    {
+                        ModManager.DownloadMod(dep, depVersion, Token);
+                    }
+                }
+            }
+
+            ModManager.DownloadMod(Mod, Version, Token, dictOfDeps);
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {

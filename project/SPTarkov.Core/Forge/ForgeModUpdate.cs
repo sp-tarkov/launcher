@@ -1,4 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+using SPTarkov.Core.Semver;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Forge;
 
@@ -32,7 +35,8 @@ public class UpdateMod
     public string? Slug { get; set; } = "";
 
     [JsonPropertyName("version")]
-    public string? Version { get; set; } = "";
+    [JsonConverter(typeof(SemVerConverter))]
+    public Version? Version { get; set; } = new Version(0, 0, 0);
 
     [JsonPropertyName("link")]
     public string? Link { get; set; } = "";
@@ -44,5 +48,5 @@ public class UpdateMod
     public string? FikaCompatibility { get; set; }
 
     [JsonPropertyName("spt_versions")]
-    public List<string>? SptVersions { get; set; }
+    public List<Version>? SptVersions { get; set; }
 }

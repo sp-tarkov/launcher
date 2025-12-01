@@ -1,11 +1,9 @@
-﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
-using MudBlazor;
-using SPTarkov.Core.Helpers;
+﻿using Microsoft.Extensions.Logging;
 using SevenZip;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Forge;
 using SPTarkov.Core.SPT;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Mods;
 
@@ -28,8 +26,10 @@ public class ModManager
         // LoadMods();
     }
 
-    public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationTokenSource cancellationToken)
+    public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationTokenSource cancellationToken, Dictionary<string, Version>? dictOfDeps = null)
     {
+        dictOfDeps ??= new Dictionary<string, Version>();
+
         // start the download
         var downloadTask = await _downloadHelper.StartDownloadTask(forgeMod, version, cancellationToken);
 
@@ -48,6 +48,8 @@ public class ModManager
         }
 
         await _downloadHelper.RemoveModTask(downloadTask);
+
+        configMod.Dependencies = dictOfDeps;
         _configHelper.AddMod(configMod);
 
         _logger.LogDebug("Download task completed");
@@ -120,14 +122,78 @@ public class ModManager
         configMod.IsInstalled = true;
 
         _configHelper.AddMod(configMod);
+        await InstallModDependencies(guid);
         return true;
     }
 
-    /// <summary>
-    /// TODO: folders are risidual, and configs dont get saved. if its even worth doing
-    /// </summary>
-    /// <param name="guid"></param>
-    /// <returns></returns>
+    public async Task<bool> InstallModDependencies(string guid)
+    {
+        // get mod, get the mod deps, install mod deps if not already installed.
+        var mods = GetMods();
+        var mod = mods.FirstOrDefault(x => x.Key == guid); // mod to install
+        var deps = mod.Value.Dependencies; // deps of mod to install
+        foreach (var (depGuid, depVersion) in deps) // check if dep is installed already
+        {
+            // does dep exist
+            if (!mods.TryGetValue(depGuid, out ConfigMod? depAsMod))
+            {
+                _logger.LogError("dep not found: {dep}", depGuid);
+                continue;
+            }
+
+            // install it if it isnt
+            if (!depAsMod.IsInstalled)
+            {
+                await InstallMod(depGuid);
+            }
+        }
+
+        return true;
+    }
+
+    public async Task<bool> UninstallModDependencies(string guid)
+    {
+        // get all mods, check deps, if this mods dep is required by another mod, do not uninstall it
+        // if no other mod needs it, uninstall it
+        // get mod, get the mod deps, install mod deps if not already installed.
+        var mods = GetMods();
+        var mod = mods.FirstOrDefault(x => x.Key == guid); // mod to uninstall
+        var modsToCheck = mods.Where(x => x.Key != guid).ToList();
+        var deps = mod.Value.Dependencies; // deps of mod to uninstall
+        foreach (var (depGuid, depVersion) in deps) // check if dep is installed already
+        {
+            // does dep exist
+            if (!mods.TryGetValue(depGuid, out ConfigMod? depAsMod))
+            {
+                _logger.LogError("dep not found: {dep}", depGuid);
+                continue;
+            }
+
+            // install it if it isnt
+            if (depAsMod.IsInstalled)
+            {
+                var check = false;
+                // check if other mods require that dep
+                // if they do, dont uninstall
+                foreach (var keyValuePair in modsToCheck)
+                {
+                    if (keyValuePair.Value.Dependencies.ContainsKey(depGuid))
+                    {
+                        // another mod requires that dep, dont remove it
+                        check = true;
+                    }
+                }
+
+                if (!check)
+                {
+                    await UninstallMod(depGuid);
+                }
+            }
+        }
+
+        return true;
+    }
+
     public async Task<bool> UninstallMod(string guid)
     {
         if (!_configHelper.GetConfig().Mods.ContainsKey(guid))
@@ -165,11 +231,12 @@ public class ModManager
         configMod.IsInstalled = false;
 
         _configHelper.AddMod(configMod);
+        await UninstallModDependencies(guid);
         return true;
     }
 
     /// <summary>
-    /// TODO: folders are risidual, and configs dont get saved. if its even worth doing
+    /// TODO: add dependency checking before deleting
     /// </summary>
     /// <param name="guid"></param>
     /// <returns></returns>

@@ -1,4 +1,6 @@
 ﻿using System.Text.Json.Serialization;
+using SPTarkov.Core.Semver;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Forge;
 
@@ -11,7 +13,8 @@ public record ForgeModVersion
     public int? HubId { get; set; }
 
     [JsonPropertyName("version")]
-    public required string Version { get; set; }
+    [JsonConverter(typeof(SemVerConverter))]
+    public required Version Version { get; set; }
 
     [JsonPropertyName("description")]
     public string? Description { get; set; }

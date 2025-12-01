@@ -125,11 +125,12 @@
                     {
                         continue;
                     }
+
                     <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
                         <MudContainer Class="d-flex flex-row pa-0">
                             <MudContainer Class="text-overflow py-2 px-1">
                                 <MudText HtmlTag="span">
-                                    @mod.ModName
+                                    @($"{mod.ModName} - {mod.ModVersion}")
                                 </MudText>
                             </MudContainer>
                             <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Uninstall Mod" Placement="Placement.Left">

@@ -1,4 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+using SPTarkov.Core.Semver;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.SPT;
 
@@ -11,7 +14,8 @@ public record SptMod
     public string Name { get; set; } = "";
 
     [JsonPropertyName("version")]
-    public string Version { get; set; } = "";
+    [JsonConverter(typeof(SemVerConverter))]
+    public Version Version { get; set; } = new Version(0, 0, 0);
 
     [JsonPropertyName("url")]
     public string Url { get; set; } = "";

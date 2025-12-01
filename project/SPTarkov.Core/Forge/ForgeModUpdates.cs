@@ -1,11 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+using SPTarkov.Core.Semver;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Forge;
 
 public class ForgeModUpdates
 {
     [JsonPropertyName("spt_version")]
-    public string SptVersion { get; set; } = "0.0.0";
+    [JsonConverter(typeof(SemVerConverter))]
+    public Version SptVersion { get; set; } = new Version(0, 0, 0);
 
     [JsonPropertyName("updates")]
     public required List<ForgeModUpdate> Updates { get; set; }

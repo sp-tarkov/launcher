@@ -1,9 +1,16 @@
-﻿namespace SPTarkov.Core.Mods;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
+using SPTarkov.Core.Semver;
+using Version = SemanticVersioning.Version;
+
+namespace SPTarkov.Core.Mods;
 
 public class UpdateTask : IModTask
 {
     public string ModName { get; set; }
-    public string Version { get; set; }
+
+    [JsonConverter(typeof(SemVerConverter))]
+    public Version Version { get; set; }
     public string GUID { get; set; }
     public string Link { get; set; }
     public float Progress { get; set; }

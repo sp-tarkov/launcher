@@ -260,6 +260,7 @@ public class GameHelper
         {
             var call = await _httpHelper.GameServerGet<SPTVersionResponse>(Urls.Version, CancellationToken.None);
 
+            // TODO: can this be changed to use `using Version = SemanticVersioning.Version;`
             var serverVersion = new SptVersion(call?.Response!);
             var coreDllPath = Path.Combine(_configHelper.GetConfig().GamePath, Paths.CoreDllPath);
             if (!File.Exists(coreDllPath))

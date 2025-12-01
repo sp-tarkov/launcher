@@ -182,7 +182,8 @@ public class HttpHelper
             };
         }
 
-        return JsonSerializer.Deserialize<ForgeModsResponse>(await task.Content.ReadAsStringAsync(token));
+        var jsonString = await task.Content.ReadAsStringAsync(token);
+        return JsonSerializer.Deserialize<ForgeModsResponse>(jsonString);
     }
 
     public async Task<ForgeUpdateResponse?> ForgeGetUpdate(List<string> modGuidsWithVersions, string sptVersion, CancellationToken token)
