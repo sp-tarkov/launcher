@@ -185,7 +185,7 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeModsResponse>(await task.Content.ReadAsStringAsync(token));
     }
 
-    public async Task<ForgeUpdateResponse?> ForgeGetUpdate(string modGuid, string versionId, string sptVersion, CancellationToken token)
+    public async Task<ForgeUpdateResponse?> ForgeGetUpdate(List<string> modGuidsWithVersions, string sptVersion, CancellationToken token)
     {
         _logger.LogInformation("forge GetModsFromForge");
 
@@ -197,7 +197,7 @@ public class HttpHelper
 
         _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
-        var paramsToUse = GetParamsCollectionForUpdates(modGuid,  versionId, sptVersion);
+        var paramsToUse = GetParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
         var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeUpdate}?{paramsToUse}")
         {
             Content = new StringContent("", Encoding.UTF8, "application/json")
@@ -304,11 +304,6 @@ public class HttpHelper
         return queryString;
     }
 
-    /// <summary>
-    /// Valid Parameters are: dependencies,virus_total_links
-    /// </summary>
-    /// <param name="versionId"></param>
-    /// <returns></returns>
     private NameValueCollection GetParamsCollectionForVersions(string? versionId = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
@@ -322,10 +317,18 @@ public class HttpHelper
         return queryString;
     }
 
-    private NameValueCollection GetParamsCollectionForUpdates(string guid, string version, string sptVersion)
+    private NameValueCollection GetParamsCollectionForUpdates(List<string> modGuidsWithVersions, string sptVersion)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
-        queryString.Add("mods", $"{guid}:{version}");
+        var strbuilder = new StringBuilder();
+        foreach (var modGuidsWithVersion in modGuidsWithVersions)
+        {
+            strbuilder.Append($"{modGuidsWithVersion},");
+        }
+        // remove the last ,
+        strbuilder.Remove(strbuilder.Length - 1, 1);
+
+        queryString.Add("mods",  strbuilder.ToString());
         queryString.Add("spt_version", sptVersion);
 
         return queryString;
@@ -381,6 +384,4 @@ public class HttpHelper
         _logger.LogInformation("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
         return _internetAccess;
     }
-
-
 }
