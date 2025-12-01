@@ -11,7 +11,12 @@
     <MudGrid Spacing="4" Justify="Justify.SpaceEvenly">
         <MudItem sm="6" Class="uninstalled">
             <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
-                <MudText Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
+                <MudContainer Class="d-flex flex-row">
+                    <MudText Class="flex-auto" Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
+                    <MudTooltip Class="flex-1" Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Check for mod updates" Placement="Placement.Left">
+                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Update" Color="Color.Info" OnClick="OpenUpdateDialog" />
+                    </MudTooltip>
+                </MudContainer>
                 @foreach (var (name, item) in DownloadHelper.GetModTasks())
                 {
                     @if (item.Complete && item.Error is null)
@@ -98,15 +103,14 @@
                                     @($"{mod.ModName} - {mod.ModVersion}")
                                 </MudText>
                             </MudContainer>
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Update Mod" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Update" Color="Color.Info" OnClick="() => OpenUpdateDialog(mod)" />
-                            </MudTooltip>
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)" />
-                            </MudTooltip>
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" />
-                            </MudTooltip>
+                            <MudContainer Class="flex-1 d-flex flex-row justify-center align-center pr-0">
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)" />
+                                </MudTooltip>
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" />
+                                </MudTooltip>
+                            </MudContainer>
                         </MudContainer>
                     </MudLink>
                 }
@@ -156,16 +160,9 @@
         _progressTimer?.Dispose();
     }
 
-    private async Task OpenUpdateDialog(ConfigMod mod)
+    private async Task OpenUpdateDialog()
     {
-        var param = new DialogParameters
-        {
-            {
-                "Mod", mod
-            }
-        };
-
-        var dialog = await DialogService.ShowAsync<ForgeUpdateDialog>("ForgeUpdateDialog", param, ConfigHelper.DialogOptions);
+        var dialog = await DialogService.ShowAsync<ForgeUpdateDialog>("ForgeUpdateDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
