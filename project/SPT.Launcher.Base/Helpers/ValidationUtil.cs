@@ -35,7 +35,7 @@ namespace SPT.Launcher.Helpers
                     new FileInfo(Path.Join(v2, @"BattlEye\BEClient_x64.dll")),
                     new FileInfo(Path.Join(v2, @"BattlEye\BEService_x64.dll")),
                     new FileInfo(Path.Join(v2, "ConsistencyInfo")),
-                    new FileInfo(Path.Join(v2, "Uninstall.exe")),
+                    new FileInfo(Path.Join(v2, "UnityPlayer.dll")),
                     new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
                 };
 
@@ -93,7 +93,7 @@ namespace SPT.Launcher.Helpers
 
         private static string[] d(string l, string k)
         {
-            if (!File.Exists(l)) Array.Empty<string>();
+            if (!File.Exists(l)) return Array.Empty<string>();
             var q = new List<string>();
             var s = $@"""{k}""\s+""(.*)""";
             foreach (var r in File.ReadLines(l))
