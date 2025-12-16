@@ -14,5 +14,6 @@ public class ConfigMod
     public bool IsInstalled { get; set; } = false;
     public bool CanBeUpdated { get; set; } = false;
     public List<string>? Files { get; set; } = new List<string>();
+    [JsonConverter(typeof(SemVerDictConverter))]
     public Dictionary<string, Version>? Dependencies { get; set; } = new Dictionary<string, Version>();
 }
