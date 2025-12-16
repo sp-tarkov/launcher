@@ -41,4 +41,6 @@ public record LauncherSettings
 
     /// String is the mods GUID
     public Dictionary<string, ConfigMod>  Mods { get; set; } = new();
+
+    public bool DebugLogging { get; set; } = false;
 }
