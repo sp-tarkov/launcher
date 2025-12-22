@@ -11,27 +11,34 @@ public class ModManager
 {
     private ILogger<ModManager> _logger;
     private ConfigHelper _configHelper;
-    private DownloadHelper _downloadHelper;
+    private ModHelper _modHelper;
 
     public ModManager
     (
         ILogger<ModManager> logger,
         ConfigHelper configHelper,
-        DownloadHelper downloadHelper
+        ModHelper modHelper
     )
     {
         _logger = logger;
         _configHelper = configHelper;
-        _downloadHelper = downloadHelper;
-        // LoadMods();
+        _modHelper = modHelper;
     }
 
+    /// <summary>
+    /// TODO: add check if mod is already installed
+    /// </summary>
+    /// <param name="forgeMod"></param>
+    /// <param name="version"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="dictOfDeps"></param>
+    /// <returns></returns>
     public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationTokenSource cancellationToken, Dictionary<string, Version>? dictOfDeps = null)
     {
         dictOfDeps ??= new Dictionary<string, Version>();
 
         // start the download
-        var downloadTask = await _downloadHelper.StartDownloadTask(forgeMod, version, cancellationToken);
+        var downloadTask = await _modHelper.StartDownloadTask(forgeMod, version, cancellationToken);
 
         if (!downloadTask.Complete)
         {
@@ -47,7 +54,7 @@ public class ModManager
             return false;
         }
 
-        await _downloadHelper.RemoveModTask(downloadTask);
+        await _modHelper.RemoveModTask(downloadTask);
 
         configMod.Dependencies = dictOfDeps;
         _configHelper.AddMod(configMod);
@@ -94,7 +101,7 @@ public class ModManager
         return _configHelper.GetConfig().Mods;
     }
 
-    public async Task<bool> InstallMod(string guid)
+    public async Task<bool> InstallMod(string guid, CancellationTokenSource cancellationToken = null)
     {
         var modFilePath = Path.Combine(Paths.ModCache, guid);
         if (!File.Exists(modFilePath))
@@ -103,26 +110,25 @@ public class ModManager
             return false;
         }
 
-        var extractor = new SevenZipExtractor(modFilePath);
+        var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
+        configMod.IsInstalling = true;
+        _logger.LogInformation("Installing mod: {guid}", guid);
 
-        // check if zip contains bepinex or spt folder for correct starting structure
-        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+        var installTask = await _modHelper.StartInstallTask(configMod, cancellationToken);
 
-        // we checked this before, but to be sure
-        if (!checkForCorrectFilePath)
+        if (installTask == null || !installTask.Complete || installTask.Error != null)
         {
-            _logger.LogError("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            // TODO: something fucked up, do something
             return false;
         }
 
-        await extractor.ExtractArchiveAsync(_configHelper.GetConfig().GamePath);
         _logger.LogInformation("Installed mod: {guid}", guid);
-
-        var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
+        configMod.IsInstalling = false;
         configMod.IsInstalled = true;
-
         _configHelper.AddMod(configMod);
+
         await InstallModDependencies(guid);
+
         return true;
     }
 
@@ -307,7 +313,7 @@ public class ModManager
             return false;
         }
 
-        var task = await _downloadHelper.StartUpdateTask(mod, cancellationToken);
+        var task = await _modHelper.StartUpdateTask(mod, cancellationToken);
 
         var extractor = new SevenZipExtractor(ogPath);
 

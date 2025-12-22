@@ -42,7 +42,7 @@ public class Launcher
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
             .AddSingleton<ModManager>()
-            .AddSingleton<DownloadHelper>()
+            .AddSingleton<ModHelper>()
             .AddSingleton<StateHelper>()
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()

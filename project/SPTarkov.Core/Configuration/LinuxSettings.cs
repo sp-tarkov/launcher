@@ -12,7 +12,7 @@ public record LinuxSettings
     public string LaunchSettings { get; set; } = "";
 
     // "GE-Proton10-24" "GE-Proton10-20"
-    public string ProtonVersion { get; set; } = "GE-Proton10-25";
+    public string ProtonVersion { get; set; } = "GE-Proton10-26";
 
     public bool GameMode { get; set; } = false;
 }

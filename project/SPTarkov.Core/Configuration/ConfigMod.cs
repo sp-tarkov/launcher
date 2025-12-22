@@ -12,6 +12,7 @@ public class ConfigMod
     public Version ModVersion { get; set; } = new Version(0, 0, 0);
     public string GUID { get; set; } = "com.unknown.mod";
     public bool IsInstalled { get; set; } = false;
+    public bool IsInstalling { get; set; } = false;
     public bool CanBeUpdated { get; set; } = false;
     public List<string>? Files { get; set; } = new List<string>();
     [JsonConverter(typeof(SemVerDictConverter))]

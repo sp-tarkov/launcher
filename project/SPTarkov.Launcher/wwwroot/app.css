@@ -466,6 +466,7 @@ div.overlay-container {
 }
 
 p.progress-bar {
-    background-color: rgba(0, 0, 0, 0.2) !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
     border-radius: 4px;
+    padding: 0 1rem;
 }

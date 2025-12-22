@@ -4,7 +4,7 @@
 
 @inject ModManager ModManager
 @inject IDialogService DialogService
-@inject DownloadHelper DownloadHelper
+@inject ModHelper ModHelper
 @inject ConfigHelper ConfigHelper
 
 <MudContainer Class="px-4 my-2 page-animation-switch" MaxWidth="MaxWidth.Large">
@@ -17,25 +17,26 @@
                         <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Update" Color="Color.Info" OnClick="OpenUpdateDialog" />
                     </MudTooltip>
                 </MudContainer>
-                @foreach (var (name, item) in DownloadHelper.GetModTasks())
+                @foreach (var (name, item) in ModHelper.GetModTasks())
                 {
                     @if (item.Complete && item.Error is null)
                     {
                         continue;
                     }
 
-                    @if (item.Error is not null && item is DownloadTask task)
+                    // Download with error
+                    @if (item.Error is not null && item is DownloadTask downloadTask1)
                     {
                         <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
                             <MudTooltip Text="@item.Error.ToString()" >
                                 <MudContainer Class="d-flex flex-row pa-0">
                                     <MudContainer Class="text-overflow py-2 px-1">
                                         <MudText HtmlTag="span">
-                                            @($"{task.ForgeMod.Name} - {task.Version.Version}")
+                                            @($"{downloadTask1.ForgeMod.Name} - {downloadTask1.Version.Version}")
                                         </MudText>
                                     </MudContainer>
                                     <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelModTask(name)"/>
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => ModHelper.CancelModTask(name)"/>
                                     </MudTooltip>
                                 </MudContainer>
 
@@ -45,23 +46,23 @@
                         continue;
                     }
 
-                    @if (item is DownloadTask downloadTask)
+                    @if (item is DownloadTask downloadTask2)
                     {
                         <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
 
                             <MudContainer Class="d-flex flex-row pa-0">
                                 <MudContainer Class="text-overflow py-2 px-1">
                                     <MudText HtmlTag="span">
-                                        @($"{downloadTask.ForgeMod.Name} - {downloadTask.Version.Version}")
+                                        @($"{downloadTask2.ForgeMod.Name} - {downloadTask2.Version.Version}")
                                     </MudText>
                                     <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
                                         <ChildContent>
-                                            <MudText Color="Color.Default" Class="progress-bar">@item.Progress%</MudText>
+                                            <MudText Color="Color.Default" Class="progress-bar">@item.Progress.ToString("F2")%</MudText>
                                         </ChildContent>
                                     </MudProgressLinear>
                                 </MudContainer>
                                 <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelModTask(name)"/>
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => ModHelper.CancelModTask(name)"/>
                                 </MudTooltip>
                             </MudContainer>
 
@@ -78,12 +79,34 @@
                                     </MudText>
                                     <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
                                         <ChildContent>
-                                            <MudText Color="Color.Default" Class="progress-bar">@item.Progress%</MudText>
+                                            <MudText Color="Color.Default" Class="progress-bar">@item.Progress.ToString("F2")%</MudText>
                                         </ChildContent>
                                     </MudProgressLinear>
                                 </MudContainer>
                                 <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
-                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => DownloadHelper.CancelModTask(name)"/>
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => ModHelper.CancelModTask(name)"/>
+                                </MudTooltip>
+                            </MudContainer>
+
+                        </MudLink>
+                    }
+                    else if (item is InstallTask installTask)
+                    {
+                        <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
+
+                            <MudContainer Class="d-flex flex-row pa-0">
+                                <MudContainer Class="text-overflow py-2 px-1">
+                                    <MudText HtmlTag="span">
+                                        @($"{installTask.Mod.ModName} - {installTask.Mod.ModVersion}")
+                                    </MudText>
+                                    <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Indeterminate="true" Class="mt-2">
+                                        <ChildContent>
+                                            <MudText Color="Color.Default" Class="progress-bar">Unpacking, please wait!</MudText>
+                                        </ChildContent>
+                                    </MudProgressLinear>
+                                </MudContainer>
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Cancel" Placement="Placement.Left">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" OnClick="() => ModHelper.CancelModTask(name)"/>
                                 </MudTooltip>
                             </MudContainer>
 
@@ -92,7 +115,7 @@
                 }
                 @foreach (var (guid, mod) in ModManager.GetMods())
                 {
-                    if (mod.IsInstalled)
+                    if (mod.IsInstalled || mod.IsInstalling)
                     {
                         continue;
                     }
