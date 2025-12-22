@@ -1,21 +1,26 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using SevenZip;
+using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Forge;
 using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Mods;
 
-public class DownloadHelper
+public class ModHelper
 {
-    private ILogger<DownloadHelper> _logger;
+    private ILogger<ModHelper> _logger;
     private HttpClient _httpClient;
+    private ConfigHelper _configHelper;
     private ConcurrentDictionary<string, IModTask> _modDict = new();
 
-    public DownloadHelper(
-        ILogger<DownloadHelper> logger
+    public ModHelper(
+        ILogger<ModHelper> logger,
+        ConfigHelper configHelper
     )
     {
         _logger = logger;
+        _configHelper = configHelper;
 
         // leaving default atm, this will be making requests to unknown servers.
         var handler = new HttpClientHandler();
@@ -38,8 +43,12 @@ public class DownloadHelper
 
         if (!_modDict.TryAdd(mod.Guid, downloadTask))
         {
-            _logger.LogError("Unable to add download task for {name}:{guid}", mod.Name, mod.Guid);
-            return null;
+            _modDict.Remove(mod.Guid, out _);
+            if (!_modDict.TryAdd(mod.Guid, downloadTask))
+            {
+                _logger.LogError("Something seriously went wrong adding this download task: {name}:{guid}", mod.Name, mod.Guid);
+                return null;
+            }
         }
 
         var modFilePath = Path.Combine(Paths.ModCache, mod.Guid);
@@ -178,8 +187,12 @@ public class DownloadHelper
 
         if (!_modDict.TryAdd(updateTask.GUID, updateTask))
         {
-            _logger.LogError("Unable to add update task for {name}:{guid}", updateTask.ModName, updateTask.GUID);
-            return null;
+            _modDict.Remove(updateTask.GUID, out _);
+            if (!_modDict.TryAdd(updateTask.ModName, updateTask))
+            {
+                _logger.LogError("Something seriously went wrong adding this update task: {name}:{guid}", updateTask.ModName, updateTask.GUID);
+                return null;
+            }
         }
 
         var modFilePath = Path.Combine(Paths.ModCache, updateTask.GUID);
@@ -235,5 +248,49 @@ public class DownloadHelper
 
         updateTask.Complete = true;
         return updateTask;
+    }
+
+    public async Task<InstallTask?> StartInstallTask(ConfigMod mod, CancellationTokenSource cancellationToken)
+    {
+        var installTask = new InstallTask
+        {
+            Mod = mod,
+            CancellationTokenSource = cancellationToken,
+            TotalToDownload = 0,
+            Progress = 0,
+            Complete = false,
+            Error = null
+        };
+
+        if (!_modDict.TryAdd(installTask.Mod.GUID, installTask))
+        {
+            _modDict.Remove(installTask.Mod.GUID, out _);
+            if (!_modDict.TryAdd(installTask.Mod.GUID, installTask))
+            {
+                _logger.LogError("Something seriously went wrong adding this install task: {name}:{guid}", installTask.Mod.ModName, installTask.Mod.GUID);
+                return null;
+            }
+        }
+
+        var modFilePath = Path.Combine(Paths.ModCache, mod.GUID);
+        var extractor = new SevenZipExtractor(modFilePath);
+
+        // check if zip contains bepinex or spt folder for correct starting structure
+        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+
+        // we checked this before, but to be sure
+        if (!checkForCorrectFilePath)
+        {
+            _logger.LogError("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            installTask.Complete = false;
+            installTask.Error =
+                new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            return installTask;
+        }
+
+        await extractor.ExtractArchiveAsync(_configHelper.GetConfig().GamePath);
+        installTask.Complete = true;
+
+        return installTask;
     }
 }
