@@ -17,8 +17,8 @@ public class Paths
     public static readonly string LauncherAssetsPath = Path.Combine(Environment.CurrentDirectory, "user", "Launcher");
     public static readonly string LauncherSettingsPath = Path.Combine(Environment.CurrentDirectory, "user", "Launcher", "LauncherSettings.json");
     public static readonly string EFTSettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape From Tarkov", "Settings"); // might have to change if BSG support linux?
-    public static readonly string SPTSettingsFolder = Path.Combine("user", "sptsettings");
-    public static readonly string SPTAppDataFolder = Path.Combine("user", "sptappdata");
+    public static readonly string SPTSettingsFolder = Path.Combine("SPT", "user", "sptsettings");
+    public static readonly string SPTAppDataFolder = Path.Combine("SPT", "user", "sptappdata");
     public static readonly List<string> ArchiveFileInfoToIgnore =
     [
         "bepinex",
