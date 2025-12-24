@@ -328,6 +328,12 @@ public class WineHelper
     {
         // Should contain things like "GE-Proton10-24" or "GE-Proton10-21"
         // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
+        if (!Directory.Exists(Paths.ProtonPath))
+        {
+            _logger.LogError("Proton path not found, make sure to run lutris or steam first");
+            // we want this to throw an exception, so just log this
+        }
+
         var directoryContents = Directory.GetDirectories(Paths.ProtonPath);
         var listStripped = new List<string>();
 

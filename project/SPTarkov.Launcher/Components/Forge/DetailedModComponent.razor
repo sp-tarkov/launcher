@@ -199,6 +199,15 @@
     private void NavigateBack()
     {
         JsRuntime.InvokeVoidAsync("navigateBack");
+        // this doesn't seem to work on linux, so navigating back to forge instead of last page
+        if (OperatingSystem.IsWindows())
+        {
+            JsRuntime.InvokeVoidAsync("navigateBack");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/Forge");
+        }
     }
 
     private void NavigateToDependency(int? depId)
