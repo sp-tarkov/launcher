@@ -10,6 +10,4 @@ public class InstallTask : IModTask
     public float Progress { get; set; }
     public bool Complete { get; set; }
     public Exception? Error { get; set; }
-
-
 }

@@ -33,7 +33,8 @@ public class ModManager
     /// <param name="cancellationToken"></param>
     /// <param name="dictOfDeps"></param>
     /// <returns></returns>
-    public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationTokenSource cancellationToken, Dictionary<string, Version>? dictOfDeps = null)
+    public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationTokenSource cancellationToken,
+        Dictionary<string, Version>? dictOfDeps = null)
     {
         dictOfDeps ??= new Dictionary<string, Version>();
 
@@ -76,11 +77,13 @@ public class ModManager
         var extractor = new SevenZipExtractor(modFilePath);
 
         // check if zip contains bepinex or spt folder for correct starting structure
-        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+        var checkForCorrectFilePath =
+            extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
 
         if (!checkForCorrectFilePath)
         {
-            downloadTask.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            downloadTask.Error =
+                new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
             downloadTask.CancellationTokenSource.Cancel();
             return null;
         }
@@ -214,6 +217,16 @@ public class ModManager
             return false;
         }
 
+        // Check if there are any mods that depend on this one, if so, do not uninstall it
+        var checkForDependOnThis = GetMods().Where(x => x.Value.Dependencies.ContainsKey(guid) && x.Value.IsInstalled).Any();
+
+        if (checkForDependOnThis)
+        {
+            // DONT REMOVE MOD, SOMETHING DEPENDS ON IT
+            // TODO: show feedback to user that this cant be uninstalled
+            return false;
+        }
+
         foreach (var file in mod.Files)
         {
             var modFilePath = Path.Combine(_configHelper.GetConfig().GamePath, file);
@@ -241,11 +254,6 @@ public class ModManager
         return true;
     }
 
-    /// <summary>
-    /// TODO: add dependency checking before deleting
-    /// </summary>
-    /// <param name="guid"></param>
-    /// <returns></returns>
     public async Task<bool> DeleteMod(string guid)
     {
         if (!_configHelper.GetConfig().Mods.ContainsKey(guid))
@@ -257,6 +265,16 @@ public class ModManager
         if (!_configHelper.GetConfig().Mods.TryGetValue(guid, out var mod))
         {
             _logger.LogError("unable to get key: {key}", guid);
+            return false;
+        }
+
+        // Check if there are any mods that depend on this one, if so, do not delete it
+        var checkForDependOnThis = GetMods().Where(x => x.Value.Dependencies.ContainsKey(guid)).Any();
+
+        if (checkForDependOnThis)
+        {
+            // DONT REMOVE MOD, SOMETHING DEPENDS ON IT
+            // TODO: show feedback to user that this cant be deleted
             return false;
         }
 
@@ -318,7 +336,8 @@ public class ModManager
         var extractor = new SevenZipExtractor(ogPath);
 
         // check if zip contains bepinex or spt folder for correct starting structure
-        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+        var checkForCorrectFilePath =
+            extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
 
         if (!checkForCorrectFilePath)
         {
