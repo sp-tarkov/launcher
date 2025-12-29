@@ -21,14 +21,14 @@ public class ValidationUtil
         try
         {
             var v1 = a() as object;
-            if (v1 == null || !Path.Exists(Path.Combine(v1.ToString(), c2)))
+            if (v1 == null || !Path.Exists(Path.Join(v1.ToString(), c2)))
             {
                 b1 = false;
                 v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
             }
 
             var v2 = (v1 != null) ? v1.ToString() : string.Empty;
-            v2 = b1 ? Path.Combine(v2, c2) : v2;
+            v2 = b1 ? Path.Join(v2, c2) : v2;
             var v3 = new DirectoryInfo(v2);
             var v4 = new FileSystemInfo[]
             {
@@ -61,7 +61,7 @@ public class ValidationUtil
         if (string.IsNullOrEmpty(c))
             return null;
 
-        var f = d(Path.Combine(c, "steamapps", "libraryfolders.vdf"), "path");
+        var f = d(Path.Join(c, "steamapps", "libraryfolders.vdf"), "path");
         return f.Length > 0 ? g(f) : null;
     }
 
@@ -80,11 +80,11 @@ public class ValidationUtil
         var k = $"appmanifest_{c3}.acf";
         foreach (var l in j)
         {
-            var m = Path.Combine(l, "steamapps", k);
+            var m = Path.Join(l, "steamapps", k);
             if (!File.Exists(m)) continue;
 
             var n = d(m, "installdir");
-            if (n.Length > 0) return Path.Combine(l, "steamapps", "common", n[0]);
+            if (n.Length > 0) return Path.Join(l, "steamapps", "common", n[0]);
         }
 
         return null;

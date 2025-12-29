@@ -21,7 +21,7 @@
     private void LoadLiveSettings()
     {
         Logger.LogInformation("Loading Live Settings");
-        var sptSettingsFolder = Path.Combine(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder);
+        var sptSettingsFolder = Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder);
 
         if (!Directory.Exists(Paths.EFTSettingsFolder))
         {
@@ -58,7 +58,7 @@
     private void ClearGameSettings()
     {
         Logger.LogInformation("clearing game settings");
-        var sptSettings = new DirectoryInfo(Path.Combine(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder));
+        var sptSettings = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder));
 
         try
         {
@@ -111,11 +111,11 @@
     {
         var filesToCopy = new List<string>();
         var path = ConfigHelper.GetConfig().GamePath;
-        var bepinPath = Path.Combine(path, "BepInEx", "LogOutput.log");
-        var serverPath = Path.Combine(path, "SPT", "user", "logs", $"spt{DateTime.Now:yyyy-MM-dd}.log");
-        var launcherPath = Path.Combine(path, "SPT", "user", "logs", "launcher.log");
-        var tracePath = Path.Combine(path, "Logs");
-        // var profilePath = Path.Combine(path, "SPT", "user", "profiles", $"{AccountManager.SelectedAccount.id}.json")) TODO: needs to be reworked to deal with new multiprofile approach
+        var bepinPath = Path.Join(path, "BepInEx", "LogOutput.log");
+        var serverPath = Path.Join(path, "SPT", "user", "logs", $"spt{DateTime.Now:yyyy-MM-dd}.log");
+        var launcherPath = Path.Join(path, "SPT", "user", "logs", "launcher.log");
+        var tracePath = Path.Join(path, "Logs");
+        // var profilePath = Path.Join(path, "SPT", "user", "profiles", $"{AccountManager.SelectedAccount.id}.json")) TODO: needs to be reworked to deal with new multiprofile approach
 
         if (File.Exists(bepinPath))
         {

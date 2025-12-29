@@ -65,7 +65,7 @@ public class WineHelper
             return null;
         }
 
-        var regFilePath = Path.Combine(prefixPath, "system.reg");
+        var regFilePath = Path.Join(prefixPath, "system.reg");
         var RegValueToLookFor = "InstallLocation";
 
         try

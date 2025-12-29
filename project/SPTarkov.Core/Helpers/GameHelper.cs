@@ -57,9 +57,9 @@ public class GameHelper
             // We prioritize the Steam version, as the Steam CDN is faster for updates, and if someone
             // owns it on both platforms, there's a better chance their Steam version is up to date
             var steamInstallPath = _validationUtil.a();
-            if (steamInstallPath != null && Path.Exists(Path.Combine(steamInstallPath, "build")))
+            if (steamInstallPath != null && Path.Exists(Path.Join(steamInstallPath, "build")))
             {
-                var steamBuildDir = Path.Combine(steamInstallPath, "build");
+                var steamBuildDir = Path.Join(steamInstallPath, "build");
                 return Path.TrimEndingDirectorySeparator(steamBuildDir);
             }
 
@@ -145,7 +145,7 @@ public class GameHelper
         _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
 
         // check game path
-        var clientExecutable = Path.Combine(_configHelper.GetConfig().GamePath, "EscapeFromTarkov.exe");
+        var clientExecutable = Path.Join(_configHelper.GetConfig().GamePath, "EscapeFromTarkov.exe");
 
         if (!File.Exists(clientExecutable))
         {
@@ -251,7 +251,7 @@ public class GameHelper
 
     private List<string> GetCorePatches()
     {
-        return Directory.GetDirectories(Path.Combine(_configHelper.GetConfig().GamePath, Paths.PatchPath)).ToList();
+        return Directory.GetDirectories(Path.Join(_configHelper.GetConfig().GamePath, Paths.PatchPath)).ToList();
     }
 
     private async Task<bool> IsCoreDllVersionMismatched()
@@ -262,7 +262,7 @@ public class GameHelper
 
             // TODO: can this be changed to use `using Version = SemanticVersioning.Version;`
             var serverVersion = new SptVersion(call?.Response!);
-            var coreDllPath = Path.Combine(_configHelper.GetConfig().GamePath, Paths.CoreDllPath);
+            var coreDllPath = Path.Join(_configHelper.GetConfig().GamePath, Paths.CoreDllPath);
             if (!File.Exists(coreDllPath))
             {
                 _logger.LogError("spt-core.dll missing: {coreDllPath}", coreDllPath);
@@ -316,25 +316,25 @@ public class GameHelper
             List<FileInfo> files =
             [
                 // SPT files
-                new(Path.Combine(_originalGamePath!, "SPT.Launcher.exe")),
-                new(Path.Combine(_originalGamePath!, "SPT.Server.exe")),
+                new(Path.Join(_originalGamePath!, "SPT.Launcher.exe")),
+                new(Path.Join(_originalGamePath!, "SPT.Server.exe")),
 
                 // bepinex files
-                new(Path.Combine(_originalGamePath!, "doorstep_config.ini")),
-                new(Path.Combine(_originalGamePath!, "winhttp.dll")),
+                new(Path.Join(_originalGamePath!, "doorstep_config.ini")),
+                new(Path.Join(_originalGamePath!, "winhttp.dll")),
 
                 // licenses
-                new(Path.Combine(_originalGamePath!, "LICENSE-BEPINEX.txt")),
-                new(Path.Combine(_originalGamePath!, "LICENSE-ConfigurationManager.txt")),
-                new(Path.Combine(_originalGamePath!, "LICENSE-Launcher.txt")),
-                new(Path.Combine(_originalGamePath!, "LICENSE-Modules.txt")),
-                new(Path.Combine(_originalGamePath!, "LICENSE-Server.txt"))
+                new(Path.Join(_originalGamePath!, "LICENSE-BEPINEX.txt")),
+                new(Path.Join(_originalGamePath!, "LICENSE-ConfigurationManager.txt")),
+                new(Path.Join(_originalGamePath!, "LICENSE-Launcher.txt")),
+                new(Path.Join(_originalGamePath!, "LICENSE-Modules.txt")),
+                new(Path.Join(_originalGamePath!, "LICENSE-Server.txt"))
             ];
 
             List<DirectoryInfo> directories =
             [
-                new(Path.Combine(_originalGamePath!, "SPT_Data")),
-                new(Path.Combine(_originalGamePath!, "BepInEx"))
+                new(Path.Join(_originalGamePath!, "SPT_Data")),
+                new(Path.Join(_originalGamePath!, "BepInEx"))
             ];
 
             foreach (var file in files.Where(file => File.Exists(file.FullName)))
@@ -377,7 +377,7 @@ public class GameHelper
             GetFileForCleanup("WinPixEventRuntime.dll"),
 
             // Don't allow excluding this from cleanup ever
-            Path.Combine(_configHelper.GetConfig().GamePath, Paths.HwechoDllPath)
+            Path.Join(_configHelper.GetConfig().GamePath, Paths.HwechoDllPath)
         };
 
         foreach (var file in files)
@@ -408,7 +408,7 @@ public class GameHelper
             return null;
         }
 
-        return Path.Combine(_configHelper.GetConfig().GamePath, fileName);
+        return Path.Join(_configHelper.GetConfig().GamePath, fileName);
     }
 
     /// <summary>
@@ -416,7 +416,7 @@ public class GameHelper
     /// </summary>
     public void RemoveProfileRegistryKeys(string profileId)
     {
-        var registryFile = new FileInfo(Path.Combine(Environment.CurrentDirectory, Paths.SptRegJson));
+        var registryFile = new FileInfo(Path.Join(Environment.CurrentDirectory, Paths.SptRegJson));
 
         if (!registryFile.Exists)
         {

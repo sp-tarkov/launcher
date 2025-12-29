@@ -51,7 +51,7 @@ public class ModHelper
             }
         }
 
-        var modFilePath = Path.Combine(Paths.ModCache, mod.Guid);
+        var modFilePath = Path.Join(Paths.ModCache, mod.Guid);
         try
         {
             if (!Directory.Exists(Paths.ModCache))
@@ -149,9 +149,9 @@ public class ModHelper
 
             await downloadTask.CancellationTokenSource.CancelAsync();
 
-            if (File.Exists(Path.Combine(Paths.ModCache, guid)))
+            if (File.Exists(Path.Join(Paths.ModCache, guid)))
             {
-                File.Delete(Path.Combine(Paths.ModCache, guid));
+                File.Delete(Path.Join(Paths.ModCache, guid));
             }
 
             _logger.LogInformation("Mod {guid} cancelled", guid);
@@ -195,7 +195,7 @@ public class ModHelper
             }
         }
 
-        var modFilePath = Path.Combine(Paths.ModCache, updateTask.GUID);
+        var modFilePath = Path.Join(Paths.ModCache, updateTask.GUID);
 
         try
         {
@@ -272,7 +272,7 @@ public class ModHelper
             }
         }
 
-        var modFilePath = Path.Combine(Paths.ModCache, mod.GUID);
+        var modFilePath = Path.Join(Paths.ModCache, mod.GUID);
         var extractor = new SevenZipExtractor(modFilePath);
 
         // check if zip contains bepinex or spt folder for correct starting structure

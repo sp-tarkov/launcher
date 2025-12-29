@@ -57,7 +57,7 @@ public class FilePatcher
             var relativefile = file.FullName.Substring(patchpath.Length).TrimStart('\\', '/');
 
             // create a target file from the relative patch file while utilizing targetpath as the root directory.
-            target = new FileInfo(Path.Combine(targetpath, relativefile.Replace(".delta", "")));
+            target = new FileInfo(Path.Join(targetpath, relativefile.Replace(".delta", "")));
 
             var result = Patch(target.FullName, file.FullName, ignoreInputHashMismatch);
 

@@ -66,7 +66,7 @@ public class ModManager
 
     private async Task<ConfigMod?> ConvertToConfigMod(DownloadTask downloadTask)
     {
-        var modFilePath = Path.Combine(Paths.ModCache, downloadTask.ForgeMod.Guid);
+        var modFilePath = Path.Join(Paths.ModCache, downloadTask.ForgeMod.Guid);
         if (!File.Exists(modFilePath))
         {
             downloadTask.Error = new FileNotFoundException("file not found", modFilePath);
@@ -106,7 +106,7 @@ public class ModManager
 
     public async Task<bool> InstallMod(string guid, CancellationTokenSource cancellationToken = null)
     {
-        var modFilePath = Path.Combine(Paths.ModCache, guid);
+        var modFilePath = Path.Join(Paths.ModCache, guid);
         if (!File.Exists(modFilePath))
         {
             _logger.LogError("file not found: {file}", modFilePath);
@@ -229,7 +229,7 @@ public class ModManager
 
         foreach (var file in mod.Files)
         {
-            var modFilePath = Path.Combine(_configHelper.GetConfig().GamePath, file);
+            var modFilePath = Path.Join(_configHelper.GetConfig().GamePath, file);
 
             // first one will likely delete most but do all to be sure
             if (Directory.Exists(modFilePath))
@@ -280,7 +280,7 @@ public class ModManager
 
         foreach (var file in mod.Files)
         {
-            var modFilePath = Path.Combine(_configHelper.GetConfig().GamePath, file);
+            var modFilePath = Path.Join(_configHelper.GetConfig().GamePath, file);
 
             // first one will likely delete most but do all to be sure
             if (Directory.Exists(modFilePath))
@@ -296,10 +296,10 @@ public class ModManager
 
         _logger.LogInformation("Deleted mod: {guid}", guid);
 
-        if (File.Exists(Path.Combine(Paths.ModCache, guid)))
+        if (File.Exists(Path.Join(Paths.ModCache, guid)))
         {
             _logger.LogInformation("deleted zip for mod {guid}", guid);
-            File.Delete(Path.Combine(Paths.ModCache, guid));
+            File.Delete(Path.Join(Paths.ModCache, guid));
         }
 
         _configHelper.RemoveMod(guid);
@@ -321,7 +321,7 @@ public class ModManager
             return false;
         }
 
-        var ogPath = Path.Combine(Paths.ModCache, mod.CurrentVersion.GUID);
+        var ogPath = Path.Join(Paths.ModCache, mod.CurrentVersion.GUID);
 
         File.Copy(ogPath, ogPath + ".bak", true);
 

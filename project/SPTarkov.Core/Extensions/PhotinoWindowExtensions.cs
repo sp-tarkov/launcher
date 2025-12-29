@@ -18,7 +18,7 @@ public static class PhotinoWindowExtensions
             Console.WriteLine("Icon stream is null");
             return null;
         }
-        string tempFile = Path.Combine(Path.GetTempPath(), fileName);
+        string tempFile = Path.Join(Path.GetTempPath(), fileName);
         using (FileStream fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
         {
             iconStream.CopyTo(fileStream);
