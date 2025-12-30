@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -190,7 +190,7 @@ public class Launcher
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             _logger.LogCritical("Please check the following is installed:");
-            _logger.LogCritical("Libwebkit2gtk-4.1");
+            _logger.LogCritical("webkit2gtk-4.1");
         }
     }
 }
