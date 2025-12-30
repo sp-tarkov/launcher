@@ -15,6 +15,7 @@ public class LinuxSevenZip : SevenZip
         {
             throw new ArgumentNullException(nameof(Paths.SevenZip));
         }
+
         if (pathToZip is null)
         {
             throw new ArgumentNullException(nameof(pathToZip));
@@ -43,7 +44,7 @@ public class LinuxSevenZip : SevenZip
         }
 
         var output = processResult.StandardOutput.ReadToEnd();
-        var error  = processResult.StandardError.ReadToEnd();
+        var error = processResult.StandardError.ReadToEnd();
 
         await processResult.WaitForExitAsync();
 
@@ -61,10 +62,12 @@ public class LinuxSevenZip : SevenZip
         {
             throw new ArgumentNullException(nameof(Paths.SevenZip));
         }
+
         if (pathToZip is null)
         {
             throw new ArgumentNullException(nameof(pathToZip));
         }
+
         if (destination is null)
         {
             throw new ArgumentNullException(nameof(destination));
@@ -72,6 +75,7 @@ public class LinuxSevenZip : SevenZip
 
         try
         {
+            // launching extraction on a zip is `x -o"Destination" "PathToZip"`
             var process = new ProcessStartInfo
             {
                 FileName = Path.Join(Paths.SevenZip, "7zz"),
@@ -103,7 +107,7 @@ public class LinuxSevenZip : SevenZip
         return true;
     }
 
-        private async Task<List<string>> ParseEntries(string outputResult)
+    private async Task<List<string>> ParseEntries(string outputResult)
     {
         // split on ------------------------ to remove the first part that isnt needed
         // this will also split the ------------------------ of the end, so we want further work to happen to the middle section [1]
