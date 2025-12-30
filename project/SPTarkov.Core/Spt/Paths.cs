@@ -8,7 +8,7 @@ public class Paths
     public static readonly string UninstallEftRegKey = @"Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\EscapeFromTarkov";
     public static readonly string SteamRegistryInstallKey = @"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 3932890";
     public static readonly string ProtonPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share", "Steam", "compatibilitytools.d");
-    public static readonly string SevenZipDllPath = Path.Join(Directory.GetCurrentDirectory(), "SPT_Data", "Launcher", "Dependency", "7z.dll");
+    public static readonly string SevenZip = Path.Join(Directory.GetCurrentDirectory(), "SPT_Data", "Launcher", "Dependency");
     public static readonly string PatchPath = Path.Join("SPT", "SPT_Data", "Launcher", "Patches");
     public static readonly string CoreDllPath = Path.Join("BepInEx", "plugins", "spt", "spt-core.dll");
     public static readonly string HwechoDllPath = Path.Join("EscapeFromTarkov_Data", "Plugins", "x86_64", "hwecho.dll");

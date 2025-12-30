@@ -1,17 +1,19 @@
 ﻿using System.Diagnostics;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.SevenZip;
 
 public class WindowsSevenZip : SevenZip
 {
-    public string? PathToSevenZip { get; set; }
+    public ILogger<SevenZip> _logger { get; set; }
 
     public async Task<List<string>> GetEntriesAsync(string pathToZip)
     {
-        if (PathToSevenZip is null)
+        if (Paths.SevenZip is null)
         {
-            throw new ArgumentNullException(nameof(PathToSevenZip));
+            throw new ArgumentNullException(nameof(Paths.SevenZip));
         }
         if (pathToZip is null)
         {
@@ -20,8 +22,8 @@ public class WindowsSevenZip : SevenZip
 
         var process = new ProcessStartInfo
         {
-            FileName = Path.Join(PathToSevenZip, "7za.exe"),
-            WorkingDirectory = PathToSevenZip,
+            FileName = Path.Join(Paths.SevenZip, "7za.exe"),
+            WorkingDirectory = Paths.SevenZip,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -36,12 +38,12 @@ public class WindowsSevenZip : SevenZip
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogCritical(e.Message);
             throw;
         }
 
-        string output = processResult.StandardOutput.ReadToEnd();
-        string error  = processResult.StandardError.ReadToEnd();
+        var output = processResult.StandardOutput.ReadToEnd();
+        var error  = processResult.StandardError.ReadToEnd();
 
         await processResult.WaitForExitAsync();
 
@@ -55,9 +57,9 @@ public class WindowsSevenZip : SevenZip
 
     public async Task<bool> ExtractToDirectoryAsync(string pathToZip, string destination)
     {
-        if (PathToSevenZip is null)
+        if (Paths.SevenZip is null)
         {
-            throw new ArgumentNullException(nameof(PathToSevenZip));
+            throw new ArgumentNullException(nameof(Paths.SevenZip));
         }
         if (pathToZip is null)
         {
@@ -72,18 +74,18 @@ public class WindowsSevenZip : SevenZip
         {
             var process = new ProcessStartInfo
             {
-                FileName = Path.Join(PathToSevenZip, "7za.exe"),
-                WorkingDirectory = PathToSevenZip,
+                FileName = Path.Join(Paths.SevenZip, "7za.exe"),
+                WorkingDirectory = Paths.SevenZip,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 Arguments = $"x -o\"{destination}\"  \"{pathToZip}\" ",
             };
 
-            Process? processResult = Process.Start(process);
+            var processResult = Process.Start(process);
 
-            string output = processResult.StandardOutput.ReadToEnd();
-            string error = processResult.StandardError.ReadToEnd();
+            var output = processResult.StandardOutput.ReadToEnd();
+            var error = processResult.StandardError.ReadToEnd();
 
             await processResult.WaitForExitAsync();
 
@@ -94,7 +96,7 @@ public class WindowsSevenZip : SevenZip
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            _logger.LogError("Exception occured while extracting to directory: {e}", e);
             return false;
         }
 
@@ -106,10 +108,9 @@ public class WindowsSevenZip : SevenZip
         // split on ------------------------ to remove the first part that isnt needed
         // this will also split the ------------------------ of the end, so we want further work to happen to the middle section [1]
         var afterSplit = outputResult.Split("------------------------");
-        Console.WriteLine($"{afterSplit.Length} entries found");
+
         // now split on \r\n this should return multiple lines
         var afterSplit2 = afterSplit[1].Split("\r\n");
-        Console.WriteLine($"{afterSplit2.Length} entries found");
 
         var listOfEntries = new List<string>();
         var sb = new StringBuilder();
@@ -124,6 +125,7 @@ public class WindowsSevenZip : SevenZip
             var counter = 1;
             var lastCharacter = '1';
             var readingEntry = false;
+
             // entry is always 6th - This was a lie, check comments below method :sadge:
             foreach (var c in s)
             {
@@ -162,12 +164,12 @@ public class WindowsSevenZip : SevenZip
 
             var stb = sb.ToString();
             listOfEntries.Add(stb);
-            Console.WriteLine(stb);
             sb.Clear();
         }
 
         return listOfEntries;
     }
+
     // Example return from 7-zip
     // 7-Zip (a) 25.01 (x64) : Copyright (c) 1999-2025 Igor Pavlov : 2025-08-03
     // Scanning the drive for archives:

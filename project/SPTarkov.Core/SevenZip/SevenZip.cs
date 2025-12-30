@@ -1,8 +1,10 @@
-﻿namespace SPTarkov.Core.SevenZip;
+﻿using Microsoft.Extensions.Logging;
+
+namespace SPTarkov.Core.SevenZip;
 
 public interface SevenZip
 {
-    public string? PathToSevenZip { get; set; }
+    public ILogger<SevenZip> _logger { get; set; }
 
     public Task<List<string>> GetEntriesAsync(string pathToZip);
 

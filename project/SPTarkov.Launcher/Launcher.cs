@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using Photino.Blazor;
-using SevenZip;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
 using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
+using SPTarkov.Core.SevenZip;
 using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Launcher;
@@ -34,7 +34,20 @@ public class Launcher
     {
         EmbedProvider = new ManifestEmbeddedFileProvider(typeof(Launcher).Assembly, "wwwroot");
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(EmbedProvider, args);
-        SevenZipBase.SetLibraryPath(Paths.SevenZipDllPath);
+        SevenZip? sevenZip = null;
+
+        if (OperatingSystem.IsWindows())
+        {
+            sevenZip = new WindowsSevenZip();
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            sevenZip = new LinuxSevenZip();
+        }
+        else
+        {
+             throw new PlatformNotSupportedException();
+        }
 
         appBuilder.Services
             .AddSingleton<ConfigHelper>()
@@ -49,6 +62,7 @@ public class Launcher
             .AddSingleton<WindowsClipboard>()
             .AddSingleton<WineHelper>()
             .AddSingleton<ValidationUtil>()
+            .AddSingleton(sevenZip)
             .AddLogging(builder =>
             {
                 builder.ClearProviders();
@@ -68,6 +82,7 @@ public class Launcher
 
         App = appBuilder.Build();
 
+        sevenZip._logger = App.Services.GetService<ILogger<SevenZip>>();
         _logger = App.Services.GetService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetService<ConfigHelper>();
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
-using SevenZip;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Forge;
 using SPTarkov.Core.SPT;
+using SPTarkov.Core.SevenZip;
 
 namespace SPTarkov.Core.Mods;
 
@@ -13,14 +13,17 @@ public class ModHelper
     private HttpClient _httpClient;
     private ConfigHelper _configHelper;
     private ConcurrentDictionary<string, IModTask> _modDict = new();
+    private SevenZip.SevenZip _sevenZip;
 
     public ModHelper(
         ILogger<ModHelper> logger,
-        ConfigHelper configHelper
+        ConfigHelper configHelper,
+        SevenZip.SevenZip sevenZip
     )
     {
         _logger = logger;
         _configHelper = configHelper;
+        _sevenZip = sevenZip;
 
         // leaving default atm, this will be making requests to unknown servers.
         var handler = new HttpClientHandler();
@@ -273,10 +276,10 @@ public class ModHelper
         }
 
         var modFilePath = Path.Join(Paths.ModCache, mod.GUID);
-        var extractor = new SevenZipExtractor(modFilePath);
+        var entries = await _sevenZip.GetEntriesAsync(modFilePath);
 
         // check if zip contains bepinex or spt folder for correct starting structure
-        var checkForCorrectFilePath = extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+        var checkForCorrectFilePath = entries.Any(x => x.ToLower().Contains("bepinex/") || x.ToLower().Contains("spt/"));
 
         // we checked this before, but to be sure
         if (!checkForCorrectFilePath)
@@ -288,7 +291,7 @@ public class ModHelper
             return installTask;
         }
 
-        await extractor.ExtractArchiveAsync(_configHelper.GetConfig().GamePath);
+        await _sevenZip.ExtractToDirectoryAsync(modFilePath, _configHelper.GetConfig().GamePath);
         installTask.Complete = true;
 
         return installTask;

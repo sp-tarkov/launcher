@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using SevenZip;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Forge;
 using SPTarkov.Core.SPT;
@@ -12,17 +11,20 @@ public class ModManager
     private ILogger<ModManager> _logger;
     private ConfigHelper _configHelper;
     private ModHelper _modHelper;
+    private SevenZip.SevenZip _sevenZip;
 
     public ModManager
     (
         ILogger<ModManager> logger,
         ConfigHelper configHelper,
-        ModHelper modHelper
+        ModHelper modHelper,
+        SevenZip.SevenZip sevenZip
     )
     {
         _logger = logger;
         _configHelper = configHelper;
         _modHelper = modHelper;
+        _sevenZip = sevenZip;
     }
 
     /// <summary>
@@ -74,11 +76,10 @@ public class ModManager
             return null;
         }
 
-        var extractor = new SevenZipExtractor(modFilePath);
+        var entries = await _sevenZip.GetEntriesAsync(modFilePath);
 
         // check if zip contains bepinex or spt folder for correct starting structure
-        var checkForCorrectFilePath =
-            extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+        var checkForCorrectFilePath = entries.Any(x => x.ToLower().Contains("bepinex/") || x.ToLower().Contains("spt/"));
 
         if (!checkForCorrectFilePath)
         {
@@ -95,7 +96,7 @@ public class ModManager
             GUID = downloadTask.ForgeMod.Guid,
             IsInstalled = false,
             CanBeUpdated = false,
-            Files = RemoveBasePaths(extractor.ArchiveFileNames.ToList())
+            Files = RemoveBasePaths(entries)
         };
     }
 
@@ -333,11 +334,10 @@ public class ModManager
 
         var task = await _modHelper.StartUpdateTask(mod, cancellationToken);
 
-        var extractor = new SevenZipExtractor(ogPath);
+        var entries = await _sevenZip.GetEntriesAsync(ogPath);
 
         // check if zip contains bepinex or spt folder for correct starting structure
-        var checkForCorrectFilePath =
-            extractor.ArchiveFileNames.Any(x => x.ToLower().Contains("bepinex\\") || x.ToLower().Contains("spt\\"));
+        var checkForCorrectFilePath = entries.Any(x => x.ToLower().Contains("bepinex/") || x.ToLower().Contains("spt/"));
 
         if (!checkForCorrectFilePath)
         {
@@ -348,7 +348,7 @@ public class ModManager
 
         // update config for latest version
         configMod.ModVersion = mod.RecommendedVersion.Version;
-        configMod.Files = RemoveBasePaths(extractor.ArchiveFileNames.ToList());
+        configMod.Files = RemoveBasePaths(entries);
         _configHelper.AddMod(configMod);
 
         // delete old zip with .bak
