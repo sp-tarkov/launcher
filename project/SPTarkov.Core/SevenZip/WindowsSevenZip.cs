@@ -103,6 +103,11 @@ public class WindowsSevenZip : SevenZip
         return true;
     }
 
+    /// <summary>
+    /// TODO: maybe a regex wizard can do this better
+    /// </summary>
+    /// <param name="outputResult"></param>
+    /// <returns></returns>
     private async Task<List<string>> ParseEntries(string outputResult)
     {
         // split on ------------------------ to remove the first part that isnt needed
