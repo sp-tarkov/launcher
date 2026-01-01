@@ -27,6 +27,7 @@ public class WindowsSevenZip : SevenZip
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            CreateNoWindow =  true,
             Arguments = $"l \"{pathToZip}\"",
         };
 
@@ -61,11 +62,11 @@ public class WindowsSevenZip : SevenZip
         {
             throw new ArgumentNullException(nameof(Paths.SevenZip));
         }
-        if (pathToZip is null)
+        if (string.IsNullOrEmpty(pathToZip))
         {
             throw new ArgumentNullException(nameof(pathToZip));
         }
-        if (destination is null)
+        if (string.IsNullOrEmpty(destination))
         {
             throw new ArgumentNullException(nameof(destination));
         }
@@ -79,7 +80,8 @@ public class WindowsSevenZip : SevenZip
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                Arguments = $"x -o\"{destination}\"  \"{pathToZip}\" ",
+                CreateNoWindow =  true,
+                Arguments = $"x -o\"{destination}\"  \"{pathToZip}\"",
             };
 
             var processResult = Process.Start(process);

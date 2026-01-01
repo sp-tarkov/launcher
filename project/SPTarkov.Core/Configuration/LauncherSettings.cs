@@ -21,7 +21,7 @@ public record LauncherSettings
 
     public bool FirstRun { get; set; } = true;
 
-    public string GamePath { get; set; } = "";
+    public string GamePath { get; set; } = Environment.CurrentDirectory;
 
     public bool CloseToTray { get; set; }
 

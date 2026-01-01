@@ -279,7 +279,8 @@ public class ModHelper
         var entries = await _sevenZip.GetEntriesAsync(modFilePath);
 
         // check if zip contains bepinex or spt folder for correct starting structure
-        var checkForCorrectFilePath = entries.Any(x => x.ToLower().Contains("bepinex/") || x.ToLower().Contains("spt/"));
+        // this should be bepinex\ on windows and bepinex/ on linux
+        var checkForCorrectFilePath = entries.Any(x => x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt" + Path.DirectorySeparatorChar));
 
         // we checked this before, but to be sure
         if (!checkForCorrectFilePath)

@@ -28,6 +28,7 @@ public class LinuxSevenZip : SevenZip
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            CreateNoWindow =  true,
             Arguments = $"l \"{pathToZip}\"",
         };
 
@@ -83,6 +84,7 @@ public class LinuxSevenZip : SevenZip
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                CreateNoWindow =  true,
                 Arguments = $"x -o\"{destination}\"  \"{pathToZip}\" ",
             };
 
