@@ -189,12 +189,6 @@ a.download-on-hover:hover {
     user-select: none;
 }
 
-.text-ellipsis {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .edition-text {
     background-color: #303038;
 }
