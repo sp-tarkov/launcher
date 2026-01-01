@@ -43,8 +43,8 @@ public class WindowsSevenZip : SevenZip
             throw;
         }
 
-        var output = processResult.StandardOutput.ReadToEnd();
-        var error  = processResult.StandardError.ReadToEnd();
+        var output = await processResult.StandardOutput.ReadToEndAsync();
+        var error = await processResult.StandardError.ReadToEndAsync();
 
         await processResult.WaitForExitAsync();
 
@@ -86,8 +86,8 @@ public class WindowsSevenZip : SevenZip
 
             var processResult = Process.Start(process);
 
-            var output = processResult.StandardOutput.ReadToEnd();
-            var error = processResult.StandardError.ReadToEnd();
+            var output = await processResult.StandardOutput.ReadToEndAsync();
+            var error = await processResult.StandardError.ReadToEndAsync();
 
             await processResult.WaitForExitAsync();
 
