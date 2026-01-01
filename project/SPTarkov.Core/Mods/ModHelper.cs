@@ -31,7 +31,7 @@ public class ModHelper
         _httpClient = new HttpClient(handler);
     }
 
-    public async Task<DownloadTask?> StartDownloadTask(ForgeBase mod, ForgeModVersion version, CancellationTokenSource cancellationToken)
+    public async Task<DownloadTask?> StartDownloadTask(ForgeBase mod, ForgeModVersion version, CancellationTokenSource cancellationTokenSource)
     {
         var downloadTask = new DownloadTask
         {
@@ -39,7 +39,7 @@ public class ModHelper
             Version = version,
             TotalToDownload = 0,
             Progress = 0,
-            CancellationTokenSource = cancellationToken,
+            CancellationTokenSource = cancellationTokenSource,
             Complete = false,
             Error = null
         };
@@ -69,12 +69,12 @@ public class ModHelper
 
             // Use a download to EFT client to test a long download
             using var response =
-                await _httpClient.GetAsync(version.Link, HttpCompletionOption.ResponseHeadersRead, cancellationToken.Token);
+                await _httpClient.GetAsync(version.Link, HttpCompletionOption.ResponseHeadersRead, downloadTask.CancellationTokenSource.Token);
             response.EnsureSuccessStatusCode();
 
             downloadTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
 
-            var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken.Token);
+            var contentStream = await response.Content.ReadAsStreamAsync(downloadTask.CancellationTokenSource.Token);
             var fileStream = File.Create(modFilePath);
 
             var buffer = new byte[8192];
@@ -83,9 +83,9 @@ public class ModHelper
 
             var lastReportTime = DateTime.UtcNow;
 
-            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken.Token)) > 0)
+            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, downloadTask.CancellationTokenSource.Token)) > 0)
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken.Token);
+                await fileStream.WriteAsync(buffer, 0, bytesRead, downloadTask.CancellationTokenSource.Token);
                 totalRead += bytesRead;
 
                 var now = DateTime.UtcNow;
@@ -106,7 +106,7 @@ public class ModHelper
         catch (Exception e)
         {
             downloadTask.Error = e;
-            cancellationToken.Cancel();
+            await downloadTask.CancellationTokenSource.CancelAsync();
             return downloadTask;
         }
 
@@ -152,12 +152,19 @@ public class ModHelper
 
             await downloadTask.CancellationTokenSource.CancelAsync();
 
+            if (downloadTask is not DownloadTask)
+            {
+                _logger.LogInformation("Mod {guid} cancelled", guid);
+
+                return true;
+            }
+
             if (File.Exists(Path.Join(Paths.ModCache, guid)))
             {
                 File.Delete(Path.Join(Paths.ModCache, guid));
             }
 
-            _logger.LogInformation("Mod {guid} cancelled", guid);
+            _logger.LogInformation("ModDownload {guid} cancelled", guid);
 
             return true;
         }
@@ -173,7 +180,7 @@ public class ModHelper
         return _modDict;
     }
 
-    public async Task<UpdateTask?> StartUpdateTask(ForgeModUpdate mod, CancellationTokenSource cancellationToken)
+    public async Task<UpdateTask?> StartUpdateTask(ForgeModUpdate mod, CancellationTokenSource cancellationTokenSource)
     {
         var updateTask = new UpdateTask
         {
@@ -183,7 +190,7 @@ public class ModHelper
             Link = mod.RecommendedVersion.Link,
             Progress = 0,
             TotalToDownload = 0,
-            CancellationTokenSource = cancellationToken,
+            CancellationTokenSource = cancellationTokenSource,
             Complete = false,
             Error = null
         };
@@ -208,12 +215,12 @@ public class ModHelper
             }
 
             // Use a download to EFT client to test a long download
-            using var response = await _httpClient.GetAsync(updateTask.Link, HttpCompletionOption.ResponseHeadersRead, cancellationToken.Token);
+            using var response = await _httpClient.GetAsync(updateTask.Link, HttpCompletionOption.ResponseHeadersRead, updateTask.CancellationTokenSource.Token);
             response.EnsureSuccessStatusCode();
 
             updateTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
 
-            var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken.Token);
+            var contentStream = await response.Content.ReadAsStreamAsync(updateTask.CancellationTokenSource.Token);
             var fileStream = File.Create(modFilePath);
 
             var buffer = new byte[8192];
@@ -222,9 +229,9 @@ public class ModHelper
 
             var lastReportTime = DateTime.UtcNow;
 
-            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken.Token)) > 0)
+            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, updateTask.CancellationTokenSource.Token)) > 0)
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken.Token);
+                await fileStream.WriteAsync(buffer, 0, bytesRead, updateTask.CancellationTokenSource.Token);
                 totalRead += bytesRead;
 
                 var now = DateTime.UtcNow;
@@ -245,7 +252,7 @@ public class ModHelper
         catch (Exception e)
         {
             updateTask.Error = e;
-            cancellationToken.Cancel();
+            await updateTask.CancellationTokenSource.CancelAsync();
             return updateTask;
         }
 
@@ -253,12 +260,12 @@ public class ModHelper
         return updateTask;
     }
 
-    public async Task<InstallTask?> StartInstallTask(ConfigMod mod, CancellationTokenSource cancellationToken)
+    public async Task<InstallTask?> StartInstallTask(ConfigMod mod, CancellationTokenSource cancellationTokenSource)
     {
         var installTask = new InstallTask
         {
             Mod = mod,
-            CancellationTokenSource = cancellationToken,
+            CancellationTokenSource = cancellationTokenSource,
             TotalToDownload = 0,
             Progress = 0,
             Complete = false,
@@ -276,7 +283,7 @@ public class ModHelper
         }
 
         var modFilePath = Path.Join(Paths.ModCache, mod.GUID);
-        var entries = await _sevenZip.GetEntriesAsync(modFilePath);
+        var entries = await _sevenZip.GetEntriesAsync(modFilePath, installTask.CancellationTokenSource.Token);
 
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
@@ -292,7 +299,7 @@ public class ModHelper
             return installTask;
         }
 
-        await _sevenZip.ExtractToDirectoryAsync(modFilePath, _configHelper.GetConfig().GamePath);
+        await _sevenZip.ExtractToDirectoryAsync(modFilePath, _configHelper.GetConfig().GamePath, installTask.CancellationTokenSource.Token);
         installTask.Complete = true;
 
         return installTask;

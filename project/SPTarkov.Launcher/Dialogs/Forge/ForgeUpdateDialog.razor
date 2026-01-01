@@ -58,7 +58,7 @@
 
             var listOfModsToCheck = ModManager.GetMods().Where(w => !w.Value.IsInstalled).Select(x => $"{x.Key}:{x.Value.ModVersion}").ToList();
 
-            var response = await HttpHelper.ForgeGetUpdate(listOfModsToCheck, "4.0.7", Token.Token);
+            var response = await HttpHelper.ForgeGetUpdate(listOfModsToCheck, "4.0.10", Token.Token);
 
             if (response is null)
             {
@@ -132,7 +132,7 @@
 
         foreach (var forgeModUpdate in ForgeUpdateResponse.Data.Updates)
         {
-            await ModManager.UpdateMod(forgeModUpdate, Token);
+            await ModManager.UpdateMod(forgeModUpdate, Token.Token);
         }
 
         _taskText = "Updates complete";

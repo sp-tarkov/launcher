@@ -9,7 +9,7 @@ public class WindowsSevenZip : SevenZip
 {
     public ILogger<SevenZip> _logger { get; set; }
 
-    public async Task<List<string>> GetEntriesAsync(string pathToZip)
+    public async Task<List<string>> GetEntriesAsync(string pathToZip, CancellationToken token)
     {
         if (Paths.SevenZip is null)
         {
@@ -19,6 +19,8 @@ public class WindowsSevenZip : SevenZip
         {
             throw new ArgumentNullException(nameof(pathToZip));
         }
+
+        token.ThrowIfCancellationRequested();
 
         var process = new ProcessStartInfo
         {
@@ -43,33 +45,53 @@ public class WindowsSevenZip : SevenZip
             throw;
         }
 
-        var output = await processResult.StandardOutput.ReadToEndAsync();
-        var error = await processResult.StandardError.ReadToEndAsync();
+        // register killing the process if the user cancels
+        using var registration = token.Register(() =>
+        {
+            try
+            {
+                if (!processResult.HasExited)
+                {
+                    processResult.Kill(entireProcessTree: true);
+                }
+            }
+            catch (Exception _)
+            {
+                // ignored
+            }
+        });
 
-        await processResult.WaitForExitAsync();
+        var output = await processResult.StandardOutput.ReadToEndAsync(token);
+        var error = await processResult.StandardError.ReadToEndAsync(token);
+
+        await processResult.WaitForExitAsync(token);
 
         if (!string.IsNullOrEmpty(error))
         {
             throw new Exception(error);
         }
 
-        return await ParseEntries(output);
+        return await ParseEntries(output, token);
     }
 
-    public async Task<bool> ExtractToDirectoryAsync(string pathToZip, string destination)
+    public async Task<bool> ExtractToDirectoryAsync(string pathToZip, string destination, CancellationToken token)
     {
         if (Paths.SevenZip is null)
         {
             throw new ArgumentNullException(nameof(Paths.SevenZip));
         }
+
         if (string.IsNullOrEmpty(pathToZip))
         {
             throw new ArgumentNullException(nameof(pathToZip));
         }
+
         if (string.IsNullOrEmpty(destination))
         {
             throw new ArgumentNullException(nameof(destination));
         }
+
+        token.ThrowIfCancellationRequested();
 
         try
         {
@@ -86,10 +108,26 @@ public class WindowsSevenZip : SevenZip
 
             var processResult = Process.Start(process);
 
-            var output = await processResult.StandardOutput.ReadToEndAsync();
-            var error = await processResult.StandardError.ReadToEndAsync();
+            // register killing the process if the user cancels
+            using var registration = token.Register(() =>
+            {
+                try
+                {
+                    if (!processResult.HasExited)
+                    {
+                        processResult.Kill(entireProcessTree: true);
+                    }
+                }
+                catch (Exception _)
+                {
+                    // ignored
+                }
+            });
 
-            await processResult.WaitForExitAsync();
+            var output = await processResult.StandardOutput.ReadToEndAsync(token);
+            var error = await processResult.StandardError.ReadToEndAsync(token);
+
+            await processResult.WaitForExitAsync(token);
 
             if (!string.IsNullOrEmpty(error))
             {
@@ -110,8 +148,10 @@ public class WindowsSevenZip : SevenZip
     /// </summary>
     /// <param name="outputResult"></param>
     /// <returns></returns>
-    private async Task<List<string>> ParseEntries(string outputResult)
+    private async Task<List<string>> ParseEntries(string outputResult, CancellationToken token)
     {
+        token.ThrowIfCancellationRequested();
+
         // split on ------------------------ to remove the first part that isnt needed
         // this will also split the ------------------------ of the end, so we want further work to happen to the middle section [1]
         var afterSplit = outputResult.Split("------------------------");
@@ -124,6 +164,8 @@ public class WindowsSevenZip : SevenZip
 
         foreach (var s in afterSplit2)
         {
+            token.ThrowIfCancellationRequested();
+
             if (string.IsNullOrEmpty(s.Trim()) || s.Contains("-------------------"))
             {
                 continue;

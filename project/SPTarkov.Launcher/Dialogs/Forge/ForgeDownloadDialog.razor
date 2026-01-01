@@ -67,17 +67,17 @@
                     if (ModManager.GetMods().TryGetValue(dep.Guid, out var mod) && mod.ModVersion < depVersion.Version)
                     {
                         // check if mod exists, if it does, check version, if its newer, download it
-                        ModManager.DownloadMod(dep, depVersion, Token);
+                        ModManager.DownloadMod(dep, depVersion, Token.Token);
                     }
                     else if (mod is null)
                     {
                         // check if mod exists, if it doesnt, download it
-                        ModManager.DownloadMod(dep, depVersion, Token);
+                        ModManager.DownloadMod(dep, depVersion, Token.Token);
                     }
                 }
             }
 
-            ModManager.DownloadMod(Mod, Version, Token, dictOfDeps);
+            ModManager.DownloadMod(Mod, Version, Token.Token, dictOfDeps);
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {

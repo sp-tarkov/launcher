@@ -35,13 +35,15 @@ public class ModManager
     /// <param name="cancellationToken"></param>
     /// <param name="dictOfDeps"></param>
     /// <returns></returns>
-    public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationTokenSource cancellationToken,
+    public async Task<bool> DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationToken cancellationToken = default,
         Dictionary<string, Version>? dictOfDeps = null)
     {
         dictOfDeps ??= new Dictionary<string, Version>();
 
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         // start the download
-        var downloadTask = await _modHelper.StartDownloadTask(forgeMod, version, cancellationToken);
+        var downloadTask = await _modHelper.StartDownloadTask(forgeMod, version, cts);
 
         if (!downloadTask.Complete)
         {
@@ -72,11 +74,11 @@ public class ModManager
         if (!File.Exists(modFilePath))
         {
             downloadTask.Error = new FileNotFoundException("file not found", modFilePath);
-            downloadTask.CancellationTokenSource.Cancel();
+            await downloadTask.CancellationTokenSource.CancelAsync();
             return null;
         }
 
-        var entries = await _sevenZip.GetEntriesAsync(modFilePath);
+        var entries = await _sevenZip.GetEntriesAsync(modFilePath, downloadTask.CancellationTokenSource.Token);
 
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
@@ -86,7 +88,7 @@ public class ModManager
         {
             downloadTask.Error =
                 new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
-            downloadTask.CancellationTokenSource.Cancel();
+            await downloadTask.CancellationTokenSource.CancelAsync();
             return null;
         }
 
@@ -106,7 +108,7 @@ public class ModManager
         return _configHelper.GetConfig().Mods;
     }
 
-    public async Task<bool> InstallMod(string guid, CancellationTokenSource cancellationToken = null)
+    public async Task<bool> InstallMod(string guid, CancellationToken cancellationToken = default)
     {
         var modFilePath = Path.Join(Paths.ModCache, guid);
         if (!File.Exists(modFilePath))
@@ -115,15 +117,30 @@ public class ModManager
             return false;
         }
 
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
         configMod.IsInstalling = true;
         _logger.LogInformation("Installing mod: {guid}", guid);
 
-        var installTask = await _modHelper.StartInstallTask(configMod, cancellationToken);
-
-        if (installTask == null || !installTask.Complete || installTask.Error != null)
+        try
         {
-            // TODO: something fucked up, do something
+            var installTask = await _modHelper.StartInstallTask(configMod, cts);
+
+            if (installTask == null || !installTask.Complete || installTask.Error != null)
+            {
+                // TODO: something fucked up, do something or cancelled
+                _logger.LogError("install task failed for mod {mod}: {e}", guid, installTask?.Error);
+                configMod.IsInstalling = false;
+                return false;
+            }
+
+            await _modHelper.RemoveModTask(installTask);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning("install task failed for reason:  {reason}", e.Message);
+            configMod.IsInstalling = false;
             return false;
         }
 
@@ -253,6 +270,7 @@ public class ModManager
 
         _configHelper.AddMod(configMod);
         await UninstallModDependencies(guid);
+
         return true;
     }
 
@@ -308,8 +326,11 @@ public class ModManager
         return true;
     }
 
-    public async Task<bool> UpdateMod(ForgeModUpdate mod, CancellationTokenSource cancellationToken)
+    public async Task<bool> UpdateMod(ForgeModUpdate mod, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         // copy current version to be .bak
         if (!_configHelper.GetConfig().Mods.ContainsKey(mod.CurrentVersion.GUID))
         {
@@ -333,9 +354,9 @@ public class ModManager
             return false;
         }
 
-        var task = await _modHelper.StartUpdateTask(mod, cancellationToken);
+        var updateTask = await _modHelper.StartUpdateTask(mod, cts);
 
-        var entries = await _sevenZip.GetEntriesAsync(ogPath);
+        var entries = await _sevenZip.GetEntriesAsync(ogPath, cts.Token);
 
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
@@ -343,8 +364,8 @@ public class ModManager
 
         if (!checkForCorrectFilePath)
         {
-            task.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
-            task.CancellationTokenSource.Cancel();
+            updateTask.Error = new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            await cts.CancelAsync();
             return false;
         }
 
@@ -356,7 +377,9 @@ public class ModManager
         // delete old zip with .bak
         File.Delete(ogPath + ".bak");
 
-        return task.Complete;
+        await _modHelper.RemoveModTask(updateTask);
+
+        return updateTask.Complete;
     }
 
     private List<string> RemoveBasePaths(List<string> originalPaths)
