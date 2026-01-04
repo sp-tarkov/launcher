@@ -19,4 +19,5 @@ public class Urls
     public const string ForgeLogout = "https://forge.sp-tarkov.com/api/v0/auth/logout";
     public const string ForgeLogin = "https://forge.sp-tarkov.com/api/v0/auth/login";
     public const string ForgeAbilities = "https://forge.sp-tarkov.com/api/v0/auth/abilities";
+    public const string ForgeAddons = "https://forge.sp-tarkov.com/api/v0/addons";
 }

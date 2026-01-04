@@ -335,6 +335,17 @@ public class HttpHelper
         return queryString;
     }
 
+    private NameValueCollection GetParamsCollectionForAddons(string modId)
+    {
+        var queryString = HttpUtility.ParseQueryString(string.Empty);
+        var strbuilder = new StringBuilder();
+
+        queryString.Add("filter[mod_id]", modId);
+        queryString.Add("include", "versions,license,source_code_links");
+
+        return queryString;
+    }
+
     private bool? ConvertOptionToBool(string? selected)
     {
         switch (selected?.ToLower())
@@ -384,5 +395,30 @@ public class HttpHelper
 
         _logger.LogInformation("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
         return _internetAccess;
+    }
+
+    public async Task<ForgeAddonResponse?> ForgeGetModAddons(string modId, CancellationToken token)
+    {
+        _logger.LogInformation("forge ForgeGetModAddons");
+
+        if (string.IsNullOrWhiteSpace(_configHelper.GetConfig().ForgeApiKey))
+        {
+            _logger.LogWarning("GetMods - API Key is missing.");
+            return null;
+        }
+
+        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
+
+        var paramsToUse = GetParamsCollectionForAddons(modId);
+        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeAddons}?{paramsToUse}")
+        {
+            Content = new StringContent("", Encoding.UTF8, "application/json")
+        };
+
+        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+        var task = await _httpClient.SendAsync(message, token);
+        return JsonSerializer.Deserialize<ForgeAddonResponse>(await task.Content.ReadAsStringAsync(token));
     }
 }

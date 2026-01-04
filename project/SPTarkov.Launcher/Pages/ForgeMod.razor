@@ -11,7 +11,7 @@
         }
         else if (SearchResponse?.Data is not null)
         {
-            <DetailedModComponent ForgeMod="@SearchResponse?.Data" ForgeModVersion="@VersionResponse?.Data?.FirstOrDefault()"/>
+            <DetailedModComponent ForgeMod="@SearchResponse?.Data" ForgeModVersion="@VersionResponse?.Data?.FirstOrDefault()" ForgeModAddons="@AddonResponse?.Data"/>
         }
     </MudGrid>
 </MudContainer>
@@ -19,6 +19,7 @@
 @code {
     private ForgeModResponse SearchResponse { get; set; }
     private ForgeVersionResponse VersionResponse { get; set; }
+    private ForgeAddonResponse AddonResponse { get; set; }
     private bool SearchInProgress { get; set; }
 
     [Parameter]
@@ -29,6 +30,7 @@
         await base.OnInitializedAsync();
         await SearchForMod();
         await SearchForModVersion(ModId, SearchResponse.Data.Versions.FirstOrDefault().Id.ToString());
+        await SearchForModAddons(ModId);
 
     }
 
@@ -67,6 +69,27 @@
         if (!VersionResponse!.Success)
         {
             Logger.LogError("Getting Mod version failed {modId}:{versionId} for reason: {code}:{message}", modId, versionId, VersionResponse.Code, VersionResponse.Message);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task SearchForModAddons(string modId)
+    {
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            AddonResponse = await HttpHelper.ForgeGetModAddons(modId, token.Token);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Exception thrown from ForgeHelper.SearchForModAddons {Exception}", e);
+            return;
+        }
+
+        if (!VersionResponse!.Success)
+        {
+            Logger.LogError("Getting Mod Addons failed {modId} for reason: {code}:{message}", modId, VersionResponse.Code, VersionResponse.Message);
         }
 
         StateHasChanged();

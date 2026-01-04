@@ -129,6 +129,11 @@ public class ModHelper
             guid = updateTask.GUID;
             name = updateTask.ModName;
         }
+        else if (task is InstallTask installTask)
+        {
+            guid = installTask.Mod.GUID;
+            name = installTask.Mod.ModName;
+        }
 
         if (!_modDict.TryRemove(guid, out IModTask? mod))
         {

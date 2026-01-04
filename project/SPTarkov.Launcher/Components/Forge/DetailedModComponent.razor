@@ -140,6 +140,35 @@
                         }
                     </MudCardContent>
                 </MudCard>
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mt-4">
+                    <MudCardContent Class="d-flex flex-column align-start">
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">ADDONS</MudText>
+                        @if (ForgeModAddons?.Any() ?? false)
+                        {
+                            @foreach (var addon in ForgeModAddons)
+                            {
+                                @if (!addon.Versions.Select(x => x.ModVersionConstraint?.IsSatisfied(ForgeModVersion?.Version)).Any())
+                                {
+                                    continue;
+                                }
+
+                                <MudLink Color="Color.Default" Underline="Underline.None" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
+                                    <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@addon.GetThumbnail()"/>
+                                    <MudContainer Class="flex-1 gap-3 px-2">
+                                        <MudText Class="no-select text-overflow" Typo="Typo.h6">@addon.Name</MudText>
+                                        <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {addon.Versions?.First().Version} - {addon.Owner?.Name}")</MudText>
+                                    </MudContainer>
+                                </MudLink>
+                            }
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
+                                @("None")
+                            </MudText>
+                        }
+                    </MudCardContent>
+                </MudCard>
             </MudItem>
         </MudGrid>
     }
@@ -149,6 +178,7 @@
     [Parameter] public bool IsSkeleton { get; set; }
     [Parameter] public ForgeBase ForgeMod { get; set; }
     [Parameter] public ForgeModVersion? ForgeModVersion { get; set; }
+    [Parameter] public List<ForgeBase>? ForgeModAddons { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
