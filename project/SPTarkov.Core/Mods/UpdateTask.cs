@@ -9,7 +9,7 @@ public class UpdateTask : IModTask
 {
     public string ModName { get; set; }
 
-    [JsonConverter(typeof(SemVerConverter))]
+    [JsonConverter(typeof(SemVerVersionConverter))]
     public Version Version { get; set; }
     public string GUID { get; set; }
     public string Link { get; set; }

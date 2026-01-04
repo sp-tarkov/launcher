@@ -35,7 +35,7 @@ public class UpdateMod
     public string? Slug { get; set; } = "";
 
     [JsonPropertyName("version")]
-    [JsonConverter(typeof(SemVerConverter))]
+    [JsonConverter(typeof(SemVerVersionConverter))]
     public Version? Version { get; set; } = new Version(0, 0, 0);
 
     [JsonPropertyName("link")]

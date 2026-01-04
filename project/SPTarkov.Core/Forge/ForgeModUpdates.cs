@@ -8,7 +8,7 @@ namespace SPTarkov.Core.Forge;
 public class ForgeModUpdates
 {
     [JsonPropertyName("spt_version")]
-    [JsonConverter(typeof(SemVerConverter))]
+    [JsonConverter(typeof(SemVerVersionConverter))]
     public Version SptVersion { get; set; } = new Version(0, 0, 0);
 
     [JsonPropertyName("updates")]

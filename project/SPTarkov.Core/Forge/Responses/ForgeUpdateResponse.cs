@@ -8,5 +8,5 @@ public class ForgeUpdateResponse
     public bool Success { get; set; }
 
     [JsonPropertyName("data")]
-    public ForgeModUpdates Data { get; set; }
+    public ForgeModUpdates? Data { get; set; }
 }
