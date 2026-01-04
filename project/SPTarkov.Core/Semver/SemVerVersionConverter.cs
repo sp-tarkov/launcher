@@ -4,7 +4,7 @@ using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Semver;
 
-public class SemVerConverter : JsonConverter<Version>
+public class SemVerVersionConverter : JsonConverter<Version>
 {
     public override Version? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -18,7 +18,7 @@ public class SemVerConverter : JsonConverter<Version>
     }
 }
 
-public class SemVerDictConverter : JsonConverter<Dictionary<string, Version>>
+public class SemVerVersionDictConverter : JsonConverter<Dictionary<string, Version>>
 {
     public override Dictionary<string, Version>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

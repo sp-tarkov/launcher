@@ -14,7 +14,7 @@ public record SptMod
     public string Name { get; set; } = "";
 
     [JsonPropertyName("version")]
-    [JsonConverter(typeof(SemVerConverter))]
+    [JsonConverter(typeof(SemVerVersionConverter))]
     public Version Version { get; set; } = new Version(0, 0, 0);
 
     [JsonPropertyName("url")]
