@@ -240,6 +240,7 @@
         return false;
     }
 
+    // TODO : show name of dependant mod in ui
     private bool CheckForDependantBeforeDelete(string guid)
     {
         var list = ModManager.GetDependantMods(guid);
@@ -250,8 +251,8 @@
 
         foreach (var configMod in list)
         {
-            // only disable the uninstall button if a mod is installed that has the guid as a dep
-            if (!configMod.IsInstalled && configMod.Dependencies.ContainsKey(guid))
+            // only disable the delete button if a mod exists that has the guid as a dep
+            if (configMod.Dependencies.ContainsKey(guid))
             {
                 return true;
             }
