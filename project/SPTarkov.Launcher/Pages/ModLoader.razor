@@ -128,12 +128,24 @@
                                 </MudText>
                             </MudContainer>
                             <MudContainer Class="flex-1 d-flex flex-row justify-center align-center pr-0">
-                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
-                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)"/>
-                                </MudTooltip>
-                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
-                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)"/>
-                                </MudTooltip>
+                                @if (CheckForDependantBeforeDelete(guid))
+                                {
+                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)"/>
+                                    </MudTooltip>
+                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Another mod depends on this one, please delete that first!" Placement="Placement.Left">
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" Disabled="true"/>
+                                    </MudTooltip>
+                                }
+                                else
+                                {
+                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)"/>
+                                    </MudTooltip>
+                                    <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
+                                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)"/>
+                                    </MudTooltip>
+                                }
                             </MudContainer>
                         </MudContainer>
                     </MudLink>
@@ -228,4 +240,23 @@
         return false;
     }
 
+    private bool CheckForDependantBeforeDelete(string guid)
+    {
+        var list = ModManager.GetDependantMods(guid);
+        if (!list.Any())
+        {
+            return false;
+        }
+
+        foreach (var configMod in list)
+        {
+            // only disable the uninstall button if a mod is installed that has the guid as a dep
+            if (!configMod.IsInstalled && configMod.Dependencies.ContainsKey(guid))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
