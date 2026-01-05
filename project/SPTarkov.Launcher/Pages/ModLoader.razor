@@ -14,7 +14,7 @@
                 <MudContainer Class="d-flex flex-row">
                     <MudText Class="flex-auto" Typo="Typo.h6" Align="Align.Center" Color="Color.Default">Uninstalled Mods</MudText>
                     <MudTooltip Class="flex-1" Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Check for mod updates" Placement="Placement.Left">
-                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Update" Color="Color.Info" OnClick="OpenUpdateDialog" />
+                        <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Update" Color="Color.Info" OnClick="OpenUpdateDialog"/>
                     </MudTooltip>
                 </MudContainer>
                 @foreach (var (name, item) in ModHelper.GetModTasks())
@@ -28,7 +28,7 @@
                     @if (item.Error is not null && item is DownloadTask downloadTask1)
                     {
                         <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
-                            <MudTooltip Text="@item.Error.ToString()" >
+                            <MudTooltip Text="@item.Error.ToString()">
                                 <MudContainer Class="d-flex flex-row pa-0">
                                     <MudContainer Class="text-overflow py-2 px-1">
                                         <MudText HtmlTag="span">
@@ -119,6 +119,7 @@
                     {
                         continue;
                     }
+
                     <MudLink Class="setting-on-hover pa-1 d-inline-block mud-width-full d-flex flex-row" Underline="Underline.None" Color="Color.Default">
                         <MudContainer Class="d-flex flex-row pa-0">
                             <MudContainer Class="text-overflow py-2 px-1">
@@ -128,10 +129,10 @@
                             </MudContainer>
                             <MudContainer Class="flex-1 d-flex flex-row justify-center align-center pr-0">
                                 <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Install Mod" Placement="Placement.Left">
-                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)" />
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Success" OnClick="() => ModManager.InstallMod(guid)"/>
                                 </MudTooltip>
                                 <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
-                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" />
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)"/>
                                 </MudTooltip>
                             </MudContainer>
                         </MudContainer>
@@ -156,12 +157,24 @@
                                     @($"{mod.ModName} - {mod.ModVersion}")
                                 </MudText>
                             </MudContainer>
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Uninstall Mod" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Disabled="@(CheckForDependantThatIsInstalled(@mod.GUID))" Color="Color.Info" OnClick="() => ModManager.UninstallMod(guid)" />
-                            </MudTooltip>
-                            <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" />
-                            </MudTooltip>
+                            @if (CheckForDependantThatIsInstalled(guid))
+                            {
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Another mod depends on this one, please uninstall that first!" Placement="Placement.Left">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Disabled="true" Color="Color.Info"/>
+                                </MudTooltip>
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="" Placement="Placement.Left" Disabled="true">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Disabled="true"/>
+                                </MudTooltip>
+                            }
+                            else
+                            {
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Uninstall Mod" Placement="Placement.Left">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Disabled="false" Color="Color.Info" OnClick="() => ModManager.UninstallMod(guid)"/>
+                                </MudTooltip>
+                                <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
+                                    <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)"/>
+                                </MudTooltip>
+                            }
                         </MudContainer>
                     </MudLink>
                 }
@@ -214,4 +227,5 @@
 
         return false;
     }
+
 }

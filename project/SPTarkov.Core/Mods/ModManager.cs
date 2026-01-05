@@ -411,4 +411,26 @@ public class ModManager
 
         return listOfDependantMods;
     }
+
+    public List<string> CheckForDependantThatIsInstalled(string guid)
+    {
+        var resultingList = new List<string>();
+
+        var list = GetDependantMods(guid);
+        if (!list.Any())
+        {
+            return resultingList;
+        }
+
+        foreach (var configMod in list)
+        {
+            // only disable the uninstall button if a mod is installed that has the guid as a dep
+            if (configMod.IsInstalled && configMod.Dependencies.ContainsKey(guid))
+            {
+                resultingList.Add(configMod.ModName);
+            }
+        }
+
+        return resultingList;
+    }
 }
