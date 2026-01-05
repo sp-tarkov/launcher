@@ -51,14 +51,13 @@
     {
         try
         {
-            Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             _taskText = taskText;
             StateHasChanged();
             await Task.Delay(20);
 
             var listOfModsToCheck = ModManager.GetMods().Where(w => !w.Value.IsInstalled).Select(x => $"{x.Key}:{x.Value.ModVersion}").ToList();
 
-            var response = await HttpHelper.ForgeGetUpdate(listOfModsToCheck, "4.0.10", Token.Token);
+            var response = await HttpHelper.ForgeGetUpdate(listOfModsToCheck, "4.0.11", Token.Token);
 
             if (response is null)
             {
@@ -79,8 +78,9 @@
 
             return response;
         }
-        catch (Exception)
+        catch (Exception e)
         {
+            Logger.LogError("Forge ForgeGetUpdate failed {e}", e);
             AbortOrFail(failString);
         }
 
