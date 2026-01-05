@@ -48,5 +48,6 @@ public class UpdateMod
     public string? FikaCompatibility { get; set; }
 
     [JsonPropertyName("spt_versions")]
+    [JsonConverter(typeof(SemVerVersionListConverter))]
     public List<Version>? SptVersions { get; set; }
 }

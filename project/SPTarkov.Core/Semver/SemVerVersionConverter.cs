@@ -79,3 +79,51 @@ public class SemVerVersionDictConverter : JsonConverter<Dictionary<string, Versi
         writer.WriteEndObject();
     }
 }
+
+public class SemVerVersionListConverter : JsonConverter<List<Version>>
+{
+    public override List<Version>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType != JsonTokenType.StartArray)
+        {
+            throw new JsonException("Expected StartArray");
+        }
+
+        var list = new List<Version>();
+
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndArray)
+            {
+                return list;
+            }
+
+            if (reader.TokenType != JsonTokenType.String)
+            {
+                throw new JsonException("Expected string value for SemVer");
+            }
+
+            var semverString = reader.GetString();
+            if (semverString is null)
+            {
+                throw new JsonException("Null SemVer value");
+            }
+
+            list.Add(Version.Parse(semverString));
+        }
+
+        throw new JsonException("Unexpected end of JSON");
+    }
+
+    public override void Write(Utf8JsonWriter writer, List<Version> value, JsonSerializerOptions options)
+    {
+        writer.WriteStartArray();
+
+        foreach (var version in value)
+        {
+            writer.WriteStringValue(version.ToString());
+        }
+
+        writer.WriteEndArray();
+    }
+}
