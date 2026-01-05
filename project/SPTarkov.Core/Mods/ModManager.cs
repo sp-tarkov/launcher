@@ -395,4 +395,20 @@ public class ModManager
             return true;
         }).ToList();
     }
+
+    public List<ConfigMod> GetDependantMods(string guid)
+    {
+        var listOfDependantMods = new List<ConfigMod>();
+
+        var mods = GetMods();
+        foreach (var (guidKey, mod) in mods)
+        {
+            if (mod.Dependencies.ContainsKey(guid))
+            {
+                listOfDependantMods.Add(mod);
+            }
+        }
+
+        return listOfDependantMods;
+    }
 }

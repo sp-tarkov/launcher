@@ -157,7 +157,7 @@
                                 </MudText>
                             </MudContainer>
                             <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Uninstall Mod" Placement="Placement.Left">
-                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Color="Color.Info" OnClick="() => ModManager.UninstallMod(guid)" />
+                                <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.InstallDesktop" Disabled="@(CheckForDependantThatIsInstalled(@mod.GUID))" Color="Color.Info" OnClick="() => ModManager.UninstallMod(guid)" />
                             </MudTooltip>
                             <MudTooltip Arrow="false" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="Delete Mod" Placement="Placement.Left">
                                 <MudIconButton Size="Size.Small" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="() => ModManager.DeleteMod(guid)" />
@@ -193,5 +193,25 @@
         {
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private bool CheckForDependantThatIsInstalled(string guid)
+    {
+        var list = ModManager.GetDependantMods(guid);
+        if (!list.Any())
+        {
+            return false;
+        }
+
+        foreach (var configMod in list)
+        {
+            // only disable the uninstall button if a mod is installed that has the guid as a dep
+            if (configMod.IsInstalled && configMod.Dependencies.ContainsKey(guid))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
