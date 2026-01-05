@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
+using SPTarkov.Core.Logging;
 using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Configuration;
@@ -36,6 +37,7 @@ public class ConfigHelper
     {
         _logger = logger;
         LoadSettingsFromFile();
+        FileLogger.LogLevel = _settings!.DebugLogging ? LogLevel.Trace : LogLevel.Error;
     }
 
     private void LoadSettingsFromFile()
@@ -270,6 +272,17 @@ public class ConfigHelper
             }
 
             _settings!.Mods.Remove(guid);
+            SaveConfig();
+        }
+    }
+
+    public void SetDebugLogging(bool debugLogging)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetDebugLogging: {DebugLogging}", debugLogging);
+            FileLogger.LogLevel = debugLogging ? LogLevel.Trace : LogLevel.Information;
+            _settings!.DebugLogging = debugLogging;
             SaveConfig();
         }
     }

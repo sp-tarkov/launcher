@@ -6,6 +6,7 @@
         @* <SettingSwitchComponent Switch="@CloseToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="SetCloseToTray"/> *@
         <SettingSwitchComponent Switch="@MinimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="SetMinimizeOnLaunch"/>
         <SettingSwitchComponent Switch="@AlwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="SetAlwaysOnTop" Disabled="!IsWindows"/>
+        <SettingSwitchComponent Switch="@DebugLogging" OptionName="DebugLogging - Use locale" SwitchFunc="SetDebugLogging"/>
     </MudPaper>
 </MudItem>
 
@@ -14,6 +15,7 @@
     // private bool CloseToTraySwitch { get; set; }
     private bool MinimizeOnLaunchSwitch { get; set; }
     private bool AlwaysOnTopSwitch { get; set; }
+    private bool DebugLogging { get; set; }
 
     private bool IsWindows => OperatingSystem.IsWindows();
 
@@ -23,6 +25,7 @@
         // CloseToTraySwitch = settings.CloseToTray;
         MinimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
         AlwaysOnTopSwitch = settings.AlwaysTop;
+        DebugLogging = settings.DebugLogging;
 
         base.OnInitialized();
     }
@@ -30,6 +33,7 @@
     // Currently Commented out as MadByte pointed out, without force closing the app with alt-f4 or dev exit or task manager.
     // there is no real way to close the app. (thats what i get for forgetting exit task isnt on by default)
     // I want to implement a notification Area Icon, but no libs are properly X-plat and fuck implementing it
+    // TODO: DotTray, you have it starred on github
     // private Task SetCloseToTray()
     // {
     //     CloseToTraySwitch = !CloseToTraySwitch;
@@ -56,6 +60,14 @@
         AlwaysOnTopSwitch = !AlwaysOnTopSwitch;
         Launcher.App.MainWindow.SetTopMost(AlwaysOnTopSwitch);
         ConfigHelper.SetAlwaysOnTop(AlwaysOnTopSwitch);
+
+        return Task.CompletedTask;
+    }
+
+    private Task SetDebugLogging()
+    {
+        DebugLogging = !DebugLogging;
+        ConfigHelper.SetDebugLogging(DebugLogging);
 
         return Task.CompletedTask;
     }

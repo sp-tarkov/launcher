@@ -9,6 +9,7 @@ using Photino.Blazor;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
+using SPTarkov.Core.Logging;
 using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
 using SPTarkov.Core.SevenZip;
@@ -34,7 +35,7 @@ public class Launcher
     {
         EmbedProvider = new ManifestEmbeddedFileProvider(typeof(Launcher).Assembly, "wwwroot");
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(EmbedProvider, args);
-        SevenZip? sevenZip = null;
+        SevenZip? sevenZip;
 
         if (OperatingSystem.IsWindows())
         {
@@ -116,6 +117,7 @@ public class Launcher
             "spt-logo.ico"
         );
 
+        // Shut photino up
         App.MainWindow.LogVerbosity = 0;
 
 #if !DEBUG
