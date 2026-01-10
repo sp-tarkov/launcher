@@ -1,8 +1,7 @@
-﻿
-
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -15,6 +14,12 @@ public class ValidationUtil
     string c2 = "build";
     string c3 = "3932890";
     int v0 = 0;
+    private WineHelper _wineHelper;
+
+    public ValidationUtil(WineHelper wineHelper)
+    {
+        _wineHelper = wineHelper;
+    }
 
     public bool Validate()
     {
@@ -24,7 +29,13 @@ public class ValidationUtil
             if (v1 == null || !Path.Exists(Path.Join(v1.ToString(), c2)))
             {
                 b1 = false;
-                v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
+                if (OperatingSystem.IsLinux())
+                {
+                    v1 = _wineHelper.FixWithPrefix(_wineHelper.FindWineRegValue(Paths.UninstallEftRegKey, "InstallLocation"), true);
+                }
+                else
+                    v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
+
             }
 
             var v2 = (v1 != null) ? v1.ToString() : string.Empty;
@@ -32,9 +43,12 @@ public class ValidationUtil
             var v3 = new DirectoryInfo(v2);
             var v4 = new FileSystemInfo[]
             {
-                v3, new FileInfo(Path.Join(v2, @"BattlEye\BEClient_x64.dll")),
-                new FileInfo(Path.Join(v2, @"BattlEye\BEService_x64.dll")), new FileInfo(Path.Join(v2, "ConsistencyInfo")),
-                new FileInfo(Path.Join(v2, "UnityPlayer.dll")), new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
+                v3,
+                new FileInfo(Path.Join(v2, "BattlEye", "BEClient_x64.dll")),
+                new FileInfo(Path.Join(v2, "BattlEye", "BEService_x64.dll")),
+                new FileInfo(Path.Join(v2, "ConsistencyInfo")),
+                new FileInfo(Path.Join(v2, "UnityPlayer.dll")),
+                new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
             };
 
             v0 = v4.Length - 1;
@@ -68,6 +82,15 @@ public class ValidationUtil
     private string b()
     {
         var h = string.Empty;
+        if (OperatingSystem.IsLinux())
+        {
+            var n = _wineHelper.FindWineRegValue(c1, "InstallPath");
+            if (n != null)
+                h = n;
+
+            return h;
+        }
+
         using (var i = Registry.LocalMachine.OpenSubKey(c1, false))
             if (i != null)
                 h = i.GetValue("InstallPath")?.ToString();
@@ -103,4 +126,6 @@ public class ValidationUtil
 
         return q.ToArray();
     }
+
+
 }

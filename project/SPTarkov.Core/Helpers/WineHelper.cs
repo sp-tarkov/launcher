@@ -21,9 +21,9 @@ public class WineHelper
         _configHelper = configHelper;
     }
 
-    public string? FindWineRegValue(string file, string key, string valueName)
+    public string? FindWineRegValue(string key, string valueName)
     {
-        var reader = new StreamReader(file);
+        var reader = new StreamReader(Path.Join(_configHelper.GetConfig().LinuxSettings.PrefixPath, "system.reg"));
         string? line;
         string? secondLine;
         var foundIt = false;
@@ -64,13 +64,11 @@ public class WineHelper
             _logger.LogError("Prefix path is required");
             return null;
         }
-
-        var regFilePath = Path.Join(prefixPath, "system.reg");
         var RegValueToLookFor = "InstallLocation";
 
         try
         {
-            var windowsLikePath = FindWineRegValue(regFilePath, Paths.UninstallEftRegKey, RegValueToLookFor);
+            var windowsLikePath = FindWineRegValue(Paths.UninstallEftRegKey, RegValueToLookFor);
             return FixWithPrefix(windowsLikePath);
         }
         catch (Exception ex)
@@ -80,11 +78,18 @@ public class WineHelper
         }
     }
 
-    private string FixWithPrefix(string? windowsLikePath)
+    public string FixWithPrefix(string? windowsLikePath)
     {
         var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
         _logger.LogDebug("pathWithoutDrive: {0}", pathWithoutDrive);
         return string.Concat(_configHelper.GetConfig().LinuxSettings.PrefixPath, pathWithoutDrive);
+    }
+
+    public string FixWithPrefix(string? windowsLikePath, bool l)
+    {
+        var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
+        var s = Path.Join("drive_c", pathWithoutDrive);
+        return string.Concat(_configHelper.GetConfig().LinuxSettings.PrefixPath, "/", s);
     }
 
     // Example commands (to explain what would be possible using umu-run):
