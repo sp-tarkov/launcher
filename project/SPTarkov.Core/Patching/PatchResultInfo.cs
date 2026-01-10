@@ -1,12 +1,12 @@
 ﻿namespace SPTarkov.Core.Patching;
 
-public class PatchResultInfo
+public class PatchResultInfo(PatchResultEnum status, int numCompleted, int numTotal)
 {
-    public PatchResultEnum Status { get; }
+    public PatchResultEnum Status { get; } = status;
 
-    public int NumCompleted { get; }
+    private int NumCompleted { get; } = numCompleted;
 
-    public int NumTotal { get; }
+    private int NumTotal { get; } = numTotal;
 
     public bool Ok
     {
@@ -16,12 +16,5 @@ public class PatchResultInfo
     public int PercentComplete
     {
         get { return (NumCompleted * 100) / NumTotal; }
-    }
-
-    public PatchResultInfo(PatchResultEnum status, int numCompleted, int numTotal)
-    {
-        Status = status;
-        NumCompleted = numCompleted;
-        NumTotal = numTotal;
     }
 }

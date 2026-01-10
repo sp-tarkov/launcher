@@ -5,8 +5,8 @@ namespace SPTarkov.Core.Forge.Responses;
 public record ForgeAbilityReponse
 {
     [JsonPropertyName("success")]
-    public bool Success { get; set; }
+    public bool Success { get; init; }
 
     [JsonPropertyName("data")]
-    public List<string>? Data { get; set; }
+    public List<string>? Data { get; init; }
 }

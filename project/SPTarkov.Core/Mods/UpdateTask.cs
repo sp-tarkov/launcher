@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using SPTarkov.Core.Semver;
 using Version = SemanticVersioning.Version;
 
@@ -17,5 +16,5 @@ public class UpdateTask : IModTask
     public float TotalToDownload { get; set; }
     public required CancellationTokenSource CancellationTokenSource { get; set; }
     public bool Complete { get; set; }
-    public Exception Error { get; set; }
+    public Exception? Error { get; set; }
 }

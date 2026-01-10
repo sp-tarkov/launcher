@@ -16,5 +16,5 @@ public record LinuxSettings
     // "GE-Proton10-24" "GE-Proton10-20"
     public string ProtonVersion { get; set; } = "GE-Proton10-28";
 
-    public bool GameMode { get; set; } = false;
+    public bool GameMode { get; set; }
 }

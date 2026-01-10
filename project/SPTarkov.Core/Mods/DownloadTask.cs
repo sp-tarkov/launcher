@@ -4,8 +4,8 @@ namespace SPTarkov.Core.Mods;
 
 public class DownloadTask : IModTask
 {
-    public required ForgeBase ForgeMod { get; set; }
-    public required ForgeModVersion Version { get; set; }
+    public required ForgeBase ForgeMod { get; init; }
+    public required ForgeModVersion Version { get; init; }
     public float TotalToDownload { get; set; }
     public float Progress { get; set; }
     public required CancellationTokenSource CancellationTokenSource { get; set; }

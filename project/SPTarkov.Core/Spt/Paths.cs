@@ -3,7 +3,7 @@
 public class Paths
 {
     public static readonly string ModCache = Path.Join(Directory.GetCurrentDirectory(), "user", "Launcher", "ModCache");
-    public static readonly string ModTemp = Path.Join(Directory.GetCurrentDirectory(), "user", "Launcher", "ModTemp");
+
     // must contain \\ for windows reg key when looking on linux/wine
     public static readonly string UninstallEftRegKey = @"Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\EscapeFromTarkov";
     public static readonly string SteamRegistryInstallKey = @"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 3932890";
@@ -16,9 +16,9 @@ public class Paths
     public static readonly string LocalesPath = Path.Join(Directory.GetCurrentDirectory(), "SPT_Data", "Launcher", "Locales");
     public static readonly string LauncherAssetsPath = Path.Join(Environment.CurrentDirectory, "user", "Launcher");
     public static readonly string LauncherSettingsPath = Path.Join(Environment.CurrentDirectory, "user", "Launcher", "LauncherSettings.json");
-    public static readonly string EFTSettingsFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape From Tarkov", "Settings"); // might have to change if BSG support linux?
-    public static readonly string SPTSettingsFolder = Path.Join("SPT", "user", "sptsettings");
-    public static readonly string SPTAppDataFolder = Path.Join("SPT", "user", "sptappdata");
+    public static readonly string EftSettingsFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Battlestate Games", "Escape From Tarkov", "Settings"); // might have to change if BSG support linux?
+    public static readonly string SptSettingsFolder = Path.Join("SPT", "user", "sptsettings");
+    public static readonly string SptAppDataFolder = Path.Join("SPT", "user", "sptappdata");
     public static readonly List<string> ArchiveFileInfoToIgnore =
     [
         "bepinex",

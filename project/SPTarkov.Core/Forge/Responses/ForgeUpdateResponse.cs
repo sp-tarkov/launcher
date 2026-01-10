@@ -5,8 +5,8 @@ namespace SPTarkov.Core.Forge.Responses;
 public class ForgeUpdateResponse
 {
     [JsonPropertyName("success")]
-    public bool Success { get; set; }
+    public bool Success { get; init; }
 
     [JsonPropertyName("data")]
-    public ForgeModUpdates? Data { get; set; }
+    public ForgeModUpdates? Data { get; init; }
 }

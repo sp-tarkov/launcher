@@ -2,9 +2,8 @@
 
 public interface IModTask
 {
-    public CancellationTokenSource CancellationTokenSource { get; set; }
-    public float TotalToDownload { get; set; }
-    public float Progress { get; set; }
-    public bool Complete { get; set; }
-    public Exception? Error { get; set; }
+    public CancellationTokenSource CancellationTokenSource { get; }
+    public float Progress { get; }
+    public bool Complete { get; }
+    public Exception? Error { get; }
 }

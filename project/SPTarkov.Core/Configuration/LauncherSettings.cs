@@ -13,7 +13,7 @@ public record LauncherSettings
         });
     }
 
-    public List<Server> Servers { get; set; } = new();
+    public List<Server> Servers { get; set; } = [];
 
     public StartLocation StartLocation { get; set; } = new();
 
@@ -42,5 +42,5 @@ public record LauncherSettings
     /// String is the mods GUID
     public Dictionary<string, ConfigMod>  Mods { get; set; } = new();
 
-    public bool DebugLogging { get; set; } = false;
+    public bool DebugLogging { get; set; }
 }

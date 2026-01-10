@@ -4,8 +4,8 @@ namespace SPTarkov.Core.Mods;
 
 public class InstallTask : IModTask
 {
-    public required ConfigMod Mod { get; set; }
-    public CancellationTokenSource CancellationTokenSource { get; set; }
+    public required ConfigMod Mod { get; init; }
+    public required CancellationTokenSource CancellationTokenSource { get; set; }
     public float TotalToDownload { get; set; }
     public float Progress { get; set; }
     public bool Complete { get; set; }

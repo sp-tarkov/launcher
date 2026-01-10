@@ -5,20 +5,20 @@ namespace SPTarkov.Core.Forge.Responses;
 public record ForgeVersionResponse
 {
     [JsonPropertyName("success")]
-    public bool Success { get; set; }
+    public bool Success { get; init; }
 
     [JsonPropertyName("code")]
-    public string? Code { get; set; }
+    public string? Code { get; init; }
 
     [JsonPropertyName("message")]
-    public string? Message { get; set; }
+    public string? Message { get; init; }
 
     [JsonPropertyName("data")]
-    public List<ForgeModVersion>? Data { get; set; }
+    public List<ForgeModVersion>? Data { get; init; }
 
     [JsonPropertyName("links")]
-    public ForgeLinks? Links { get; set; }
+    public ForgeLinks? Links { get; init; }
 
     [JsonPropertyName("meta")]
-    public ForgeMeta? Meta { get; set; }
+    public ForgeMeta? Meta { get; init; }
 }
