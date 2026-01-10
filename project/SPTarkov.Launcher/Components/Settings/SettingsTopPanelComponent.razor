@@ -21,11 +21,11 @@
     private void LoadLiveSettings()
     {
         Logger.LogInformation("Loading Live Settings");
-        var sptSettingsFolder = Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder);
+        var sptSettingsFolder = Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptSettingsFolder);
 
-        if (!Directory.Exists(Paths.EFTSettingsFolder))
+        if (!Directory.Exists(Paths.EftSettingsFolder))
         {
-            Logger.LogWarning("Settings can not be loaded from live, path given: {EftSettingsFolder}", Paths.EFTSettingsFolder);
+            Logger.LogWarning("Settings can not be loaded from live, path given: {EftSettingsFolder}", Paths.EftSettingsFolder);
             Snackbar.Add(LocaleHelper.Get("setting_load_live_error_1"), Severity.Error);
             return;
         }
@@ -34,14 +34,14 @@
         {
             Directory.CreateDirectory(sptSettingsFolder);
 
-            foreach (var path in Directory.GetDirectories(Paths.EFTSettingsFolder, "*", SearchOption.AllDirectories))
+            foreach (var path in Directory.GetDirectories(Paths.EftSettingsFolder, "*", SearchOption.AllDirectories))
             {
-                Directory.CreateDirectory(path.Replace(Paths.EFTSettingsFolder, sptSettingsFolder));
+                Directory.CreateDirectory(path.Replace(Paths.EftSettingsFolder, sptSettingsFolder));
             }
 
-            foreach (var file in Directory.GetFiles(Paths.EFTSettingsFolder, "*.*", SearchOption.AllDirectories))
+            foreach (var file in Directory.GetFiles(Paths.EftSettingsFolder, "*.*", SearchOption.AllDirectories))
             {
-                File.Copy(file, file.Replace(Paths.EFTSettingsFolder, sptSettingsFolder), true);
+                File.Copy(file, file.Replace(Paths.EftSettingsFolder, sptSettingsFolder), true);
             }
         }
         catch (Exception e)
@@ -58,7 +58,7 @@
     private void ClearGameSettings()
     {
         Logger.LogInformation("clearing game settings");
-        var sptSettings = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SPTSettingsFolder));
+        var sptSettings = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptSettingsFolder));
 
         try
         {
@@ -87,7 +87,7 @@
     {
         try
         {
-            var tempFolder = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SPTAppDataFolder));
+            var tempFolder = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptAppDataFolder));
             tempFolder.Delete(true);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)

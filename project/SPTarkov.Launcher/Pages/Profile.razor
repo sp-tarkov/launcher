@@ -87,16 +87,15 @@
         Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Requesting Profile Updates");
         if (await GetUpdatedProfiles())
         {
-            // if this succeeded, we dont need to go further
+            // if this succeeded, we don't need to go further
             StateHasChanged();
             return;
         }
 
         if (await GetUpdatedProfile())
         {
-            // if this succeeded, we dont need to go further
+            // if this succeeded, we don't need to go further
             StateHasChanged();
-            return;
         }
 
         // if we get here, something fucked up
@@ -107,7 +106,7 @@
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            var requestObject = new SPTLoginRequest()
+            var requestObject = new SPTLoginRequest
             {
                 Username = SelectedMiniProfile.Username
             };
@@ -129,7 +128,7 @@
         catch (Exception e)
         {
             Logger.LogInformation("Exception occured in updating profile: {e}", e);
-            token.Cancel();
+            await token.CancelAsync();
             return false;
         }
     }
@@ -151,13 +150,13 @@
             StateHelper.SelectedProfile = StateHelper.ProfileList?.FirstOrDefault(x => x.ProfileId == SelectedMiniProfile.ProfileId);
             SelectedMiniProfile = StateHelper.SelectedProfile;
 
-            token?.Dispose();
+            token.Dispose();
             return true;
         }
         catch (Exception e)
         {
             Logger.LogInformation("Exception occured in updating profiles: {e}", e);
-            token?.Cancel();
+            await token.CancelAsync();
             return false;
         }
     }
@@ -192,7 +191,7 @@
         if (OperatingSystem.IsWindows())
         {
 
-            if (!await GameHelper.LaunchGame())
+            if (!GameHelper.LaunchGame())
             {
                 var message = GameHelper.ErrorMessage;
                 Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
@@ -201,7 +200,7 @@
         }
         else if (OperatingSystem.IsLinux())
         {
-            if (!await GameHelper.LaunchGameLinux())
+            if (!GameHelper.LaunchGameLinux())
             {
                 var message = GameHelper.ErrorMessage;
                 Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
@@ -226,13 +225,13 @@
         NavigationManager.NavigateTo("/ServerPageWrapper/false");
     }
 
-    public async Task<bool> WipeProfile()
+    private async Task<bool> WipeProfile()
     {
         Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Wiping profile with server");
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            var wipeRequest = new SPTRegisterRequest()
+            var wipeRequest = new SPTRegisterRequest
             {
                 Edition = SelectedMiniProfile.Edition,
                 Username = SelectedMiniProfile.Username
@@ -247,12 +246,12 @@
                 return false;
             }
 
-            token?.Dispose();
+            token.Dispose();
             return true;
         }
         catch (Exception)
         {
-            token?.Cancel();
+            await token.CancelAsync();
             return false;
         }
     }

@@ -21,7 +21,7 @@
                     <MudDivider DividerType="DividerType.Middle" Class="pb-2" />
                         @foreach (var dep in Version.Dependencies)
                         {
-                            <MudText Typo="Typo.caption">@($"{@dep.Name} - {@dep.Versions.FirstOrDefault().Version}")</MudText>
+                            <MudText Typo="Typo.caption">@($"{dep.Name} - {dep.Versions.FirstOrDefault().Version}")</MudText>
                         }
                 </MudPaper>
             }

@@ -105,12 +105,10 @@
                     Token?.Dispose();
                     return true;
                 }
-                else
-                {
-                    Logger.LogInformation("Forge ForgeLogin failed to authenticate, No Read permissions were given: {a}", ApiKey);
-                    AbortOrFail(failString);
-                    return false;
-                }
+
+                Logger.LogInformation("Forge ForgeLogin failed to authenticate, No Read permissions were given: {a}", ApiKey);
+                AbortOrFail(failString);
+                return false;
             }
         }
         catch (Exception)
@@ -124,7 +122,7 @@
 
     private void Submit()
     {
-        Snackbar.Add($"Logged in with api key!", Severity.Success);
+        Snackbar.Add("Logged in with api key!", Severity.Success);
         MudDialog.Close();
     }
 

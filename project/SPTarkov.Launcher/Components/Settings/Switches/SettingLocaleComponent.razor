@@ -6,7 +6,7 @@
     <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 pl-5">
         <MudText Class="no-select">@OptionName</MudText>
         <MudSpacer/>
-        <MudSelect T="string" Value="_selectedOption" Disabled="@Disabled" Clearable="false" ValueChanged="(v) => OnLocaleChange(v)">
+        <MudSelect T="string" Value="_selectedOption" Disabled="@Disabled" Clearable="false" ValueChanged="v => OnLocaleChange(v)">
             @foreach (var item in Options)
             {
                 <MudSelectItem Value="@item.Key">@item.Value</MudSelectItem>

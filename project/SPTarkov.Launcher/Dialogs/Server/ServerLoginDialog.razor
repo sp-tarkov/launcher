@@ -43,7 +43,6 @@
             await CallServer(RequestTask.Ping, LocaleHelper.Get("server_login_task_1"));
             await CallServer(RequestTask.Profiles, LocaleHelper.Get("server_login_task_2"), LocaleHelper.Get("server_login_task_fail_1"));
             await CallServer(RequestTask.Types, LocaleHelper.Get("server_login_task_3"), LocaleHelper.Get("server_login_task_fail_2"));
-            await CallServer(RequestTask.Mods, LocaleHelper.Get("server_login_task_4"), LocaleHelper.Get("server_login_task_fail_3"));
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
@@ -94,13 +93,6 @@
             {
                 var returnResult = await HttpHelper.GameServerGet<SPTTypesResponse>(Urls.Types, Token.Token);
                 StateHelper.ProfileTypes = returnResult?.Response!;
-                result = true;
-                break;
-            }
-            case RequestTask.Mods:
-            {
-                var returnResult = await HttpHelper.GameServerGet<SPTModsResponse>(Urls.Mods, Token.Token);
-                StateHelper.ModList = returnResult?.Response!;
                 result = true;
                 break;
             }

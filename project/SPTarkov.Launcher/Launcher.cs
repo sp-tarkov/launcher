@@ -9,11 +9,9 @@ using Photino.Blazor;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
-using SPTarkov.Core.Logging;
 using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
 using SPTarkov.Core.SevenZip;
-using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Launcher;
 
@@ -83,7 +81,7 @@ public class Launcher
 
         App = appBuilder.Build();
 
-        sevenZip._logger = App.Services.GetService<ILogger<SevenZip>>();
+        sevenZip.Logger = App.Services.GetService<ILogger<SevenZip>>();
         _logger = App.Services.GetService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetService<ConfigHelper>();
 
