@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using SPTarkov.Core.Semver;
 using Version = SemanticVersioning.Version;
 
@@ -26,7 +25,7 @@ public class UpdateMod
     public int? ModId { get; set; }
 
     [JsonPropertyName("guid")]
-    public string? GUID { get; set; } = "";
+    public string GUID { get; set; } = "";
 
     [JsonPropertyName("name")]
     public string? Name { get; set; } = "";
@@ -36,7 +35,7 @@ public class UpdateMod
 
     [JsonPropertyName("version")]
     [JsonConverter(typeof(SemVerVersionConverter))]
-    public Version? Version { get; set; } = new Version(0, 0, 0);
+    public Version? Version { get; set; } = new(0, 0, 0);
 
     [JsonPropertyName("link")]
     public string? Link { get; set; } = "";

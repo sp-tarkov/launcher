@@ -212,7 +212,7 @@ public class HttpHelper
         if (!task.IsSuccessStatusCode)
         {
             // remove any api keys and get them to log back in.
-            return new ForgeUpdateResponse()
+            return new ForgeUpdateResponse
             {
                 Success = false
             };
@@ -338,7 +338,6 @@ public class HttpHelper
     private NameValueCollection GetParamsCollectionForAddons(string modId)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
-        var strbuilder = new StringBuilder();
 
         queryString.Add("filter[mod_id]", modId);
         queryString.Add("include", "versions,license,source_code_links");
@@ -382,11 +381,9 @@ public class HttpHelper
         // TODO: change to just pinging forge https://forge.sp-tarkov.com/api/v0/ping?
         try
         {
-            using (var ping = new Ping())
-            {
-                var result = ping.Send("8.8.8.8", 1000); // Google's DNS server
-                _internetAccess = result.Status == IPStatus.Success;
-            }
+            using var ping = new Ping();
+            var result = ping.Send("8.8.8.8", 1000); // Google's DNS server
+            _internetAccess = result.Status == IPStatus.Success;
         }
         catch
         {

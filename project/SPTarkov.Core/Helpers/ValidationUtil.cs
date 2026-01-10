@@ -13,7 +13,7 @@ public class ValidationUtil
     string c1 = @"Software\Wow6432Node\Valve\Steam";
     string c2 = "build";
     string c3 = "3932890";
-    int v0 = 0;
+    int v0;
     private WineHelper _wineHelper;
 
     public ValidationUtil(WineHelper wineHelper)
@@ -30,9 +30,7 @@ public class ValidationUtil
             {
                 b1 = false;
                 if (OperatingSystem.IsLinux())
-                {
-                    v1 = _wineHelper.FixWithPrefix(_wineHelper.FindWineRegValue(Paths.UninstallEftRegKey, "InstallLocation"), true);
-                }
+                    v1 = _wineHelper.FixWithPrefixValidation(_wineHelper.FindWineRegValue(Paths.UninstallEftRegKey, "InstallLocation"));
                 else
                     v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
 
@@ -69,7 +67,7 @@ public class ValidationUtil
         return v0 == 0;
     }
 
-    public string a()
+    public string? a()
     {
         var c = b();
         if (string.IsNullOrEmpty(c))

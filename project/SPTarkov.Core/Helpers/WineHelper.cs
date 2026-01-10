@@ -6,24 +6,15 @@ using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
-public class WineHelper
+public class WineHelper(
+    ILogger<WineHelper> logger,
+    ConfigHelper configHelper)
 {
-    private readonly ILogger<WineHelper> _logger;
-    private readonly ConfigHelper _configHelper;
-    private readonly string _keyStartingCharacter = "[";
-
-    public WineHelper(
-        ILogger<WineHelper> logger,
-        ConfigHelper configHelper
-    )
-    {
-        _logger = logger;
-        _configHelper = configHelper;
-    }
+    private const string KeyStartingCharacter = "[";
 
     public string? FindWineRegValue(string key, string valueName)
     {
-        var reader = new StreamReader(Path.Join(_configHelper.GetConfig().LinuxSettings.PrefixPath, "system.reg"));
+        var reader = new StreamReader(Path.Join(configHelper.GetConfig().LinuxSettings.PrefixPath, "system.reg"));
         string? line;
         string? secondLine;
         var foundIt = false;
@@ -32,7 +23,7 @@ public class WineHelper
         {
             line = line.Trim();
 
-            if (line.StartsWith(_keyStartingCharacter))
+            if (line.StartsWith(KeyStartingCharacter))
             {
                 foundIt = line.Contains(key);
             }
@@ -58,12 +49,13 @@ public class WineHelper
 
     public string? GetOriginalGamePath()
     {
-        var prefixPath = _configHelper.GetConfig().LinuxSettings.PrefixPath;
+        var prefixPath = configHelper.GetConfig().LinuxSettings.PrefixPath;
         if (string.IsNullOrEmpty(prefixPath))
         {
-            _logger.LogError("Prefix path is required");
+            logger.LogError("Prefix path is required");
             return null;
         }
+
         var RegValueToLookFor = "InstallLocation";
 
         try
@@ -73,23 +65,23 @@ public class WineHelper
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Failed to get EFT game path: {ex}");
+            logger.LogError($"Failed to get EFT game path: {ex}");
             return null;
         }
     }
 
-    public string FixWithPrefix(string? windowsLikePath)
+    private string FixWithPrefix(string? windowsLikePath)
     {
         var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
-        _logger.LogDebug("pathWithoutDrive: {0}", pathWithoutDrive);
-        return string.Concat(_configHelper.GetConfig().LinuxSettings.PrefixPath, pathWithoutDrive);
+        logger.LogDebug("pathWithoutDrive: {0}", pathWithoutDrive);
+        return string.Concat(configHelper.GetConfig().LinuxSettings.PrefixPath, pathWithoutDrive);
     }
 
-    public string FixWithPrefix(string? windowsLikePath, bool l)
+    public string FixWithPrefixValidation(string? windowsLikePath)
     {
         var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
         var s = Path.Join("drive_c", pathWithoutDrive);
-        return string.Concat(_configHelper.GetConfig().LinuxSettings.PrefixPath, "/", s);
+        return string.Concat(configHelper.GetConfig().LinuxSettings.PrefixPath, "/", s);
     }
 
     // Example commands (to explain what would be possible using umu-run):
@@ -98,28 +90,31 @@ public class WineHelper
     // _wineHelper.RunInPrefix("winetricks", "-q win11") -- To set the windows version of the prefix to Windows 11
     // _wineHelper.RunInPrefix("winetricks", "-q dotnetdesktop9") -- To install .NET Desktop 9 automatically
     // _wineHelper.RunInPrefix("regedit") -- To launch the regedit tool (Pretty much the same as on windows)
-    public async Task<bool> RunInPrefix(string cmd = "", List<string>? args = null)
+    public bool RunInPrefix(string cmd = "", List<string>? args = null)
     {
         // This looks something like: "/home/{username}/Games/tarkov"
         // However this could be anything the user sets it too when they use MadBytes script.
-        var prefixPath = _configHelper.GetConfig().LinuxSettings.PrefixPath;
+        var prefixPath = configHelper.GetConfig().LinuxSettings.PrefixPath;
 
         // This looks something like this: "/home/{username}/.local/bin/umu-run"
-        var umuPath = _configHelper.GetConfig().LinuxSettings.UmuPath;
+        var umuPath = configHelper.GetConfig().LinuxSettings.UmuPath;
 
         // this looks something like this: "GE-Proton10-24"
-        var proton = _configHelper.GetConfig().LinuxSettings.ProtonVersion;
+        var proton = configHelper.GetConfig().LinuxSettings.ProtonVersion;
 
         if (string.IsNullOrEmpty(prefixPath) || string.IsNullOrEmpty(umuPath) || string.IsNullOrEmpty(proton))
         {
-            _logger.LogError("Prefix path or umu path or proton version are required");
+            logger.LogError("Prefix path or umu path or proton version are required");
             return false;
         }
 
         // this looks something like: "/home/{username}/Games/tarkov/drive_c/SPTarkov"
-        var sptPath = _configHelper.GetConfig().GamePath;
+        var sptPath = configHelper.GetConfig().GamePath;
 
-        // this is what needs to be done for GameScope to work.
+        ProcessStartInfo? process;
+
+        // This is what needs to be done for GameScope to work.
+        // I don't know if this is used as much, so leave for now and implement a way later if needed/wanting
         // var process = new ProcessStartInfo
         // {
         //     FileName = "gamescope",
@@ -142,42 +137,48 @@ public class WineHelper
         //     }
         // };
 
-        // Example of GameMode
-        // var process = new ProcessStartInfo
-        // {
-        //     FileName = "gamemoderun",
-        //     UseShellExecute = false,
-        //     CreateNoWindow = true,
-        //     WorkingDirectory = sptPath,
-        //     Environment =
-        //     {
-        //         { "WINEPREFIX", prefixPath },
-        //         { "PROTONPATH", proton },
-        //     },
-        //     ArgumentList =
-        //     {
-        //         umuPath,
-        //         cmd
-        //     }
-        // };
-
-        var process = new ProcessStartInfo
+        // I don't know if this actually helps in any way, but some use it
+        // User must install gamemode from package manager, try catch below will log it
+        if (configHelper.GetConfig().LinuxSettings.GameMode)
         {
-            FileName = "python3",
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WorkingDirectory = sptPath,
-            Environment =
+            process = new ProcessStartInfo
             {
-                { "WINEPREFIX", prefixPath },
-                { "PROTONPATH", proton },
-            },
-            ArgumentList =
+                FileName = "gamemoderun",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = sptPath,
+                Environment =
+                {
+                    { "WINEPREFIX", prefixPath },
+                    { "PROTONPATH", proton },
+                },
+                ArgumentList =
+                {
+                    umuPath,
+                    cmd
+                }
+            };
+        }
+        else
+        {
+            process = new ProcessStartInfo
             {
-                umuPath,
-                cmd
-            }
-        };
+                FileName = "python3",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = sptPath,
+                Environment =
+                {
+                    { "WINEPREFIX", prefixPath },
+                    { "PROTONPATH", proton },
+                },
+                ArgumentList =
+                {
+                    umuPath,
+                    cmd
+                }
+            };
+        }
 
         // Add these individually so they are not wrapped in ""
         if (args != null)
@@ -206,21 +207,21 @@ public class WineHelper
         try
         {
             Process.Start(process);
-            _logger.LogInformation("Game process started on linux");
+            logger.LogInformation("Game process started on linux");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Starting game process failed: {ex}");
+            logger.LogError("Starting game process failed: {Exception}", ex);
             return false;
         }
 
         return true;
     }
 
-    // TODO: Maybe some Regex Guru can make this simplier
-    public Dictionary<string, string> ParseLaunchSettings()
+    // TODO: Maybe some Regex Guru can make this simpler
+    private Dictionary<string, string> ParseLaunchSettings()
     {
-        var launchSettings = _configHelper.GetConfig().LinuxSettings.LaunchSettings;
+        var launchSettings = configHelper.GetConfig().LinuxSettings.LaunchSettings;
         var result = new Dictionary<string, string>();
 
         if (string.IsNullOrEmpty(launchSettings))
@@ -229,7 +230,7 @@ public class WineHelper
         }
 
         // So parsing this string into usable EnvVar's and Arguments might be a bit weird
-        // Most of the time i'd expect no spaces:
+        // Most of the time I'd expect no spaces:
         // EnvironmentVariableName=EnvironmentVariableValue
         // -ArgumentName=ArgumentValue
         // The - is the diff between them and EnvVar's afaik are all uppercase
@@ -322,7 +323,7 @@ public class WineHelper
         }
         catch (Exception e)
         {
-            _logger.LogWarning("unable to parse launch Settings of: {setting}, please format correctly: {e}", launchSettings, e);
+            logger.LogWarning("unable to parse launch Settings of: {setting}, please format correctly: {e}", launchSettings, e);
             return new Dictionary<string, string>();
         }
 
@@ -335,7 +336,7 @@ public class WineHelper
         // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
         if (!Directory.Exists(Paths.ProtonPath))
         {
-            _logger.LogError("Proton path not found, make sure to run lutris or steam first");
+            logger.LogError("Proton path not found, make sure to run lutris or steam first");
             // we want this to throw an exception, so just log this
         }
 

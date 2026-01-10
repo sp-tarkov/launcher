@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Photino.NET;
+﻿using Photino.NET;
 
 namespace SPTarkov.Core.Extensions;
 
@@ -11,18 +10,16 @@ public static class PhotinoWindowExtensions
         return iconpath != null ? window.SetIconFile(iconpath) : window;
     }
 
-    private static string? ExtractEmbeddedResourceToTempFile(Stream iconStream, string fileName)
+    private static string? ExtractEmbeddedResourceToTempFile(Stream? iconStream, string fileName)
     {
         if (iconStream == null)
         {
             Console.WriteLine("Icon stream is null");
             return null;
         }
-        string tempFile = Path.Join(Path.GetTempPath(), fileName);
-        using (FileStream fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
-        {
-            iconStream.CopyTo(fileStream);
-        }
+        var tempFile = Path.Join(Path.GetTempPath(), fileName);
+        using var fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write);
+        iconStream.CopyTo(fileStream);
         return tempFile;
     }
 }

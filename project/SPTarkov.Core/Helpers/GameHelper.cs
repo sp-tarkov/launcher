@@ -6,6 +6,7 @@ using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Patching;
 using SPTarkov.Core.SPT;
 using SPTarkov.Core.SPT.Responses;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -138,7 +139,7 @@ public class GameHelper
         return true;
     }
 
-    public async Task<bool> LaunchGame()
+    public bool LaunchGame()
     {
         _logger.LogInformation("Launching game");
         _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
@@ -184,7 +185,7 @@ public class GameHelper
         return true;
     }
 
-    public async Task<bool> LaunchGameLinux()
+    public bool LaunchGameLinux()
     {
         _logger.LogInformation("Launching game on linux");
         _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
@@ -198,7 +199,7 @@ public class GameHelper
             $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}"
         ];
 
-        if (!await _wineHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
+        if (!_wineHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
         {
             return false;
         }
@@ -318,6 +319,7 @@ public class GameHelper
                 // SPT files
                 new(Path.Join(_originalGamePath!, "SPT.Launcher.exe")),
                 new(Path.Join(_originalGamePath!, "SPT.Server.exe")),
+                new(Path.Join(_originalGamePath!, "SPT.Server.linux")),
 
                 // bepinex files
                 new(Path.Join(_originalGamePath!, "doorstep_config.ini")),
@@ -333,7 +335,7 @@ public class GameHelper
 
             List<DirectoryInfo> directories =
             [
-                new(Path.Join(_originalGamePath!, "SPT_Data")),
+                new(Path.Join(_originalGamePath!, "SPT")),
                 new(Path.Join(_originalGamePath!, "BepInEx"))
             ];
 

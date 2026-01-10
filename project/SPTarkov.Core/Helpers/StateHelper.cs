@@ -4,10 +4,8 @@ using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
-public class StateHelper
+public class StateHelper(ILogger<StateHelper> logger)
 {
-    private readonly ILogger<StateHelper> _logger;
-    public Dictionary<string, SptMod> ModList = [];
     public List<MiniProfile> ProfileList = [];
     public Dictionary<string, string> ProfileTypes = new();
     public MiniProfile? SelectedProfile;
@@ -22,19 +20,11 @@ public class StateHelper
     public bool AllowNavigation { get; set; } = true;
     public event Action? OnStateChanged;
 
-    public StateHelper(
-        ILogger<StateHelper> logger
-    )
-    {
-        _logger = logger;
-    }
-
     public void LogoutAndDispose()
     {
-        _logger.LogInformation("Logged out of server {SelectedServerIpAddress} and disposed", SelectedServer?.IpAddress ?? "Unknown");
+        logger.LogInformation("Logged out of server {SelectedServerIpAddress} and disposed", SelectedServer?.IpAddress ?? "Unknown");
         ProfileTypes = new Dictionary<string, string>();
         ProfileList = [];
-        ModList = [];
         SelectedProfile = null;
         SelectedServer = null;
     }

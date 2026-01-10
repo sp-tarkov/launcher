@@ -13,8 +13,8 @@ public class LocaleHelper
     private readonly Lock _lock = new();
     private readonly ILogger<LocaleHelper> _logger;
     private readonly ConfigHelper _configHelper;
-    private string _defaultLocale;
-    private List<Dictionary<string, string>> _listOfLocales = [];
+    private readonly string _defaultLocale;
+    private readonly List<Dictionary<string, string>> _listOfLocales = [];
     private Dictionary<string, string> _selectedLocale = new();
     private bool _logLocalesOne;
 
