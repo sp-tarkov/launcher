@@ -11,15 +11,8 @@ using SharpHDiffPatch.Core;
 
 namespace SPTarkov.Core.Patching;
 
-public class FilePatcher
+public class FilePatcher(ILogger<FilePatcher> logger)
 {
-    private ILogger<FilePatcher> _logger;
-
-    public FilePatcher(ILogger<FilePatcher> logger)
-    {
-        _logger = logger;
-    }
-
     private PatchResultInfo Patch(string targetfile, string patchfile, bool ignoreInputHashMismatch = false)
     {
         // Backup the original file if a backup doesn't exist yet
@@ -112,7 +105,7 @@ public class FilePatcher
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("exception thrown: {ex}", ex);
+                    logger.LogError("exception thrown: {ex}", ex);
                 }
             }
         }
@@ -131,7 +124,7 @@ public class FilePatcher
         }
         catch (Exception ex)
         {
-            _logger.LogError("exception thrown: {ex}", ex);
+            logger.LogError("exception thrown: {ex}", ex);
             return new PatchResultInfo(PatchResultEnum.InputLengthMismatch, 1, 1);
         }
 

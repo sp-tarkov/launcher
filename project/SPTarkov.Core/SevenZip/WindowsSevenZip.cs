@@ -7,7 +7,7 @@ namespace SPTarkov.Core.SevenZip;
 
 public class WindowsSevenZip : SevenZip
 {
-    public ILogger<SevenZip> _logger { get; set; }
+    public ILogger<SevenZip> Logger { get; set; }
 
     public async Task<List<string>> GetEntriesAsync(string pathToZip, CancellationToken token)
     {
@@ -41,7 +41,7 @@ public class WindowsSevenZip : SevenZip
         }
         catch (Exception e)
         {
-            _logger.LogCritical(e.Message);
+            Logger.LogCritical(e.Message);
             throw;
         }
 
@@ -136,7 +136,7 @@ public class WindowsSevenZip : SevenZip
         }
         catch (Exception e)
         {
-            _logger.LogError("Exception occured while extracting to directory: {e}", e);
+            Logger.LogError("Exception occured while extracting to directory: {e}", e);
             return false;
         }
 

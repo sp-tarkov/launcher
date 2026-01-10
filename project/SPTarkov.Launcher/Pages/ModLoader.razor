@@ -200,7 +200,7 @@
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        _progressTimer = new Timer((_) => { InvokeAsync(StateHasChanged); }, default, TimeSpan.FromMilliseconds(500), TimeSpan.Zero);
+        _progressTimer = new Timer(_ => { InvokeAsync(StateHasChanged); }, default, TimeSpan.FromMilliseconds(500), TimeSpan.Zero);
         return base.OnAfterRenderAsync(firstRender);
     }
 

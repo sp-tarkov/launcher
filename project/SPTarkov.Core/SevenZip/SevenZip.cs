@@ -4,7 +4,7 @@ namespace SPTarkov.Core.SevenZip;
 
 public interface SevenZip
 {
-    public ILogger<SevenZip> _logger { get; set; }
+    public ILogger<SevenZip> Logger { get; set; }
 
     public Task<List<string>> GetEntriesAsync(string pathToZip, CancellationToken token);
 

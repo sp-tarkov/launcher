@@ -3,17 +3,16 @@ using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Forge;
 using SPTarkov.Core.SPT;
-using SPTarkov.Core.SevenZip;
 
 namespace SPTarkov.Core.Mods;
 
 public class ModHelper
 {
-    private ILogger<ModHelper> _logger;
-    private HttpClient _httpClient;
-    private ConfigHelper _configHelper;
-    private ConcurrentDictionary<string, IModTask> _modDict = new();
-    private SevenZip.SevenZip _sevenZip;
+    private readonly ILogger<ModHelper> _logger;
+    private readonly HttpClient _httpClient;
+    private readonly ConfigHelper _configHelper;
+    private readonly ConcurrentDictionary<string, IModTask> _modDict = new();
+    private readonly SevenZip.SevenZip _sevenZip;
 
     public ModHelper(
         ILogger<ModHelper> logger,
@@ -26,8 +25,11 @@ public class ModHelper
         _sevenZip = sevenZip;
 
         // leaving default atm, this will be making requests to unknown servers.
-        var handler = new HttpClientHandler();
-        handler.UseCookies = false;
+        var handler = new HttpClientHandler
+        {
+            UseCookies = false
+        };
+
         _httpClient = new HttpClient(handler);
     }
 
@@ -114,35 +116,32 @@ public class ModHelper
         return downloadTask;
     }
 
-    public async Task<IModTask?> RemoveModTask(IModTask task)
+    public void RemoveModTask(IModTask task)
     {
-        string guid = "";
-        string name = "";
+        var guid = "";
+        var name = "";
 
-        if (task is DownloadTask downloadTask)
+        switch (task)
         {
-            guid = downloadTask.ForgeMod.Guid;
-            name = downloadTask.ForgeMod.Name;
-        }
-        else if (task is UpdateTask updateTask)
-        {
-            guid = updateTask.GUID;
-            name = updateTask.ModName;
-        }
-        else if (task is InstallTask installTask)
-        {
-            guid = installTask.Mod.GUID;
-            name = installTask.Mod.ModName;
+            case DownloadTask downloadTask:
+                guid = downloadTask.ForgeMod.Guid;
+                name = downloadTask.ForgeMod.Name;
+                break;
+            case UpdateTask updateTask:
+                guid = updateTask.GUID;
+                name = updateTask.ModName;
+                break;
+            case InstallTask installTask:
+                guid = installTask.Mod.GUID;
+                name = installTask.Mod.ModName;
+                break;
         }
 
-        if (!_modDict.TryRemove(guid, out IModTask? mod))
+        if (!_modDict.TryRemove(guid, out _))
         {
             _logger.LogError("Unable to remove mod from download Dictionary for {name}:{guid}", name,
                 guid);
-            return null;
         }
-
-        return mod;
     }
 
     public async Task<bool> CancelModTask(string guid)
@@ -189,10 +188,10 @@ public class ModHelper
     {
         var updateTask = new UpdateTask
         {
-            ModName = mod.CurrentVersion.Name,
-            Version = mod.RecommendedVersion.Version,
-            GUID = mod.CurrentVersion.GUID,
-            Link = mod.RecommendedVersion.Link,
+            ModName = mod.CurrentVersion.Name!,
+            Version = mod.RecommendedVersion.Version!,
+            GUID = mod.CurrentVersion.GUID!,
+            Link = mod.RecommendedVersion.Link!,
             Progress = 0,
             TotalToDownload = 0,
             CancellationTokenSource = cancellationTokenSource,

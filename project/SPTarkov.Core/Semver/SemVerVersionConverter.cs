@@ -20,7 +20,7 @@ public class SemVerVersionConverter : JsonConverter<Version>
 
 public class SemVerVersionDictConverter : JsonConverter<Dictionary<string, Version>>
 {
-    public override Dictionary<string, Version>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Dictionary<string, Version> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
@@ -82,7 +82,7 @@ public class SemVerVersionDictConverter : JsonConverter<Dictionary<string, Versi
 
 public class SemVerVersionListConverter : JsonConverter<List<Version>>
 {
-    public override List<Version>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override List<Version> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartArray)
         {
