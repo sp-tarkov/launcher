@@ -31,7 +31,7 @@
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No Internet access found, please fix and refresh!</MudAlert>
         </MudItem>
         <MudItem sm="12" Class="mt-4 d-flex justify-center align-center">
-            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" @onclick="CheckInternetAccess">Refresh</MudButton>
+            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="CheckInternetAccess">Refresh</MudButton>
         </MudItem>
     }
     else if (!ApiKeyAvailable)
@@ -48,11 +48,11 @@
             </MudItem>
             <MudExpansionPanels MultiExpansion="true">
                 <MudExpansionPanel Text="Email and password login">
-                    <MudText>If you have a Email and password login we are able to get a key automatically,</MudText>
+                    <MudText>If you have an Email and password login we are able to get a key automatically,</MudText>
                     <MudText>This requires you to login via the button below.</MudText>
                     <MudAlert Dense="true" Severity="Severity.Info" Variant="Variant.Outlined" Class="my-2">None of your login details will be saved!</MudAlert>
                     <MudItem sm="12" Class="mt-4 d-flex justify-start">
-                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeLoginTask">Login</MudButton>
+                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" OnClick="StartForgeLoginTask">Login</MudButton>
                     </MudItem>
                 </MudExpansionPanel>
                 <MudExpansionPanel Text="Discord login">
@@ -63,7 +63,7 @@
                     <MudText>3. Under "Token Name" put "SPT Launcher Key" and click create.</MudText>
                     <MudText>4. Click the button below to save this Token and test it.</MudText>
                     <MudItem sm="12" Class="mt-4 d-flex justify-start">
-                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" @onclick="StartForgeDiscordTask">Login</MudButton>
+                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" OnClick="StartForgeDiscordTask">Login</MudButton>
                     </MudItem>
                 </MudExpansionPanel>
             </MudExpansionPanels>
