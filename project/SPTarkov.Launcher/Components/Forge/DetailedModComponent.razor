@@ -192,18 +192,6 @@
 
     private async Task StartDownloadModTask()
     {
-        var option = new DialogOptions
-        {
-            Position = ConfigHelper.DialogOptions.Position,
-            BackdropClick = ConfigHelper.DialogOptions.BackdropClick,
-            CloseOnEscapeKey = ConfigHelper.DialogOptions.CloseOnEscapeKey,
-            NoHeader = ConfigHelper.DialogOptions.NoHeader,
-            CloseButton = ConfigHelper.DialogOptions.CloseButton,
-            FullScreen = ConfigHelper.DialogOptions.FullScreen,
-            FullWidth = ConfigHelper.DialogOptions.FullWidth,
-            BackgroundClass = ConfigHelper.DialogOptions.BackgroundClass
-        };
-
         var param = new DialogParameters
         {
             {
@@ -214,7 +202,7 @@
             }
         };
 
-        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", param, option);
+        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", param, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
@@ -228,7 +216,6 @@
 
     private void NavigateBack()
     {
-        JsRuntime.InvokeVoidAsync("navigateBack");
         // this doesn't seem to work on linux, so navigating back to forge instead of last page
         if (OperatingSystem.IsWindows())
         {
