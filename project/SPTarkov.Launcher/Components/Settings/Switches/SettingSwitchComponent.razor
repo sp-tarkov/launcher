@@ -2,7 +2,7 @@
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())" OnClick="SwitchFunc">
         <MudText Class="@(GetTextClasses())">@OptionName</MudText>
         <MudSpacer/>
-        <MudSwitch Disabled="Disabled" @bind-Value="@Switch" Color="Color.Tertiary"/>
+        <MudSwitch ReadOnly="true" Disabled="Disabled" @bind-Value="@Switch" Color="Color.Tertiary" Style="pointer-events: none"/>
     </MudLink>
 </MudContainer>
 @if (AddDiv)
