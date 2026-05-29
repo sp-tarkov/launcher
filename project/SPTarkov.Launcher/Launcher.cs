@@ -50,7 +50,6 @@ public class Launcher
 
         appBuilder.Services
             .AddSingleton<ConfigHelper>()
-            // .AddSingleton<ForgeHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
             .AddSingleton<ModManager>()
@@ -157,21 +156,23 @@ public class Launcher
 
         App.MainWindow.RegisterWebMessageReceivedHandler((_, message) =>
         {
-            if (message.StartsWith(_openExternalString))
+            if (!message.StartsWith(_openExternalString))
             {
-                var url = message.Substring(_openExternalString.Length);
-                try
+                return;
+            }
+
+            var url = message.Substring(_openExternalString.Length);
+            try
+            {
+                Process.Start(new ProcessStartInfo
                 {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = url,
-                        UseShellExecute = true
-                    });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to open URL: {ex}", ex);
-                }
+                    FileName = url,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to open URL: {ex}", ex);
             }
         });
     }
