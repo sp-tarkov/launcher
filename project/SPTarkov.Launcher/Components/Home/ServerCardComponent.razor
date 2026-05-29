@@ -123,6 +123,7 @@
         if (result?.Canceled is false)
         {
             StateHelper.SetSelectedServer(Server);
+            StateHelper.SetAllowServerPage(true);
             if (StateHelper.SelectedServer != null)
             {
                 IsConnectedServer = StateHelper.SelectedServer.ServerId == Server.ServerId;

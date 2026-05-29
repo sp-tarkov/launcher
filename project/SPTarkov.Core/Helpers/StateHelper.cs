@@ -18,6 +18,7 @@ public class StateHelper(ILogger<StateHelper> logger)
     public string CurrentAi = "Exclude";
 
     public bool AllowNavigation { get; set; } = true;
+    public bool AllowServerPage { get; set; } = false;
     public event Action? OnStateChanged;
 
     public void LogoutAndDispose()
@@ -52,6 +53,12 @@ public class StateHelper(ILogger<StateHelper> logger)
     public void SetAllowNavigation(bool state)
     {
         AllowNavigation = state;
+        NotifyStateChanged();
+    }
+
+    public void SetAllowServerPage(bool state)
+    {
+        AllowServerPage = state;
         NotifyStateChanged();
     }
 }

@@ -127,6 +127,7 @@
     private void Submit()
     {
         MudDialog.Close(DialogResult.Ok(Server));
+        StateHelper.SetAllowServerPage(true);
         Snackbar.Add(LocaleHelper.Get("server_login_task_success"), Severity.Success);
     }
 

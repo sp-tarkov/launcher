@@ -8,6 +8,12 @@
     <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="@(LocaleHelper.Get("home"))" Inline="false">
         <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.ConnectedTv" Match="NavLinkMatch.All" Href="/ServerPageWrapper/false"/>
     </MudTooltip>
+    @if (StateHelper.AllowServerPage)
+    {
+        <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="Spt Server Web Console" Inline="false">
+            <MudNavLink Disabled="!StateHelper.AllowServerPage" IconColor="Color.Default" Icon="@Icons.Material.Filled.Security" Match="NavLinkMatch.All" Href="@($"https://{StateHelper.SelectedServer?.IpAddress}/")"/>
+        </MudTooltip>
+    }
 </MudNavMenu>
 <MudSpacer/>
 <MudNavMenu Class="mud-typography-nowrap">
