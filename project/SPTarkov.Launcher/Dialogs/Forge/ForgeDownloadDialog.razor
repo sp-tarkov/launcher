@@ -16,12 +16,12 @@
             </MudPaper>
             @if (Version.Dependencies.Any())
             {
-                <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
-                    <MudText Class="pb-2">This mod has a dependency on another mod. this will also be downloaded.</MudText>
+                <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2 d-flex flex-column">
+                    <MudText Class="pb-2">This mod has a dependency on other mods. these will also be downloaded.</MudText>
                     <MudDivider DividerType="DividerType.Middle" Class="pb-2" />
                         @foreach (var dep in Version.Dependencies)
                         {
-                            <MudText Typo="Typo.caption">@($"{dep.Name} - {dep.Versions.FirstOrDefault().Version}")</MudText>
+                            <MudText Typo="Typo.caption" >@($"{dep.Name} - {dep.Versions.FirstOrDefault().Version}.")</MudText>
                         }
                 </MudPaper>
             }

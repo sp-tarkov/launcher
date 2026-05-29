@@ -123,13 +123,15 @@
                         {
                             @foreach (var dep in ForgeModVersion.Dependencies)
                             {
-                                <MudLink Color="Color.Default" Underline="Underline.None" OnClick="() => NavigateToDependency(dep.Id)" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
-                                    <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@dep.GetThumbnail()"/>
-                                    <MudContainer Class="flex-1 gap-3 px-2">
-                                        <MudText Class="no-select text-overflow" Typo="Typo.h6">@dep.Name</MudText>
-                                        <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {dep.Versions?.First().Version} - {dep.Owner?.Name}")</MudText>
-                                    </MudContainer>
-                                </MudLink>
+                                <MudTooltip ShowOnHover="true" Placement="Placement.Left" Arrow="false" ShowOnClick="false" ShowOnFocus="false" Text="@dep.Name">
+                                    <MudLink Color="Color.Default" Underline="Underline.None" OnClick="() => NavigateToDependency(dep.Id)" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
+                                        <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@dep.GetThumbnail()"/>
+                                        <MudContainer Class="flex-1 gap-3 px-2">
+                                            <MudText Class="no-select text-overflow" Typo="Typo.h6">@dep.Name</MudText>
+                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {dep.Versions?.First().Version} - {dep.Owner?.Name}")</MudText>
+                                        </MudContainer>
+                                    </MudLink>
+                                </MudTooltip>
                             }
                         }
                         else
@@ -152,13 +154,15 @@
                                     continue;
                                 }
 
-                                <MudLink Color="Color.Default" Underline="Underline.None" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
-                                    <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@addon.GetThumbnail()"/>
-                                    <MudContainer Class="flex-1 gap-3 px-2">
-                                        <MudText Class="no-select text-overflow" Typo="Typo.h6">@addon.Name</MudText>
-                                        <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {addon.Versions?.First().Version} - {addon.Owner?.Name}")</MudText>
-                                    </MudContainer>
-                                </MudLink>
+                                <MudTooltip ShowOnHover="true" Placement="Placement.Left" Arrow="false" ShowOnClick="false" ShowOnFocus="false" Text="@addon.Name">
+                                    <MudLink Color="Color.Default" Underline="Underline.None" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
+                                        <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@addon.GetThumbnail()"/>
+                                        <MudContainer Class="flex-1 gap-3 px-2 overflow-hidden">
+                                            <MudText Class="no-select text-overflow" Typo="Typo.h6">@addon.Name</MudText>
+                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {addon.Versions?.First().Version} - {addon.Owner?.Name}")</MudText>
+                                        </MudContainer>
+                                    </MudLink>
+                                </MudTooltip>
                             }
                         }
                         else
@@ -177,8 +181,8 @@
 @code {
     [Parameter] public bool IsSkeleton { get; set; }
     [Parameter] public ForgeBase ForgeMod { get; set; }
-    [Parameter] public ForgeModVersion? ForgeModVersion { get; set; }
-    [Parameter] public List<ForgeBase>? ForgeModAddons { get; set; }
+    [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
+    [Parameter] public List<ForgeBase> ForgeModAddons { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -202,7 +206,20 @@
             }
         };
 
-        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", param, ConfigHelper.DialogOptions);
+        var options = new DialogOptions
+        {
+            Position = ConfigHelper.DialogOptions.Position,
+            MaxWidth = MaxWidth.Large,
+            BackdropClick = ConfigHelper.DialogOptions.BackdropClick,
+            CloseOnEscapeKey = ConfigHelper.DialogOptions.CloseOnEscapeKey,
+            NoHeader = ConfigHelper.DialogOptions.NoHeader,
+            CloseButton = ConfigHelper.DialogOptions.CloseButton,
+            FullScreen = ConfigHelper.DialogOptions.FullScreen,
+            FullWidth = ConfigHelper.DialogOptions.FullWidth,
+            BackgroundClass = ConfigHelper.DialogOptions.BackgroundClass,
+        };
+
+        var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", param, options);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)
