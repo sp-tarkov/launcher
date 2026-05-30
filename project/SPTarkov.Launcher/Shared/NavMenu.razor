@@ -10,8 +10,8 @@
     </MudTooltip>
     @if (StateHelper.AllowServerPage)
     {
-        <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="Spt Server Web Console" Inline="false">
-            <MudNavLink Disabled="!StateHelper.AllowServerPage" IconColor="Color.Default" Icon="@Icons.Material.Filled.Security" Match="NavLinkMatch.All" Href="@($"https://{StateHelper.SelectedServer?.IpAddress}/")"/>
+        <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="Server Information Center (SIC)" Inline="false">
+            <MudNavLink Disabled="!StateHelper.AllowServerPage" IconColor="Color.Default" Icon="@Icons.Material.Filled.Bathtub" Match="NavLinkMatch.All" Href="@($"https://{StateHelper.SelectedServer?.IpAddress}/")"/>
         </MudTooltip>
     }
 </MudNavMenu>
