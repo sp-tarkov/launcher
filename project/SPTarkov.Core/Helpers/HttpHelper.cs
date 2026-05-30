@@ -294,7 +294,7 @@ public class HttpHelper
             queryString.Add("filter[contains_ai_content]", ai.ToString());
         }
 
-        // make this dynamic later
+        // TODO: make this dynamic later
         queryString.Add("filter[spt_version]", "4.0.*");
 
         if (!string.IsNullOrWhiteSpace(sort))
