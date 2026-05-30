@@ -1,0 +1,130 @@
+﻿@inject ISnackbar Snackbar
+@inject IJSRuntime JsRuntime
+@inject ModManager ModManager
+@inject ILogger<ForgeAddonDialog> Logger
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="d-flex flex-column gap-1 mt-4">
+            <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+                <MudText>Please make sure to read the mod page and this Addon's changes!</MudText>
+            </MudPaper>
+            <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+                <MudText Class="user-markdown">
+                    @((MarkupString)ModAddon.Description)
+                </MudText>
+            </MudPaper>
+            @* @if (Version.Dependencies.Any()) *@
+            @* { *@
+            @*     <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2 d-flex flex-column"> *@
+            @*         <MudText Class="pb-2">This mod has a dependency on other mods. these will also be downloaded.</MudText> *@
+            @*         <MudDivider DividerType="DividerType.Middle" Class="pb-2" /> *@
+            @*             @foreach (var dep in Version.Dependencies) *@
+            @*             { *@
+            @*                 <MudText Typo="Typo.caption" >@($"{dep.Name} - {dep.Versions.FirstOrDefault().Version}.")</MudText> *@
+            @*             } *@
+            @*     </MudPaper> *@
+            @* } *@
+            <MudContainer Class="mb-4 pa-0">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Close</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [Parameter] public ForgeBase ModAddon { get; set; }
+
+    private bool _requestInProgress;
+    private CancellationTokenSource Token { get; set; }
+    private bool UserCancel { get; set; }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JsRuntime.InvokeVoidAsync("setTabContent");
+        }
+
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task RunDownloadTask()
+    {
+        // _requestInProgress = true;
+        // Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
+        // var dictOfDeps = new Dictionary<string, Version>();
+        // try
+        // {
+        //     if (Version.Dependencies.Any())
+        //     {
+        //         foreach (var dep in Version.Dependencies)
+        //         {
+        //             var depVersion = dep.Versions.FirstOrDefault();
+        //             dictOfDeps.Add(dep.Guid, depVersion.Version);
+        //             if (ModManager.GetMods().TryGetValue(dep.Guid, out var mod) && mod.ModVersion < depVersion.Version)
+        //             {
+        //                 // check if mod exists, if it does, check version, if its newer, download it
+        //                 ModManager.DownloadMod(dep, depVersion, Token.Token);
+        //             }
+        //             else if (mod is null)
+        //             {
+        //                 // check if mod exists, if it doesnt, download it
+        //                 ModManager.DownloadMod(dep, depVersion, Token.Token);
+        //             }
+        //         }
+        //     }
+        //
+        //     ModManager.DownloadMod(Mod, Version, Token.Token, dictOfDeps);
+        // }
+        // catch (TaskCanceledException) when (Token.IsCancellationRequested)
+        // {
+        //     AbortOrFail("Request Timed out!");
+        //     return;
+        // }
+        // catch (HttpRequestException)
+        // {
+        //     AbortOrFail();
+        //     return;
+        // }
+        // catch (Exception)
+        // {
+        //     AbortOrFail();
+        //     return;
+        // }
+        //
+        // if (true)
+        // {
+        //     _requestInProgress = false;
+        //     Submit();
+        // }
+    }
+
+    private void Submit()
+    {
+        // Snackbar.Add($"Download started for {Mod.Name}", Severity.Success);
+        // MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void AbortOrFail(string message = "Cancelled download")
+    {
+        // if (!UserCancel)
+        // {
+        //     Snackbar.Add(message, Severity.Error);
+        // }
+        //
+        // Token?.Cancel();
+        // MudDialog.Cancel();
+        // _requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        // UserCancel = true;
+        // _requestInProgress = false;
+        // Token?.Cancel();
+        // MudDialog.Cancel();
+    }
+}
