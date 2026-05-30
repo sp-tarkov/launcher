@@ -74,6 +74,9 @@ public record ForgeBase
     [JsonPropertyName("source_code_links")]
     public List<ForgeListOfLinks>? SourceCodeLinks { get; set; }
 
+    [JsonPropertyName("shows_profile_binding_notice")]
+    public bool ShowsProfileBindingNotice { get; set; }
+
     public char? GetAvatarLetter()
     {
         return Owner?.Name?.ToUpper().FirstOrDefault();
