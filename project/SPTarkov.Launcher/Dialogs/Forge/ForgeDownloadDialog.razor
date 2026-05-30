@@ -6,9 +6,17 @@
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="d-flex flex-column gap-1 mt-4">
-            <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+            <MudPaper Class="mud-background-gray border-2 border-solid mud-alert-outlined-warning mb-4 pa-2">
                 <MudText>Please make sure to read the mod page and this version's changes!</MudText>
             </MudPaper>
+            @if (Mod.ShowsProfileBindingNotice)
+            {
+                <MudPaper Class="mud-background-gray border-2 border-solid mud-alert-outlined-warning mb-4 pa-2">
+                    <MudText Typo="Typo.caption" Inline="true" Class="">Notice: </MudText>
+                    <MudText Typo="Typo.caption" Inline="true" Class="">This mod may make permanent changes to your profile, and may not be removable without starting a new profile.</MudText>
+                    <MudText Typo="Typo.caption" Inline="true" Class=""><MudLink Typo="Typo.caption" Class="" Underline="Underline.Always" Href="https://wiki.sp-tarkov.com/Profiles#mods"> More Information.</MudLink></MudText>
+                </MudPaper>
+            }
             <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
                 <MudText Class="user-markdown">
                     @((MarkupString)Version.Description)

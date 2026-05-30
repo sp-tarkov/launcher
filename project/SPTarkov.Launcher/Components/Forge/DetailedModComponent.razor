@@ -60,6 +60,16 @@
                 </MudCard>
             </MudItem>
             <MudItem sm="4" Class="pt-4">
+                @if (ForgeMod.ShowsProfileBindingNotice)
+                {
+                    <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
+                        <MudCardContent>
+                            <MudText Typo="Typo.caption" Inline="true" Class="">Notice: </MudText>
+                            <MudText Typo="Typo.caption" Inline="true" Class="">This mod may make permanent changes to your profile, and may not be removable without starting a new profile.</MudText>
+                            <MudText Typo="Typo.caption" Inline="true" Class=""><MudLink Typo="Typo.caption" Class="" Underline="Underline.Always" Href="https://wiki.sp-tarkov.com/Profiles#mods"> More Information.</MudLink></MudText>
+                        </MudCardContent>
+                    </MudCard>
+                }
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start">
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">GUID</MudText>
