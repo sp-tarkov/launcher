@@ -1,7 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
+  <Import Project="..\Build.props" />
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <Authors>Single Player Tarkov</Authors>
+    <Description>Single Player Tarkov Launcher project.</Description>
+    <Copyright>Copyright (c) Single Player Tarkov 2026</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://sp-tarkov.com</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sp-tarkov/launcher</RepositoryUrl>
     <LangVersion>latestmajor</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>WinExe</OutputType>
