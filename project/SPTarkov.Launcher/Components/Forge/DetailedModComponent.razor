@@ -73,7 +73,7 @@
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start">
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">GUID</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@ForgeMod.Guid</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@ForgeMod.GUID</MudText>
 
 
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
@@ -165,7 +165,7 @@
                                 }
 
                                 <MudTooltip ShowOnHover="true" Placement="Placement.Left" Arrow="false" ShowOnClick="false" ShowOnFocus="false" Text="@addon.Name">
-                                    <MudLink Color="Color.Default" Underline="Underline.None" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
+                                    <MudLink Color="Color.Default" Underline="Underline.None" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden" OnClick="() => StartDownloadAddonTask(addon.Id)">
                                         <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@addon.GetThumbnail()"/>
                                         <MudContainer Class="flex-1 gap-3 px-2 overflow-hidden">
                                             <MudText Class="no-select text-overflow" Typo="Typo.h6">@addon.Name</MudText>
@@ -230,6 +230,40 @@
         };
 
         var dialog = await DialogService.ShowAsync<ForgeDownloadDialog>("ForgeDownloadDialog", param, options);
+        var result = await dialog.Result;
+
+        if (result?.Canceled is false)
+        {
+            Logger.LogInformation("Started Download for {mod}", ForgeMod.Name);
+            return;
+        }
+
+        Logger.LogInformation("Download cancelled for {mod}", ForgeMod.Name);
+    }
+
+    private async Task StartDownloadAddonTask(int id)
+    {
+        var param = new DialogParameters
+        {
+            {
+                "ModAddon", ForgeModAddons.FirstOrDefault(x => x.Id == id)
+            }
+        };
+
+        var options = new DialogOptions
+        {
+            Position = ConfigHelper.DialogOptions.Position,
+            MaxWidth = MaxWidth.Large,
+            BackdropClick = ConfigHelper.DialogOptions.BackdropClick,
+            CloseOnEscapeKey = ConfigHelper.DialogOptions.CloseOnEscapeKey,
+            NoHeader = ConfigHelper.DialogOptions.NoHeader,
+            CloseButton = ConfigHelper.DialogOptions.CloseButton,
+            FullScreen = ConfigHelper.DialogOptions.FullScreen,
+            FullWidth = ConfigHelper.DialogOptions.FullWidth,
+            BackgroundClass = ConfigHelper.DialogOptions.BackgroundClass,
+        };
+
+        var dialog = await DialogService.ShowAsync<ForgeAddonDialog>("ForgeAddonDialog", param, options);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)

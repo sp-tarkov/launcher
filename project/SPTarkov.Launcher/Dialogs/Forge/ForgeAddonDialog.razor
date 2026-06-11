@@ -2,6 +2,7 @@
 @inject IJSRuntime JsRuntime
 @inject ModManager ModManager
 @inject ILogger<ForgeAddonDialog> Logger
+@inject HttpHelper HttpHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -9,22 +10,30 @@
             <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
                 <MudText>Please make sure to read the mod page and this Addon's changes!</MudText>
             </MudPaper>
-            <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
-                <MudText Class="user-markdown">
-                    @((MarkupString)ModAddon.Description)
-                </MudText>
-            </MudPaper>
-            @* @if (Version.Dependencies.Any()) *@
-            @* { *@
-            @*     <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2 d-flex flex-column"> *@
-            @*         <MudText Class="pb-2">This mod has a dependency on other mods. these will also be downloaded.</MudText> *@
-            @*         <MudDivider DividerType="DividerType.Middle" Class="pb-2" /> *@
-            @*             @foreach (var dep in Version.Dependencies) *@
-            @*             { *@
-            @*                 <MudText Typo="Typo.caption" >@($"{dep.Name} - {dep.Versions.FirstOrDefault().Version}.")</MudText> *@
-            @*             } *@
-            @*     </MudPaper> *@
-            @* } *@
+
+            @if (AddonDetails is null || _requestInProgress)
+            {
+                <MudSkeleton Animation="Animation.Pulse" Height="300" SkeletonType="SkeletonType.Rectangle" Width="900"></MudSkeleton>
+            }
+            else
+            {
+                <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
+                    <MudText Class="user-markdown">
+                        @((MarkupString)AddonDetails.Description)
+                    </MudText>
+                </MudPaper>
+                @if (ModAddon.Versions.FirstOrDefault().Dependencies.Any())
+                {
+                    <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2 d-flex flex-column">
+                        <MudText Class="pb-2">This mod has a dependency on other mods. these will also be downloaded.</MudText>
+                        <MudDivider DividerType="DividerType.Middle" Class="pb-2" />
+                            @foreach (var dep in ModAddon.Versions.FirstOrDefault().Dependencies)
+                            {
+                                <MudText Typo="Typo.caption" >@($"{dep.Name} - {dep.Versions.FirstOrDefault().Version}.")</MudText>
+                            }
+                    </MudPaper>
+                }
+            }
             <MudContainer Class="mb-4 pa-0">
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Close</MudButton>
@@ -36,6 +45,7 @@
 @code {
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
     [Parameter] public ForgeBase ModAddon { get; set; }
+    private ForgeBase AddonDetails { get; set; }
 
     private bool _requestInProgress;
     private CancellationTokenSource Token { get; set; }
@@ -45,10 +55,31 @@
     {
         if (firstRender)
         {
+            _ = GetModAddonDetails();
             JsRuntime.InvokeVoidAsync("setTabContent");
         }
 
         return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task GetModAddonDetails()
+    {
+        _requestInProgress = true;
+
+        try
+        {
+            Token = new CancellationTokenSource();
+            var addonDetails = await HttpHelper.ForgeGetModAddonDetails(ModAddon.Id.ToString(), Token.Token);
+            AddonDetails = addonDetails?.Data;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        _requestInProgress = false;
+        StateHasChanged();
     }
 
     private async Task RunDownloadTask()
