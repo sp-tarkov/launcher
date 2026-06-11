@@ -71,8 +71,8 @@
                 foreach (var dep in Version.Dependencies)
                 {
                     var depVersion = dep.Versions.FirstOrDefault();
-                    dictOfDeps.Add(dep.Guid, depVersion.Version);
-                    if (ModManager.GetMods().TryGetValue(dep.Guid, out var mod) && mod.ModVersion < depVersion.Version)
+                    dictOfDeps.Add(dep.GUID, depVersion.Version);
+                    if (ModManager.GetMods().TryGetValue(dep.GUID, out var mod) && mod.ModVersion < depVersion.Version)
                     {
                         // check if mod exists, if it does, check version, if its newer, download it
                         ModManager.DownloadMod(dep, depVersion, Token.Token);

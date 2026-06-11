@@ -103,8 +103,6 @@ public class HttpHelper
             return null;
         }
 
-        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
-
         var paramsToUse = GetParamsCollection();
         var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}?{paramsToUse}")
         {
@@ -127,8 +125,6 @@ public class HttpHelper
             _logger.LogWarning("GetMods - API Key is missing.");
             return null;
         }
-
-        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
         var paramsToUse = GetParamsCollectionForVersions(versionId);
         var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}")
@@ -159,8 +155,6 @@ public class HttpHelper
             _logger.LogWarning("GetMods - API Key is missing.");
             return null;
         }
-
-        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
         var paramsToUse = GetParamsCollection(search, sort, ConvertOptionToBool(includeFeatured), ConvertOptionToBool(includeAi));
         var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMods}?page={page}&{paramsToUse}")
@@ -195,8 +189,6 @@ public class HttpHelper
             _logger.LogWarning("GetMods - API Key is missing.");
             return null;
         }
-
-        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
         var paramsToUse = GetParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
         var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeUpdate}?{paramsToUse}")
@@ -271,8 +263,7 @@ public class HttpHelper
         message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
         var task = await _httpClient.SendAsync(message, token);
-        var showString = await task.Content.ReadAsStringAsync(token);
-        return JsonSerializer.Deserialize<ForgeAbilityReponse>(showString);
+        return JsonSerializer.Deserialize<ForgeAbilityReponse>(await task.Content.ReadAsStringAsync(token));
     }
 
     private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null)
@@ -295,7 +286,7 @@ public class HttpHelper
         }
 
         // TODO: make this dynamic later
-        queryString.Add("filter[spt_version]", "4.0.*");
+        queryString.Add("filter[spt_version]", ProgramStatics.SptVersionCompiledFor.ToString());
 
         if (!string.IsNullOrWhiteSpace(sort))
         {
@@ -396,15 +387,13 @@ public class HttpHelper
 
     public async Task<ForgeAddonResponse?> ForgeGetModAddons(string modId, CancellationToken token)
     {
-        _logger.LogInformation("forge ForgeGetModAddons");
+        _logger.LogInformation("Forge ForgeGetModAddons");
 
         if (string.IsNullOrWhiteSpace(_configHelper.GetConfig().ForgeApiKey))
         {
-            _logger.LogWarning("GetMods - API Key is missing.");
+            _logger.LogWarning("ForgeGetModAddons - API Key is missing.");
             return null;
         }
-
-        _logger.LogInformation("api key: {ForgeApiKey}", _configHelper.GetConfig().ForgeApiKey);
 
         var paramsToUse = GetParamsCollectionForAddons(modId);
         var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeAddons}?{paramsToUse}")
@@ -417,5 +406,28 @@ public class HttpHelper
 
         var task = await _httpClient.SendAsync(message, token);
         return JsonSerializer.Deserialize<ForgeAddonResponse>(await task.Content.ReadAsStringAsync(token));
+    }
+
+    public async Task<ForgeAddonDetailsResponse?> ForgeGetModAddonDetails(string addonId, CancellationToken token)
+    {
+        _logger.LogInformation("Forge ForgeGetModAddon");
+
+        if (string.IsNullOrWhiteSpace(_configHelper.GetConfig().ForgeApiKey))
+        {
+            _logger.LogWarning("ForgeGetModAddon - API Key is missing.");
+            return null;
+        }
+
+        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeAddonDetails}/{addonId}")
+        {
+            Content = new StringContent("", Encoding.UTF8, "application/json")
+        };
+
+        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+
+        var task = await _httpClient.SendAsync(message, token);
+        var stringToRead = await task.Content.ReadAsStringAsync(token);
+        return JsonSerializer.Deserialize<ForgeAddonDetailsResponse>(stringToRead);
     }
 }

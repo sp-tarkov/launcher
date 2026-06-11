@@ -6,7 +6,7 @@ namespace SPTarkov.Core.Configuration;
 
 public class ConfigMod
 {
-    public string ModName { get; init; } = "unknown";
+    public string Name { get; init; } = "unknown";
     public string GUID { get; set; } = "com.unknown.mod";
     public bool IsInstalled { get; set; }
     public bool IsInstalling { get; set; }

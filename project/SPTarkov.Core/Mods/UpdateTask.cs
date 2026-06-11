@@ -6,7 +6,7 @@ namespace SPTarkov.Core.Mods;
 
 public class UpdateTask : IModTask
 {
-    public string ModName { get; set; }
+    public string Name { get; set; }
 
     [JsonConverter(typeof(SemVerVersionConverter))]
     public Version Version { get; set; }

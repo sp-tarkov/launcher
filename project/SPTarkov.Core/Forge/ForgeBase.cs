@@ -9,7 +9,7 @@ public record ForgeBase
     public required int Id { get; set; }
 
     [JsonPropertyName("guid")]
-    public string? Guid { get; set; }
+    public string? GUID { get; set; }
 
     [JsonPropertyName("name")]
     public required string Name { get; set; }

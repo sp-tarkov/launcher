@@ -75,7 +75,7 @@
                             <MudContainer Class="d-flex flex-row pa-0">
                                 <MudContainer Class="text-overflow py-2 px-1">
                                     <MudText HtmlTag="span">
-                                        @($"{updateTask.ModName} - {updateTask.Version}")
+                                        @($"{updateTask.Name} - {updateTask.Version}")
                                     </MudText>
                                     <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
                                         <ChildContent>
@@ -97,7 +97,7 @@
                             <MudContainer Class="d-flex flex-row pa-0">
                                 <MudContainer Class="text-overflow py-2 px-1">
                                     <MudText HtmlTag="span">
-                                        @($"{installTask.Mod.ModName} - {installTask.Mod.ModVersion}")
+                                        @($"{installTask.ForgeMod.Name} - {installTask.ForgeMod.ModVersion}")
                                     </MudText>
                                     <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Indeterminate="true" Class="mt-2">
                                         <ChildContent>
@@ -124,7 +124,7 @@
                         <MudContainer Class="d-flex flex-row pa-0">
                             <MudContainer Class="text-overflow py-2 px-1">
                                 <MudText HtmlTag="span">
-                                    @($"{mod.ModName} - {mod.ModVersion}")
+                                    @($"{mod.Name} - {mod.ModVersion}")
                                 </MudText>
                             </MudContainer>
                             <MudContainer Class="flex-1 d-flex flex-row justify-center align-center pr-0">
@@ -166,7 +166,7 @@
                         <MudContainer Class="d-flex flex-row pa-0">
                             <MudContainer Class="text-overflow py-2 px-1">
                                 <MudText HtmlTag="span">
-                                    @($"{mod.ModName} - {mod.ModVersion}")
+                                    @($"{mod.Name} - {mod.ModVersion}")
                                 </MudText>
                             </MudContainer>
                             @if (CheckForDependantThatIsInstalled(guid))

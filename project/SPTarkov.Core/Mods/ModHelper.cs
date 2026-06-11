@@ -33,7 +33,8 @@ public class ModHelper
         _httpClient = new HttpClient(handler);
     }
 
-    public async Task<DownloadTask?> StartDownloadTask(ForgeBase mod, ForgeModVersion version, CancellationTokenSource cancellationTokenSource)
+    public async Task<DownloadTask?> StartDownloadTask(ForgeBase mod, ForgeModVersion version,
+        CancellationTokenSource cancellationTokenSource)
     {
         var downloadTask = new DownloadTask
         {
@@ -46,17 +47,17 @@ public class ModHelper
             Error = null
         };
 
-        if (!_modDict.TryAdd(mod.Guid, downloadTask))
+        if (!_modDict.TryAdd(mod.GUID, downloadTask))
         {
-            _modDict.Remove(mod.Guid, out _);
-            if (!_modDict.TryAdd(mod.Guid, downloadTask))
+            _modDict.Remove(mod.GUID, out _);
+            if (!_modDict.TryAdd(mod.GUID, downloadTask))
             {
-                _logger.LogError("Something seriously went wrong adding this download task: {name}:{guid}", mod.Name, mod.Guid);
+                _logger.LogError("Something seriously went wrong adding this download task: {name}:{guid}", mod.Name, mod.GUID);
                 return null;
             }
         }
 
-        var modFilePath = Path.Join(Paths.ModCache, mod.Guid);
+        var modFilePath = Path.Join(Paths.ModCache, mod.GUID);
         try
         {
             if (!Directory.Exists(Paths.ModCache))
@@ -71,7 +72,8 @@ public class ModHelper
 
             // Use a download to EFT client to test a long download
             using var response =
-                await _httpClient.GetAsync(version.Link, HttpCompletionOption.ResponseHeadersRead, downloadTask.CancellationTokenSource.Token);
+                await _httpClient.GetAsync(version.Link, HttpCompletionOption.ResponseHeadersRead,
+                    downloadTask.CancellationTokenSource.Token);
             response.EnsureSuccessStatusCode();
 
             downloadTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
@@ -124,23 +126,22 @@ public class ModHelper
         switch (task)
         {
             case DownloadTask downloadTask:
-                guid = downloadTask.ForgeMod.Guid;
+                guid = downloadTask.ForgeMod.GUID;
                 name = downloadTask.ForgeMod.Name;
                 break;
             case UpdateTask updateTask:
                 guid = updateTask.GUID;
-                name = updateTask.ModName;
+                name = updateTask.Name;
                 break;
             case InstallTask installTask:
-                guid = installTask.Mod.GUID;
-                name = installTask.Mod.ModName;
+                guid = installTask.ForgeMod.GUID;
+                name = installTask.ForgeMod.Name;
                 break;
         }
 
         if (!_modDict.TryRemove(guid, out _))
         {
-            _logger.LogError("Unable to remove mod from download Dictionary for {name}:{guid}", name,
-                guid);
+            _logger.LogError("Unable to remove mod from download Dictionary for {name}:{guid}", name, guid);
         }
     }
 
@@ -188,7 +189,7 @@ public class ModHelper
     {
         var updateTask = new UpdateTask
         {
-            ModName = mod.CurrentVersion.Name!,
+            Name = mod.CurrentVersion.Name!,
             Version = mod.RecommendedVersion.Version!,
             GUID = mod.CurrentVersion.GUID!,
             Link = mod.RecommendedVersion.Link!,
@@ -202,9 +203,9 @@ public class ModHelper
         if (!_modDict.TryAdd(updateTask.GUID, updateTask))
         {
             _modDict.Remove(updateTask.GUID, out _);
-            if (!_modDict.TryAdd(updateTask.ModName, updateTask))
+            if (!_modDict.TryAdd(updateTask.Name, updateTask))
             {
-                _logger.LogError("Something seriously went wrong adding this update task: {name}:{guid}", updateTask.ModName, updateTask.GUID);
+                _logger.LogError("Something seriously went wrong adding this update task: {name}:{guid}", updateTask.Name, updateTask.GUID);
                 return null;
             }
         }
@@ -219,7 +220,8 @@ public class ModHelper
             }
 
             // Use a download to EFT client to test a long download
-            using var response = await _httpClient.GetAsync(updateTask.Link, HttpCompletionOption.ResponseHeadersRead, updateTask.CancellationTokenSource.Token);
+            using var response = await _httpClient.GetAsync(updateTask.Link, HttpCompletionOption.ResponseHeadersRead,
+                updateTask.CancellationTokenSource.Token);
             response.EnsureSuccessStatusCode();
 
             updateTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
@@ -268,7 +270,7 @@ public class ModHelper
     {
         var installTask = new InstallTask
         {
-            Mod = mod,
+            ForgeMod = mod,
             CancellationTokenSource = cancellationTokenSource,
             TotalToDownload = 0,
             Progress = 0,
@@ -276,12 +278,13 @@ public class ModHelper
             Error = null
         };
 
-        if (!_modDict.TryAdd(installTask.Mod.GUID, installTask))
+        if (!_modDict.TryAdd(installTask.ForgeMod.GUID, installTask))
         {
-            _modDict.Remove(installTask.Mod.GUID, out _);
-            if (!_modDict.TryAdd(installTask.Mod.GUID, installTask))
+            _modDict.Remove(installTask.ForgeMod.GUID, out _);
+            if (!_modDict.TryAdd(installTask.ForgeMod.GUID, installTask))
             {
-                _logger.LogError("Something seriously went wrong adding this install task: {name}:{guid}", installTask.Mod.ModName, installTask.Mod.GUID);
+                _logger.LogError("Something seriously went wrong adding this install task: {name}:{guid}", installTask.ForgeMod.Name,
+                    installTask.ForgeMod.GUID);
                 return null;
             }
         }
@@ -291,7 +294,8 @@ public class ModHelper
 
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
-        var checkForCorrectFilePath = entries.Any(x => x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt" + Path.DirectorySeparatorChar));
+        var checkForCorrectFilePath = entries.Any(x =>
+            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt" + Path.DirectorySeparatorChar));
 
         // we checked this before, but to be sure
         if (!checkForCorrectFilePath)
