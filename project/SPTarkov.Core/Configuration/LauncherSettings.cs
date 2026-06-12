@@ -21,7 +21,8 @@ public record LauncherSettings
 
     public bool FirstRun { get; set; } = true;
 
-    public string GamePath { get; set; } = Environment.CurrentDirectory;
+    // because we are 1 folder deeper than the game path, get parent dir
+    public string GamePath { get; set; } = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
 
     public bool CloseToTray { get; set; }
 
@@ -33,7 +34,7 @@ public record LauncherSettings
 
     public bool UseBackground { get; set; } = true;
 
-    public bool ClearCacheOnLaunch { get; set; } = false;
+    public bool ClearCacheOnLaunch { get; set; }
 
     public List<string> ExcludeFromCleanup { get; set; } = new();
 
