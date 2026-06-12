@@ -1,6 +1,6 @@
 ﻿# NCSA Open Source License  
 
-Copyright (c) 2022 SPT. All rights reserved.  
+Copyright (c) 2026 SPT. All rights reserved.  
 
 Developed by: SPT
 
