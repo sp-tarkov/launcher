@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\Build.props" />
+  <Import Project="../Build.props" />
   <PropertyGroup>
     <Authors>Single Player Tarkov</Authors>
     <Description>Core library for the Single Player Tarkov Launcher project.</Description>
@@ -25,21 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Update version number when needed -->
-    <Content Include="$(NuGetPackageRoot)mudblazor\8.15.0\staticwebassets\MudBlazor.min.css">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(NuGetPackageRoot)mudblazor\8.15.0\staticwebassets\MudBlazor.min.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="zlib.net">
-      <HintPath>SharedDependencies\zlib.net.dll</HintPath>
+      <HintPath>SharedDependencies/zlib.net.dll</HintPath>
     </Reference>
     <Reference Include="7z">
-      <HintPath>SPT_Data\Launcher\Dependency\7z.dll</HintPath>
+      <HintPath>SPT_Data/Launcher/Dependency/7z.dll</HintPath>
     </Reference>
   </ItemGroup>
 

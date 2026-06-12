@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <Import Project="..\Build.props" />
+  <Import Project="../Build.props"/>
+
   <PropertyGroup>
     <Authors>Single Player Tarkov</Authors>
     <Description>Single Player Tarkov Launcher project.</Description>
@@ -11,31 +12,63 @@
     <LangVersion>latestmajor</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>WinExe</OutputType>
-    <ApplicationIcon>wwwroot\spt-logo.ico</ApplicationIcon>
+    <ApplicationIcon>wwwroot/spt-logo.ico</ApplicationIcon>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <AssemblyName>SPT.Launcher</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SPTarkov.Core\SPTarkov.Core.csproj"/>
-  </ItemGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
+    <AssemblyName>SPT.Launcher.Linux</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Moves the MudBlazor.min.js and css to the wwwroot folder in SPTarkov.Launcher project -->
+  <!-- If once built, you find the launcher looks broken, its probably because these didnt exist first -->
+  <Target Name="CopyMudBlazor" BeforeTargets="PrepareForBuild">
+    <ItemGroup>
+      <MudBlazorAssets Include="$(NuGetPackageRoot)mudblazor/8.15.0/staticwebassets/MudBlazor.min.*" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(MudBlazorAssets)"
+      DestinationFiles="@(MudBlazorAssets->'$(ProjectDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')"
+    />
+  </Target>
 
   <ItemGroup>
-    <EmbeddedResource Include="wwwroot\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.0" />
+    <ProjectReference Include="../SPTarkov.Core/SPTarkov.Core.csproj"/>
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="10.0.0"/>
+    <EmbeddedResource Include="wwwroot/**"/>
+    <SptData Include="$(ProjectDir)../SPTarkov.Core/SPT_Data/**/*.*"/>
   </ItemGroup>
 
   <Target Name="CopySptData" AfterTargets="PostBuildEvent">
-    <ItemGroup>
-      <SptData Include="$(SolutionDir)SPTarkov.Core\SPT_Data\**\*.*" />
-    </ItemGroup>
     <Copy
       SourceFiles="@(SptData);"
-      DestinationFolder="$(ProjectDir)$(OutDir)SPT_Data\%(RecursiveDir)"
+      DestinationFolder="$(ProjectDir)$(OutDir)SPT_Data/%(RecursiveDir)"
     />
+  </Target>
+
+  <Target Name="SPTBuildEvent" AfterTargets="Publish">
+    <RemoveDir Directories="$(ProjectDir)../Build"/>
+    <MakeDir Directories="$(ProjectDir)../Build"/>
+
+    <!-- Windows -->
+    <Copy
+      Condition="'$(RuntimeIdentifier)' == 'win-x64'"
+      SourceFiles="$(ProjectDir)bin/Release/net10.0/win-x64/publish/SPT.Launcher.exe"
+      DestinationFolder="$(ProjectDir)../Build"
+    />
+
+    <!-- Linux -->
+    <Copy
+      Condition="'$(RuntimeIdentifier)' == 'linux-x64'"
+      SourceFiles="$(ProjectDir)bin/Release/net10.0/linux-x64/publish/SPT.Launcher.Linux"
+      DestinationFolder="$(ProjectDir)../Build"
+    />
+
+    <Copy
+      SourceFiles="@(SptData)"
+      DestinationFiles="@(SptData->'$(ProjectDir)../Build/SPT_Data/%(RecursiveDir)%(Filename)%(Extension)')"/>
   </Target>
 
 </Project>
