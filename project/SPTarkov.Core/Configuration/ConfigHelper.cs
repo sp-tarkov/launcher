@@ -273,4 +273,14 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void SetClearCacheOnLaunch(bool clearCacheOnLaunch)
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("SetClearCacheOnLaunch: {ClearCacheOnLaunch}", clearCacheOnLaunch);
+            _settings!.ClearCacheOnLaunch = clearCacheOnLaunch;
+            SaveConfig();
+        }
+    }
 }

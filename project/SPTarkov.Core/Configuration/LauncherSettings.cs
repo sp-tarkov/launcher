@@ -33,6 +33,8 @@ public record LauncherSettings
 
     public bool UseBackground { get; set; } = true;
 
+    public bool ClearCacheOnLaunch { get; set; } = false;
+
     public List<string> ExcludeFromCleanup { get; set; } = new();
 
     public string Language { get; set; } = "en";
