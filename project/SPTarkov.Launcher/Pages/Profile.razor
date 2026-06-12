@@ -179,6 +179,13 @@
             return;
         }
 
+        if (ConfigHelper.GetConfig().ClearCacheOnLaunch && !await ClearCache())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"CHANGE ME TO USE LOCALE SYSTEM unable to clear game cache: {message}", Severity.Error);
+            return;
+        }
+
         Snackbar.Add(LocaleHelper.Get("profile_page_task_2"));
         if (!await GameHelper.PatchGame())
         {
@@ -254,6 +261,25 @@
             await token.CancelAsync();
             return false;
         }
+    }
+
+    private async Task<bool> ClearCache()
+    {
+        Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Clearing game cache");
+        if (Directory.Exists(Paths.SptAppDataFolder))
+        {
+            try
+            {
+                Directory.Delete(Paths.SptAppDataFolder, true);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                Logger.LogError("Unable to delete SptAppData Folder");
+            }
+        }
+
+        return true;
     }
 
 }
