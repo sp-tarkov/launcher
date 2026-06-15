@@ -45,46 +45,44 @@
     private bool UserCancel { get; set; }
     private string _taskText = "Check for updates?";
     private bool CheckedForUpdates { get; set; }
-    private ForgeUpdateResponse ForgeUpdateResponse { get; set; }
+    private ForgeUpdateResponse? ForgeUpdateResponse { get; set; }
+    private bool NoModsToUpdate { get; set; } = false;
 
     private async Task<ForgeUpdateResponse?> CallForge(string taskText = "", string failString = "")
     {
-        try
+        _taskText = taskText;
+        StateHasChanged();
+        await Task.Delay(20);
+
+        var listOfModsToCheck = ModManager.GetMods().Where(w => !w.Value.IsInstalled).Select(x => $"{x.Key}:{x.Value.ModVersion}").ToList();
+
+        if (!listOfModsToCheck.Any())
         {
-            _taskText = taskText;
-            StateHasChanged();
-            await Task.Delay(20);
-
-            var listOfModsToCheck = ModManager.GetMods().Where(w => !w.Value.IsInstalled).Select(x => $"{x.Key}:{x.Value.ModVersion}").ToList();
-
-            var response = await HttpHelper.ForgeGetUpdate(listOfModsToCheck, "4.0.11", Token.Token);
-
-            if (response is null)
-            {
-                Logger.LogError("Forge ForgeGetUpdate response is null");
-            }
-
-            if (response!.Success)
-            {
-                Logger.LogInformation("Forge ForgeGetUpdate Authenticated");
-            }
-
-            if (!response.Success)
-            {
-                Logger.LogInformation("Forge ForgeGetUpdate NOT - Authenticated");
-                Token?.Dispose();
-                AbortOrFail(failString);
-            }
-
-            return response;
+            Logger.LogInformation("Forge ForgeGetUpdate No mods found to check");
+            NoModsToUpdate = true;
+            return null;
         }
-        catch (Exception e)
+
+        var response = await HttpHelper.ForgeGetUpdate(listOfModsToCheck, ProgramStatics.SptVersionCompiledFor.ToString(), Token.Token);
+
+        if (response is null)
         {
-            Logger.LogError("Forge ForgeGetUpdate failed {e}", e);
+            Logger.LogError("Forge ForgeGetUpdate response is null");
+        }
+
+        if (response!.Success)
+        {
+            Logger.LogInformation("Forge ForgeGetUpdate Authenticated");
+        }
+
+        if (!response.Success)
+        {
+            Logger.LogInformation("Forge ForgeGetUpdate NOT - Authenticated");
+            Token?.Dispose();
             AbortOrFail(failString);
         }
 
-        return null;
+        return response;
     }
 
     private async Task CheckForUpdates()
@@ -97,7 +95,7 @@
             // we abort if failed so no need to check result
             CheckedForUpdates = true;
 
-            if (!ForgeUpdateResponse.Data.Updates.Any())
+            if ((ForgeUpdateResponse is not null && !ForgeUpdateResponse.Data.Updates.Any()) || (NoModsToUpdate && ForgeUpdateResponse == null))
             {
                 Snackbar.Add("No update detected", Severity.Info);
                 Submit();
