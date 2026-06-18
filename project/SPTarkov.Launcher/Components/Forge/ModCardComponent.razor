@@ -1,4 +1,6 @@
-﻿<MudItem sm="6">
+﻿@inject LocaleHelper LocaleHelper
+
+<MudItem sm="6">
     @if (IsSkeleton)
     {
         <MudCard Class="info-card-height mud-background-gray border-2 border-solid mud-border-lines-default">
@@ -45,12 +47,12 @@
                     </CardHeaderAvatar>
                     <CardHeaderContent>
                         <MudText Typo="Typo.body1">@ForgeMod.GetModName()</MudText>
-                        <MudText Typo="Typo.body2">By @ForgeMod.GetModdersName()</MudText>
+                        <MudText Typo="Typo.body2">@(LocaleHelper.Get("mod_by")) @ForgeMod.GetModdersName()</MudText>
                     </CardHeaderContent>
                     <CardHeaderActions>
                         @if (ForgeMod.GetModFeatured())
                         {
-                            <MudTooltip Placement="Placement.Left" Arrow="false" Text="Featured">
+                            <MudTooltip Placement="Placement.Left" Arrow="false" Text="@(LocaleHelper.Get("featured"))">
                                 <MudIconButton Icon="@Icons.Material.Filled.Favorite"/>
                             </MudTooltip>
                         }
