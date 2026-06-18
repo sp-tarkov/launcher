@@ -26,11 +26,11 @@
         <MudGrid>
             <MudItem sm="12" Class="d-flex flex-row">
                 <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" IconColor="Color.Error" Color="Color.Dark" Size="Size.Medium" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="NavigateBack">
-                    Back
+                    @(LocaleHelper.Get("mod_navigate_back"))
                 </MudButton>
                 <MudSpacer/>
                 <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">
-                    @($"Download Latest ({ForgeModVersion?.Version})")
+                    @($"{LocaleHelper.Get("mod_download_latest")} ({ForgeModVersion.Version})")
                 </MudButton>
             </MudItem>
             <MudItem sm="8" Class="pt-4">
@@ -42,12 +42,12 @@
                             </MudItem>
                             <MudItem sm="9">
                                 <MudItem Class="d-flex mud-width-full">
-                                    <MudTooltip Arrow="false" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" Text="Open in the Forge">
+                                    <MudTooltip Arrow="false" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" Text="@(LocaleHelper.Get("mod_open_forge"))">
                                         <MudLink Color="Color.Default" Underline="Underline.Always" Href="@($"https://forge.sp-tarkov.com/mod/{ForgeMod.Id}/{ForgeMod.Slug}/")" Typo="Typo.h6">@ForgeMod.Name</MudLink>
                                     </MudTooltip>
                                 </MudItem>
-                                <MudText Typo="Typo.body1" Class="no-pointers no-select">By @ForgeMod.GetModdersName()</MudText>
-                                <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Downloads Downloads</MudText>
+                                <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_by")) @ForgeMod.GetModdersName()</MudText>
+                                <MudText Typo="Typo.body2" Class="no-pointers no-select">@ForgeMod.Downloads @(LocaleHelper.Get("mod_download"))</MudText>
                             </MudItem>
                         </MudGrid>
                     </MudCardHeader>
@@ -64,22 +64,22 @@
                 {
                     <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
                         <MudCardContent>
-                            <MudText Typo="Typo.caption" Inline="true" Class="">Notice: </MudText>
-                            <MudText Typo="Typo.caption" Inline="true" Class="">This mod may make permanent changes to your profile, and may not be removable without starting a new profile.</MudText>
-                            <MudText Typo="Typo.caption" Inline="true" Class=""><MudLink Typo="Typo.caption" Class="" Underline="Underline.Always" Href="https://wiki.sp-tarkov.com/Profiles#mods"> More Information.</MudLink></MudText>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_notice_title"))</MudText>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_notice_text"))</MudText>
+                            <MudText Typo="Typo.caption" Inline="true"><MudLink Typo="Typo.caption" Underline="Underline.Always" Href="https://wiki.sp-tarkov.com/Profiles#mods"> @(LocaleHelper.Get("mod_notice_link"))</MudLink></MudText>
                         </MudCardContent>
                     </MudCard>
                 }
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
                     <MudCardContent Class="d-flex flex-column align-start">
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">GUID</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_guid"))</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@ForgeMod.GUID</MudText>
 
 
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Additional Authors</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_additional_authors"))</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.GetAdditionalAuthors())</MudText> @* TODO: Get aditional author page *@
 
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">License</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_license"))</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
                             @if (ForgeMod.License is not null)
                             {
@@ -87,11 +87,11 @@
                             }
                             else
                             {
-                                @("None")
+                                @(LocaleHelper.Get("mod_none"))
                             }
                         </MudText>
 
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Source Code</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_source_code"))</MudText>
                         @if (ForgeMod.SourceCodeLinks?.Any() ?? false)
                         {
                             @foreach (var link in ForgeMod.SourceCodeLinks)
@@ -104,11 +104,11 @@
                         else
                         {
                             <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
-                                @("None")
+                                @(LocaleHelper.Get("mod_none"))
                             </MudText>
                         }
 
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Latest VirusTotal Result</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_virustotal"))</MudText>
                         @if (ForgeModVersion?.VirusTotalLinks?.Any() ?? false)
                         {
                             @foreach (var link in ForgeModVersion.VirusTotalLinks)
@@ -121,14 +121,14 @@
                         else
                         {
                             <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
-                                @("None")
+                                @(LocaleHelper.Get("mod_none"))
                             </MudText>
                         }
 
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Fika Compatible</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.FikaCompatible ?? false ? "Yes" : "No")</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_fika_Compatible"))</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.FikaCompatible ?? false ? LocaleHelper.Get("mod_yes") : LocaleHelper.Get("mod_no"))</MudText>
 
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">Dependencies</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_dependencies"))</MudText>
                         @if (ForgeModVersion?.Dependencies?.Any() ?? false)
                         {
                             @foreach (var dep in ForgeModVersion.Dependencies)
@@ -138,7 +138,7 @@
                                         <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@dep.GetThumbnail()"/>
                                         <MudContainer Class="flex-1 gap-3 px-2">
                                             <MudText Class="no-select text-overflow" Typo="Typo.h6">@dep.Name</MudText>
-                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {dep.Versions?.First().Version} - {dep.Owner?.Name}")</MudText>
+                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"{LocaleHelper.Get("mod_requires")} {dep.Versions?.First().Version} - {dep.Owner?.Name}")</MudText>
                                         </MudContainer>
                                     </MudLink>
                                 </MudTooltip>
@@ -147,19 +147,19 @@
                         else
                         {
                             <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
-                                @("None")
+                                @(LocaleHelper.Get("mod_none"))
                             </MudText>
                         }
                     </MudCardContent>
                 </MudCard>
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mt-4">
                     <MudCardContent Class="d-flex flex-column align-start">
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">ADDONS</MudText>
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_addons"))</MudText>
                         @if (ForgeModAddons?.Any() ?? false)
                         {
                             @foreach (var addon in ForgeModAddons)
                             {
-                                @if (!addon.Versions.Select(x => x.ModVersionConstraint?.IsSatisfied(ForgeModVersion?.Version)).Any())
+                                @if (!addon.Versions.Select(x => x.ModVersionConstraint?.IsSatisfied(ForgeModVersion.Version)).Any())
                                 {
                                     continue;
                                 }
@@ -169,7 +169,7 @@
                                         <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@addon.GetThumbnail()"/>
                                         <MudContainer Class="flex-1 gap-3 px-2 overflow-hidden">
                                             <MudText Class="no-select text-overflow" Typo="Typo.h6">@addon.Name</MudText>
-                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"Requires {addon.Versions?.First().Version} - {addon.Owner?.Name}")</MudText>
+                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"{LocaleHelper.Get("mod_requires")} {addon.Versions?.First().Version} - {addon.Owner?.Name}")</MudText>
                                         </MudContainer>
                                     </MudLink>
                                 </MudTooltip>
@@ -178,7 +178,7 @@
                         else
                         {
                             <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
-                                @("None")
+                                @(LocaleHelper.Get("mod_none"))
                             </MudText>
                         }
                     </MudCardContent>
