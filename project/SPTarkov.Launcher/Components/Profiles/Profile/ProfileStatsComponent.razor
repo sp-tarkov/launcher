@@ -3,48 +3,48 @@
         <MudTabPanel Text="Overall">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Raids" P1Value="2" P2="Run Through" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="Survived" P1Value="2" P2="AWOL" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="KIA" P1Value="2" P2="MIA" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="Kills" P1Value="2" P2="KD" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Raids" P1Value="@(MiniProfile.ProfileStats.Overall["Raids"])" P2="Run Through" P2Value="@(MiniProfile.ProfileStats.Overall["RunThrough"])"/>
+                    <ProfileStatsSubColComponent P1="Survived" P1Value="@(MiniProfile.ProfileStats.Overall["Survived"])" P2="AWOL" P2Value="@(MiniProfile.ProfileStats.Overall["AWOL"])"/>
+                    <ProfileStatsSubColComponent P1="KIA" P1Value="@(MiniProfile.ProfileStats.Overall["KIA"])" P2="MIA" P2Value="@(MiniProfile.ProfileStats.Overall["MIA"])"/>
+                    <ProfileStatsSubColComponent P1="Kills" P1Value="@(MiniProfile.ProfileStats.Overall["Kills"])" P2="KD" P2Value="@(MiniProfile.ProfileStats.Overall["KD"])"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Survival Rate" P1Value="100%" P2="Leave Rate" P2Value="0%"/>
-                    <ProfileStatsSubColComponent P1="Average Life Span" P1Value="00:00" P2="Survivals in a row" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="Online" P1Value="0H00M" P2="Account Lifetime" P2Value="0H48M"/>
+                    <ProfileStatsSubColComponent P1="Survival Rate" P1Value="@(MiniProfile.ProfileStats.Overall["SurvivalRate"])" P2="Leave Rate" P2Value="@(MiniProfile.ProfileStats.Overall["LeaveRate"])"/>
+                    <ProfileStatsSubColComponent P1="Average Life Span" P1Value="@(MiniProfile.ProfileStats.Overall["AverageLifeSpan"])" P2="Survivals in a row" P2Value="@(MiniProfile.ProfileStats.Overall["SurvivalsInARow"])"/>
+                    <ProfileStatsSubColComponent P1="Online" P1Value="@(MiniProfile.ProfileStats.Overall["Online"])" P2="Account Lifetime" P2Value="@(MiniProfile.ProfileStats.Overall["AccountLifetime"])"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>
         <MudTabPanel Text="Pmc">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Raids" P1Value="2" P2="Run Through" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="Survived" P1Value="2" P2="Survival Rate" P2Value="100%"/>
-                    <ProfileStatsSubColComponent P1="KIA" P1Value="2" P2="Average Life Span" P2Value="00:00"/>
-                    <ProfileStatsSubColComponent P1="Kills" P1Value="2" P2="KD" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Raids" P1Value="@(MiniProfile.ProfileStats.Overall["Raids"])" P2="Run Through" P2Value="@(MiniProfile.ProfileStats.Overall["RunThrough"])"/>
+                    <ProfileStatsSubColComponent P1="Survived" P1Value="@(MiniProfile.ProfileStats.Overall["Survived"])" P2="AWOL" P2Value="@(MiniProfile.ProfileStats.Overall["AWOL"])"/>
+                    <ProfileStatsSubColComponent P1="KIA" P1Value="@(MiniProfile.ProfileStats.Overall["KIA"])" P2="MIA" P2Value="@(MiniProfile.ProfileStats.Overall["MIA"])"/>
+                    <ProfileStatsSubColComponent P1="Kills" P1Value="@(MiniProfile.ProfileStats.Overall["Kills"])" P2="KD" P2Value="@(MiniProfile.ProfileStats.Overall["KD"])"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="AWOL" P1Value="2" P2="Leave Rate" P2Value="0%"/>
-                    <ProfileStatsSubColComponent P1="MIA" P1Value="2" P2="Survivals in a row" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="Online" P1Value="0H00M" P2="Account Lifetime" P2Value="0H48M"/>
+                    <ProfileStatsSubColComponent P1="Survival Rate" P1Value="@(MiniProfile.ProfileStats.Overall["SurvivalRate"])" P2="Leave Rate" P2Value="@(MiniProfile.ProfileStats.Overall["LeaveRate"])"/>
+                    <ProfileStatsSubColComponent P1="Average Life Span" P1Value="@(MiniProfile.ProfileStats.Overall["AverageLifeSpan"])" P2="Survivals in a row" P2Value="@(MiniProfile.ProfileStats.Overall["SurvivalsInARow"])"/>
+                    <ProfileStatsSubColComponent P1="Online" P1Value="@(MiniProfile.ProfileStats.Overall["Online"])" P2="Account Lifetime" P2Value="@(MiniProfile.ProfileStats.Overall["AccountLifetime"])"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>
         <MudTabPanel Text="Scav">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="Raids" P1Value="2" P2="Run Through" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="Survived" P1Value="2" P2="Survival Rate" P2Value="100%"/>
-                    <ProfileStatsSubColComponent P1="KIA" P1Value="2" P2="Average Life Span" P2Value="00:00"/>
-                    <ProfileStatsSubColComponent P1="Kills" P1Value="2" P2="KD" P2Value="2"/>
+                    <ProfileStatsSubColComponent P1="Raids" P1Value="@(MiniProfile.ProfileStats.Overall["Raids"])" P2="Run Through" P2Value="@(MiniProfile.ProfileStats.Overall["RunThrough"])"/>
+                    <ProfileStatsSubColComponent P1="Survived" P1Value="@(MiniProfile.ProfileStats.Overall["Survived"])" P2="AWOL" P2Value="@(MiniProfile.ProfileStats.Overall["AWOL"])"/>
+                    <ProfileStatsSubColComponent P1="KIA" P1Value="@(MiniProfile.ProfileStats.Overall["KIA"])" P2="MIA" P2Value="@(MiniProfile.ProfileStats.Overall["MIA"])"/>
+                    <ProfileStatsSubColComponent P1="Kills" P1Value="@(MiniProfile.ProfileStats.Overall["Kills"])" P2="KD" P2Value="@(MiniProfile.ProfileStats.Overall["KD"])"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="AWOL" P1Value="2" P2="Leave Rate" P2Value="0%"/>
-                    <ProfileStatsSubColComponent P1="MIA" P1Value="2" P2="Survivals in a row" P2Value="2"/>
-                    <ProfileStatsSubColComponent P1="Online" P1Value="0H00M" P2="Account Lifetime" P2Value="0H48M"/>
+                    <ProfileStatsSubColComponent P1="Survival Rate" P1Value="@(MiniProfile.ProfileStats.Overall["SurvivalRate"])" P2="Leave Rate" P2Value="@(MiniProfile.ProfileStats.Overall["LeaveRate"])"/>
+                    <ProfileStatsSubColComponent P1="Average Life Span" P1Value="@(MiniProfile.ProfileStats.Overall["AverageLifeSpan"])" P2="Survivals in a row" P2Value="@(MiniProfile.ProfileStats.Overall["SurvivalsInARow"])"/>
+                    <ProfileStatsSubColComponent P1="Online" P1Value="@(MiniProfile.ProfileStats.Overall["Online"])" P2="Account Lifetime" P2Value="@(MiniProfile.ProfileStats.Overall["AccountLifetime"])"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>

@@ -36,10 +36,10 @@
     </MudContainer>
     <MudContainer Class="pa-0 mb-4">
         <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
-            <MudText Typo="Typo.h6">₽: 1,000,000,000</MudText>
-            <MudText Typo="Typo.h6">$: 1,000,000</MudText>
-            <MudText Typo="Typo.h6">€: 1,000,000</MudText>
-            <MudText Typo="Typo.h6">GP: 69</MudText>
+            <MudText Typo="Typo.h6">₽: @SelectedMiniProfile.ProfileCurrency.Roubles</MudText>
+            <MudText Typo="Typo.h6">$: @SelectedMiniProfile.ProfileCurrency.Dollars</MudText>
+            <MudText Typo="Typo.h6">€: @SelectedMiniProfile.ProfileCurrency.Euros</MudText>
+            <MudText Typo="Typo.h6">GP: @SelectedMiniProfile.ProfileCurrency.GP</MudText>
         </MudPaper>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">

@@ -36,4 +36,37 @@ public record MiniProfile
 
     [JsonPropertyName("invalidOrUnloadableProfile")]
     public bool InvalidOrUnloadableProfile { get; set; }
+
+    [JsonPropertyName("profileCurrency")]
+    public ProfileCurrency ProfileCurrency { get; set; } = new();
+
+    [JsonPropertyName("profileStats")]
+    public ProfileStats ProfileStats { get; set; } = new();
+}
+
+public record ProfileStats
+{
+    [JsonPropertyName("overall")]
+    public Dictionary<string, string> Overall { get; set; } = new();
+
+    [JsonPropertyName("pmc")]
+    public Dictionary<string, string> Pmc { get; set; } = new();
+
+    [JsonPropertyName("scav")]
+    public Dictionary<string, string> Scav { get; set; } = new();
+}
+
+public record ProfileCurrency
+{
+    [JsonPropertyName("roubles")]
+    public int Roubles { get; set; } = 0;
+
+    [JsonPropertyName("euros")]
+    public int Euros { get; set; } = 0;
+
+    [JsonPropertyName("dollars")]
+    public int Dollars { get; set; } = 0;
+
+    [JsonPropertyName("gp")]
+    public int GP { get; set; } = 0;
 }
