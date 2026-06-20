@@ -481,8 +481,10 @@ public class GameHelper
         // }
 
         // As wine can take some time to start the game, we'll just delay 12seconds,
+        // needs to search for EscapeFromTarkov for windows
+        // TODO: this might not work for linux
         await Task.Delay(12000);
-        var process = Process.GetProcessesByName("EscapeFromTarko").FirstOrDefault();
+        var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
 
         if (process != null)
         {
