@@ -6,48 +6,48 @@
         <MudTabPanel Text="@(LocaleHelper.Get("profile_stats_overall"))">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_raids"))" P1Value="@(MiniProfile.ProfileStats.Overall["Raids"])" P2="@(LocaleHelper.Get("profile_stats_run_through"))" P2Value="@(MiniProfile.ProfileStats.Overall["RunThrough"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survived"))" P1Value="@(MiniProfile.ProfileStats.Overall["Survived"])" P2="@(LocaleHelper.Get("profile_stats_awol"))" P2Value="@(MiniProfile.ProfileStats.Overall["AWOL"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kia"))" P1Value="@(MiniProfile.ProfileStats.Overall["KIA"])" P2="@(LocaleHelper.Get("profile_stats_mia"))" P2Value="@(MiniProfile.ProfileStats.Overall["MIA"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kills"))" P1Value="@(MiniProfile.ProfileStats.Overall["Kills"])" P2="@(LocaleHelper.Get("profile_stats_kd"))" P2Value="@(MiniProfile.ProfileStats.Overall["KD"])"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_raids"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Overall, "Raids"))" P2="@(LocaleHelper.Get("profile_stats_run_through"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Overall, "RunThrough"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survived"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Overall, "Survived"))" P2="@(LocaleHelper.Get("profile_stats_awol"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Overall, "AWOL"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kia"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Overall, "KIA"))" P2="@(LocaleHelper.Get("profile_stats_mia"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Overall, "MIA"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kills"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Overall, "Kills"))" P2="@(LocaleHelper.Get("profile_stats_kd"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Overall, "KD"))"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survival_rate"))" P1Value="@(MiniProfile.ProfileStats.Overall["SurvivalRate"])" P2="@(LocaleHelper.Get("profile_stats_leave_rate"))" P2Value="@(MiniProfile.ProfileStats.Overall["LeaveRate"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_average_life_span"))" P1Value="@(MiniProfile.ProfileStats.Overall["AverageLifeSpan"])" P2="@(LocaleHelper.Get("profile_stats_survivals_row"))" P2Value="@(MiniProfile.ProfileStats.Overall["SurvivalsInARow"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_online"))" P1Value="@(MiniProfile.ProfileStats.Overall["Online"])" P2="@(LocaleHelper.Get("profile_stats_account_lifetime"))" P2Value="@(MiniProfile.ProfileStats.Overall["AccountLifetime"])"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survival_rate"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Overall, "SurvivalRate"))" P2="@(LocaleHelper.Get("profile_stats_leave_rate"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Overall, "LeaveRate"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_average_life_span"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Overall, "AverageLifeSpan"))" P2="@(LocaleHelper.Get("profile_stats_survivals_row"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Overall, "SurvivalsInARow"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_online"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Overall, "Online"))" P2="@(LocaleHelper.Get("profile_stats_account_lifetime"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Overall, "AccountLifetime"))"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>
         <MudTabPanel Text="@(LocaleHelper.Get("profile_stats_pmc"))">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_raids"))" P1Value="@(MiniProfile.ProfileStats.Pmc["Raids"])" P2="@(LocaleHelper.Get("profile_stats_run_through"))" P2Value="@(MiniProfile.ProfileStats.Pmc["RunThrough"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survived"))" P1Value="@(MiniProfile.ProfileStats.Pmc["Survived"])" P2="@(LocaleHelper.Get("profile_stats_awol"))" P2Value="@(MiniProfile.ProfileStats.Pmc["AWOL"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kia"))" P1Value="@(MiniProfile.ProfileStats.Pmc["KIA"])" P2="@(LocaleHelper.Get("profile_stats_mia"))" P2Value="@(MiniProfile.ProfileStats.Pmc["MIA"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kills"))" P1Value="@(MiniProfile.ProfileStats.Pmc["Kills"])" P2="@(LocaleHelper.Get("profile_stats_kd"))" P2Value="@(MiniProfile.ProfileStats.Pmc["KD"])"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_raids"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "Raids"))" P2="@(LocaleHelper.Get("profile_stats_run_through"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "RunThrough"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survived"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "Survived"))" P2="@(LocaleHelper.Get("profile_stats_awol"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "AWOL"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kia"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "KIA"))" P2="@(LocaleHelper.Get("profile_stats_mia"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "MIA"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kills"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "Kills"))" P2="@(LocaleHelper.Get("profile_stats_kd"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "KD"))"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survival_rate"))" P1Value="@(MiniProfile.ProfileStats.Pmc["SurvivalRate"])" P2="@(LocaleHelper.Get("profile_stats_leave_rate"))" P2Value="@(MiniProfile.ProfileStats.Pmc["LeaveRate"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_average_life_span"))" P1Value="@(MiniProfile.ProfileStats.Pmc["AverageLifeSpan"])" P2="@(LocaleHelper.Get("profile_stats_survivals_row"))" P2Value="@(MiniProfile.ProfileStats.Pmc["SurvivalsInARow"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_online"))" P1Value="@(MiniProfile.ProfileStats.Pmc["Online"])" P2="@(LocaleHelper.Get("profile_stats_account_lifetime"))" P2Value="@(MiniProfile.ProfileStats.Pmc["AccountLifetime"])"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survival_rate"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "SurvivalRate"))" P2="@(LocaleHelper.Get("profile_stats_leave_rate"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "LeaveRate"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_average_life_span"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "AverageLifeSpan"))" P2="@(LocaleHelper.Get("profile_stats_survivals_row"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "SurvivalsInARow"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_online"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "Online"))" P2="@(LocaleHelper.Get("profile_stats_account_lifetime"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Pmc, "AccountLifetime"))"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>
         <MudTabPanel Text="@(LocaleHelper.Get("profile_stats_scav"))">
             <MudContainer>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_raids"))" P1Value="@(MiniProfile.ProfileStats.Scav["Raids"])" P2="@(LocaleHelper.Get("profile_stats_run_through"))" P2Value="@(MiniProfile.ProfileStats.Scav["RunThrough"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survived"))" P1Value="@(MiniProfile.ProfileStats.Scav["Survived"])" P2="@(LocaleHelper.Get("profile_stats_awol"))" P2Value="@(MiniProfile.ProfileStats.Scav["AWOL"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kia"))" P1Value="@(MiniProfile.ProfileStats.Scav["KIA"])" P2="@(LocaleHelper.Get("profile_stats_mia"))" P2Value="@(MiniProfile.ProfileStats.Scav["MIA"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kills"))" P1Value="@(MiniProfile.ProfileStats.Scav["Kills"])" P2="@(LocaleHelper.Get("profile_stats_kd"))" P2Value="@(MiniProfile.ProfileStats.Scav["KD"])"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_raids"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Scav, "Raids"))" P2="@(LocaleHelper.Get("profile_stats_run_through"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Scav, "RunThrough"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survived"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Scav, "Survived"))" P2="@(LocaleHelper.Get("profile_stats_awol"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Scav, "AWOL"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kia"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Scav, "KIA"))" P2="@(LocaleHelper.Get("profile_stats_mia"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Scav, "MIA"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kills"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Scav, "Kills"))" P2="@(LocaleHelper.Get("profile_stats_kd"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Scav, "KD"))"/>
                 </MudContainer>
                 <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
                 <MudContainer Class="d-flex flex-row justify-space-between">
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survival_rate"))" P1Value="@(MiniProfile.ProfileStats.Scav["SurvivalRate"])" P2="@(LocaleHelper.Get("profile_stats_leave_rate"))" P2Value="@(MiniProfile.ProfileStats.Scav["LeaveRate"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_average_life_span"))" P1Value="@(MiniProfile.ProfileStats.Scav["AverageLifeSpan"])" P2="@(LocaleHelper.Get("profile_stats_survivals_row"))" P2Value="@(MiniProfile.ProfileStats.Scav["SurvivalsInARow"])"/>
-                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_online"))" P1Value="@(MiniProfile.ProfileStats.Scav["Online"])" P2="@(LocaleHelper.Get("profile_stats_account_lifetime"))" P2Value="@(MiniProfile.ProfileStats.Scav["AccountLifetime"])"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survival_rate"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Scav, "SurvivalRate"))" P2="@(LocaleHelper.Get("profile_stats_leave_rate"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Scav, "LeaveRate"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_average_life_span"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Scav, "AverageLifeSpan"))" P2="@(LocaleHelper.Get("profile_stats_survivals_row"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Scav, "SurvivalsInARow"))"/>
+                    <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_online"))" P1Value="@(GetStat(MiniProfile.ProfileStats.Scav, "Online"))" P2="@(LocaleHelper.Get("profile_stats_account_lifetime"))" P2Value="@(GetStat(MiniProfile.ProfileStats.Scav, "AccountLifetime"))"/>
                 </MudContainer>
             </MudContainer>
         </MudTabPanel>
@@ -57,4 +57,9 @@
 @code {
     [Parameter]
     public MiniProfile MiniProfile { get; set; }
+
+    private static string GetStat(IReadOnlyDictionary<string, string>? stats, string key)
+    {
+        return stats is not null && stats.TryGetValue(key, out var value) ? value : "—";
+    }
 }
