@@ -66,7 +66,7 @@ public class FilePatcher(ILogger<FilePatcher> logger)
         return new PatchResultInfo(PatchResultEnum.Success, processed, countfiles);
     }
 
-    public PatchResultInfo Run(string targetPath, string patchPath, bool ignoreInputHashMismatch = false)
+    public async Task<PatchResultInfo> Run(string targetPath, string patchPath, bool ignoreInputHashMismatch = false)
     {
         return PatchAll(targetPath, patchPath, ignoreInputHashMismatch);
     }

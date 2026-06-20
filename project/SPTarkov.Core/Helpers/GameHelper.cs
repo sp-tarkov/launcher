@@ -26,7 +26,10 @@ public class GameHelper
 
     private List<string> Patches
     {
-        get { return GetCorePatches(); }
+        get
+        {
+            return Directory.GetDirectories(Path.Join(_configHelper.GetConfig().GamePath, Paths.PatchPath)).ToList();
+        }
     }
 
     public GameHelper(
@@ -237,7 +240,7 @@ public class GameHelper
 
         foreach (var patch in Patches)
         {
-            var result = await Task.Factory.StartNew(() => _filePatcher.Run(_configHelper.GetConfig().GamePath, patch, ignoreInputHashMismatch));
+            var result = await _filePatcher.Run(_configHelper.GetConfig().GamePath, patch, ignoreInputHashMismatch);
             if (!result.Ok)
             {
                 yield return new PatchResultInfo(result.Status, processed, countpatches);
@@ -248,11 +251,6 @@ public class GameHelper
             var ourResult = new PatchResultInfo(PatchResultEnum.Success, processed, countpatches);
             yield return ourResult;
         }
-    }
-
-    private List<string> GetCorePatches()
-    {
-        return Directory.GetDirectories(Path.Join(_configHelper.GetConfig().GamePath, Paths.PatchPath)).ToList();
     }
 
     private async Task<bool> IsCoreDllVersionMismatched()
