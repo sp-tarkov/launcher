@@ -30,8 +30,6 @@ public record LauncherSettings
 
     public bool AlwaysTop { get; set; }
 
-    public string ForgeApiKey { get; set; } = "";
-
     public bool UseBackground { get; set; } = true;
 
     public bool ClearCacheOnLaunch { get; set; }

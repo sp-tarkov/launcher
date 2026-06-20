@@ -42,41 +42,7 @@
             <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="CheckInternetAccess">Refresh</MudButton>
         </MudItem>
     }
-    else if (!ApiKeyAvailable)
-    {
-        <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container mud-height-full">
-            <MudItem sm="12">
-                <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Dense="true">No API Key found, please follow the instructions below to be able to use Forge!</MudAlert>
-            </MudItem>
-            <MudItem sm="12" Class="my-2 pa-2">
-                <MudText Class="mb-1">To use Forge via the launcher you must:</MudText>
-                <MudText>1. Have an account on the Forge.</MudText>
-                <MudText>2. Login and generate an Api Key for you to use.</MudText>
-                <MudText Class="mt-1">Below are two paths on how to generate that key.</MudText>
-            </MudItem>
-            <MudExpansionPanels MultiExpansion="true">
-                <MudExpansionPanel Text="Email and password login">
-                    <MudText>If you have an Email and password login we are able to get a key automatically,</MudText>
-                    <MudText>This requires you to login via the button below.</MudText>
-                    <MudAlert Dense="true" Severity="Severity.Info" Variant="Variant.Outlined" Class="my-2">None of your login details will be saved!</MudAlert>
-                    <MudItem sm="12" Class="mt-4 d-flex justify-start">
-                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" OnClick="StartForgeLoginTask">Login</MudButton>
-                    </MudItem>
-                </MudExpansionPanel>
-                <MudExpansionPanel Text="Discord login">
-                    <MudText>If you have a Discord login we are NOT able to get a key automatically,</MudText>
-                    <MudText>This requires you to login via the Forge.</MudText>
-                    <MudText Class="mt-2">1. Start by logging into <MudLink Href="https://forge.sp-tarkov.com">The Forge.</MudLink></MudText>
-                    <MudText>2. Click your icon top right and select API Tokens.</MudText>
-                    <MudText>3. Under "Token Name" put "SPT Launcher Key" and click create.</MudText>
-                    <MudText>4. Click the button below to save this Token and test it.</MudText>
-                    <MudItem sm="12" Class="mt-4 d-flex justify-start">
-                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Login" OnClick="StartForgeDiscordTask">Login</MudButton>
-                    </MudItem>
-                </MudExpansionPanel>
-            </MudExpansionPanels>
-        </MudPaper>
-    }
+
     else if (SearchResponse is null || SearchInProgress)
     {
         <MudGrid>
@@ -98,7 +64,6 @@
 
 @code {
     private bool NetAvailable { get; set; }
-    private bool ApiKeyAvailable { get; set; }
     private ForgeModsResponse SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
 
@@ -181,9 +146,8 @@
     {
         await base.OnInitializedAsync();
         NetAvailable = HttpHelper.IsInternetAccessAvailable();
-        ApiKeyAvailable = !string.IsNullOrEmpty(HttpHelper.GetApiKey());
 
-        if (!ApiKeyAvailable || !NetAvailable)
+        if (!NetAvailable)
         {
             return;
         }
@@ -224,40 +188,11 @@
             Logger.LogError("response: {SearchResponse}", SearchResponse);
 
             SearchResponse = null;
-            ApiKeyAvailable = false;
         }
 
         PaginationSelected = (int) page;
         StateHelper.CurrentPagination = PaginationSelected;
         SearchInProgress = false;
         StateHasChanged();
-    }
-
-    private async Task StartForgeLoginTask()
-    {
-        var dialog = await DialogService.ShowAsync<ForgeLoginDialog>("ForgeLoginDialog", ConfigHelper.DialogOptions);
-        var result = await dialog.Result;
-
-        if (result?.Canceled is false)
-        {
-            ApiKeyAvailable = true;
-            Logger.LogInformation("Saved Apikey");
-            await SearchForMods();
-        }
-    }
-
-    // TODO: see if Fridge is up for adding a apikey check endpoint
-    // like ping/pong with validation
-    private async Task StartForgeDiscordTask()
-    {
-        var dialog = await DialogService.ShowAsync<ForgeDiscordDialog>("ForgeDiscordDialog", ConfigHelper.DialogOptions);
-        var result = await dialog.Result;
-
-        if (result?.Canceled is false)
-        {
-            ApiKeyAvailable = true;
-            Logger.LogInformation("Saved Apikey");
-            await SearchForMods();
-        }
     }
 }

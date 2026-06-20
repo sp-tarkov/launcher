@@ -11,7 +11,6 @@
     <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
     <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
     <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="!IsWindows" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
-    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearApiKey">@(LocaleHelper.Get("setting_clear_api"))</MudButton>
 </MudContainer>
 
 @code {
@@ -171,42 +170,5 @@
         }
 
         Clipboard.CopyFiles(filePaths.ToArray());
-    }
-
-    private async Task ClearApiKey()
-    {
-        ForgeLogoutResponse result;
-        try
-        {
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            result = await HttpHelper.ForgeLogout(token.Token);
-        }
-        catch (Exception e)
-        {
-            Logger.LogError("Exception thrown from SettingsTopPanelComponent.ClearApiKey: {Exception}", e);
-            Snackbar.Add(LocaleHelper.Get("setting_clear_api_error_1"), Severity.Error);
-            return;
-        }
-
-        if (result is null)
-        {
-            Logger.LogError("Forge ForgeLogout result is null");
-            Snackbar.Add(LocaleHelper.Get("setting_clear_api_error_1"), Severity.Error);
-            return;
-        }
-
-        if (result.Code == ForgeResponseMessage.Unauthenticated)
-        {
-            Logger.LogWarning("Forge ForgeLogout failed to authenticate");
-            Snackbar.Add(LocaleHelper.Get("setting_clear_api_error_1"), Severity.Error);
-            return;
-        }
-
-        if (result.Success)
-        {
-            Logger.LogInformation("Forge ForgeLogout Successful");
-            Snackbar.Add(LocaleHelper.Get("setting_clear_api_success"), Severity.Success);
-            HttpHelper.ClearApiKey();
-        }
     }
 }

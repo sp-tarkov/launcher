@@ -154,16 +154,6 @@ public class ConfigHelper
         }
     }
 
-    public void SetApiKey(string apiKey)
-    {
-        lock (_lock)
-        {
-            _logger.LogInformation("SetApiKey: {ApiKey}", apiKey);
-            _settings!.ForgeApiKey = apiKey;
-            SaveConfig();
-        }
-    }
-
     public void SetUseBackground(bool useBackground)
     {
         lock (_lock)
