@@ -38,7 +38,7 @@ public class FileLogger(string name, string path, SemaphoreSlim locker) : ILogge
     /// <returns></returns>
     public bool IsEnabled(LogLevel logLevel)
     {
-        return logLevel > LogLevel;
+        return logLevel >= LogLevel;
     }
 
     public IDisposable BeginScope<TState>(TState state) where TState : notnull
