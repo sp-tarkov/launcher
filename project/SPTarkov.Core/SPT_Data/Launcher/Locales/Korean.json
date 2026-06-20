@@ -189,5 +189,7 @@
   "profile_stats_average_life_span": "Average Life Span",
   "profile_stats_survivals_row": "Survivals in a row",
   "profile_stats_online": "Online",
-  "profile_stats_account_lifetime": "Account Lifetime"
+  "profile_stats_account_lifetime": "Account Lifetime",
+  "setting_debug_logging": "Debug Logging",
+  "setting_option_clear_cache": "Clear Cache On Launch"
 }

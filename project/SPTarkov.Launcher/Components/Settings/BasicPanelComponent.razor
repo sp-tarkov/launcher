@@ -6,7 +6,7 @@
         @* <SettingSwitchComponent Switch="@CloseToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="SetCloseToTray"/> *@
         <SettingSwitchComponent Switch="@MinimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="SetMinimizeOnLaunch"/>
         <SettingSwitchComponent Switch="@AlwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="SetAlwaysOnTop" Disabled="!IsWindows"/>
-        <SettingSwitchComponent Switch="@DebugLogging" OptionName="DebugLogging - Use locale" SwitchFunc="SetDebugLogging"/>
+        <SettingSwitchComponent Switch="@DebugLogging" OptionName="@(LocaleHelper.Get("setting_debug_logging"))" SwitchFunc="SetDebugLogging"/>
     </MudPaper>
 </MudItem>
 
