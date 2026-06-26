@@ -24,7 +24,7 @@
     protected override async Task OnInitializedAsync()
     {
         _selectedOption = ConfigHelper.GetConfig().LinuxSettings.ProtonVersion;
-        OptionName = "Proton Version";
+        OptionName = LocaleHelper.Get("linux_proton_version");
         Options = await WineHelper.GetProtonVersions();
         await base.OnInitializedAsync();
     }

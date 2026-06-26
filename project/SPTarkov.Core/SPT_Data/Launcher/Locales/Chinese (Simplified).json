@@ -222,6 +222,10 @@
   "download_started": "Download started for",
   "download_aborted": "Cancelled download",
   "addons_read_me": "Please make sure to read the mod page and this Addon's changes!",
-  "addons_deps_text": "This Addon has dependencies. these will also be downloaded."
+  "addons_deps_text": "This Addon has dependencies. these will also be downloaded.",
+  "linux_proton_version": "Proton Version",
+  "linux_wine_prefix": "Wine Prefix",
+  "linux_launch_settings": "Launch Settings",
+  "profile_copy_id": "Copy Profile ID"
 
 }

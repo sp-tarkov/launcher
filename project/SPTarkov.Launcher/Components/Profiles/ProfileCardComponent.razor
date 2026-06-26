@@ -30,7 +30,7 @@
         {
             <MudContainer Class="justify-end d-flex pa-0">
 
-                <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" Text="COPY PROFILE ID">
+                <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" Text="@(LocaleHelper.Get("profile_copy_id"))">
                     <MudIconButton Disabled="!IsWindows" Class="mr-1" Color="Color.Info" Icon="@Icons.Material.Filled.FileCopy" Size="Size.Small" OnClick="CopyProfileId"/>
                 </MudTooltip>
                 <MudSpacer/>
@@ -139,7 +139,10 @@
             StateHelper.SetSelectedProfile(MiniProfile);
             LoggedIn = StateHelper.SelectedProfile != null;
 
-            Logger.LogInformation("Navigating to /ServerPageWrapper/false");
+            if (Logger.IsEnabled(LogLevel.Debug))
+            {
+                Logger.LogDebug("Navigating to /ServerPageWrapper/false");
+            }
             NavigationManager.NavigateTo("/ServerPageWrapper/false");
         }
     }
@@ -171,7 +174,10 @@
         }
 
         WindowsClipboard.CopyText(MiniProfile.ProfileId);
-        Logger.LogInformation("Copied profile id to clipboard: {id}", MiniProfile.ProfileId);
+        if (Logger.IsEnabled(LogLevel.Debug))
+        {
+            Logger.LogDebug("Copied profile id to clipboard: {id}", MiniProfile.ProfileId);
+        }
     }
 
 }
