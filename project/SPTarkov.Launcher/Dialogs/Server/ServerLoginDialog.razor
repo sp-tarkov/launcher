@@ -110,7 +110,7 @@
         Token?.Dispose();
     }
 
-    private void AbortOrFail(string message = null)
+    private void AbortOrFail(string? message = null)
     {
         message ??= LocaleHelper.Get("server_login_default");
 

@@ -56,7 +56,6 @@
         }
 
         await RunLoginTask();
-
         await base.OnInitializedAsync();
     }
 
@@ -64,6 +63,7 @@
     {
         bool result;
         _requestInProgress = true;
+
         try
         {
             result = await CallServer(LocaleHelper.Get("profile_login_task_1"), LocaleHelper.Get("profile_login_task_fail"));
@@ -139,7 +139,7 @@
         MudDialog.Close(DialogResult.Ok(MiniProfile));
     }
 
-    private void AbortOrFail(string message = null)
+    private void AbortOrFail(string? message = null)
     {
         message ??= LocaleHelper.Get("profile_login_task_default");
 

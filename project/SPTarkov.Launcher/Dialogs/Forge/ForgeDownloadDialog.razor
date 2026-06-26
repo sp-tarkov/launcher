@@ -2,19 +2,20 @@
 @inject IJSRuntime JsRuntime
 @inject ModManager ModManager
 @inject ILogger<ForgeDownloadDialog> Logger
+@inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <MudContainer Class="d-flex flex-column gap-1 mt-4">
             <MudPaper Class="mud-background-gray border-2 border-solid mud-alert-outlined-warning mb-4 pa-2">
-                <MudText>Please make sure to read the mod page and this version's changes!</MudText>
+                <MudText>@(LocaleHelper.Get("download_dialog_read_me"))</MudText>
             </MudPaper>
             @if (Mod.ShowsProfileBindingNotice)
             {
                 <MudPaper Class="mud-background-gray border-2 border-solid mud-alert-outlined-warning mb-4 pa-2">
-                    <MudText Typo="Typo.caption" Inline="true" Class="">Notice: </MudText>
-                    <MudText Typo="Typo.caption" Inline="true" Class="">This mod may make permanent changes to your profile, and may not be removable without starting a new profile.</MudText>
-                    <MudText Typo="Typo.caption" Inline="true" Class=""><MudLink Typo="Typo.caption" Class="" Underline="Underline.Always" Href="https://wiki.sp-tarkov.com/Profiles#mods"> More Information.</MudLink></MudText>
+                    <MudText Typo="Typo.caption" Inline="true" Class="">@(LocaleHelper.Get("download_notice_title")): </MudText>
+                    <MudText Typo="Typo.caption" Inline="true" Class="">@(LocaleHelper.Get("download_notice_text_1"))</MudText>
+                    <MudText Typo="Typo.caption" Inline="true" Class=""><MudLink Typo="Typo.caption" Class="" Underline="Underline.Always" Href="https://wiki.sp-tarkov.com/Profiles#mods"> @(LocaleHelper.Get("download_notice_link"))</MudLink></MudText>
                 </MudPaper>
             }
             <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
@@ -25,7 +26,7 @@
             @if (Version.Dependencies.Any())
             {
                 <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2 d-flex flex-column">
-                    <MudText Class="pb-2">This mod has a dependency on other mods. these will also be downloaded.</MudText>
+                    <MudText Class="pb-2">@(LocaleHelper.Get("download_deps_text"))</MudText>
                     <MudDivider DividerType="DividerType.Middle" Class="pb-2" />
                         @foreach (var dep in Version.Dependencies)
                         {
@@ -34,8 +35,8 @@
                 </MudPaper>
             }
             <MudContainer Class="mb-4 pa-0">
-                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunDownloadTask" Disabled="@_requestInProgress">Download</MudButton>
-                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Close</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunDownloadTask" Disabled="@_requestInProgress">@(LocaleHelper.Get("mod_download"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">@(LocaleHelper.Get("forge_update_close"))</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>
@@ -89,7 +90,7 @@
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
-            AbortOrFail("Request Timed out!");
+            AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
         catch (HttpRequestException)
@@ -112,12 +113,14 @@
 
     private void Submit()
     {
-        Snackbar.Add($"Download started for {Mod.Name}", Severity.Success);
+        Snackbar.Add($"{LocaleHelper.Get("download_started")} {Mod.Name}", Severity.Success);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private void AbortOrFail(string message = "Cancelled download")
+    private void AbortOrFail(string? message = null)
     {
+        message ??= LocaleHelper.Get("download_aborted");
+
         if (!UserCancel)
         {
             Snackbar.Add(message, Severity.Error);

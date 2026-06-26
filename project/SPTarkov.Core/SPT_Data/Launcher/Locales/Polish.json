@@ -202,5 +202,26 @@
   "profile_unable_clear": "Unable to clear game cache",
   "profile_wipe": "Wiping profile with server",
   "profile_clear": "Clearing game cache",
-  "coming_soon": "Coming Soon!"
+  "coming_soon": "Coming Soon!",
+  "forge_update_check": "Check for Updates?",
+  "forge_update_close": "Close",
+  "forge_update_run": "Update Mods",
+  "forge_update_cancel": "Cancel",
+  "forge_update_checking": "Checking for updates",
+  "forge_update_failed_1": "Failed to check for updates",
+  "forge_update_none": "No update detected",
+  "forge_update_detected": "Below mods have available updates!",
+  "forge_update_updating": "Updating mods",
+  "forge_update_updated": "Updates complete",
+  "forge_update_aborted": "Cancelled Update",
+  "download_dialog_read_me": "Please make sure to read the mod page and this version's changes!",
+  "download_notice_title": "Notice",
+  "download_notice_text_1": "This mod may make permanent changes to your profile, and may not be removable without starting a new profile.",
+  "download_notice_link": "More Information.",
+  "download_deps_text": "This mod has dependencies. these will also be downloaded.",
+  "download_started": "Download started for",
+  "download_aborted": "Cancelled download",
+  "addons_read_me": "Please make sure to read the mod page and this Addon's changes!",
+  "addons_deps_text": "This Addon has dependencies. these will also be downloaded."
+
 }

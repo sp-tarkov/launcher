@@ -3,6 +3,7 @@
 @inject ModManager ModManager
 @inject ILogger<ForgeDownloadDialog> Logger
 @inject HttpHelper HttpHelper
+@inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -13,8 +14,8 @@
                     <MudText>@_taskText</MudText>
                 </MudPaper>
                 <MudContainer Class="mb-4 pa-0">
-                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="CheckForUpdates" Disabled="@_requestInProgress">Check for Updates</MudButton>
-                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Close</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="CheckForUpdates" Disabled="@_requestInProgress">@(LocaleHelper.Get("forge_update_check"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">@(LocaleHelper.Get("forge_update_close"))</MudButton>
                 </MudContainer>
             </MudContainer>
         }
@@ -30,8 +31,8 @@
                     }
                 </MudPaper>
                 <MudContainer Class="mb-4 pa-0">
-                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunUpdates" Disabled="@_requestInProgress">Update Mods</MudButton>
-                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">Cancel</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunUpdates" Disabled="@_requestInProgress">@(LocaleHelper.Get("forge_update_check"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">@(LocaleHelper.Get("forge_update_cancel"))</MudButton>
                 </MudContainer>
             </MudContainer>
         }
@@ -43,10 +44,17 @@
     private bool _requestInProgress;
     private CancellationTokenSource Token { get; set; }
     private bool UserCancel { get; set; }
-    private string _taskText = "Check for updates?";
+    private string _taskText = "";
     private bool CheckedForUpdates { get; set; }
     private ForgeUpdateResponse? ForgeUpdateResponse { get; set; }
     private bool NoModsToUpdate { get; set; } = false;
+
+    protected override Task OnInitializedAsync()
+    {
+        _taskText = LocaleHelper.Get("forge_update_check");
+
+        return base.OnInitializedAsync();
+    }
 
     private async Task<ForgeUpdateResponse?> CallForge(string taskText = "", string failString = "")
     {
@@ -58,7 +66,7 @@
 
         if (!listOfModsToCheck.Any())
         {
-            Logger.LogInformation("Forge ForgeGetUpdate No mods found to check");
+            Logger.LogDebug("Forge ForgeGetUpdate No mods found to check");
             NoModsToUpdate = true;
             return null;
         }
@@ -67,7 +75,7 @@
 
         if (response is null)
         {
-            Logger.LogError("Forge ForgeGetUpdate response is null");
+            Logger.LogWarning("Forge ForgeGetUpdate response is null");
         }
 
         if (response!.Success)
@@ -77,7 +85,7 @@
 
         if (!response.Success)
         {
-            Logger.LogInformation("Forge ForgeGetUpdate NOT - Authenticated");
+            Logger.LogWarning("Forge ForgeGetUpdate NOT - Authenticated");
             Token?.Dispose();
             AbortOrFail(failString);
         }
@@ -91,22 +99,22 @@
         Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
         try
         {
-            ForgeUpdateResponse = await CallForge("Checking for updates", "Failed to check for updates");
+            ForgeUpdateResponse = await CallForge(LocaleHelper.Get("forge_update_checking"), LocaleHelper.Get("forge_update_failed"));
             // we abort if failed so no need to check result
             CheckedForUpdates = true;
 
             if ((ForgeUpdateResponse is not null && !ForgeUpdateResponse.Data.Updates.Any()) || (NoModsToUpdate && ForgeUpdateResponse == null))
             {
-                Snackbar.Add("No update detected", Severity.Info);
+                Snackbar.Add(LocaleHelper.Get("forge_update_none"), Severity.Info);
                 Submit();
                 return;
             }
 
-            _taskText = "Below mods have available updates!";
+            _taskText = LocaleHelper.Get("forge_update_detected");
         }
         catch (TaskCanceledException) when (Token.IsCancellationRequested)
         {
-            AbortOrFail("Request Timed out!");
+            AbortOrFail(LocaleHelper.Get("request_timed_out"));
             return;
         }
         catch (HttpRequestException)
@@ -125,7 +133,7 @@
 
     private async Task RunUpdates()
     {
-        _taskText = "Updating mods";
+        _taskText = LocaleHelper.Get("forge_update_updating");
         StateHasChanged();
 
         foreach (var forgeModUpdate in ForgeUpdateResponse.Data.Updates)
@@ -133,7 +141,7 @@
             await ModManager.UpdateMod(forgeModUpdate, Token.Token);
         }
 
-        _taskText = "Updates complete";
+        _taskText = LocaleHelper.Get("forge_update_updated");
         StateHasChanged();
         await Task.Delay(1000);
 
@@ -145,8 +153,10 @@
         MudDialog.Close(DialogResult.Ok(true));
     }
 
-    private void AbortOrFail(string message = "Cancelled Update")
+    private void AbortOrFail(string? message = null)
     {
+        message ??= LocaleHelper.Get("forge_update_aborted");
+
         if (!UserCancel)
         {
             Snackbar.Add(message, Severity.Error);
