@@ -191,5 +191,15 @@
   "profile_stats_online": "Online",
   "profile_stats_account_lifetime": "Account Lifetime",
   "setting_debug_logging": "Debug Logging",
-  "setting_option_clear_cache": "Clear Cache On Launch"
+  "setting_option_clear_cache": "Clear Cache On Launch",
+  "profile_wipe_warning": "The below will NOT be wiped;",
+  "profile_wipe_warning_1": "Achievements.",
+  "profile_wipe_warning_2": "Prestige.",
+  "profile_wipe_warning_3": "Rewards from those.",
+  "profile_wipe_warning_4": "Some Account level stats.",
+  "profile_update_request": "Requesting Profile Updates",
+  "profile_unable_wipe": "Unable to wipe profile",
+  "profile_unable_clear": "Unable to clear game cache",
+  "profile_wipe": "Wiping profile with server",
+  "profile_clear": "Clearing game cache"
 }
