@@ -8,6 +8,6 @@ namespace SPTarkov.Core.SPT;
 
 public static partial class ProgramStatics
 {
-    private static Version SptVersion { get; } = new("4.0.0");
-
+    private static Version SptVersion { get; } = new("4.1.0");
+    private static string SptCommitTag { get; } = "abc123a";
 }

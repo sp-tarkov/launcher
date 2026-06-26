@@ -8,4 +8,9 @@ public static partial class ProgramStatics
     {
         get { return SptVersion; }
     }
+
+    public static string SptCommit
+    {
+        get { return SptCommitTag; }
+    }
 }
