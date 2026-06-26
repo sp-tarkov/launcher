@@ -21,11 +21,11 @@
             </ChildContent>
             <TooltipContent>
                 <MudContainer Class="d-flex flex-column align-start justify-start">
-                    <MudText>The below will NOT be wiped;</MudText>
-                    <MudText>- Achievements.</MudText>
-                    <MudText>- Prestige.</MudText>
-                    <MudText>- Rewards from those.</MudText>
-                    <MudText>- Some Account level stats.</MudText>
+                    <MudText>@(LocaleHelper.Get("profile_wipe_warning"))</MudText>
+                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_1"))</MudText>
+                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_2"))</MudText>
+                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_3"))</MudText>
+                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_4"))</MudText>
                 </MudContainer>
             </TooltipContent>
         </MudTooltip>
@@ -56,7 +56,12 @@
     protected override void OnInitialized()
     {
         SelectedMiniProfile = StateHelper.SelectedProfile;
-        Logger.LogInformation("Selected profile: {Username}", SelectedMiniProfile?.Username);
+
+        if (Logger.IsEnabled(LogLevel.Debug))
+        {
+            Logger.LogDebug("Selected profile: {Username}", SelectedMiniProfile?.Username);
+        }
+
         base.OnInitialized();
     }
 
@@ -84,7 +89,7 @@
 
     private async Task RefreshProfiles()
     {
-        Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Requesting Profile Updates");
+        Snackbar.Add(LocaleHelper.Get("profile_update_request"));
         if (await GetUpdatedProfiles())
         {
             // if this succeeded, we don't need to go further
@@ -127,7 +132,7 @@
         }
         catch (Exception e)
         {
-            Logger.LogInformation("Exception occured in updating profile: {e}", e);
+            Logger.LogError("Exception occured in updating profile: {e}", e);
             await token.CancelAsync();
             return false;
         }
@@ -155,7 +160,7 @@
         }
         catch (Exception e)
         {
-            Logger.LogInformation("Exception occured in updating profiles: {e}", e);
+            Logger.LogError("Exception occured in updating profiles: {e}", e);
             await token.CancelAsync();
             return false;
         }
@@ -175,14 +180,14 @@
         if (CheckboxForWipe && !await WipeProfile())
         {
             var message = GameHelper.ErrorMessage;
-            Snackbar.Add($"CHANGE ME TO USE LOCALE SYSTEM unable to wipe profile: {message}", Severity.Error);
+            Snackbar.Add($"{LocaleHelper.Get("profile_unable_wipe")}: {message}", Severity.Error);
             return;
         }
 
         if (ConfigHelper.GetConfig().ClearCacheOnLaunch && !await ClearCache())
         {
             var message = GameHelper.ErrorMessage;
-            Snackbar.Add($"CHANGE ME TO USE LOCALE SYSTEM unable to clear game cache: {message}", Severity.Error);
+            Snackbar.Add($"{LocaleHelper.Get("profile_unable_clear")}: {message}", Severity.Error);
             return;
         }
 
@@ -234,7 +239,7 @@
 
     private async Task<bool> WipeProfile()
     {
-        Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Wiping profile with server");
+        Snackbar.Add(LocaleHelper.Get("profile_wipe"));
         var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
@@ -265,7 +270,7 @@
 
     private async Task<bool> ClearCache()
     {
-        Snackbar.Add("CHANGE ME TO USE LOCALE SYSTEM Clearing game cache");
+        Snackbar.Add(LocaleHelper.Get("profile_clear"));
         if (Directory.Exists(Paths.SptAppDataFolder))
         {
             try
@@ -274,8 +279,7 @@
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
-                Logger.LogError("Unable to delete SptAppData Folder");
+                Logger.LogError("exception occured in clearing game cache: {e}", e);
             }
         }
 
