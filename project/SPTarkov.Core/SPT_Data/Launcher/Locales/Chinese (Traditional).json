@@ -201,5 +201,6 @@
   "profile_unable_wipe": "Unable to wipe profile",
   "profile_unable_clear": "Unable to clear game cache",
   "profile_wipe": "Wiping profile with server",
-  "profile_clear": "Clearing game cache"
+  "profile_clear": "Clearing game cache",
+  "coming_soon": "Coming Soon!"
 }
