@@ -226,6 +226,7 @@
   "linux_proton_version": "Proton Version",
   "linux_wine_prefix": "Wine Prefix",
   "linux_launch_settings": "Launch Settings",
-  "profile_copy_id": "Copy Profile ID"
+  "profile_copy_id": "Copy Profile ID",
+  "info_spt_desc": "Your community-driven resource for everything related to SPT. Whether you’re new to SPT or a seasoned modder, this wiki aims to be your central hub for information."
 
 }
