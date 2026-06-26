@@ -20,7 +20,7 @@ public class FileLogger(string name, string path, SemaphoreSlim locker) : ILogge
         {
             await locker.WaitAsync();
             _sb.Clear();
-            _sb.Append($"[{name}]");
+            _sb.Append($"[{name}] ");
             _sb.Append(formatter(state, exception));
             _sb.Append(Environment.NewLine);
             await File.AppendAllTextAsync(path, _sb.ToString(), Encoding.UTF8);
