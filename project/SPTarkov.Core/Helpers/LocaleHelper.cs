@@ -27,7 +27,10 @@ public class LocaleHelper
 
         lock (_lock)
         {
-            _logger.LogInformation("Loading locales from {dirPath}", Paths.LocalesPath);
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Loading locales from {dirPath}", Paths.LocalesPath);
+            }
 
             if (!Directory.Exists(Paths.LocalesPath))
             {
@@ -51,10 +54,10 @@ public class LocaleHelper
     {
         if (!_selectedLocale.TryGetValue(key, out var value))
         {
-            _logger.LogError("Key {key} not found in locale {locale}", key, _selectedLocale["ietf_tag"]);
+            _logger.LogError("Key \"{key}\" not found in locale file \"{locale}\"", key, _selectedLocale["ietf_tag"]);
         }
 
-        value ??= "Value was null, Please report this for fixing";
+        value ??= "Value was not found in locale, Please report this to SPT for fixing";
         return value;
     }
 
@@ -62,7 +65,10 @@ public class LocaleHelper
     {
         if (!_logLocalesOne)
         {
-            _logger.LogInformation("Available locales: {locales}", _listOfLocales.Select(x => x["ietf_tag"]));
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("Available locales: {locales}", _listOfLocales.Select(x => x["ietf_tag"]));
+            }
             _logLocalesOne = true;
         }
 
@@ -71,7 +77,9 @@ public class LocaleHelper
 
     public void SetLocale(string locale)
     {
-        _selectedLocale = _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == locale) ?? _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == _defaultLocale)!;
+        _selectedLocale = _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == locale) ??
+                          _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == _defaultLocale)!;
+
         _configHelper.SetLocale(_selectedLocale.GetValueOrDefault("ietf_tag", "en"));
     }
 }
