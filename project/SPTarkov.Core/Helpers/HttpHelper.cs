@@ -16,19 +16,16 @@ namespace SPTarkov.Core.Helpers;
 
 public class HttpHelper
 {
-    private readonly ConfigHelper _configHelper;
     private readonly HttpClient _httpClient;
     private readonly ILogger<HttpHelper> _logger;
     private readonly StateHelper _stateHelper;
     private bool _internetAccess;
 
     public HttpHelper(
-        ConfigHelper configHelper,
         ILogger<HttpHelper> logger,
         StateHelper stateHelper
     )
     {
-        _configHelper = configHelper;
         _logger = logger;
         _stateHelper = stateHelper;
 
@@ -58,21 +55,22 @@ public class HttpHelper
 
     public async Task<T?> GameServerGet<T>(string url, CancellationToken token)
     {
-        _logger.LogInformation("GET: {Url}", url);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Get: {Url}", url);
+        }
+
         var task = await _httpClient.GetAsync(BuildGameUrl(url), token);
-
-        var json = SimpleZlib.Decompress(
-            await task.Content.ReadAsByteArrayAsync(token)
-        );
-
-        return JsonSerializer.Deserialize<T>(
-            json
-        );
+        var json = SimpleZlib.Decompress(await task.Content.ReadAsByteArrayAsync(token));
+        return JsonSerializer.Deserialize<T>(json);
     }
 
     public async Task<T?> GameServerPut<T>(string url, object request, CancellationToken token)
     {
-        _logger.LogInformation("Put: {Url}", url);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("Put: {Url}", url);
+        }
 
         var content = new ByteArrayContent(
             SimpleZlib.CompressToBytes(
@@ -92,34 +90,32 @@ public class HttpHelper
 
     public async Task<ForgeModResponse?> ForgeGetMod(string? modId, CancellationToken token)
     {
-        _logger.LogInformation("forge GetModFromForge");
-
         var paramsToUse = GetParamsCollection();
-        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}?{paramsToUse}")
-        {
-            Content = new StringContent("", Encoding.UTF8, "application/json")
-        };
-
-        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
-        return JsonSerializer.Deserialize<ForgeModResponse>(await task.Content.ReadAsStringAsync(token));
+        var response = await task.Content.ReadAsStringAsync(token);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("ForgeGetMod Response: {Response}", response);
+        }
+
+        return JsonSerializer.Deserialize<ForgeModResponse>(response);
     }
 
     public async Task<ForgeVersionResponse?> ForgeGetModVersion(string modId, string versionId, CancellationToken token)
     {
-        _logger.LogInformation("forge GetModVersionFromForge");
-
-        var paramsToUse = GetParamsCollectionForVersions(versionId);
-        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}")
-        {
-            Content = new StringContent("", Encoding.UTF8, "application/json")
-        };
-
-        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+        var paramsToUse = ParamsCollectionForVersions(versionId);
+        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
-        return JsonSerializer.Deserialize<ForgeVersionResponse>(await task.Content.ReadAsStringAsync(token));
+        var response = await task.Content.ReadAsStringAsync(token);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("ForgeGetModVersion Response: {Response}", response);
+        }
+
+        return JsonSerializer.Deserialize<ForgeVersionResponse>(response);
     }
 
     public async Task<ForgeModsResponse?> ForgeGetMods(
@@ -131,70 +127,77 @@ public class HttpHelper
         string? includeAi = null
     )
     {
-        _logger.LogInformation("forge GetModsFromForge");
-
         var paramsToUse = GetParamsCollection(search, sort, ConvertOptionToBool(includeFeatured), ConvertOptionToBool(includeAi));
-        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeMods}?page={page}&{paramsToUse}")
-        {
-            Content = new StringContent("", Encoding.UTF8, "application/json")
-        };
-
-        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMods}?page={page}&{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
+        var response = await task.Content.ReadAsStringAsync(token);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("ForgeGetMods Response: {Response}", response);
+        }
 
         if (!task.IsSuccessStatusCode)
         {
-            // remove any api keys and get them to log back in.
             return new ForgeModsResponse
             {
                 Success = false
             };
         }
 
-        var jsonString = await task.Content.ReadAsStringAsync(token);
-        return JsonSerializer.Deserialize<ForgeModsResponse>(jsonString);
+        return JsonSerializer.Deserialize<ForgeModsResponse>(response);
     }
 
     public async Task<ForgeUpdateResponse?> ForgeGetUpdate(List<string> modGuidsWithVersions, string sptVersion, CancellationToken token)
     {
-        _logger.LogInformation("forge GetModsFromForge");
-
-        var paramsToUse = GetParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
-        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeUpdate}?{paramsToUse}")
-        {
-            Content = new StringContent("", Encoding.UTF8, "application/json")
-        };
-
-        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+        var paramsToUse = ParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
+        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeUpdate}?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
+        var response = await task.Content.ReadAsStringAsync(token);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("ForgeGetUpdate Response: {Response}", response);
+        }
 
         if (!task.IsSuccessStatusCode)
         {
-            // remove any api keys and get them to log back in.
             return new ForgeUpdateResponse
             {
                 Success = false
             };
         }
 
-        return JsonSerializer.Deserialize<ForgeUpdateResponse>(await task.Content.ReadAsStringAsync(token));
+        return JsonSerializer.Deserialize<ForgeUpdateResponse>(response);
     }
 
-    public async Task<ForgeAbilityReponse?> ForgeApiAbility(string apiKey, CancellationToken token)
+    public async Task<ForgeAddonResponse?> ForgeGetModAddons(string modId, CancellationToken token)
     {
-        _logger.LogInformation("Forge ForgeApiAbility");
-
-        var message = new HttpRequestMessage(HttpMethod.Get, Urls.ForgeAbilities)
-        {
-            Content = new StringContent("", Encoding.UTF8, "application/json")
-        };
-
-        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+        var paramsToUse = ParamsCollectionForAddons(modId);
+        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeAddons}?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
-        return JsonSerializer.Deserialize<ForgeAbilityReponse>(await task.Content.ReadAsStringAsync(token));
+        var response = await task.Content.ReadAsStringAsync(token);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("ForgeGetModAddons Response: {Response}", response);
+        }
+
+        return JsonSerializer.Deserialize<ForgeAddonResponse>(response);
+    }
+
+    public async Task<ForgeAddonDetailsResponse?> ForgeGetModAddonDetails(string addonId, CancellationToken token)
+    {
+        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeAddonDetails}/{addonId}");
+        var task = await _httpClient.SendAsync(message, token);
+        var response = await task.Content.ReadAsStringAsync(token);
+
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("ForgeGetModAddon Response: {Response}", response);
+        }
+
+        return JsonSerializer.Deserialize<ForgeAddonDetailsResponse>(response);
     }
 
     private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null)
@@ -216,7 +219,6 @@ public class HttpHelper
             queryString.Add("filter[contains_ai_content]", ai.ToString());
         }
 
-        // TODO: make this dynamic later
         queryString.Add("filter[spt_version]", ProgramStatics.SptVersionCompiledFor.ToString());
 
         if (!string.IsNullOrWhiteSpace(sort))
@@ -227,7 +229,7 @@ public class HttpHelper
         return queryString;
     }
 
-    private NameValueCollection GetParamsCollectionForVersions(string? versionId = null)
+    private NameValueCollection ParamsCollectionForVersions(string? versionId = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         queryString.Add("include", "dependencies,virus_total_links");
@@ -240,7 +242,7 @@ public class HttpHelper
         return queryString;
     }
 
-    private NameValueCollection GetParamsCollectionForUpdates(List<string> modGuidsWithVersions, string sptVersion)
+    private NameValueCollection ParamsCollectionForUpdates(List<string> modGuidsWithVersions, string sptVersion)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         var strbuilder = new StringBuilder();
@@ -248,6 +250,7 @@ public class HttpHelper
         {
             strbuilder.Append($"{modGuidsWithVersion},");
         }
+
         // remove the last ,
         strbuilder.Remove(strbuilder.Length - 1, 1);
 
@@ -257,7 +260,7 @@ public class HttpHelper
         return queryString;
     }
 
-    private NameValueCollection GetParamsCollectionForAddons(string modId)
+    private NameValueCollection ParamsCollectionForAddons(string modId)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
 
@@ -294,38 +297,20 @@ public class HttpHelper
             _internetAccess = false;
         }
 
-        _logger.LogInformation("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
+        }
+
         return _internetAccess;
     }
 
-    public async Task<ForgeAddonResponse?> ForgeGetModAddons(string modId, CancellationToken token)
+    private HttpRequestMessage BuildMessage(HttpMethod methodType, string url)
     {
-        _logger.LogInformation("Forge ForgeGetModAddons");
-
-        var paramsToUse = GetParamsCollectionForAddons(modId);
-        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeAddons}?{paramsToUse}")
-        {
-            Content = new StringContent("", Encoding.UTF8, "application/json")
-        };
-
+        var message = new HttpRequestMessage(methodType, url);
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        message.Headers.UserAgent.Add(new ProductInfoHeaderValue("SinglePlayerTarkovLauncher", $"SPT-{ProgramStatics.SptVersionCompiledFor}-{ProgramStatics.SptCommit}"));
 
-        var task = await _httpClient.SendAsync(message, token);
-        return JsonSerializer.Deserialize<ForgeAddonResponse>(await task.Content.ReadAsStringAsync(token));
-    }
-
-    public async Task<ForgeAddonDetailsResponse?> ForgeGetModAddonDetails(string addonId, CancellationToken token)
-    {
-        _logger.LogInformation("Forge ForgeGetModAddon");
-
-        var message = new HttpRequestMessage(HttpMethod.Get, $"{Urls.ForgeAddonDetails}/{addonId}")
-        {
-            Content = new StringContent("", Encoding.UTF8, "application/json")
-        };
-
-        message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        var task = await _httpClient.SendAsync(message, token);
-        return JsonSerializer.Deserialize<ForgeAddonDetailsResponse>(await task.Content.ReadAsStringAsync(token));
+        return message;
     }
 }
