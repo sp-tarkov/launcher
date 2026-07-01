@@ -152,11 +152,11 @@
                         }
                     </MudCardContent>
                 </MudCard>
-                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mt-4">
-                    <MudCardContent Class="d-flex flex-column align-start">
-                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_addons"))</MudText>
-                        @if (ForgeModAddons?.Any() ?? false)
-                        {
+                @if (ForgeModAddons?.Any() ?? false)
+                {
+                    <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mt-4">
+                        <MudCardContent Class="d-flex flex-column align-start">
+                            <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_addons"))</MudText>
                             @foreach (var addon in ForgeModAddons)
                             {
                                 @if (!addon.Versions.Select(x => x.ModVersionConstraint?.IsSatisfied(ForgeModVersion.Version)).Any())
@@ -174,15 +174,9 @@
                                     </MudLink>
                                 </MudTooltip>
                             }
-                        }
-                        else
-                        {
-                            <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
-                                @(LocaleHelper.Get("mod_none"))
-                            </MudText>
-                        }
-                    </MudCardContent>
-                </MudCard>
+                        </MudCardContent>
+                    </MudCard>
+                }
             </MudItem>
         </MudGrid>
     }
