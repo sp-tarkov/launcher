@@ -14,7 +14,7 @@
 
             @if (AddonDetails is null || _requestInProgress)
             {
-                <MudSkeleton Animation="Animation.Pulse" Height="300" SkeletonType="SkeletonType.Rectangle" Width="900"></MudSkeleton>
+                <MudSkeleton Animation="Animation.Pulse" Height="300px" SkeletonType="SkeletonType.Rectangle" Width="900"></MudSkeleton>
             }
             else
             {
@@ -23,7 +23,7 @@
                         @((MarkupString)AddonDetails.Description)
                     </MudText>
                 </MudPaper>
-                @if (ModAddon.Versions.FirstOrDefault().Dependencies.Any())
+                @if (ModAddon.Versions?.FirstOrDefault()?.Dependencies is not null && ModAddon.Versions.FirstOrDefault()!.Dependencies!.Any())
                 {
                     <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2 d-flex flex-column">
                         <MudText Class="pb-2">@(LocaleHelper.Get("addons_deps_text"))</MudText>
