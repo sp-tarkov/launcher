@@ -16,6 +16,7 @@ public class StateHelper(ILogger<StateHelper> logger)
     public string CurrentSort = "-downloads";
     public string CurrentFilter = "Include";
     public string CurrentAi = "Exclude";
+    public string CurrentCategory = "";
 
     public bool AllowNavigation { get; set; } = true;
     public bool AllowServerPage { get; set; } = false;

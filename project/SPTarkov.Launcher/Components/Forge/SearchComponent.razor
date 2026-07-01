@@ -3,25 +3,32 @@
 <MudContainer Class="d-flex flex-column px-0 mb-4">
     <MudGrid>
         <MudItem sm="6">
-            <MudTextField @bind-Value="Search" Label="@(LocaleHelper.Get("search_title"))" Variant="Variant.Outlined" Adornment="Adornment.End"
+            <MudTextField @bind-Value="SearchValue" Label="@(LocaleHelper.Get("search_title"))" Variant="Variant.Outlined" Adornment="Adornment.End"
                           AdornmentIcon="@Icons.Material.Filled.Search"  Clearable="true"
                           DebounceInterval="500" OnDebounceIntervalElapsed="SearchFunc" />
         </MudItem>
-        <MudItem sm="2">
+        <MudItem sm="6">
             <MudSelect @bind-Value="SortValue" Label="@(LocaleHelper.Get("search_sort"))" Variant="Variant.Outlined" Dense="true" AdornmentIcon="@Icons.Material.Filled.Sort" >
                 <MudSelectItem Value="@("-downloads")">@(LocaleHelper.Get("search_most_download"))</MudSelectItem>
                 <MudSelectItem Value="@("-updated_at")">@(LocaleHelper.Get("search_recently_updated"))</MudSelectItem>
                 <MudSelectItem Value="@("-created_at")">@(LocaleHelper.Get("search_newest"))</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem sm="2">
+        <MudItem sm="4">
             <MudSelect @bind-Value="FilterValue" Label="@(LocaleHelper.Get("featured"))" Variant="Variant.Outlined" Dense="true" AdornmentIcon="@Icons.Material.Filled.FilterAlt" >
                 <MudSelectItem Value="@("Include")">@(LocaleHelper.Get("search_include"))</MudSelectItem>
                 <MudSelectItem Value="@("Exclude")">@(LocaleHelper.Get("search_exclude"))</MudSelectItem>
                 <MudSelectItem Value="@("Only")">@(LocaleHelper.Get("search_only"))</MudSelectItem>
             </MudSelect>
         </MudItem>
-        <MudItem sm="2">
+        <MudItem sm="4">
+            <MudSelect @bind-Value="CategoryValue" Label="@(LocaleHelper.Get("search_category"))" Variant="Variant.Outlined" Dense="true" AdornmentIcon="@Icons.Material.Filled.FilterAlt" >
+                <MudSelectItem Value="@("Exclude")">@(LocaleHelper.Get("search_exclude"))</MudSelectItem>
+                <MudSelectItem Value="@("Include")">@(LocaleHelper.Get("search_include"))</MudSelectItem>
+                <MudSelectItem Value="@("Only")">@(LocaleHelper.Get("search_only"))</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem sm="4">
             <MudSelect @bind-Value="AiValue" Label="@(LocaleHelper.Get("search_ai_content"))" Variant="Variant.Outlined" Dense="true" AdornmentIcon="@Icons.Material.Filled.FilterAlt" >
                 <MudSelectItem Value="@("Exclude")">@(LocaleHelper.Get("search_exclude"))</MudSelectItem>
                 <MudSelectItem Value="@("Include")">@(LocaleHelper.Get("search_include"))</MudSelectItem>
@@ -36,7 +43,7 @@
 @code {
 #pragma warning disable BL0007
     [Parameter]
-    public string Search
+    public string SearchValue
     {
         get;
         set
@@ -47,12 +54,12 @@
             }
 
             field = value;
-            SearchChanged.InvokeAsync(field);
+            SearchValueChanged.InvokeAsync(field);
         }
     } = "";
 
     [Parameter]
-    public EventCallback<string> SearchChanged { get; set; }
+    public EventCallback<string> SearchValueChanged { get; set; }
 
     [Parameter]
     public string SortValue
@@ -110,6 +117,25 @@
 
     [Parameter]
     public EventCallback<string> AiValueChanged { get; set; }
+
+    [Parameter]
+    public string CategoryValue
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            CategoryValueChanged.InvokeAsync(field);
+        }
+    } = "";
+
+    [Parameter]
+    public EventCallback<string> CategoryValueChanged { get; set; }
 
     [Parameter]
     public Func<Task> SearchFunc { get; set; }

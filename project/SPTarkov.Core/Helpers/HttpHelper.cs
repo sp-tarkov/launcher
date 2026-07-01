@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Net.Security;
@@ -8,7 +9,7 @@ using System.Text.Json;
 using System.Web;
 using ComponentAce.Compression.Libs.zlib;
 using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Configuration;
+using SPTarkov.Core.Forge;
 using SPTarkov.Core.Forge.Responses;
 using SPTarkov.Core.SPT;
 
@@ -19,15 +20,18 @@ public class HttpHelper
     private readonly HttpClient _httpClient;
     private readonly ILogger<HttpHelper> _logger;
     private readonly StateHelper _stateHelper;
+    private readonly ForgeRateLimiter _rateLimiter;
     private bool _internetAccess;
 
     public HttpHelper(
         ILogger<HttpHelper> logger,
-        StateHelper stateHelper
+        StateHelper stateHelper,
+        ForgeRateLimiter rateLimiter
     )
     {
         _logger = logger;
         _stateHelper = stateHelper;
+        _rateLimiter = rateLimiter;
 
         var handler = new HttpClientHandler();
         handler.ServerCertificateCustomValidationCallback = CertificateValidationCallback;
@@ -84,6 +88,8 @@ public class HttpHelper
 
     public async Task<ForgeModResponse?> ForgeGetMod(string? modId, CancellationToken token)
     {
+        await _rateLimiter.WaitAsync(token);
+
         var paramsToUse = GetParamsCollection();
         var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
@@ -96,6 +102,8 @@ public class HttpHelper
 
     public async Task<ForgeVersionResponse?> ForgeGetModVersion(string modId, string versionId, CancellationToken token)
     {
+        await _rateLimiter.WaitAsync(token);
+
         var paramsToUse = ParamsCollectionForVersions(versionId);
         var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
@@ -112,15 +120,24 @@ public class HttpHelper
         string sort = "-featured,name",
         int page = 1,
         string? includeFeatured = null,
-        string? includeAi = null
+        string? includeAi = null,
+        string? category = null
     )
     {
-        var paramsToUse = GetParamsCollection(search, sort, ConvertOptionToBool(includeFeatured), ConvertOptionToBool(includeAi));
+        await _rateLimiter.WaitAsync(token);
+
+        var paramsToUse = GetParamsCollection(search, sort, ConvertOptionToBool(includeFeatured), ConvertOptionToBool(includeAi), category);
         var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMods}?page={page}&{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
 
         _logger.LogDebug("ForgeGetMods Response: {Response}", response);
+
+        if (task.StatusCode == HttpStatusCode.TooManyRequests)
+        {
+            _httpClient.CancelPendingRequests();
+            throw new ForgeRetryException("Too many requests made to the forge", null);
+        }
 
         if (!task.IsSuccessStatusCode)
         {
@@ -135,6 +152,8 @@ public class HttpHelper
 
     public async Task<ForgeUpdateResponse?> ForgeGetUpdate(List<string> modGuidsWithVersions, string sptVersion, CancellationToken token)
     {
+        await _rateLimiter.WaitAsync(token);
+
         var paramsToUse = ParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
         var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeUpdate}?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
@@ -155,6 +174,8 @@ public class HttpHelper
 
     public async Task<ForgeAddonResponse?> ForgeGetModAddons(string modId, CancellationToken token)
     {
+        await _rateLimiter.WaitAsync(token);
+
         var paramsToUse = ParamsCollectionForAddons(modId);
         var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeAddons}?{paramsToUse}");
         var task = await _httpClient.SendAsync(message, token);
@@ -167,6 +188,8 @@ public class HttpHelper
 
     public async Task<ForgeAddonDetailsResponse?> ForgeGetModAddonDetails(string addonId, CancellationToken token)
     {
+        await _rateLimiter.WaitAsync(token);
+
         var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeAddonDetails}/{addonId}");
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
@@ -176,7 +199,7 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeAddonDetailsResponse>(response);
     }
 
-    private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null)
+    private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null, string? category = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         queryString.Add("include", "versions,license,category,source_code_links");
@@ -193,6 +216,12 @@ public class HttpHelper
         if (ai is not null)
         {
             queryString.Add("filter[contains_ai_content]", ai.ToString());
+        }
+
+        if (category is not null)
+        {
+            // must be lower case
+            queryString.Add("filter[category_slug]", category);
         }
 
         queryString.Add("filter[spt_version]", ProgramStatics.SptVersionCompiledFor.ToString());

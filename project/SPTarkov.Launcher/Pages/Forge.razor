@@ -20,13 +20,13 @@
     {
         <MudItem sm="12" Class="mb-6">
             <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
-                <SearchComponent @bind-Search="Search" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" SearchFunc="@SearchUpdate"/>
+                <SearchComponent @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" SearchFunc="@SearchUpdate"/>
 
                 @if (SearchResponse?.Meta?.LastPage is not null && SearchResponse?.Data?.Count > 0)
                 {
                     <MudItem sm="12" Class="d-flex justify-center">
                         <MudPagination Rectangular="true" Variant="Variant.Text" Count="@((int)SearchResponse.Meta.LastPage)" Class="mb-4"
-                                       ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@PaginationSelected"/>
+                                       ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@PaginationValue" Disabled="@SearchInProgress"/>
                     </MudItem>
                 }
             </MudCard>
@@ -68,10 +68,10 @@
 
 @code {
     private bool NetAvailable { get; set; }
-    private ForgeModsResponse SearchResponse { get; set; }
+    private ForgeModsResponse? SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
 
-    private int PaginationSelected
+    private int PaginationValue
     {
         get => StateHelper.CurrentPagination;
         set
@@ -86,7 +86,7 @@
         }
     }
 
-    public string Search
+    public string SearchValue
     {
         get => StateHelper.CurrentSearch;
         set
@@ -146,6 +146,21 @@
         }
     }
 
+    public string CategoryValue
+    {
+        get => StateHelper.CurrentCategory;
+        set
+        {
+            if (StateHelper.CurrentCategory == value)
+            {
+                return;
+            }
+
+            StateHelper.CurrentCategory = value;
+            _ = SearchUpdate();
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -156,6 +171,7 @@
             return;
         }
 
+        // await GetCategories();
         await SearchForMods();
     }
 
@@ -169,15 +185,33 @@
         await SearchForMods(1);
     }
 
+    private async Task GetCategories()
+    {
+        throw new NotImplementedException();
+    }
+
     private async Task SearchForMods(int? page = null)
     {
+        if (SearchInProgress)
+        {
+            // do this to stop multiple requests happening at the same time
+            return;
+        }
+
         SearchInProgress = true;
         page ??= StateHelper.CurrentPagination;
 
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            SearchResponse = await HttpHelper.ForgeGetMods(token.Token, Search, SortValue, (int) page, FilterValue, AiValue);
+            SearchResponse = await HttpHelper.ForgeGetMods(token.Token, SearchValue, SortValue, (int)page, FilterValue, AiValue, CategoryValue);
+        }
+        catch (ForgeRetryException e)
+        {
+            Logger.LogError(e.Message);
+            SearchInProgress = false;
+
+            return;
         }
         catch (Exception e)
         {
@@ -188,14 +222,14 @@
         if (!SearchResponse!.Success)
         {
             Logger.LogError("Something failed");
-            Logger.LogError("Request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", Search, SortValue, page, FilterValue, AiValue);
+            Logger.LogError("Request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", SearchValue, SortValue, page, FilterValue, AiValue);
             Logger.LogError("Response: {SearchResponse}", SearchResponse);
 
             SearchResponse = null;
         }
 
-        PaginationSelected = (int) page;
-        StateHelper.CurrentPagination = PaginationSelected;
+        PaginationValue = (int) page;
+        StateHelper.CurrentPagination = PaginationValue;
         SearchInProgress = false;
         StateHasChanged();
     }

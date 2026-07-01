@@ -6,8 +6,10 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using Photino.Blazor;
+using Photino.NET;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
+using SPTarkov.Core.Forge;
 using SPTarkov.Core.Helpers;
 using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
@@ -52,6 +54,7 @@ public class Launcher
             .AddSingleton<ConfigHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
+            .AddSingleton<ForgeRateLimiter>()
             .AddSingleton<ModManager>()
             .AddSingleton<ModHelper>()
             .AddSingleton<StateHelper>()
@@ -129,6 +132,7 @@ public class Launcher
         App.MainWindow.ContextMenuEnabled = false;
 #else
         App.MainWindow.DevToolsEnabled = true;
+        App.MainWindow.ContextMenuEnabled = true;
 #endif
         App.MainWindow.Topmost = ConfigHelper.GetConfig().AlwaysTop;
         App.MainWindow.MinHeight = 550;
