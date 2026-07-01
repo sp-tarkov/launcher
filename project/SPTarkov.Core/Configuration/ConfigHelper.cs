@@ -37,14 +37,14 @@ public class ConfigHelper
     {
         _logger = logger;
         LoadSettingsFromFile();
-        FileLogger.LogLevel = _settings!.DebugLogging ? LogLevel.Trace : LogLevel.Information;
+        FileLogger.LogLevel = _settings!.DebugLogging ? LogLevel.Debug : LogLevel.Information;
     }
 
     private void LoadSettingsFromFile()
     {
         lock (_lock)
         {
-            _logger.LogInformation("LoadSettingsFromFile.");
+            _logger.LogDebug("LoadSettingsFromFile.");
 
             if (!File.Exists(Paths.LauncherSettingsPath))
             {
@@ -59,7 +59,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            _logger.LogInformation("SaveDefaults.");
+            _logger.LogDebug("SaveDefaults.");
             Directory.CreateDirectory(Paths.LauncherAssetsPath);
             File.WriteAllText(Paths.LauncherSettingsPath,
                 JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
@@ -86,11 +86,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetClientSize: h{Height} w{Width}", height, width);
-            }
-
+            _logger.LogDebug("SetClientSize: h{Height} w{Width}", height, width);
             _settings!.StartSize.Height = height;
             _settings!.StartSize.Width = width;
             SaveConfig();
@@ -101,11 +97,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetClientLocation: x{x} y{y}", x, y);
-            }
-
+            _logger.LogDebug("SetClientLocation: x{x} y{y}", x, y);
             _settings!.StartLocation.X = x;
             _settings!.StartLocation.Y = y;
             SaveConfig();
@@ -116,11 +108,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetFirstRun: {FirstRun}", firstRun);
-            }
-
+            _logger.LogDebug("SetFirstRun: {FirstRun}", firstRun);
             _settings!.FirstRun = firstRun;
             SaveConfig();
         }
@@ -130,11 +118,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetServers: {ServersCount}", servers.Count);
-            }
-
+            _logger.LogDebug("SetServers: {ServersCount}", servers.Count);
             _settings!.Servers = servers;
             SaveConfig();
         }
@@ -144,11 +128,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetCloseToTray: {CloseToTray}", closeToTray);
-            }
-
+            _logger.LogDebug("SetCloseToTray: {CloseToTray}", closeToTray);
             _settings!.CloseToTray = closeToTray;
             SaveConfig();
         }
@@ -158,11 +138,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetMinimizeOnLaunch: {MinimizeOnLaunch}", minimizeOnLaunch);
-            }
-
+            _logger.LogDebug("SetMinimizeOnLaunch: {MinimizeOnLaunch}", minimizeOnLaunch);
             _settings!.MinimizeOnLaunch = minimizeOnLaunch;
             SaveConfig();
         }
@@ -172,11 +148,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetAlwaysOnTop: {AlwaysOnTop}", alwaysOnTop);
-            }
-
+            _logger.LogDebug("SetAlwaysOnTop: {AlwaysOnTop}", alwaysOnTop);
             _settings!.AlwaysTop = alwaysOnTop;
             SaveConfig();
         }
@@ -186,11 +158,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetUseBackground: {UseBackground}", useBackground);
-            }
-
+            _logger.LogDebug("SetUseBackground: {UseBackground}", useBackground);
             _settings!.UseBackground = useBackground;
             SaveConfig();
         }
@@ -200,11 +168,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetLocale: {Locale}", locale);
-            }
-
+            _logger.LogDebug("SetLocale: {Locale}", locale);
             _settings!.Language = locale;
             SaveConfig();
         }
@@ -214,11 +178,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetLinuxPrefixPath: {LinuxPrefixPath}", linuxPrefixPath);
-            }
-
+            _logger.LogDebug("SetLinuxPrefixPath: {LinuxPrefixPath}", linuxPrefixPath);
             _settings!.LinuxSettings.PrefixPath = linuxPrefixPath;
             SaveConfig();
         }
@@ -228,11 +188,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetLinuxUmuPath: {UmuPath}", linuxUmuPath);
-            }
-
+            _logger.LogDebug("SetLinuxUmuPath: {UmuPath}", linuxUmuPath);
             _settings!.LinuxSettings.UmuPath = linuxUmuPath;
             SaveConfig();
         }
@@ -242,11 +198,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetLinuxLaunchSettings: {LaunchSettings}", linuxLaunchSettings);
-            }
-
+            _logger.LogDebug("SetLinuxLaunchSettings: {LaunchSettings}", linuxLaunchSettings);
             _settings!.LinuxSettings.LaunchSettings = linuxLaunchSettings;
             SaveConfig();
         }
@@ -256,11 +208,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetLinuxProtonVersion: {ProtonVersion}", linuxProtonVersion);
-            }
-
+            _logger.LogDebug("SetLinuxProtonVersion: {ProtonVersion}", linuxProtonVersion);
             _settings!.LinuxSettings.ProtonVersion = linuxProtonVersion;
             SaveConfig();
         }
@@ -270,11 +218,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetLinuxGameMode: {GameMode}", linuxGameMode);
-            }
-
+            _logger.LogDebug("SetLinuxGameMode: {GameMode}", linuxGameMode);
             _settings!.LinuxSettings.GameMode = linuxGameMode;
             SaveConfig();
         }
@@ -284,11 +228,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("AddMod: {Mod}", mod.Name);
-            }
-
+            _logger.LogDebug("AddMod: {Mod}", mod.Name);
             if (!_settings!.Mods.TryAdd(mod.GUID, mod))
             {
                 _settings!.Mods[mod.GUID] = mod;
@@ -302,11 +242,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("RemoveMod: {Mod}", guid);
-            }
-
+            _logger.LogDebug("RemoveMod: {Mod}", guid);
             if (!_settings!.Mods.ContainsKey(guid))
             {
                 _logger.LogError("key {key} not found", guid);
@@ -322,7 +258,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logger.LogInformation("SetDebugLogging: {DebugLogging}", debugLogging);
-            FileLogger.LogLevel = debugLogging ? LogLevel.Trace : LogLevel.Information;
+            FileLogger.LogLevel = debugLogging ? LogLevel.Debug : LogLevel.Information;
             _settings!.DebugLogging = debugLogging;
             SaveConfig();
         }
@@ -332,11 +268,7 @@ public class ConfigHelper
     {
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("SetClearCacheOnLaunch: {ClearCacheOnLaunch}", clearCacheOnLaunch);
-            }
-
+            _logger.LogDebug("SetClearCacheOnLaunch: {ClearCacheOnLaunch}", clearCacheOnLaunch);
             _settings!.ClearCacheOnLaunch = clearCacheOnLaunch;
             SaveConfig();
         }

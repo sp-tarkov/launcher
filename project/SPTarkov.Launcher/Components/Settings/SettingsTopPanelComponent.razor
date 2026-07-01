@@ -56,7 +56,6 @@
 
     private void ClearGameSettings()
     {
-        Logger.LogInformation("clearing game settings");
         var sptSettings = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptSettingsFolder));
 
         try

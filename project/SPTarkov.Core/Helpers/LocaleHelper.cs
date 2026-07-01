@@ -23,14 +23,11 @@ public class LocaleHelper
         _logger = logger;
         _configHelper = configHelper;
         _defaultLocale = _configHelper.GetConfig().Language;
-        _logger.LogInformation("Default locale: {locale}", _defaultLocale);
+        _logger.LogDebug("Default locale: {locale}", _defaultLocale);
 
         lock (_lock)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Loading locales from {dirPath}", Paths.LocalesPath);
-            }
+            _logger.LogDebug("Loading locales from {dirPath}", Paths.LocalesPath);
 
             if (!Directory.Exists(Paths.LocalesPath))
             {
@@ -65,10 +62,7 @@ public class LocaleHelper
     {
         if (!_logLocalesOne)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Available locales: {locales}", _listOfLocales.Select(x => x["ietf_tag"]));
-            }
+            _logger.LogDebug("Available locales: {locales}", _listOfLocales.Select(x => x["ietf_tag"]));
             _logLocalesOne = true;
         }
 

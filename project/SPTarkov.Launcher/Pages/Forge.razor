@@ -59,6 +59,10 @@
             }
         </MudGrid>
     }
+    else if (SearchResponse?.Data.Count == 0)
+    {
+        // decide if i actually wanna put something here
+    }
 
 </MudContainer>
 
@@ -184,8 +188,8 @@
         if (!SearchResponse!.Success)
         {
             Logger.LogError("Something failed");
-            Logger.LogError("request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", Search, SortValue, page, FilterValue, AiValue);
-            Logger.LogError("response: {SearchResponse}", SearchResponse);
+            Logger.LogError("Request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", Search, SortValue, page, FilterValue, AiValue);
+            Logger.LogError("Response: {SearchResponse}", SearchResponse);
 
             SearchResponse = null;
         }

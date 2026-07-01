@@ -55,10 +55,7 @@ public class HttpHelper
 
     public async Task<T?> GameServerGet<T>(string url, CancellationToken token)
     {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Get: {Url}", url);
-        }
+        _logger.LogDebug("Get: {Url}", url);
 
         var task = await _httpClient.GetAsync(BuildGameUrl(url), token);
         var json = SimpleZlib.Decompress(await task.Content.ReadAsByteArrayAsync(token));
@@ -67,10 +64,7 @@ public class HttpHelper
 
     public async Task<T?> GameServerPut<T>(string url, object request, CancellationToken token)
     {
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Put: {Url}", url);
-        }
+        _logger.LogDebug("Put: {Url}", url);
 
         var content = new ByteArrayContent(
             SimpleZlib.CompressToBytes(
@@ -95,10 +89,7 @@ public class HttpHelper
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
 
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("ForgeGetMod Response: {Response}", response);
-        }
+        _logger.LogDebug("ForgeGetMod Response: {Response}", response);
 
         return JsonSerializer.Deserialize<ForgeModResponse>(response);
     }
@@ -110,10 +101,7 @@ public class HttpHelper
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
 
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("ForgeGetModVersion Response: {Response}", response);
-        }
+        _logger.LogDebug("ForgeGetModVersion Response: {Response}", response);
 
         return JsonSerializer.Deserialize<ForgeVersionResponse>(response);
     }
@@ -132,10 +120,7 @@ public class HttpHelper
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
 
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("ForgeGetMods Response: {Response}", response);
-        }
+        _logger.LogDebug("ForgeGetMods Response: {Response}", response);
 
         if (!task.IsSuccessStatusCode)
         {
@@ -155,10 +140,7 @@ public class HttpHelper
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
 
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("ForgeGetUpdate Response: {Response}", response);
-        }
+        _logger.LogDebug("ForgeGetUpdate Response: {Response}", response);
 
         if (!task.IsSuccessStatusCode)
         {
@@ -178,10 +160,7 @@ public class HttpHelper
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
 
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("ForgeGetModAddons Response: {Response}", response);
-        }
+        _logger.LogDebug("ForgeGetModAddons Response: {Response}", response);
 
         return JsonSerializer.Deserialize<ForgeAddonResponse>(response);
     }
@@ -192,10 +171,7 @@ public class HttpHelper
         var task = await _httpClient.SendAsync(message, token);
         var response = await task.Content.ReadAsStringAsync(token);
 
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("ForgeGetModAddon Response: {Response}", response);
-        }
+        _logger.LogDebug("ForgeGetModAddon Response: {Response}", response);
 
         return JsonSerializer.Deserialize<ForgeAddonDetailsResponse>(response);
     }
@@ -254,7 +230,7 @@ public class HttpHelper
         // remove the last ,
         strbuilder.Remove(strbuilder.Length - 1, 1);
 
-        queryString.Add("mods",  strbuilder.ToString());
+        queryString.Add("mods", strbuilder.ToString());
         queryString.Add("spt_version", sptVersion);
 
         return queryString;
@@ -297,10 +273,7 @@ public class HttpHelper
             _internetAccess = false;
         }
 
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
-        }
+        _logger.LogDebug("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
 
         return _internetAccess;
     }
@@ -309,7 +282,8 @@ public class HttpHelper
     {
         var message = new HttpRequestMessage(methodType, url);
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        message.Headers.UserAgent.Add(new ProductInfoHeaderValue("SinglePlayerTarkovLauncher", $"SPT-{ProgramStatics.SptVersionCompiledFor}-{ProgramStatics.SptCommit}"));
+        message.Headers.UserAgent.Add(new ProductInfoHeaderValue("SinglePlayerTarkovLauncher",
+            $"SPT-{ProgramStatics.SptVersionCompiledFor}-{ProgramStatics.SptCommit}"));
 
         return message;
     }

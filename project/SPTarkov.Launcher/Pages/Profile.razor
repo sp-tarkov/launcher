@@ -56,11 +56,7 @@
     protected override void OnInitialized()
     {
         SelectedMiniProfile = StateHelper.SelectedProfile;
-
-        if (Logger.IsEnabled(LogLevel.Debug))
-        {
-            Logger.LogDebug("Selected profile: {Username}", SelectedMiniProfile?.Username);
-        }
+        Logger.LogDebug("Selected profile: {Username}", SelectedMiniProfile?.Username);
 
         base.OnInitialized();
     }
@@ -202,7 +198,6 @@
         Snackbar.Add(LocaleHelper.Get("profile_page_task_3"));
         if (OperatingSystem.IsWindows())
         {
-
             if (!GameHelper.LaunchGame())
             {
                 var message = GameHelper.ErrorMessage;

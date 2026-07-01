@@ -139,10 +139,7 @@
             StateHelper.SetSelectedProfile(MiniProfile);
             LoggedIn = StateHelper.SelectedProfile != null;
 
-            if (Logger.IsEnabled(LogLevel.Debug))
-            {
-                Logger.LogDebug("Navigating to /ServerPageWrapper/false");
-            }
+            Logger.LogDebug("Navigating to /ServerPageWrapper/false");
             NavigationManager.NavigateTo("/ServerPageWrapper/false");
         }
     }
@@ -174,10 +171,7 @@
         }
 
         WindowsClipboard.CopyText(MiniProfile.ProfileId);
-        if (Logger.IsEnabled(LogLevel.Debug))
-        {
-            Logger.LogDebug("Copied profile id to clipboard: {id}", MiniProfile.ProfileId);
-        }
+        Logger.LogDebug("Copied profile id to clipboard: {id}", MiniProfile.ProfileId);
     }
 
 }
