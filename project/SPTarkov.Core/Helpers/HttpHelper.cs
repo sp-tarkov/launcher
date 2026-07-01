@@ -199,6 +199,19 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeAddonDetailsResponse>(response);
     }
 
+    public async Task<ForgeCategoriesResponse?> ForgeGetCategories(CancellationToken tokenToken)
+    {
+        await _rateLimiter.WaitAsync(tokenToken);
+
+        var message = BuildMessage(HttpMethod.Get, Urls.ForgeCategories);
+        var task = await _httpClient.SendAsync(message, tokenToken);
+        var response = await task.Content.ReadAsStringAsync(tokenToken);
+
+        _logger.LogDebug("ForgeGetCategories Response: {Response}", response);
+
+        return JsonSerializer.Deserialize<ForgeCategoriesResponse>(response);
+    }
+
     private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null, string? category = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
@@ -218,7 +231,7 @@ public class HttpHelper
             queryString.Add("filter[contains_ai_content]", ai.ToString());
         }
 
-        if (category is not null)
+        if (category is not null && !string.Equals(category, "all-cat", StringComparison.OrdinalIgnoreCase))
         {
             // must be lower case
             queryString.Add("filter[category_slug]", category);

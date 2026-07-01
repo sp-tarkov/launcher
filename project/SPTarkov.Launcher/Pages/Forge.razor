@@ -16,21 +16,28 @@
             </MudContainer>
         </div>
     </div>
-    @if (NetAvailable && ApiKeyAvailable)
+    @if (NetAvailable)
     {
-        <MudItem sm="12" Class="mb-6">
-            <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
-                <SearchComponent @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" SearchFunc="@SearchUpdate"/>
+        @if (GettingCategories)
+        {
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" Width="100%" />
+        }
+        else
+        {
+            <MudItem sm="12" Class="mb-6">
+                <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
+                    <SearchComponent @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" Categories="@Categories?.Data" SearchFunc="@SearchUpdate"/>
 
-                @if (SearchResponse?.Meta?.LastPage is not null && SearchResponse?.Data?.Count > 0)
-                {
-                    <MudItem sm="12" Class="d-flex justify-center">
-                        <MudPagination Rectangular="true" Variant="Variant.Text" Count="@((int)SearchResponse.Meta.LastPage)" Class="mb-4"
-                                       ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@PaginationValue" Disabled="@SearchInProgress"/>
-                    </MudItem>
-                }
-            </MudCard>
-        </MudItem>
+                    @if (SearchResponse?.Meta?.LastPage is not null && SearchResponse?.Data?.Count > 0)
+                    {
+                        <MudItem sm="12" Class="d-flex justify-center">
+                            <MudPagination Rectangular="true" Variant="Variant.Text" Count="@((int)SearchResponse.Meta.LastPage)" Class="mb-4"
+                                           ShowFirstButton="true" ShowLastButton="true" ShowNextButton="true" ShowPreviousButton="true" @bind-Selected="@PaginationValue" Disabled="@SearchInProgress"/>
+                        </MudItem>
+                    }
+                </MudCard>
+            </MudItem>
+        }
     }
 
     @if (!NetAvailable)
@@ -70,6 +77,8 @@
     private bool NetAvailable { get; set; }
     private ForgeModsResponse? SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
+    private ForgeCategoriesResponse? Categories { get; set; }
+    private bool GettingCategories { get; set; }
 
     private int PaginationValue
     {
@@ -171,7 +180,11 @@
             return;
         }
 
-        // await GetCategories();
+        if (StateHelper.ListOfCategoriesAvailable is null || !StateHelper.ListOfCategoriesAvailable.Any())
+        {
+            await GetCategories();
+        }
+
         await SearchForMods();
     }
 
@@ -187,7 +200,27 @@
 
     private async Task GetCategories()
     {
-        throw new NotImplementedException();
+        GettingCategories = true;
+
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            Categories = await HttpHelper.ForgeGetCategories(token.Token);
+        }
+        catch (ForgeRetryException e)
+        {
+            Logger.LogError(e.Message);
+            GettingCategories = false;
+            return;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Exception thrown from ForgeHelper.ForgeGetCategories {Exception}", e);
+            return;
+        }
+
+        GettingCategories = false;
+        StateHasChanged();
     }
 
     private async Task SearchForMods(int? page = null)
@@ -210,7 +243,6 @@
         {
             Logger.LogError(e.Message);
             SearchInProgress = false;
-
             return;
         }
         catch (Exception e)

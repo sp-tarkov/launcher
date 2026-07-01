@@ -228,6 +228,7 @@
   "linux_launch_settings": "Launch Settings",
   "profile_copy_id": "Copy Profile ID",
   "info_spt_desc": "Your community-driven resource for everything related to SPT. Whether you’re new to SPT or a seasoned modder, this wiki aims to be your central hub for information.",
-  "server_edit_required_name": "Name is required!"
+  "server_edit_required_name": "Name is required!",
+  "search_category": "Category"
 
 }

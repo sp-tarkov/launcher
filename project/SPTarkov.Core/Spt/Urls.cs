@@ -16,9 +16,7 @@ public class Urls
     public const string ForgeMods = "https://forge.sp-tarkov.com/api/v0/mods";
     public const string ForgeUpdate = "https://forge.sp-tarkov.com/api/v0/mods/updates";
     public const string ForgeMod = "https://forge.sp-tarkov.com/api/v0/mod";
-    public const string ForgeLogout = "https://forge.sp-tarkov.com/api/v0/auth/logout";
-    public const string ForgeLogin = "https://forge.sp-tarkov.com/api/v0/auth/login";
-    public const string ForgeAbilities = "https://forge.sp-tarkov.com/api/v0/auth/abilities";
     public const string ForgeAddons = "https://forge.sp-tarkov.com/api/v0/addons";
     public const string ForgeAddonDetails = "https://forge.sp-tarkov.com/api/v0/addon";
+    public const string ForgeCategories = "https://forge.sp-tarkov.com/api/v0/mod-categories";
 }
