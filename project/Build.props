@@ -1,7 +1,8 @@
 <Project>
     <PropertyGroup>
-        <!--  SPT specific  -->
-        <SptVersion Condition="'$(SptVersion)' == ''">4.1.0</SptVersion>
+        <!-- SPT specific  -->
+        <!-- TODO: Change back to 4.1.0 before release-->
+        <SptVersion Condition="'$(SptVersion)' == ''">4.0.13</SptVersion>
         <SptCommitTag Condition="'$(SptCommitTag)' == ''">abc123a</SptCommitTag>
         <Version>$(SptVersion)</Version>
         <AssemblyVersion>$(SptVersion)</AssemblyVersion>
