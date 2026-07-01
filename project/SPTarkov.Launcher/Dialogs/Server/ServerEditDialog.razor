@@ -5,8 +5,8 @@
     <DialogContent>
         <MudContainer Class="py-4">
             <MudForm Model="Server" @bind-IsValid="@_success" Class="gap-2 mt-3">
-                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_edit_name"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
-                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_edit_name"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required_name"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
+                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense" HelperText="IPAddress:Port or sub.domain:Port" HelperTextOnFocus="true"/>
             </MudForm>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" OnClick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
@@ -18,9 +18,6 @@
 
 @code {
     private bool _success;
-
-    // TODO: create mask that can be either IP or an actual address - Example: https://127.0.0.1:6969 or https://nerd.something.net:6969
-    // private readonly IMask _ipPortMask = RegexMask.IPv4(true);
 
     [Parameter]
     public Server Server { get; set; }
@@ -36,6 +33,9 @@
 
     private void Submit()
     {
+        Server.IpAddress = Server.IpAddress.Replace("https://", "");
+        Server.IpAddress = Server.IpAddress.Trim();
+
         Snackbar.Add(LocaleHelper.Get("server_edit_success"), Severity.Success);
         MudDialog.Close(DialogResult.Ok(Server));
     }
