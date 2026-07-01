@@ -1,7 +1,8 @@
 function setTabContent() {
+
     // Find all elements with the "tabset" class within the user-markdown container.
     const userMarkdownArea = document.querySelector(".user-markdown");
-    if (!userMarkdownArea) {
+    if (!userMarkdownArea || userMarkdownArea.classList.contains("user-markdown-converted")) {
         return;
     }
 
@@ -116,4 +117,7 @@ function setTabContent() {
             }
         });
     });
+
+    // add user-markdown-converted so it's not done again and duplicate the MD
+    userMarkdownArea.classList.add("user-markdown-converted");
 }
