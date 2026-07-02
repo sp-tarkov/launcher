@@ -134,7 +134,7 @@
                             @foreach (var dep in ForgeModVersion.Dependencies)
                             {
                                 <MudTooltip ShowOnHover="true" Placement="Placement.Left" Arrow="false" ShowOnClick="false" ShowOnFocus="false" Text="@dep.Name">
-                                    <MudLink Color="Color.Default" Underline="Underline.None" OnClick="() => NavigateToDependency(dep.Id)" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
+                                    <MudLink Color="Color.Default" Underline="Underline.None" Href="@($"ForgeMod/{dep.Id}")" Class="d-flex align-center cursor-pointer setting-on-hover pa-2 mud-width-full overflow-hidden">
                                         <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@dep.GetThumbnail()"/>
                                         <MudContainer Class="flex-1 gap-3 px-2">
                                             <MudText Class="no-select text-overflow" Typo="Typo.h6">@dep.Name</MudText>
@@ -280,12 +280,6 @@
         {
             NavigationManager.NavigateTo("/Forge");
         }
-    }
-
-    private void NavigateToDependency(int? depId)
-    {
-        // TODO: reloading looks awful, but navigating to the same page (different mod) doesnt seem to get blazor to update
-        NavigationManager.NavigateTo("/ForgeMod/" + depId, true);
     }
 
 }

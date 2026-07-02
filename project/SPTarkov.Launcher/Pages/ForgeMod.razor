@@ -25,13 +25,12 @@
     [Parameter]
     public string ModId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        await base.OnInitializedAsync();
         await SearchForMod();
         await SearchForModVersion(ModId, SearchResponse.Data.Versions.FirstOrDefault().Id.ToString());
         await SearchForModAddons(ModId);
-
+        await base.OnInitializedAsync();
     }
 
     private async Task SearchForMod()
