@@ -212,6 +212,17 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeCategoriesResponse>(response);
     }
 
+    public async Task ForgePing(CancellationToken tokenToken = default)
+    {
+        await _rateLimiter.WaitAsync(tokenToken);
+
+        var message = BuildMessage(HttpMethod.Get, Urls.ForgePing);
+        var task = await _httpClient.SendAsync(message, tokenToken);
+
+        _logger.LogDebug("Pinged Forge");
+
+    }
+
     private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null, string? category = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);

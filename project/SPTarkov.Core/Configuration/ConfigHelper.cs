@@ -273,4 +273,14 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void SetGamePath(string gamePath)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetGamePath: {GamePath}", gamePath);
+            _settings!.GamePath = gamePath;
+            SaveConfig();
+        }
+    }
 }

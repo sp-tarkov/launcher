@@ -87,6 +87,10 @@ public class Launcher
         _logger = App.Services.GetRequiredService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetRequiredService<ConfigHelper>();
 
+        // Temp ping for fridge, test api
+        var httpHelper = App.Services.GetRequiredService<HttpHelper>();
+        _ = httpHelper.ForgePing();
+
         CustomizeComponent();
 
         AppDomain.CurrentDomain.UnhandledException += (_, error) =>

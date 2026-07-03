@@ -19,4 +19,5 @@ public class Urls
     public const string ForgeAddons = "https://forge.sp-tarkov.com/api/v0/addons";
     public const string ForgeAddonDetails = "https://forge.sp-tarkov.com/api/v0/addon";
     public const string ForgeCategories = "https://forge.sp-tarkov.com/api/v0/mod-categories";
+    public const string ForgePing = "https://forge.sp-tarkov.com/api/v0/ping";
 }
