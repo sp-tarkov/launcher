@@ -17,13 +17,13 @@
 </MudContainer>
 
 @code {
-    private ForgeModResponse SearchResponse { get; set; }
-    private ForgeVersionResponse VersionResponse { get; set; }
-    private ForgeAddonResponse AddonResponse { get; set; }
+    private ForgeModResponse SearchResponse { get; set; } = default!;
+    private ForgeVersionResponse VersionResponse { get; set; } = default!;
+    private ForgeAddonResponse AddonResponse { get; set; } = default!;
     private bool SearchInProgress { get; set; }
 
     [Parameter]
-    public string ModId { get; set; }
+    public string ModId { get; set; } = "";
 
     protected override async Task OnParametersSetAsync()
     {

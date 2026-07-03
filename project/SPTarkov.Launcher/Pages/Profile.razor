@@ -51,7 +51,7 @@
 @code {
     private bool CheckboxForWipe { get; set; }
     private bool DisableWipe { get; set; } = false;
-    private MiniProfile SelectedMiniProfile { get; set; }
+    private MiniProfile SelectedMiniProfile { get; set; } = default!;
     private bool _buttonDisabled;
 
     protected override void OnInitialized()

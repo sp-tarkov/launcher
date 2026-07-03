@@ -42,8 +42,8 @@
 </MudContainer>
 
 @code {
-    private MiniProfile PartialProfile { get; set; }
-    public List<MiniProfile> ProfilesList { get; set; }
+    private MiniProfile PartialProfile { get; set; } = default!;
+    public List<MiniProfile> ProfilesList { get; set; } = [];
     private bool IsConnected { get; set; }
 
     protected override void OnInitialized()
