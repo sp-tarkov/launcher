@@ -83,9 +83,9 @@ public class Launcher
 
         App = appBuilder.Build();
 
-        sevenZip.Logger = App.Services.GetService<ILogger<SevenZip>>();
-        _logger = App.Services.GetService<ILogger<Launcher>>();
-        ConfigHelper = App.Services.GetService<ConfigHelper>();
+        sevenZip.Logger = App.Services.GetRequiredService<ILogger<SevenZip>>();
+        _logger = App.Services.GetRequiredService<ILogger<Launcher>>();
+        ConfigHelper = App.Services.GetRequiredService<ConfigHelper>();
 
         CustomizeComponent();
 
