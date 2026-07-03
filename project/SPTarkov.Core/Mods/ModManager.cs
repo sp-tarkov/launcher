@@ -60,7 +60,15 @@ public class ModManager(
 
     private async Task<ConfigMod?> ConvertToConfigMod(DownloadTask downloadTask)
     {
-        var modFilePath = Path.Join(Paths.ModCache, downloadTask.ForgeMod.GUID);
+        var modGuid = downloadTask.ForgeMod.GUID;
+        if (modGuid is null)
+        {
+            downloadTask.Error = new Exception("Mod has no GUID");
+            await downloadTask.CancellationTokenSource.CancelAsync();
+            return null;
+        }
+
+        var modFilePath = Path.Join(Paths.ModCache, modGuid);
         if (!File.Exists(modFilePath))
         {
             downloadTask.Error = new FileNotFoundException("file not found", modFilePath);
@@ -87,7 +95,7 @@ public class ModManager(
         {
             Name = downloadTask.ForgeMod.Name,
             ModVersion = downloadTask.Version.Version,
-            GUID = downloadTask.ForgeMod.GUID,
+            GUID = modGuid,
             IsInstalled = false,
             CanBeUpdated = false,
             Files = RemoveBasePaths(entries)
