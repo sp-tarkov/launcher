@@ -32,11 +32,10 @@ public class ValidationUtil
                 if (OperatingSystem.IsLinux())
                     v1 = _wineHelper.FixWithPrefixValidation(_wineHelper.FindWineRegValue(Paths.UninstallEftRegKey, "InstallLocation"));
                 else
-                    v1 = Registry.LocalMachine.OpenSubKey(c0, false).GetValue("InstallLocation");
-
+                    v1 = Registry.LocalMachine.OpenSubKey(c0, false)?.GetValue("InstallLocation");
             }
 
-            var v2 = (v1 != null) ? v1.ToString() : string.Empty;
+            var v2 = (v1 != null) ? v1.ToString()! : string.Empty;
             v2 = b1 ? Path.Join(v2, c2) : v2;
             var v3 = new DirectoryInfo(v2);
             var v4 = new FileSystemInfo[]
@@ -46,7 +45,7 @@ public class ValidationUtil
                 new FileInfo(Path.Join(v2, "BattlEye", "BEService_x64.dll")),
                 new FileInfo(Path.Join(v2, "ConsistencyInfo")),
                 new FileInfo(Path.Join(v2, "UnityPlayer.dll")),
-                new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe"))
+                new FileInfo(Path.Join(v2, "UnityCrashHandler64.exe")),
             };
 
             v0 = v4.Length - 1;
@@ -77,7 +76,7 @@ public class ValidationUtil
         return f.Length > 0 ? g(f) : null;
     }
 
-    private string b()
+    private string? b()
     {
         var h = string.Empty;
         if (OperatingSystem.IsLinux())
@@ -96,16 +95,18 @@ public class ValidationUtil
         return h;
     }
 
-    private string g(string[] j)
+    private string? g(string[] j)
     {
         var k = $"appmanifest_{c3}.acf";
         foreach (var l in j)
         {
             var m = Path.Join(l, "steamapps", k);
-            if (!File.Exists(m)) continue;
+            if (!File.Exists(m))
+                continue;
 
             var n = d(m, "installdir");
-            if (n.Length > 0) return Path.Join(l, "steamapps", "common", n[0]);
+            if (n.Length > 0)
+                return Path.Join(l, "steamapps", "common", n[0]);
         }
 
         return null;
@@ -120,11 +121,10 @@ public class ValidationUtil
         foreach (var r in File.ReadLines(l))
         {
             var p = Regex.Match(r, s);
-            if (p.Success) q.Add(Regex.Unescape(p.Groups[1].Value));
+            if (p.Success)
+                q.Add(Regex.Unescape(p.Groups[1].Value));
         }
 
         return q.ToArray();
     }
-
-
 }
