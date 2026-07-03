@@ -113,14 +113,14 @@
             };
 
             var returnResult = await HttpHelper.GameServerPut<SPTProfileResponse>(Urls.Profile, requestObject, token.Token);
-            StateHelper.SelectedProfile = returnResult.Response;
-            var result = returnResult.Response;
+            var result = returnResult?.Response;
 
             if (result is null)
             {
                 return false;
             }
 
+            StateHelper.SelectedProfile = result;
             SelectedMiniProfile = StateHelper.SelectedProfile;
 
             token.Dispose();
@@ -245,6 +245,12 @@
             };
 
             var returnResult = await HttpHelper.GameServerPut<SPTWipeResponse>(Urls.Wipe, wipeRequest, token.Token);
+
+            if (returnResult is null)
+            {
+                return false;
+            }
+
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 

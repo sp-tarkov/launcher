@@ -101,6 +101,13 @@
             await Task.Delay(250);
 
             var returnResult = await HttpHelper.GameServerPut<SPTLoginResponse>(Urls.Login, Request, Token.Token);
+
+            if (returnResult is null)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
             var result = returnResult.Response;
 
             if (!result)
@@ -112,7 +119,7 @@
             if (MiniProfile is null) // manual login
             {
                 var returnResult2 = await HttpHelper.GameServerPut<SPTProfileResponse>(Urls.Profile, Request, Token.Token);
-                var result2 = returnResult2.Response;
+                var result2 = returnResult2?.Response;
 
                 if (result2 is null)
                 {

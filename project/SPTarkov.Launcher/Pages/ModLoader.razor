@@ -240,7 +240,7 @@
         foreach (var configMod in list)
         {
             // only disable the uninstall button if a mod is installed that has the guid as a dep
-            if (configMod.IsInstalled && configMod.Dependencies.ContainsKey(guid))
+            if (configMod.IsInstalled && configMod.Dependencies != null && configMod.Dependencies.ContainsKey(guid))
             {
                 return true;
             }
@@ -261,7 +261,7 @@
         foreach (var configMod in list)
         {
             // only disable the delete button if a mod exists that has the guid as a dep
-            if (configMod.Dependencies.ContainsKey(guid))
+            if (configMod.Dependencies != null && configMod.Dependencies.ContainsKey(guid))
             {
                 return true;
             }

@@ -79,7 +79,7 @@
                 // Do it only on Ping so its done once and doesnt look like a blank box
                 await Task.Delay(250);
                 var returnResult = await HttpHelper.GameServerGet<SPTPingResponse>(Urls.Ping, Token.Token);
-                result = returnResult.Response == "Pong!";
+                result = returnResult?.Response == "Pong!";
                 break;
             }
             case RequestTask.Profiles:

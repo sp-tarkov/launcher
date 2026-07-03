@@ -40,9 +40,9 @@
         var dialog = await DialogService.ShowAsync<ServerAddDialog>("ServerAddDialog", ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
-        if (result?.Canceled is false)
+        if (result?.Canceled is false && result.Data is Server server)
         {
-            _serverList.Add(result.Data as Server);
+            _serverList.Add(server);
             ConfigHelper.SetServers(_serverList);
         }
     }

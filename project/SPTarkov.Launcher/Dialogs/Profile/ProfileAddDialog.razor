@@ -99,6 +99,13 @@
             await Task.Delay(20);
 
             var returnResult = await HttpHelper.GameServerPut<SPTRegisterResponse>(Urls.Register, Request, Token.Token);
+
+            if (returnResult is null)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
             StateHelper.ProfileList = returnResult.Profiles;
             var result = returnResult.Response;
 
