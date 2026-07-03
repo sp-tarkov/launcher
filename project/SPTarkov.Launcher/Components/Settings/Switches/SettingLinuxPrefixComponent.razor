@@ -17,7 +17,7 @@
 
     protected override Task OnInitializedAsync()
     {
-        OldValue = ConfigHelper.GetConfig().LinuxSettings.PrefixPath;
+        OldValue = ConfigHelper.GetConfig().LinuxSettings.PrefixPath ?? "";
         NewValue = $"{OldValue}";
 
         return base.OnInitializedAsync();
