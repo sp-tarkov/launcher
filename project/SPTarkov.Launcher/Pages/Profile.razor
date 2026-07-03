@@ -16,7 +16,7 @@
         <MudTooltip Arrow="false" Placement="Placement.Bottom" ShowOnHover="true">
             <ChildContent>
                 <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container mr-2">
-                    <MudCheckBox @bind-Value="CheckboxForWipe" Class="wipe-checkbox" Disabled="@_buttonDisabled">Wipe?</MudCheckBox>
+                    <MudCheckBox @bind-Value="CheckboxForWipe" Class="wipe-checkbox" Disabled="@(_buttonDisabled || DisableWipe)">Wipe?</MudCheckBox>
                 </MudPaper>
             </ChildContent>
             <TooltipContent>
@@ -50,12 +50,18 @@
 
 @code {
     private bool CheckboxForWipe { get; set; }
+    private bool DisableWipe { get; set; } = false;
     private MiniProfile SelectedMiniProfile { get; set; }
     private bool _buttonDisabled;
 
     protected override void OnInitialized()
     {
         SelectedMiniProfile = StateHelper.SelectedProfile;
+        CheckboxForWipe = SelectedMiniProfile.Wipe;
+        if (CheckboxForWipe)
+        {
+            DisableWipe = true;
+        }
         Logger.LogDebug("Selected profile: {Username}", SelectedMiniProfile?.Username);
 
         base.OnInitialized();
