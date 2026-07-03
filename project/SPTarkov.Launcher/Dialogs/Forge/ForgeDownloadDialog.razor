@@ -20,17 +20,17 @@
             }
             <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
                 <MudText Class="user-markdown">
-                    @((MarkupString)Version.Description)
+                    @((MarkupString)(Version.Description ?? string.Empty))
                 </MudText>
             </MudPaper>
-            @if (Version.Dependencies.Any())
+            @if (Version.Dependencies != null && Version.Dependencies.Any())
             {
                 <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2 d-flex flex-column">
                     <MudText Class="pb-2">@(LocaleHelper.Get("download_deps_text"))</MudText>
                     <MudDivider DividerType="DividerType.Middle" Class="pb-2" />
                         @foreach (var dep in Version.Dependencies)
                         {
-                            <MudText Typo="Typo.caption" >@($"{dep.Name} - {dep.Versions.FirstOrDefault().Version}.")</MudText>
+                            <MudText Typo="Typo.caption" >@($"{dep.Name} - {dep.Versions?.FirstOrDefault()?.Version}.")</MudText>
                         }
                 </MudPaper>
             }
@@ -43,11 +43,11 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
-    [Parameter] public ForgeBase Mod { get; set; }
-    [Parameter] public ForgeModVersion Version { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public ForgeBase Mod { get; set; } = default!;
+    [Parameter] public ForgeModVersion Version { get; set; } = default!;
     private bool _requestInProgress;
-    private CancellationTokenSource Token { get; set; }
+    private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
@@ -67,11 +67,17 @@
         var dictOfDeps = new Dictionary<string, Version>();
         try
         {
-            if (Version.Dependencies.Any())
+            if (Version.Dependencies != null && Version.Dependencies.Any())
             {
                 foreach (var dep in Version.Dependencies)
                 {
-                    var depVersion = dep.Versions.FirstOrDefault();
+                    var depVersion = dep.Versions?.FirstOrDefault();
+                    if (dep.GUID is null || depVersion is null)
+                    {
+                        Logger.LogWarning("Dependency {name} has no GUID or versions, skipping", dep.Name);
+                        continue;
+                    }
+
                     dictOfDeps.Add(dep.GUID, depVersion.Version);
                     if (ModManager.GetMods().TryGetValue(dep.GUID, out var mod) && mod.ModVersion < depVersion.Version)
                     {

@@ -7,13 +7,13 @@ namespace SPTarkov.Core.Forge;
 public class ForgeModUpdate
 {
     [JsonPropertyName("current_version")]
-    public UpdateMod CurrentVersion { get; set; }
+    public required UpdateMod CurrentVersion { get; set; }
 
     [JsonPropertyName("recommended_version")]
-    public UpdateMod RecommendedVersion { get; set; }
+    public required UpdateMod RecommendedVersion { get; set; }
 
     [JsonPropertyName("update_reason")]
-    public string UpdateReason { get; set; }
+    public required string UpdateReason { get; set; }
 }
 
 public class UpdateMod

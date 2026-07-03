@@ -69,7 +69,15 @@ public class ModManager(
 
     private async Task<ConfigMod?> ConvertToConfigMod(DownloadTask downloadTask)
     {
-        var modFilePath = Path.Join(Paths.ModCache, downloadTask.ForgeMod.GUID);
+        var modGuid = downloadTask.ForgeMod.GUID;
+        if (modGuid is null)
+        {
+            downloadTask.Error = new Exception("Mod has no GUID");
+            await downloadTask.CancellationTokenSource.CancelAsync();
+            return null;
+        }
+
+        var modFilePath = Path.Join(Paths.ModCache, modGuid);
         if (!File.Exists(modFilePath))
         {
             downloadTask.Error = new FileNotFoundException("file not found", modFilePath);
@@ -96,7 +104,7 @@ public class ModManager(
         {
             Name = downloadTask.ForgeMod.Name,
             ModVersion = downloadTask.Version.Version,
-            GUID = downloadTask.ForgeMod.GUID,
+            GUID = modGuid,
             IsInstalled = false,
             CanBeUpdated = false,
             Files = RemoveBasePaths(entries)
@@ -366,6 +374,12 @@ public class ModManager(
 
         var updateTask = await modHelper.StartUpdateTask(mod, cts);
 
+        if (updateTask == null)
+        {
+            logger.LogError("Update task failed for mod {mod}", mod.CurrentVersion.Name);
+            return;
+        }
+
         var entries = await sevenZip.GetEntriesAsync(ogPath, cts.Token);
 
         // check if zip contains bepinex or spt folder for correct starting structure
@@ -389,7 +403,7 @@ public class ModManager(
         // delete old zip with .bak
         File.Delete(ogPath + ".bak");
 
-        modHelper.RemoveModTask(updateTask!);
+        modHelper.RemoveModTask(updateTask);
     }
 
     private List<string> RemoveBasePaths(List<string> originalPaths)
@@ -413,7 +427,7 @@ public class ModManager(
         var mods = GetMods();
         foreach (var (_, mod) in mods)
         {
-            if (mod.Dependencies.ContainsKey(guid))
+            if (mod.Dependencies != null && mod.Dependencies.ContainsKey(guid))
             {
                 listOfDependantMods.Add(mod);
             }

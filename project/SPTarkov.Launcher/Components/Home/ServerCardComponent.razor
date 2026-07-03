@@ -48,9 +48,9 @@
 </MudItem>
 
 @code {
-    [Parameter] public Server Server { get; set; }
+    [Parameter] public Server Server { get; set; } = default!;
 
-    [Parameter] public List<Server> ServerList { get; set; }
+    [Parameter] public List<Server> ServerList { get; set; } = [];
 
     [Parameter] public EventCallback<List<Server>> ServerListChanged { get; set; }
 

@@ -21,12 +21,12 @@
     private string _taskText = "";
 
     [Parameter]
-    public Server Server { get; set; }
+    public Server Server { get; set; } = default!;
 
     [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; } = default!;
 
-    private CancellationTokenSource Token { get; set; }
+    private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -79,7 +79,7 @@
                 // Do it only on Ping so its done once and doesnt look like a blank box
                 await Task.Delay(250);
                 var returnResult = await HttpHelper.GameServerGet<SPTPingResponse>(Urls.Ping, Token.Token);
-                result = returnResult.Response == "Pong!";
+                result = returnResult?.Response == "Pong!";
                 break;
             }
             case RequestTask.Profiles:

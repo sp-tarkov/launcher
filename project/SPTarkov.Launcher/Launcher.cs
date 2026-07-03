@@ -19,16 +19,16 @@ namespace SPTarkov.Launcher;
 
 public class Launcher
 {
-    public static PhotinoBlazorApp App { get; set; }
-    private static ManifestEmbeddedFileProvider EmbedProvider { get; set; }
-    private static ConfigHelper ConfigHelper { get; set; }
+    public static PhotinoBlazorApp App { get; set; } = null!;
+    private static ManifestEmbeddedFileProvider EmbedProvider { get; set; } = null!;
+    private static ConfigHelper ConfigHelper { get; set; } = null!;
 
     private static int _visibleStateDuration = 2000;
     private static int _showTransitionDuration = 100;
     private static int _hideTransitionDuration = 100;
     private static string _openExternalString = "open-external:";
     private static string _appTitle = "SPTarkov Launcher";
-    private static ILogger<Launcher> _logger;
+    private static ILogger<Launcher> _logger = null!;
 
     [STAThread]
     private static void Main(string[] args)
@@ -83,9 +83,9 @@ public class Launcher
 
         App = appBuilder.Build();
 
-        sevenZip.Logger = App.Services.GetService<ILogger<SevenZip>>();
-        _logger = App.Services.GetService<ILogger<Launcher>>();
-        ConfigHelper = App.Services.GetService<ConfigHelper>();
+        sevenZip.Logger = App.Services.GetRequiredService<ILogger<SevenZip>>();
+        _logger = App.Services.GetRequiredService<ILogger<Launcher>>();
+        ConfigHelper = App.Services.GetRequiredService<ConfigHelper>();
 
         CustomizeComponent();
 

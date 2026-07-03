@@ -56,7 +56,7 @@
                     </MudCardContent>
                 </MudCard>
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default">
-                    <MudCardContent Class="user-markdown">@((MarkupString)ForgeMod.Description)</MudCardContent>
+                    <MudCardContent Class="user-markdown">@((MarkupString)(ForgeMod.Description ?? string.Empty))</MudCardContent>
                 </MudCard>
             </MudItem>
             <MudItem sm="4" Class="pt-4">
@@ -159,7 +159,7 @@
                             <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_addons"))</MudText>
                             @foreach (var addon in ForgeModAddons)
                             {
-                                @if (!addon.Versions.Select(x => x.ModVersionConstraint?.IsSatisfied(ForgeModVersion.Version)).Any())
+                                @if (addon.Versions is null || !addon.Versions.Select(x => x.ModVersionConstraint?.IsSatisfied(ForgeModVersion.Version)).Any())
                                 {
                                     continue;
                                 }
@@ -184,9 +184,9 @@
 
 @code {
     [Parameter] public bool IsSkeleton { get; set; }
-    [Parameter] public ForgeBase ForgeMod { get; set; }
-    [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
-    [Parameter] public List<ForgeBase> ForgeModAddons { get; set; }
+    [Parameter] public ForgeBase ForgeMod { get; set; } = default!;
+    [Parameter] public ForgeModVersion ForgeModVersion { get; set; } = default!;
+    [Parameter] public List<ForgeBase> ForgeModAddons { get; set; } = [];
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {

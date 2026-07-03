@@ -17,18 +17,24 @@
 </MudContainer>
 
 @code {
-    private ForgeModResponse SearchResponse { get; set; }
-    private ForgeVersionResponse VersionResponse { get; set; }
-    private ForgeAddonResponse AddonResponse { get; set; }
+    private ForgeModResponse SearchResponse { get; set; } = default!;
+    private ForgeVersionResponse VersionResponse { get; set; } = default!;
+    private ForgeAddonResponse AddonResponse { get; set; } = default!;
     private bool SearchInProgress { get; set; }
 
     [Parameter]
-    public string ModId { get; set; }
+    public string ModId { get; set; } = "";
 
     protected override async Task OnParametersSetAsync()
     {
         await SearchForMod();
-        await SearchForModVersion(ModId, SearchResponse.Data.Versions.FirstOrDefault().Id.ToString());
+
+        var firstVersion = SearchResponse?.Data?.Versions?.FirstOrDefault();
+        if (firstVersion != null)
+        {
+            await SearchForModVersion(ModId, firstVersion.Id.ToString());
+        }
+
         await SearchForModAddons(ModId);
         await base.OnInitializedAsync();
     }
@@ -40,7 +46,15 @@
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            SearchResponse = await HttpHelper.ForgeGetMod(ModId, token.Token);
+            var response = await HttpHelper.ForgeGetMod(ModId, token.Token);
+
+            if (response is null)
+            {
+                Logger.LogError("Getting mod {modId} returned no response", ModId);
+                return;
+            }
+
+            SearchResponse = response;
         }
         catch (Exception e)
         {
@@ -57,7 +71,15 @@
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            VersionResponse = await HttpHelper.ForgeGetModVersion(modId, versionId, token.Token);
+            var response = await HttpHelper.ForgeGetModVersion(modId, versionId, token.Token);
+
+            if (response is null)
+            {
+                Logger.LogError("Getting mod version {modId}:{versionId} returned no response", modId, versionId);
+                return;
+            }
+
+            VersionResponse = response;
         }
         catch (Exception e)
         {
@@ -65,7 +87,7 @@
             return;
         }
 
-        if (!VersionResponse!.Success)
+        if (!VersionResponse.Success)
         {
             Logger.LogError("Getting Mod version failed {modId}:{versionId} for reason: {code}:{message}", modId, versionId, VersionResponse.Code, VersionResponse.Message);
         }
@@ -78,7 +100,15 @@
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            AddonResponse = await HttpHelper.ForgeGetModAddons(modId, token.Token);
+            var response = await HttpHelper.ForgeGetModAddons(modId, token.Token);
+
+            if (response is null)
+            {
+                Logger.LogError("Getting mod addons {modId} returned no response", modId);
+                return;
+            }
+
+            AddonResponse = response;
         }
         catch (Exception e)
         {
@@ -86,9 +116,9 @@
             return;
         }
 
-        if (!VersionResponse!.Success)
+        if (!AddonResponse.Success)
         {
-            Logger.LogError("Getting Mod Addons failed {modId} for reason: {code}:{message}", modId, VersionResponse.Code, VersionResponse.Message);
+            Logger.LogError("Getting Mod Addons failed {modId}", modId);
         }
 
         StateHasChanged();

@@ -7,7 +7,7 @@ namespace SPTarkov.Core.SevenZip;
 
 public class WindowsSevenZip : SevenZip
 {
-    public ILogger<SevenZip> Logger { get; set; }
+    public ILogger<SevenZip> Logger { get; set; } = null!;
 
     public async Task<List<string>> GetEntriesAsync(string pathToZip, CancellationToken token)
     {
@@ -43,6 +43,11 @@ public class WindowsSevenZip : SevenZip
         {
             Logger.LogCritical(e.Message);
             throw;
+        }
+
+        if (processResult is null)
+        {
+            throw new InvalidOperationException("Failed to start 7za process");
         }
 
         // register killing the process if the user cancels
@@ -107,6 +112,11 @@ public class WindowsSevenZip : SevenZip
             };
 
             var processResult = Process.Start(process);
+
+            if (processResult is null)
+            {
+                throw new InvalidOperationException("Failed to start 7za process");
+            }
 
             // register killing the process if the user cancels
             using var registration = token.Register(() =>

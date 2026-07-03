@@ -42,6 +42,9 @@ public record MiniProfile
 
     [JsonPropertyName("profileStats")]
     public ProfileStats ProfileStats { get; set; } = new();
+
+    [JsonPropertyName("wipe")]
+    public bool Wipe { get; set; } = false;
 }
 
 public record ProfileStats

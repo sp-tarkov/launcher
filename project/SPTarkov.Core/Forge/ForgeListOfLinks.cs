@@ -5,8 +5,8 @@ namespace SPTarkov.Core.Forge;
 public class ForgeListOfLinks
 {
     [JsonPropertyName("url")]
-    public string Url { get; set; }
+    public required string Url { get; set; }
 
     [JsonPropertyName("label")]
-    public string Label { get; set; }
+    public string? Label { get; set; }
 }

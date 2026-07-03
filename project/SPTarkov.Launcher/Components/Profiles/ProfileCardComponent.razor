@@ -62,9 +62,9 @@
 
     [Parameter] public bool HideSideImage { get; set; }
 
-    [Parameter] public MiniProfile MiniProfile { get; set; }
+    [Parameter] public MiniProfile MiniProfile { get; set; } = default!;
 
-    [Parameter] public List<MiniProfile> ProfileList { get; set; }
+    [Parameter] public List<MiniProfile> ProfileList { get; set; } = [];
 
     [Parameter] public EventCallback<List<MiniProfile>> ProfileListChanged { get; set; }
 

@@ -36,6 +36,12 @@ public class ModHelper
     public async Task<DownloadTask?> StartDownloadTask(ForgeBase mod, ForgeModVersion version,
         CancellationTokenSource cancellationTokenSource)
     {
+        if (mod.GUID is null)
+        {
+            _logger.LogError("Mod {name} has no GUID, cannot start download task", mod.Name);
+            return null;
+        }
+
         var downloadTask = new DownloadTask
         {
             ForgeMod = mod,
@@ -126,7 +132,7 @@ public class ModHelper
         switch (task)
         {
             case DownloadTask downloadTask:
-                guid = downloadTask.ForgeMod.GUID;
+                guid = downloadTask.ForgeMod.GUID ?? "";
                 name = downloadTask.ForgeMod.Name;
                 break;
             case UpdateTask updateTask:
