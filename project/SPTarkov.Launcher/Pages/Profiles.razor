@@ -76,11 +76,10 @@
         var dialog = await DialogService.ShowAsync<ProfileLoginDialog>("ProfileLoginDialog", dialogParams, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
-        if (result?.Canceled is false)
+        if (result?.Canceled is false && result.Data is MiniProfile profile)
         {
-            var objectToUse = result.Data as MiniProfile;
-            PartialProfile = objectToUse;
-            StateHelper.SetSelectedProfile(objectToUse);
+            PartialProfile = profile;
+            StateHelper.SetSelectedProfile(profile);
             NavigationManager.NavigateTo("/ServerPageWrapper/false");
         }
     }

@@ -56,6 +56,12 @@
 
     protected override void OnInitialized()
     {
+        if (StateHelper.SelectedProfile is null)
+        {
+            NavigationManager.NavigateTo("/ServerPageWrapper/false");
+            return;
+        }
+
         SelectedMiniProfile = StateHelper.SelectedProfile;
         CheckboxForWipe = SelectedMiniProfile.Wipe;
         if (CheckboxForWipe)
@@ -154,8 +160,15 @@
                 return false;
             }
 
-            StateHelper.SelectedProfile = StateHelper.ProfileList?.FirstOrDefault(x => x.ProfileId == SelectedMiniProfile.ProfileId);
-            SelectedMiniProfile = StateHelper.SelectedProfile;
+            var updatedProfile = StateHelper.ProfileList?.FirstOrDefault(x => x.ProfileId == SelectedMiniProfile.ProfileId);
+
+            if (updatedProfile is null)
+            {
+                return false;
+            }
+
+            StateHelper.SelectedProfile = updatedProfile;
+            SelectedMiniProfile = updatedProfile;
 
             token.Dispose();
             return true;
