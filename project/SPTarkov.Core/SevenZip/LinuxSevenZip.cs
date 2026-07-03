@@ -56,7 +56,7 @@ public class LinuxSevenZip : SevenZip
                     processResult.Kill(entireProcessTree: true);
                 }
             }
-            catch (Exception _)
+            catch
             {
                 // ignored
             }
@@ -121,7 +121,7 @@ public class LinuxSevenZip : SevenZip
                         processResult.Kill(entireProcessTree: true);
                     }
                 }
-                catch (Exception _)
+                catch
                 {
                     // ignored
                 }
