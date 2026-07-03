@@ -113,7 +113,8 @@ public class ValidationUtil
 
     private string[] d(string l, string k)
     {
-        if (!File.Exists(l)) Array.Empty<string>();
+        if (!File.Exists(l))
+            return Array.Empty<string>();
         var q = new List<string>();
         var s = $@"""{k}""\s+""(.*)""";
         foreach (var r in File.ReadLines(l))
