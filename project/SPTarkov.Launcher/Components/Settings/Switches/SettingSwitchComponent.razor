@@ -47,7 +47,7 @@
 
     [Parameter] public bool Switch { get; set; }
 
-    [Parameter] public string OptionName { get; set; }
+    [Parameter] public string OptionName { get; set; } = "";
 
-    [Parameter] public Func<Task> SwitchFunc { get; set; }
+    [Parameter] public Func<Task> SwitchFunc { get; set; } = () => Task.CompletedTask;
 }

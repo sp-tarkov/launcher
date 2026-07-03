@@ -34,9 +34,9 @@
     [Parameter]
     public bool AddDiv { get; set; }
 
-    private List<string> Options { get; set; }
-    private string OptionName { get; set; }
-    private string _selectedOption;
+    private List<string> Options { get; set; } = [];
+    private string OptionName { get; set; } = "";
+    private string _selectedOption = "";
 
     private void OnValueChanged(string value)
     {

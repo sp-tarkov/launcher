@@ -56,7 +56,7 @@
 
 @code {
     [Parameter]
-    public MiniProfile MiniProfile { get; set; }
+    public MiniProfile MiniProfile { get; set; } = default!;
 
     private static string GetStat(IReadOnlyDictionary<string, string>? stats, string key)
     {

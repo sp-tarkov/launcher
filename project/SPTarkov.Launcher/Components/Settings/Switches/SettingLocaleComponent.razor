@@ -34,12 +34,12 @@
     public bool AddDiv { get; set; }
 
     [Parameter]
-    public Dictionary<string, string> Options { get; set; }
+    public Dictionary<string, string> Options { get; set; } = [];
 
     [Parameter]
-    public string OptionName { get; set; }
+    public string OptionName { get; set; } = "";
 
-    private string _selectedOption;
+    private string _selectedOption = "";
 
     private void OnLocaleChange(string locale)
     {

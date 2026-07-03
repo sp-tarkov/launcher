@@ -184,9 +184,9 @@
 
 @code {
     [Parameter] public bool IsSkeleton { get; set; }
-    [Parameter] public ForgeBase ForgeMod { get; set; }
-    [Parameter] public ForgeModVersion ForgeModVersion { get; set; }
-    [Parameter] public List<ForgeBase> ForgeModAddons { get; set; }
+    [Parameter] public ForgeBase ForgeMod { get; set; } = default!;
+    [Parameter] public ForgeModVersion ForgeModVersion { get; set; } = default!;
+    [Parameter] public List<ForgeBase> ForgeModAddons { get; set; } = [];
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
