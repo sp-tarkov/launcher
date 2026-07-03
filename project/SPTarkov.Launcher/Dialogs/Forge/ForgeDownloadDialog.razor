@@ -43,11 +43,11 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
-    [Parameter] public ForgeBase Mod { get; set; }
-    [Parameter] public ForgeModVersion Version { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public ForgeBase Mod { get; set; } = default!;
+    [Parameter] public ForgeModVersion Version { get; set; } = default!;
     private bool _requestInProgress;
-    private CancellationTokenSource Token { get; set; }
+    private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)

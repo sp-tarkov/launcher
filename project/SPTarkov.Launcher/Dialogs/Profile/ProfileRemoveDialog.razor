@@ -28,15 +28,15 @@
 
 @code {
     [Parameter]
-    public MiniProfile MiniProfile { get; set; }
+    public MiniProfile MiniProfile { get; set; } = default!;
 
     [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; } = default!;
 
     private bool _requestInProgress;
     private string _taskText = "";
     private SPTLoginRequest Request { get; } = new();
-    private CancellationTokenSource Token { get; set; }
+    private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
 
     protected override void OnInitialized()

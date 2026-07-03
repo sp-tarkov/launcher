@@ -40,9 +40,9 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
     private bool _requestInProgress;
-    private CancellationTokenSource Token { get; set; }
+    private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
     private string _taskText = "";
     private bool CheckedForUpdates { get; set; }

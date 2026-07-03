@@ -44,13 +44,13 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
-    [Parameter] public ForgeBase ModAddon { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public ForgeBase ModAddon { get; set; } = default!;
     private ForgeBase? AddonDetails { get; set; }
     private List<ForgeBase>? AddonDependencies => ModAddon.Versions?.FirstOrDefault()?.Dependencies;
 
     private bool _requestInProgress;
-    private CancellationTokenSource Token { get; set; }
+    private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
 
     protected override Task OnAfterRenderAsync(bool firstRender)

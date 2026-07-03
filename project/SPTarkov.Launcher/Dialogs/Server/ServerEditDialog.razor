@@ -20,10 +20,10 @@
     private bool _success;
 
     [Parameter]
-    public Server Server { get; set; }
+    public Server Server { get; set; } = default!;
 
     [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; } = default!;
 
     protected override void OnInitialized()
     {

@@ -41,14 +41,14 @@
 
 @code {
     [CascadingParameter]
-    private IMudDialogInstance MudDialog { get; set; }
+    private IMudDialogInstance MudDialog { get; set; } = default!;
 
     private bool _success;
     private bool _requestInProgress;
     private string _taskText = "";
     public SPTRegisterRequest Request = new();
-    private List<string> ServerEditions { get; set; }
-    private CancellationTokenSource Token { get; set; }
+    private List<string> ServerEditions { get; set; } = [];
+    private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
     private string TooltipText => StateHelper.ProfileTypes.GetValueOrDefault(Request.Edition, "");
 

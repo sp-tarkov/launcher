@@ -20,7 +20,7 @@
     private bool _success;
     private Server _server = new();
 
-    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
 
     private void Submit()
     {
