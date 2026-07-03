@@ -6,12 +6,12 @@ namespace SPTarkov.Core.Mods;
 
 public class UpdateTask : IModTask
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonConverter(typeof(SemVerVersionConverter))]
-    public Version Version { get; set; }
-    public string GUID { get; set; }
-    public string Link { get; set; }
+    public required Version Version { get; set; }
+    public required string GUID { get; set; }
+    public required string Link { get; set; }
     public float Progress { get; set; }
     public float TotalToDownload { get; set; }
     public required CancellationTokenSource CancellationTokenSource { get; set; }

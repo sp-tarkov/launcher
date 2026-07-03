@@ -7,7 +7,7 @@ namespace SPTarkov.Core.SevenZip;
 
 public class LinuxSevenZip : SevenZip
 {
-    public ILogger<SevenZip> Logger { get; set; }
+    public ILogger<SevenZip> Logger { get; set; } = null!;
 
     public async Task<List<string>> GetEntriesAsync(string pathToZip, CancellationToken token)
     {
