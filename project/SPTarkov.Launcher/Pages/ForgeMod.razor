@@ -28,7 +28,13 @@
     protected override async Task OnParametersSetAsync()
     {
         await SearchForMod();
-        await SearchForModVersion(ModId, SearchResponse.Data.Versions.FirstOrDefault().Id.ToString());
+
+        var firstVersion = SearchResponse?.Data?.Versions?.FirstOrDefault();
+        if (firstVersion != null)
+        {
+            await SearchForModVersion(ModId, firstVersion.Id.ToString());
+        }
+
         await SearchForModAddons(ModId);
         await base.OnInitializedAsync();
     }

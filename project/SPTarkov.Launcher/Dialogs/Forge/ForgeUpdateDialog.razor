@@ -19,7 +19,7 @@
                 </MudContainer>
             </MudContainer>
         }
-        else if (CheckedForUpdates && ForgeUpdateResponse is not null && ForgeUpdateResponse.Success && ForgeUpdateResponse.Data.Updates.Any())
+        else if (CheckedForUpdates && ForgeUpdateResponse is not null && ForgeUpdateResponse.Success && ForgeUpdateResponse.Data is not null && ForgeUpdateResponse.Data.Updates.Any())
         {
             <MudContainer Class="d-flex flex-column gap-1 mt-4">
                 <MudPaper Class="mud-background-gray border-2 border-solid mud-border-lines-default mb-4 pa-2">
@@ -103,7 +103,7 @@
             // we abort if failed so no need to check result
             CheckedForUpdates = true;
 
-            if ((ForgeUpdateResponse is not null && !ForgeUpdateResponse.Data.Updates.Any()) || (NoModsToUpdate && ForgeUpdateResponse == null))
+            if ((ForgeUpdateResponse is not null && ForgeUpdateResponse.Data?.Updates.Any() != true) || (NoModsToUpdate && ForgeUpdateResponse == null))
             {
                 Snackbar.Add(LocaleHelper.Get("forge_update_none"), Severity.Info);
                 Submit();
@@ -135,6 +135,11 @@
     {
         _taskText = LocaleHelper.Get("forge_update_updating");
         StateHasChanged();
+
+        if (ForgeUpdateResponse?.Data == null)
+        {
+            return;
+        }
 
         foreach (var forgeModUpdate in ForgeUpdateResponse.Data.Updates)
         {
