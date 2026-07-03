@@ -45,6 +45,11 @@ public class WindowsSevenZip : SevenZip
             throw;
         }
 
+        if (processResult is null)
+        {
+            throw new InvalidOperationException("Failed to start 7za process");
+        }
+
         // register killing the process if the user cancels
         using var registration = token.Register(() =>
         {
@@ -107,6 +112,11 @@ public class WindowsSevenZip : SevenZip
             };
 
             var processResult = Process.Start(process);
+
+            if (processResult is null)
+            {
+                throw new InvalidOperationException("Failed to start 7za process");
+            }
 
             // register killing the process if the user cancels
             using var registration = token.Register(() =>
