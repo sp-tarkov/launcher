@@ -100,27 +100,17 @@
                     if (ModManager.GetMods().TryGetValue(dep.GUID, out var mod) && mod.ModVersion < depVersion.Version)
                     {
                         // check if mod exists, if it does, check version, if its newer, download it
-                        ModManager.DownloadMod(dep, depVersion, Token.Token);
+                        _ = ModManager.DownloadMod(dep, depVersion, Token.Token);
                     }
                     else if (mod is null)
                     {
                         // check if mod exists, if it doesnt, download it
-                        ModManager.DownloadMod(dep, depVersion, Token.Token);
+                        _ = ModManager.DownloadMod(dep, depVersion, Token.Token);
                     }
                 }
             }
 
             // ModManager.DownloadMod(version, Version, Token.Token, dictOfDeps);
-        }
-        catch (TaskCanceledException) when (Token.IsCancellationRequested)
-        {
-            AbortOrFail("Request Timed out!");
-            return;
-        }
-        catch (HttpRequestException)
-        {
-            AbortOrFail();
-            return;
         }
         catch (Exception)
         {
