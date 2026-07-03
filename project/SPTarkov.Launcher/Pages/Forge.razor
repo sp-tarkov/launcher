@@ -8,14 +8,6 @@
 @inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
-    @* TODO: remember to remove this *@
-    <div class="mud-overlay dialog-backdrop-class">
-        <div class="mud-overlay-scrim mud-overlay-dark">
-            <MudContainer Class="d-flex flex-column justify-center align-center absolute mud-height-full">
-                <MudText Color="Color.Info" Typo="Typo.h3">Coming Soon!</MudText>
-            </MudContainer>
-        </div>
-    </div>
     @if (NetAvailable)
     {
         @if (GettingCategories)

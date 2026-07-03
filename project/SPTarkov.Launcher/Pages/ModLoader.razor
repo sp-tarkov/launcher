@@ -9,14 +9,6 @@
 @inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-4 my-2 page-animation-switch" MaxWidth="MaxWidth.Large">
-    @* TODO: remember to remove this *@
-    <div class="mud-overlay dialog-backdrop-class">
-        <div class="mud-overlay-scrim mud-overlay-dark">
-            <MudContainer Class="d-flex flex-column justify-center align-center absolute mud-height-full">
-                <MudText Color="Color.Info" Typo="Typo.h3">@(LocaleHelper.Get("coming_soon"))</MudText>
-            </MudContainer>
-        </div>
-    </div>
     <MudGrid Spacing="4" Justify="Justify.SpaceEvenly">
         <MudItem sm="6" Class="uninstalled">
             <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
