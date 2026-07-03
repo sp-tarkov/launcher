@@ -8,5 +8,5 @@ public class ForgeListOfLinks
     public required string Url { get; set; }
 
     [JsonPropertyName("label")]
-    public required string Label { get; set; }
+    public string? Label { get; set; }
 }
