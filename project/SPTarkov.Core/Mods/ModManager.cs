@@ -42,18 +42,27 @@ public class ModManager(
             return;
         }
 
-        var configMod = await ConvertToConfigMod(downloadTask);
-
-        if (configMod == null)
+        try
         {
-            logger.LogError("configMod is null, download error: {downloadTask}", downloadTask.Error);
+            var configMod = await ConvertToConfigMod(downloadTask);
+
+            if (configMod == null)
+            {
+                logger.LogError("configMod is null, download error: {downloadTask}", downloadTask.Error);
+                return;
+            }
+
+            modHelper.RemoveModTask(downloadTask);
+
+            configMod.Dependencies = dictOfDeps;
+            configHelper.AddMod(configMod);
+        }
+        catch (Exception e) // callers fire-and-forget this task, errors must catch here for display/logging
+        {
+            downloadTask.Error = e;
+            logger.LogError("Download task failed for mod {mod}: {e}", forgeMod.Name, e);
             return;
         }
-
-        modHelper.RemoveModTask(downloadTask);
-
-        configMod.Dependencies = dictOfDeps;
-        configHelper.AddMod(configMod);
 
         logger.LogDebug("Download task completed");
     }
