@@ -314,7 +314,7 @@ public class HttpHelper
 
     public bool IsInternetAccessAvailable()
     {
-        // TODO: change to just pinging forge https://forge.sp-tarkov.com/api/v0/ping?
+
         try
         {
             using var ping = new Ping();

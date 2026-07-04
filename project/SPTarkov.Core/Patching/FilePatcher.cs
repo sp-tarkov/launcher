@@ -46,10 +46,10 @@ public class FilePatcher(ILogger<FilePatcher> logger)
         {
             FileInfo target;
 
-            // get the relative portion of the patch file that will be appended to targetpath in order to create an official target file.
+            // get the relative portion of the patch file that will be appended to target path in order to create an official target file.
             var relativefile = file.FullName.Substring(patchpath.Length).TrimStart('\\', '/');
 
-            // create a target file from the relative patch file while utilizing targetpath as the root directory.
+            // create a target file from the relative patch file while utilizing target path as the root directory.
             target = new FileInfo(Path.Join(targetpath, relativefile.Replace(".delta", "")));
 
             var result = Patch(target.FullName, file.FullName, ignoreInputHashMismatch);
