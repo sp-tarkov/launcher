@@ -10,7 +10,9 @@
     @if (StateHelper.AllowServerPage)
     {
         <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="Server Information Center (SIC)" Inline="false">
-            <MudNavLink Disabled="!StateHelper.AllowServerPage" IconColor="Color.Default" Icon="@Icons.Material.Filled.Bathtub" Match="NavLinkMatch.All" Href="@($"https://{StateHelper.SelectedServer?.IpAddress}/")"/>
+            <MudNavLink Class="sic-icon" Disabled="!StateHelper.AllowServerPage" Match="NavLinkMatch.All" Href="@($"https://{StateHelper.SelectedServer?.IpAddress}/")">
+                <MudImage Src="SICIcon.png" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center"></MudImage>
+            </MudNavLink>
         </MudTooltip>
     }
 </MudNavMenu>

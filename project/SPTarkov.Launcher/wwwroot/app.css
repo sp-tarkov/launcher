@@ -464,3 +464,12 @@ p.progress-bar {
     border-radius: 4px;
     padding: 0 1rem;
 }
+
+.sic-icon a .mud-nav-link-text {
+    margin: 0;
+}
+
+.sic-icon img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
