@@ -1,6 +1,6 @@
 ﻿@inject ILogger<SettingsTopPanelComponent> Logger
 @inject ConfigHelper ConfigHelper
-@inject HttpHelper HttpHelper
+@inject StateHelper StateHelper
 @inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
 @inject WindowsClipboard Clipboard
@@ -111,9 +111,18 @@
         var path = ConfigHelper.GetConfig().GamePath;
         var bepinPath = Path.Join(path, "BepInEx", "LogOutput.log");
         var serverPath = Path.Join(path, "SPT_Runtime", "user", "logs", $"spt{DateTime.Now:yyyy-MM-dd}.log");
-        var launcherPath = Path.Join(path, "SPT_Runtime", "user", "logs", "launcher.log");
+        var launcherPath = Path.Join(path, "SPT_Runtime", "user", "logs", "Launcher.log");
         var tracePath = Path.Join(path, "Logs");
-        // var profilePath = Path.Join(path, "SPT", "user", "profiles", $"{AccountManager.SelectedAccount.id}.json")) TODO: needs to be reworked to deal with new multiprofile approach
+
+        if (StateHelper.SelectedProfile is not null)
+        {
+            var profilePath = Path.Join(path, "SPT_Runtime", "user", "profiles", $"{StateHelper.SelectedProfile.ProfileId}.json");
+
+            if (File.Exists(profilePath))
+            {
+                filesToCopy.Add(profilePath);
+            }
+        }
 
         if (File.Exists(bepinPath))
         {
@@ -141,8 +150,6 @@
                 filesToCopy.Add(log);
             }
         }
-
-        // TODO: profile - if not logged in show dialog to choose profile to copy
 
         try
         {
