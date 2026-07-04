@@ -90,7 +90,7 @@ public class ModManager(
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
         var checkForCorrectFilePath = entries.Any(x =>
-            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt" + Path.DirectorySeparatorChar));
+            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar));
 
         if (!checkForCorrectFilePath)
         {
@@ -385,7 +385,7 @@ public class ModManager(
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on Windows and bepinex/ on linux
         var checkForCorrectFilePath = entries.Any(x =>
-            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt" + Path.DirectorySeparatorChar));
+            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar));
 
         if (!checkForCorrectFilePath)
         {

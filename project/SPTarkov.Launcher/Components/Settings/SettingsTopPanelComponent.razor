@@ -110,8 +110,8 @@
         var filesToCopy = new List<string>();
         var path = ConfigHelper.GetConfig().GamePath;
         var bepinPath = Path.Join(path, "BepInEx", "LogOutput.log");
-        var serverPath = Path.Join(path, "SPT", "user", "logs", $"spt{DateTime.Now:yyyy-MM-dd}.log");
-        var launcherPath = Path.Join(path, "SPT", "user", "logs", "launcher.log");
+        var serverPath = Path.Join(path, "SPT_Runtime", "user", "logs", $"spt{DateTime.Now:yyyy-MM-dd}.log");
+        var launcherPath = Path.Join(path, "SPT_Runtime", "user", "logs", "launcher.log");
         var tracePath = Path.Join(path, "Logs");
         // var profilePath = Path.Join(path, "SPT", "user", "profiles", $"{AccountManager.SelectedAccount.id}.json")) TODO: needs to be reworked to deal with new multiprofile approach
 
