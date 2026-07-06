@@ -15,7 +15,8 @@ public class FileLoggerProvider : ILoggerProvider
         {
             Directory.CreateDirectory(path!);
         }
-        File.Create(_path).Close();
+
+        File.WriteAllText(_path, $"Launcher started at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC{Environment.NewLine}");
     }
 
     public ILogger CreateLogger(string categoryName)
@@ -23,8 +24,5 @@ public class FileLoggerProvider : ILoggerProvider
         return new FileLogger(categoryName, _path, _lock);
     }
 
-    public void Dispose()
-    {
-
-    }
+    public void Dispose() { }
 }
