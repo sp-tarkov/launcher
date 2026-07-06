@@ -34,6 +34,11 @@ public record LauncherSettings
 
     public bool ClearCacheOnLaunch { get; set; }
 
+    public bool AutoConnectLastProfile { get; set; }
+
+    /// The last server/profile the user launched with
+    public PreferredProfile? PreferredProfile { get; set; }
+
     public List<string> ExcludeFromCleanup { get; set; } = new();
 
     public string Language { get; set; } = "en";

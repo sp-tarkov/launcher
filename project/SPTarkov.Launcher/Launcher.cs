@@ -58,6 +58,7 @@ public class Launcher
             .AddSingleton<ModManager>()
             .AddSingleton<ModHelper>()
             .AddSingleton<StateHelper>()
+            .AddSingleton<SessionHelper>()
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
             .AddSingleton<WindowsClipboard>()

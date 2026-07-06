@@ -23,6 +23,9 @@ public class StateHelper(ILogger<StateHelper> logger)
 
     public bool AllowNavigation { get; set; } = true;
     public bool AllowServerPage { get; set; } = false;
+
+    public bool AutoConnectAttempted { get; set; } = false; // Startup auto-connect guard
+
     public event Action? OnStateChanged;
 
     public void LogoutAndDispose()
