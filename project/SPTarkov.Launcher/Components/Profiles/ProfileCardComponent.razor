@@ -71,6 +71,8 @@
 
     private bool IsWindows => OperatingSystem.IsWindows();
 
+    private bool CardIsClickable => !HideButtons && !MiniProfile.InvalidOrUnloadableProfile;
+
     private bool SideIsUnknown { get; set; }
     private bool LoggedIn { get; set; }
 
@@ -83,7 +85,7 @@
     {
         return new CssBuilder()
             .AddClass("pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height")
-            .AddClass("cursor-pointer", !HideButtons)
+            .AddClass("cursor-pointer", CardIsClickable)
             .Build();
     }
 
@@ -123,7 +125,7 @@
 
     private async Task RunLoginTask()
     {
-        if (HideButtons)
+        if (!CardIsClickable)
         {
             return;
         }
