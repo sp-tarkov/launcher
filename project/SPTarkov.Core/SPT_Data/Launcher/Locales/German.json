@@ -57,7 +57,7 @@
   "setting_load_live": "Live-Einstellungen laden",
   "setting_clear_game": "Spieleinstellungen löschen",
   "setting_clean_temp": "Temporäre Dateien bereinigen",
-  "setting_copy_logs": "Logs kopieren",
+  "setting_copy_logs": "Logdateien kopieren",
   "setting_clear_api": "API-Schlüssel löschen",
   "setting_load_live_error_1": "Einstellungen können nicht aus Live geladen werden",
   "setting_load_live_error_2": "Live-Einstellungen laden fehlgeschlagen",

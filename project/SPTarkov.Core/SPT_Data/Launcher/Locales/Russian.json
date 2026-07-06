@@ -57,7 +57,7 @@
   "setting_load_live": "Загрузить настройки Live",
   "setting_clear_game": "Очистить настройки игры",
   "setting_clean_temp": "Очистить временные файлы",
-  "setting_copy_logs": "Копировать логи",
+  "setting_copy_logs": "Копировать файлы логов",
   "setting_clear_api": "Очистить ApiKey",
   "setting_load_live_error_1": "Настройки не могут быть загружены из live",
   "setting_load_live_error_2": "Загрузка настроек live не удалась",

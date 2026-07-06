@@ -57,7 +57,7 @@
   "setting_load_live": "Wczytaj ustawienia Live",
   "setting_clear_game": "Wyczyść ustawienia gry",
   "setting_clean_temp": "Wyczyść pliki tymczasowe",
-  "setting_copy_logs": "Kopiuj logi",
+  "setting_copy_logs": "Kopiuj pliki logów",
   "setting_clear_api": "Wyczyść ApiKey",
   "setting_load_live_error_1": "Nie można załadować ustawień z Live",
   "setting_load_live_error_2": "Ładowanie ustawień Live nie powiodło się",

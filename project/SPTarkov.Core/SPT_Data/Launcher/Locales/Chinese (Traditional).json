@@ -57,7 +57,7 @@
   "setting_load_live": "載入線上設定",
   "setting_clear_game": "清除遊戲設定",
   "setting_clean_temp": "清理臨時檔案",
-  "setting_copy_logs": "複製日誌",
+  "setting_copy_logs": "複製日誌檔案",
   "setting_clear_api": "清除 API 金鑰",
   "setting_load_live_error_1": "無法從線上載入設定",
   "setting_load_live_error_2": "載入線上設定失敗",

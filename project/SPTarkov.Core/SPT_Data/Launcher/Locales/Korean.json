@@ -57,7 +57,7 @@
   "setting_load_live": "라이브 설정 불러오기",
   "setting_clear_game": "게임 설정 초기화",
   "setting_clean_temp": "임시 파일 정리",
-  "setting_copy_logs": "로그 복사",
+  "setting_copy_logs": "로그 파일 복사",
   "setting_clear_api": "ApiKey 지우기",
   "setting_load_live_error_1": "라이브에서 설정을 불러올 수 없음",
   "setting_load_live_error_2": "라이브 설정 불러오기 실패",

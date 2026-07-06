@@ -57,7 +57,7 @@
   "setting_load_live": "Carica impostazioni Live",
   "setting_clear_game": "Cancella impostazioni gioco",
   "setting_clean_temp": "Pulisci file temporanei",
-  "setting_copy_logs": "Copia log",
+  "setting_copy_logs": "Copia file di log",
   "setting_clear_api": "Cancella ApiKey",
   "setting_load_live_error_1": "Le impostazioni non possono essere caricate da live",
   "setting_load_live_error_2": "Caricamento impostazioni live fallito",

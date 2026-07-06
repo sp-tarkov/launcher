@@ -57,7 +57,7 @@
   "setting_load_live": "Live設定を読み込む",
   "setting_clear_game": "ゲーム設定をクリア",
   "setting_clean_temp": "一時ファイルを削除",
-  "setting_copy_logs": "ログをコピー",
+  "setting_copy_logs": "ログファイルをコピー",
   "setting_clear_api": "APIキーをクリア",
   "setting_load_live_error_1": "Live設定を読み込めません",
   "setting_load_live_error_2": "Live設定の読み込みに失敗",

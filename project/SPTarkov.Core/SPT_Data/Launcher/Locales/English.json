@@ -57,7 +57,7 @@
   "setting_load_live": "Load Live Settings",
   "setting_clear_game": "Clear Game Settings",
   "setting_clean_temp": "Clean Temp Files",
-  "setting_copy_logs": "Copy Logs",
+  "setting_copy_logs": "Copy Log Files",
   "setting_clear_api": "Clear ApiKey",
   "setting_load_live_error_1": "Settings can not be loaded from live",
   "setting_load_live_error_2": "Loading live settings failed",

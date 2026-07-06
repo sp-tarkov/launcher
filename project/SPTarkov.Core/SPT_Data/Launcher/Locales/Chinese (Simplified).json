@@ -57,7 +57,7 @@
   "setting_load_live": "加载线上设置",
   "setting_clear_game": "清除游戏设置",
   "setting_clean_temp": "清理临时文件",
-  "setting_copy_logs": "复制日志",
+  "setting_copy_logs": "复制日志文件",
   "setting_clear_api": "清除 API 密钥",
   "setting_load_live_error_1": "无法从线上加载设置",
   "setting_load_live_error_2": "加载线上设置失败",
