@@ -4,9 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SPTarkov.Core.Helpers;
 
-public partial class WindowsClipboard(
-    ILogger<WindowsClipboard> logger
-)
+public partial class WindowsClipboard(ILogger<WindowsClipboard> logger)
 {
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -33,6 +31,9 @@ public partial class WindowsClipboard(
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool GlobalUnlock(IntPtr hMem);
 
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial IntPtr GlobalFree(IntPtr hMem);
+
     private const uint CfHdrop = 15;
     private const uint GmemMoveable = 0x0002;
     private const uint CfUnicodetext = 13;
@@ -54,38 +55,70 @@ public partial class WindowsClipboard(
 
         var dropFiles = new Dropfiles
         {
-            pFiles = (uint) Marshal.SizeOf<Dropfiles>(),
+            pFiles = (uint)Marshal.SizeOf<Dropfiles>(),
             ptX = 0,
             ptY = 0,
             fNC = 0,
-            fWide = 1
+            fWide = 1,
         };
 
         var totalSize = Marshal.SizeOf<Dropfiles>() + data.Length;
 
-        var hGlobal = GlobalAlloc(GmemMoveable, (UIntPtr) totalSize);
+        var hGlobal = GlobalAlloc(GmemMoveable, (UIntPtr)totalSize);
+        if (hGlobal == IntPtr.Zero)
+        {
+            logger.LogError("GlobalAlloc failed, error: {error}", Marshal.GetLastWin32Error());
+            return;
+        }
+
         var ptr = GlobalLock(hGlobal);
+        if (ptr == IntPtr.Zero)
+        {
+            logger.LogError("GlobalLock failed, error: {error}", Marshal.GetLastWin32Error());
+            GlobalFree(hGlobal);
+            return;
+        }
 
         Marshal.StructureToPtr(dropFiles, ptr, false);
         var dataPtr = IntPtr.Add(ptr, Marshal.SizeOf<Dropfiles>());
         Marshal.Copy(data, 0, dataPtr, data.Length);
 
+        // GlobalUnlock failure is only indicated by a non-zero GetLastError.
         if (!GlobalUnlock(hGlobal))
         {
-            logger.LogError("Failed to unlock clipboard, error: {error}", Marshal.GetLastWin32Error());
+            var error = Marshal.GetLastWin32Error();
+            if (error != 0)
+            {
+                logger.LogError("Failed to unlock clipboard, error: {error}", error);
+                GlobalFree(hGlobal);
+                return;
+            }
         }
 
         if (!OpenClipboard(IntPtr.Zero))
         {
             logger.LogError("Failed to open clipboard, error: {error}", Marshal.GetLastWin32Error());
+            GlobalFree(hGlobal);
+            return;
         }
 
         if (!EmptyClipboard())
         {
             logger.LogError("Failed to empty clipboard, error: {error}", Marshal.GetLastWin32Error());
+            CloseClipboard();
+            GlobalFree(hGlobal);
+            return;
         }
-        _ = SetClipboardData(CfHdrop, hGlobal);
 
+        if (SetClipboardData(CfHdrop, hGlobal) == IntPtr.Zero)
+        {
+            logger.LogError("Failed to set clipboard data, error: {error}", Marshal.GetLastWin32Error());
+            CloseClipboard();
+            GlobalFree(hGlobal);
+            return;
+        }
+
+        // On success, system owns hGlobal, so don't free it.
         if (!CloseClipboard())
         {
             logger.LogError("Failed to close clipboard, error: {error}", Marshal.GetLastWin32Error());
