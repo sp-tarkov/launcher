@@ -20,7 +20,7 @@
     private void LoadLiveSettings()
     {
         Logger.LogInformation("Loading Live Settings");
-        var sptSettingsFolder = Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptSettingsFolder);
+        var sptSettingsFolder = Paths.SptSettingsFolder;
 
         if (!Directory.Exists(Paths.EftSettingsFolder))
         {
@@ -56,7 +56,7 @@
 
     private void ClearGameSettings()
     {
-        var sptSettings = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptSettingsFolder));
+        var sptSettings = new DirectoryInfo(Paths.SptSettingsFolder);
 
         try
         {
@@ -85,7 +85,7 @@
     {
         try
         {
-            var tempFolder = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptAppDataFolder));
+            var tempFolder = new DirectoryInfo(Paths.SptAppDataFolder);
             tempFolder.Delete(true);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
@@ -110,13 +110,13 @@
         var filesToCopy = new List<string>();
         var path = ConfigHelper.GetConfig().GamePath;
         var bepinPath = Path.Join(path, "BepInEx", "LogOutput.log");
-        var serverPath = Path.Join(path, "SPT_Runtime", "user", "logs", $"spt{DateTime.Now:yyyy-MM-dd}.log");
-        var launcherPath = Path.Join(path, "SPT_Runtime", "user", "logs", "Launcher.log");
+        var serverPath = Path.Join(Paths.LogsFolder, $"spt{DateTime.Now:yyyy-MM-dd}.log");
+        var launcherPath = Paths.LauncherLog;
         var tracePath = Path.Join(path, "Logs");
 
         if (StateHelper.SelectedProfile is not null)
         {
-            var profilePath = Path.Join(path, "SPT_Runtime", "user", "profiles", $"{StateHelper.SelectedProfile.ProfileId}.json");
+            var profilePath = Path.Join(Paths.ProfilesFolder, $"{StateHelper.SelectedProfile.ProfileId}.json");
 
             if (File.Exists(profilePath))
             {

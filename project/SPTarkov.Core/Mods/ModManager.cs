@@ -408,16 +408,7 @@ public class ModManager(
 
     private List<string> RemoveBasePaths(List<string> originalPaths)
     {
-        return originalPaths.Where(x =>
-        {
-            var lowered = x.ToLower();
-            if (Paths.ArchiveFileInfoToIgnore.Contains(lowered))
-            {
-                return false;
-            }
-
-            return true;
-        }).ToList();
+        return originalPaths.Where(x => !Paths.ArchiveFileInfoToIgnore.Contains(x)).ToList();
     }
 
     public List<ConfigMod> GetDependantMods(string guid)

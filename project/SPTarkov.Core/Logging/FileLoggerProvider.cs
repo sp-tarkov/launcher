@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Logging;
 
 public class FileLoggerProvider : ILoggerProvider
 {
-    private readonly string _path = Path.Join(Directory.GetCurrentDirectory(), "user", "logs", "Launcher.log");
+    private readonly string _path = Paths.LauncherLog;
     private readonly SemaphoreSlim _lock = new(1, 1);
 
     public FileLoggerProvider()
