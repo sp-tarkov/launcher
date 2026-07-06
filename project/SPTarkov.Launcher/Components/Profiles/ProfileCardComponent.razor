@@ -7,7 +7,7 @@
 @inject WindowsClipboard WindowsClipboard
 
 <MudItem sm="4">
-    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height cursor-pointer" @onclick="RunLoginTask">
+    <MudPaper Elevation="2" Class="@CardClassNames()" @onclick="RunLoginTask">
         <div class="card-overflow no-select no-pointers">
             @if (!SideIsUnknown && !HideSideImage)
             {
@@ -79,6 +79,14 @@
         return string.IsNullOrEmpty(MiniProfile.Side.ToLower()) ? "unknown" : MiniProfile.Side.ToLower();
     }
 
+    private string CardClassNames()
+    {
+        return new CssBuilder()
+            .AddClass("pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height")
+            .AddClass("cursor-pointer", !HideButtons)
+            .Build();
+    }
+
     private string ImageClassNames()
     {
         var side = GetSideAsString();
@@ -115,6 +123,11 @@
 
     private async Task RunLoginTask()
     {
+        if (HideButtons)
+        {
+            return;
+        }
+
         if (StateHelper.SelectedProfile != null)
         {
             if (StateHelper.SelectedProfile.ProfileId == MiniProfile.ProfileId)
