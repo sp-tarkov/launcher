@@ -1,38 +1,129 @@
-﻿@page "/"
+@page "/"
 
 @inject IDialogService DialogService
 @inject ConfigHelper ConfigHelper
 @inject LocaleHelper LocaleHelper
+@inject StateHelper StateHelper
+@inject SessionHelper SessionHelper
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
-    <MudContainer Class="pa-0 d-flex justify-space-between pb-4">
-        <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.AddToQueue" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy">@(LocaleHelper.Get("home_add_server"))</MudButton>
-    </MudContainer>
-    <MudGrid>
-        @if (_serverList.Any())
-        {
-            @foreach (var server in _serverList)
+    @if (_connecting)
+    {
+        <MudContainer Class="d-flex flex-column align-center gap-4 py-8">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+            <MudText>@_connectingText</MudText>
+        </MudContainer>
+    }
+    else
+    {
+        <MudContainer Class="pa-0 d-flex justify-space-between pb-4">
+            <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.AddToQueue" Size="Size.Medium" OnClick="RunAddTask" Variant="Variant.Filled" IconColor="Color.Success" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy">@(LocaleHelper.Get("home_add_server"))</MudButton>
+        </MudContainer>
+        <MudGrid>
+            @if (_serverList.Any())
             {
-                <ServerCardComponent Server="@server" @bind-ServerList="_serverList"/>
+                @foreach (var server in _serverList)
+                {
+                    <ServerCardComponent Server="@server" @bind-ServerList="_serverList"/>
+                }
             }
-        }
-        else
-        {
-            <MudItem sm="12">
-                <MudAlert Severity="Severity.Info" Variant="Variant.Filled">@(LocaleHelper.Get("home_add_server_cta"))</MudAlert>
-            </MudItem>
-        }
-    </MudGrid>
+            else
+            {
+                <MudItem sm="12">
+                    <MudAlert Severity="Severity.Info" Variant="Variant.Filled">@(LocaleHelper.Get("home_add_server_cta"))</MudAlert>
+                </MudItem>
+            }
+        </MudGrid>
+    }
 </MudContainer>
 
 @code {
     private List<Server> _serverList = [];
+    private bool _connecting;
+    private string _connectingText = "";
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         _serverList = ConfigHelper.GetConfig().Servers;
         Launcher.App.MainWindow.SetMinimized(false);
-        base.OnInitialized();
+
+        await base.OnInitializedAsync();
+
+        await TryAutoConnect();
+    }
+
+    private async Task TryAutoConnect()
+    {
+        var config = ConfigHelper.GetConfig();
+
+        // Only attempt once per launch, and only when the feature is enabled with a saved preference.
+        if (StateHelper.AutoConnectAttempted || !config.AutoConnectLastProfile || config.PreferredProfile is null)
+        {
+            return;
+        }
+
+        StateHelper.AutoConnectAttempted = true;
+
+        var preferred = config.PreferredProfile;
+
+        // The preferred server must still exist in the saved list.
+        var server = config.Servers.FirstOrDefault(s => s.ServerId == preferred.ServerId);
+        if (server is null)
+        {
+            ConfigHelper.ClearPreferredProfile();
+            Snackbar.Add(LocaleHelper.Get("auto_connect_server_missing"), Severity.Warning);
+            return;
+        }
+
+        _connecting = true;
+        _connectingText = LocaleHelper.Get("auto_connect_connecting");
+        StateHasChanged();
+
+        // Attempt server connection.
+        var connectResult = await SessionHelper.ConnectToServerAsync(server);
+        if (!connectResult.Success)
+        {
+            StateHelper.LogoutAndDispose();
+            StopConnecting();
+            Snackbar.Add(LocaleHelper.Get("auto_connect_failed"), Severity.Error);
+            return;
+        }
+
+        // The saved profile must still exist and be loadable.
+        var profile = StateHelper.ProfileList?.FirstOrDefault(p => p.ProfileId == preferred.ProfileId);
+        if (profile is null || profile.InvalidOrUnloadableProfile)
+        {
+            // Only clear if it's missing. The user *may* be able to fix a broken one?
+            if (profile is null)
+            {
+                ConfigHelper.ClearPreferredProfile();
+            }
+
+            StateHelper.LogoutAndDispose();
+            StopConnecting();
+            Snackbar.Add(LocaleHelper.Get("auto_connect_profile_missing"), Severity.Warning);
+            return;
+        }
+
+        // Log into the profile.
+        if (!await SessionHelper.LoginToProfileAsync(profile))
+        {
+            StateHelper.LogoutAndDispose();
+            StopConnecting();
+            Snackbar.Add(LocaleHelper.Get("auto_connect_failed"), Severity.Error);
+            return;
+        }
+
+        StateHelper.SetAllowServerPage(true);
+        NavigationManager.NavigateTo("/Profile");
+    }
+
+    private void StopConnecting()
+    {
+        _connecting = false;
+        StateHasChanged();
     }
 
     private async Task RunAddTask()

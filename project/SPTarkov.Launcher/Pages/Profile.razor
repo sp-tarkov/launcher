@@ -244,6 +244,12 @@
             }
         }
 
+        // If enabled, remember this server/profile so the next launcher startup can auto-connect straight to the profile page.
+        if (ConfigHelper.GetConfig().AutoConnectLastProfile && StateHelper.SelectedServer is not null && StateHelper.SelectedProfile is not null)
+        {
+            ConfigHelper.SetPreferredProfile(StateHelper.SelectedServer.ServerId, StateHelper.SelectedProfile.ProfileId);
+        }
+
         if (ConfigHelper.GetConfig().MinimizeOnLaunch)
         {
             Launcher.App.MainWindow.SetMinimized(true);
@@ -315,5 +321,4 @@
 
         return true;
     }
-
 }

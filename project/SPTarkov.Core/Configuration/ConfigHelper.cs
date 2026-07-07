@@ -283,4 +283,38 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void SetAutoConnectLastProfile(bool autoConnectLastProfile)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetAutoConnectLastProfile: {AutoConnectLastProfile}", autoConnectLastProfile);
+            _settings!.AutoConnectLastProfile = autoConnectLastProfile;
+            SaveConfig();
+        }
+    }
+
+    public void SetPreferredProfile(string serverId, string profileId)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetPreferredProfile: server {ServerId} profile {ProfileId}", serverId, profileId);
+            _settings!.PreferredProfile = new PreferredProfile
+            {
+                ServerId = serverId,
+                ProfileId = profileId
+            };
+            SaveConfig();
+        }
+    }
+
+    public void ClearPreferredProfile()
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("ClearPreferredProfile");
+            _settings!.PreferredProfile = null;
+            SaveConfig();
+        }
+    }
 }
