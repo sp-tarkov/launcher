@@ -1,0 +1,45 @@
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="wipe-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <div class="d-flex flex-column gap-3">
+            <MudText Typo="Typo.h6" Color="Color.Error">@(LocaleHelper.Get("profile_wipe_confirm_heading")) <b>@MiniProfile.Username</b>?</MudText>
+
+            <MudText>@(LocaleHelper.Get("profile_wipe_confirm_text"))</MudText>
+
+            <div>
+                <MudText Class="mb-1">@(LocaleHelper.Get("profile_wipe_warning"))</MudText>
+                <ul class="wipe-warning-list">
+                    <li>@(LocaleHelper.Get("profile_wipe_warning_1"))</li>
+                    <li>@(LocaleHelper.Get("profile_wipe_warning_2"))</li>
+                    <li>@(LocaleHelper.Get("profile_wipe_warning_3"))</li>
+                    <li>@(LocaleHelper.Get("profile_wipe_warning_4"))</li>
+                </ul>
+            </div>
+
+            <div class="mt-2 d-flex justify-end gap-2">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy wipe-danger-button" Variant="Variant.Filled" Color="Color.Default" @onclick="Confirm">@(LocaleHelper.Get("profile_wipe_confirm_button"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">@(LocaleHelper.Get("profile_wipe_cancel_button"))</MudButton>
+            </div>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public MiniProfile MiniProfile { get; set; } = default!;
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private void Confirm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+}
