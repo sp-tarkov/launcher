@@ -30,3 +30,23 @@ git config --local user.email "USERNAME@SOMETHING.com"
 - - `--runtime` is either `win-x64 or linux-x64`
 - - `SptVersion` is the servers version number. for example `4.1.0` = `-p:SptVersion=4.1.0`
 - this will create a build folder at the project folder
+
+## Code Style
+
+We use [CSharpier](https://csharpier.com/) to keep the project's code styled/formatted. It is pinned as a local tool, so no global install is required. Restore it once with:
+
+```bash
+dotnet tool restore
+```
+
+You may then apply the formatting rules by running the following from the repository root:
+
+```bash
+dotnet csharpier format .
+```
+
+Please ensure this is run before your PR is created to make merges easier. The `Format` workflow will fail a PR if formatting changes are required.
+
+### Format On Save
+
+There are plugins for both [VS](https://marketplace.visualstudio.com/items?itemName=csharpier.csharpier-vscode) and [Rider](https://plugins.jetbrains.com/plugin/18243-csharpier) which allow you to automatically format project code when a file is saved.

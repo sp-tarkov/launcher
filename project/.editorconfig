@@ -6,7 +6,7 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
-max_line_length = 300
+max_line_length = 140
 
 [{*.yaml,*.yml}]
 charset = utf-8
@@ -28,7 +28,6 @@ csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
 csharp_new_line_between_query_expression_clauses = true
 csharp_style_namespace_declarations = file_scoped:warning
-max_line_length = 140
 
 # Indentation preferences
 csharp_indent_block_contents = true
@@ -148,6 +147,9 @@ resharper_wrap_object_and_collection_initializer_style = chop_always
 resharper_merge_into_pattern_highlighting = none
 resharper_member_can_be_made_static_global_highlighting = none
 resharper_possible_multiple_enumeration_highlighting = none
+resharper_collection_never_updated_global_highlighting = none
+resharper_unused_auto_property_accessor_global_highlighting = none
+resharper_convert_to_auto_property_highlighting = none
 
 # Ignored warnings
 dotnet_diagnostic.CS1591.severity = none
