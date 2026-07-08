@@ -8,28 +8,19 @@
 @inject ConfigHelper ConfigHelper
 @inject ISnackbar Snackbar
 @inject HttpHelper HttpHelper
+@inject IDialogService DialogService
 
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
     <MudContainer Class="pa-0 pb-4 d-flex flex-row justify-space-between">
         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
         <MudSpacer/>
-        <MudTooltip Arrow="false" Placement="Placement.Bottom" ShowOnHover="true">
-            <ChildContent>
-                <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container mr-2">
-                    <MudCheckBox @bind-Value="CheckboxForWipe" Class="wipe-checkbox" Disabled="@(_buttonDisabled || DisableWipe)">Wipe?</MudCheckBox>
-                </MudPaper>
-            </ChildContent>
-            <TooltipContent>
-                <MudContainer Class="d-flex flex-column align-start justify-start">
-                    <MudText>@(LocaleHelper.Get("profile_wipe_warning"))</MudText>
-                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_1"))</MudText>
-                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_2"))</MudText>
-                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_3"))</MudText>
-                    <MudText>- @(LocaleHelper.Get("profile_wipe_warning_4"))</MudText>
-                </MudContainer>
-            </TooltipContent>
-        </MudTooltip>
-        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="Color.Success">@(LocaleHelper.Get("profile_start_game"))</MudButton>
+        @if (ShowWipeCheckbox)
+        {
+            <MudPaper Elevation="2" Class="px-2 py-0 d-flex flex-row justify-center align-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container mr-2 wipe-control">
+                <MudCheckBox T="bool" Value="CheckboxForWipe" ValueChanged="OnWipeCheckboxChanged" Class="wipe-checkbox" Disabled="@_buttonDisabled">@(LocaleHelper.Get("profile_wipe_checkbox"))</MudCheckBox>
+            </MudPaper>
+        }
+        <MudButton Class="@($"mud-button-border-copy border-2 border-solid mud-button-inner-text-copy{(CheckboxForWipe ? " wipe-danger-button" : "")}")" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="@(CheckboxForWipe ? Color.Inherit : Color.Success)">@(CheckboxForWipe ? LocaleHelper.Get("profile_wipe_and_start") : LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
         <ProfileLevelComponent CurrentExp="SelectedMiniProfile.CurrentExp" CurrentLevel="SelectedMiniProfile.CurrentLevel" NeededExp="SelectedMiniProfile.NextLevel"/>
@@ -50,9 +41,9 @@
 
 @code {
     private bool CheckboxForWipe { get; set; }
-    private bool DisableWipe { get; set; } = false;
     private MiniProfile SelectedMiniProfile { get; set; } = default!;
     private bool _buttonDisabled;
+    private bool ShowWipeCheckbox => !SelectedMiniProfile.Wipe;
 
     protected override void OnInitialized()
     {
@@ -63,14 +54,31 @@
         }
 
         SelectedMiniProfile = StateHelper.SelectedProfile;
-        CheckboxForWipe = SelectedMiniProfile.Wipe;
-        if (CheckboxForWipe)
-        {
-            DisableWipe = true;
-        }
         Logger.LogDebug("Selected profile: {Username}", SelectedMiniProfile?.Username);
 
         base.OnInitialized();
+    }
+
+    private async Task OnWipeCheckboxChanged(bool value)
+    {
+        if (!value)
+        {
+            CheckboxForWipe = false;
+            return;
+        }
+
+        var dialogParams = new DialogParameters
+        {
+            {
+                "MiniProfile", SelectedMiniProfile
+            }
+        };
+
+        var dialog = await DialogService.ShowAsync<ProfileWipeDialog>(LocaleHelper.Get("profile_wipe_confirm_title"), dialogParams, ConfigHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        CheckboxForWipe = result?.Canceled is false;
+        StateHasChanged();
     }
 
     /// <summary>
@@ -83,6 +91,8 @@
 
         await StartGame();
         await RefreshProfiles();
+
+        CheckboxForWipe = false;
 
         _buttonDisabled = false;
 
@@ -234,6 +244,12 @@
             }
         }
 
+        // If enabled, remember this server/profile so the next launcher startup can auto-connect straight to the profile page.
+        if (ConfigHelper.GetConfig().AutoConnectLastProfile && StateHelper.SelectedServer is not null && StateHelper.SelectedProfile is not null)
+        {
+            ConfigHelper.SetPreferredProfile(StateHelper.SelectedServer.ServerId, StateHelper.SelectedProfile.ProfileId);
+        }
+
         if (ConfigHelper.GetConfig().MinimizeOnLaunch)
         {
             Launcher.App.MainWindow.SetMinimized(true);
@@ -305,5 +321,4 @@
 
         return true;
     }
-
 }

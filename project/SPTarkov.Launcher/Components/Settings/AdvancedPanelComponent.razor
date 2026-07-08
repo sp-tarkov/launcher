@@ -9,6 +9,7 @@
         </MudTooltip>
         <SettingLocaleComponent Options="@LocaleOptions" OptionName="@(LocaleHelper.Get("setting_option_language"))"/>
         <SettingSwitchComponent Switch="@ClearCacheOnLaunchSwitch" SwitchFunc="SetClearCacheOnLaunch" OptionName="@(LocaleHelper.Get("setting_option_clear_cache"))"></SettingSwitchComponent>
+        <SettingGamePath />
     </MudPaper>
 </MudItem>
 

@@ -28,7 +28,7 @@ public class GameHelper
     {
         get
         {
-            return Directory.GetDirectories(Path.Join(_configHelper.GetConfig().GamePath, Paths.PatchPath)).ToList();
+            return Directory.GetDirectories(Paths.PatchPath).ToList();
         }
     }
 
@@ -333,7 +333,7 @@ public class GameHelper
 
             List<DirectoryInfo> directories =
             [
-                new(Path.Join(_originalGamePath!, "SPT")),
+                new(Path.Join(_originalGamePath!, "SPT_Runtime")),
                 new(Path.Join(_originalGamePath!, "BepInEx"))
             ];
 
@@ -416,7 +416,7 @@ public class GameHelper
     /// </summary>
     public void RemoveProfileRegistryKeys(string profileId)
     {
-        var registryFile = new FileInfo(Path.Join(Environment.CurrentDirectory, Paths.SptRegJson));
+        var registryFile = new FileInfo(Paths.SptRegJson);
 
         if (!registryFile.Exists)
         {

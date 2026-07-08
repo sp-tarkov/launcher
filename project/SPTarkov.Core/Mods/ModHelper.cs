@@ -301,7 +301,7 @@ public class ModHelper
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
         var checkForCorrectFilePath = entries.Any(x =>
-            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt" + Path.DirectorySeparatorChar));
+            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar));
 
         // we checked this before, but to be sure
         if (!checkForCorrectFilePath)

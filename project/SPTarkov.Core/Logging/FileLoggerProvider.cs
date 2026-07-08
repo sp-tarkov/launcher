@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Logging;
 
 public class FileLoggerProvider : ILoggerProvider
 {
-    private readonly string _path = Path.Join(Directory.GetCurrentDirectory(), "user", "logs", "Launcher.log");
+    private readonly string _path = Paths.LauncherLog;
     private readonly SemaphoreSlim _lock = new(1, 1);
 
     public FileLoggerProvider()
@@ -14,7 +15,8 @@ public class FileLoggerProvider : ILoggerProvider
         {
             Directory.CreateDirectory(path!);
         }
-        File.Create(_path).Close();
+
+        File.WriteAllText(_path, $"Launcher started at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC{Environment.NewLine}");
     }
 
     public ILogger CreateLogger(string categoryName)
@@ -22,8 +24,5 @@ public class FileLoggerProvider : ILoggerProvider
         return new FileLogger(categoryName, _path, _lock);
     }
 
-    public void Dispose()
-    {
-
-    }
+    public void Dispose() { }
 }

@@ -2,6 +2,7 @@
 
 @inject HttpHelper HttpHelper
 @inject ILogger<ForgeMod> Logger
+@inject TitleHelper TitleHelper
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     <MudGrid>
@@ -55,6 +56,11 @@
             }
 
             SearchResponse = response;
+
+            if (SearchResponse.Data is not null)
+            {
+                TitleHelper.Apply($"ForgeMod/{ModId}", SearchResponse.Data.Name);
+            }
         }
         catch (Exception e)
         {

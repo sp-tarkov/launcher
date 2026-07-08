@@ -1,16 +1,16 @@
 ﻿@inject ILogger<SettingsTopPanelComponent> Logger
 @inject ConfigHelper ConfigHelper
-@inject HttpHelper HttpHelper
+@inject StateHelper StateHelper
 @inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
 @inject WindowsClipboard Clipboard
 
 <MudContainer Class="pa-0 pb-4 d-flex justify-start gap-2">
     @* TODO: Disabled inline with Master Branch will come back to this *@
-    <MudButton Disabled="true" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
-    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
-    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
-    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="!IsWindows" Color="Color.Dark" Size="Size.Small" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
+    <MudButton Disabled="true" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="!IsWindows" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
 </MudContainer>
 
 @code {
@@ -20,7 +20,7 @@
     private void LoadLiveSettings()
     {
         Logger.LogInformation("Loading Live Settings");
-        var sptSettingsFolder = Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptSettingsFolder);
+        var sptSettingsFolder = Paths.SptSettingsFolder;
 
         if (!Directory.Exists(Paths.EftSettingsFolder))
         {
@@ -56,7 +56,7 @@
 
     private void ClearGameSettings()
     {
-        var sptSettings = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptSettingsFolder));
+        var sptSettings = new DirectoryInfo(Paths.SptSettingsFolder);
 
         try
         {
@@ -85,7 +85,7 @@
     {
         try
         {
-            var tempFolder = new DirectoryInfo(Path.Join(ConfigHelper.GetConfig().GamePath, Paths.SptAppDataFolder));
+            var tempFolder = new DirectoryInfo(Paths.SptAppDataFolder);
             tempFolder.Delete(true);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
@@ -110,10 +110,19 @@
         var filesToCopy = new List<string>();
         var path = ConfigHelper.GetConfig().GamePath;
         var bepinPath = Path.Join(path, "BepInEx", "LogOutput.log");
-        var serverPath = Path.Join(path, "SPT", "user", "logs", $"spt{DateTime.Now:yyyy-MM-dd}.log");
-        var launcherPath = Path.Join(path, "SPT", "user", "logs", "launcher.log");
+        var serverPath = Path.Join(Paths.LogsFolder, $"spt{DateTime.Now:yyyy-MM-dd}.log");
+        var launcherPath = Paths.LauncherLog;
         var tracePath = Path.Join(path, "Logs");
-        // var profilePath = Path.Join(path, "SPT", "user", "profiles", $"{AccountManager.SelectedAccount.id}.json")) TODO: needs to be reworked to deal with new multiprofile approach
+
+        if (StateHelper.SelectedProfile is not null)
+        {
+            var profilePath = Path.Join(Paths.ProfilesFolder, $"{StateHelper.SelectedProfile.ProfileId}.json");
+
+            if (File.Exists(profilePath))
+            {
+                filesToCopy.Add(profilePath);
+            }
+        }
 
         if (File.Exists(bepinPath))
         {
@@ -141,8 +150,6 @@
                 filesToCopy.Add(log);
             }
         }
-
-        // TODO: profile - if not logged in show dialog to choose profile to copy
 
         try
         {

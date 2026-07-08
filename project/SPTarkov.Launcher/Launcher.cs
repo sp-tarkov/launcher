@@ -14,6 +14,7 @@ using SPTarkov.Core.Helpers;
 using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
 using SPTarkov.Core.SevenZip;
+using SPTarkov.Launcher.Helpers;
 
 namespace SPTarkov.Launcher;
 
@@ -27,7 +28,7 @@ public class Launcher
     private static int _showTransitionDuration = 100;
     private static int _hideTransitionDuration = 100;
     private static string _openExternalString = "open-external:";
-    private static string _appTitle = "SPTarkov Launcher";
+    private static string _appTitle = TitleHelper.AppName;
     private static ILogger<Launcher> _logger = null!;
 
     [STAThread]
@@ -58,6 +59,8 @@ public class Launcher
             .AddSingleton<ModManager>()
             .AddSingleton<ModHelper>()
             .AddSingleton<StateHelper>()
+            .AddSingleton<TitleHelper>()
+            .AddSingleton<SessionHelper>()
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
             .AddSingleton<WindowsClipboard>()
@@ -86,6 +89,10 @@ public class Launcher
         sevenZip.Logger = App.Services.GetRequiredService<ILogger<SevenZip>>();
         _logger = App.Services.GetRequiredService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetRequiredService<ConfigHelper>();
+
+        // Temp ping for fridge, test api
+        var httpHelper = App.Services.GetRequiredService<HttpHelper>();
+        _ = httpHelper.ForgePing();
 
         CustomizeComponent();
 

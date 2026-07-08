@@ -1,6 +1,6 @@
-﻿@inject ISnackbar Snackbar
+@inject ISnackbar Snackbar
 @inject StateHelper StateHelper
-@inject HttpHelper HttpHelper
+@inject SessionHelper SessionHelper
 @inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
@@ -26,7 +26,7 @@
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
 
-    private CancellationTokenSource Token { get; set; } = new();
+    private CancellationTokenSource Token { get; } = new();
     private bool UserCancel { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -37,77 +37,50 @@
 
     private async Task StartLoginTasks()
     {
-        try
-        {
-            StateHelper.SetSelectedServer(Server);
-            await CallServer(RequestTask.Ping, LocaleHelper.Get("server_login_task_1"));
-            await CallServer(RequestTask.Profiles, LocaleHelper.Get("server_login_task_2"), LocaleHelper.Get("server_login_task_fail_1"));
-            await CallServer(RequestTask.Types, LocaleHelper.Get("server_login_task_3"), LocaleHelper.Get("server_login_task_fail_2"));
-        }
-        catch (TaskCanceledException) when (Token.IsCancellationRequested)
-        {
-            AbortOrFail(LocaleHelper.Get("request_timed_out"));
-            return;
-        }
-        catch (HttpRequestException)
-        {
-            AbortOrFail();
-            return;
-        }
-        catch (Exception)
-        {
-            AbortOrFail();
-            return;
-        }
+        await Task.Delay(250); // Prevents dialogue flash.
 
-        Submit();
+        var progress = new Progress<ConnectStep>(step =>
+        {
+            _taskText = StepText(step);
+            InvokeAsync(StateHasChanged);
+        });
+
+        var result = await SessionHelper.ConnectToServerAsync(Server, progress, Token.Token);
+
+        if (result.Success)
+        {
+            Submit();
+        }
+        else
+        {
+            AbortOrFail(MapFailure(result));
+        }
     }
 
-    private async Task CallServer(RequestTask option, string taskText = "", string failString = "")
+    private string StepText(ConnectStep step)
     {
-        bool result;
-        Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        _taskText = taskText;
-        StateHasChanged();
-
-        switch (option)
+        return step switch
         {
-            case RequestTask.Ping:
-            {
-                // Add artificial delay to get around opening and closing a dialog too fast
-                // Causes an exception that I cant fix.
-                // Do it only on Ping so its done once and doesnt look like a blank box
-                await Task.Delay(250);
-                var returnResult = await HttpHelper.GameServerGet<SPTPingResponse>(Urls.Ping, Token.Token);
-                result = returnResult?.Response == "Pong!";
-                break;
-            }
-            case RequestTask.Profiles:
-            {
-                var returnResult = await HttpHelper.GameServerGet<SPTProfilesResponse>(Urls.Profiles, Token.Token);
-                StateHelper.ProfileList = returnResult?.Response!;
-                result = true;
-                break;
-            }
-            case RequestTask.Types:
-            {
-                var returnResult = await HttpHelper.GameServerGet<SPTTypesResponse>(Urls.Types, Token.Token);
-                StateHelper.ProfileTypes = returnResult?.Response!;
-                result = true;
-                break;
-            }
-            case RequestTask.Profile:
-            default:
-                throw new ArgumentOutOfRangeException(nameof(option), option, null);
+            ConnectStep.Ping => LocaleHelper.Get("server_login_task_1"),
+            ConnectStep.Profiles => LocaleHelper.Get("server_login_task_2"),
+            ConnectStep.Types => LocaleHelper.Get("server_login_task_3"),
+            _ => ""
+        };
+    }
+
+    private string MapFailure(ConnectResult result)
+    {
+        if (result.TimedOut)
+        {
+            return LocaleHelper.Get("request_timed_out");
         }
 
-        if (!result)
+        return result.FailedStep switch
         {
-            AbortOrFail(failString);
-            return;
-        }
-
-        Token?.Dispose();
+            ConnectStep.Profiles => LocaleHelper.Get("server_login_task_fail_1"),
+            ConnectStep.Types => LocaleHelper.Get("server_login_task_fail_2"),
+            _ => LocaleHelper.Get("server_login_default")
+        };
     }
 
     private void AbortOrFail(string? message = null)
@@ -120,7 +93,7 @@
         }
 
         StateHelper.LogoutAndDispose();
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
     }
 
@@ -134,7 +107,7 @@
     private void UserCancelled()
     {
         UserCancel = true;
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
     }
 }

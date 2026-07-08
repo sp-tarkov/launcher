@@ -3,6 +3,8 @@
 
 @inject StateHelper StateHelper
 @inject ConfigHelper ConfigHelper
+@inject NavigationManager NavigationManager
+@inject TitleHelper TitleHelper
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudPopoverProvider/>
@@ -34,13 +36,33 @@
 
     protected override void OnInitialized()
     {
-        StateHelper.OnStateChanged += StateHasChanged;
+        StateHelper.OnStateChanged += HandleStateChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
+
+        RefreshTitle();
+
         base.OnInitialized();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        RefreshTitle();
+    }
+
+    private void HandleStateChanged()
+    {
+        RefreshTitle();
+        StateHasChanged();
+    }
+
+    private void RefreshTitle()
+    {
+        TitleHelper.Apply(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
     }
 
     public void Dispose()
     {
-        StateHelper.OnStateChanged -= StateHasChanged;
+        StateHelper.OnStateChanged -= HandleStateChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
     }
-
 }

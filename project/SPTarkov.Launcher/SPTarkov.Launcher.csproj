@@ -41,6 +41,15 @@
     <SptData Include="$(ProjectDir)../SPTarkov.Core/SPT_Data/**/*.*"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="Components\Settings\SettingLinuxLaunchComponent.razor" />
+    <AdditionalFiles Include="Components\Settings\SettingLinuxPrefixComponent.razor" />
+    <AdditionalFiles Include="Components\Settings\SettingLinuxProtonComponent.razor" />
+    <AdditionalFiles Include="Components\Settings\SettingLinuxUmuComponent.razor" />
+    <AdditionalFiles Include="Components\Settings\SettingLocaleComponent.razor" />
+    <AdditionalFiles Include="Components\Settings\SettingSwitchComponent.razor" />
+  </ItemGroup>
+
   <Target Name="CopySptData" AfterTargets="PostBuildEvent">
     <Copy
       SourceFiles="@(SptData);"

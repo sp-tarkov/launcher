@@ -7,7 +7,7 @@
 @inject WindowsClipboard WindowsClipboard
 
 <MudItem sm="4">
-    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height">
+    <MudPaper Elevation="2" Class="@CardClassNames()" @onclick="RunLoginTask">
         <div class="card-overflow no-select no-pointers">
             @if (!SideIsUnknown && !HideSideImage)
             {
@@ -33,6 +33,7 @@
                 <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" Text="@(LocaleHelper.Get("profile_copy_id"))">
                     <MudIconButton Disabled="!IsWindows" Class="mr-1" Color="Color.Info" Icon="@Icons.Material.Filled.FileCopy" Size="Size.Small" OnClick="CopyProfileId"/>
                 </MudTooltip>
+
                 <MudSpacer/>
 
                 @if (!MiniProfile.InvalidOrUnloadableProfile)
@@ -70,12 +71,22 @@
 
     private bool IsWindows => OperatingSystem.IsWindows();
 
+    private bool CardIsClickable => !HideButtons && !MiniProfile.InvalidOrUnloadableProfile;
+
     private bool SideIsUnknown { get; set; }
     private bool LoggedIn { get; set; }
 
     private string GetSideAsString()
     {
         return string.IsNullOrEmpty(MiniProfile.Side.ToLower()) ? "unknown" : MiniProfile.Side.ToLower();
+    }
+
+    private string CardClassNames()
+    {
+        return new CssBuilder()
+            .AddClass("pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height")
+            .AddClass("cursor-pointer", CardIsClickable)
+            .Build();
     }
 
     private string ImageClassNames()
@@ -114,6 +125,11 @@
 
     private async Task RunLoginTask()
     {
+        if (!CardIsClickable)
+        {
+            return;
+        }
+
         if (StateHelper.SelectedProfile != null)
         {
             if (StateHelper.SelectedProfile.ProfileId == MiniProfile.ProfileId)

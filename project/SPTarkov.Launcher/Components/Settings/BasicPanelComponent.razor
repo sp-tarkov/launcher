@@ -5,6 +5,7 @@
     <MudPaper Class="pa-5 gap-2 d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
         @* <SettingSwitchComponent Switch="@CloseToTraySwitch" OptionName="@(LocaleHelper.Get("setting_close"))" SwitchFunc="SetCloseToTray"/> *@
         <SettingSwitchComponent Switch="@MinimizeOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_minimize"))" SwitchFunc="SetMinimizeOnLaunch"/>
+        <SettingSwitchComponent Switch="@AutoConnectSwitch" OptionName="@(LocaleHelper.Get("setting_auto_connect"))" SwitchFunc="SetAutoConnect"/>
         <SettingSwitchComponent Switch="@AlwaysOnTopSwitch" OptionName="@(LocaleHelper.Get("setting_always_top"))" SwitchFunc="SetAlwaysOnTop" Disabled="!IsWindows"/>
         <SettingSwitchComponent Switch="@DebugLogging" OptionName="@(LocaleHelper.Get("setting_debug_logging"))" SwitchFunc="SetDebugLogging"/>
     </MudPaper>
@@ -14,6 +15,7 @@
 {
     // private bool CloseToTraySwitch { get; set; }
     private bool MinimizeOnLaunchSwitch { get; set; }
+    private bool AutoConnectSwitch { get; set; }
     private bool AlwaysOnTopSwitch { get; set; }
     private bool DebugLogging { get; set; }
 
@@ -24,6 +26,7 @@
         var settings = ConfigHelper.GetConfig();
         // CloseToTraySwitch = settings.CloseToTray;
         MinimizeOnLaunchSwitch = settings.MinimizeOnLaunch;
+        AutoConnectSwitch = settings.AutoConnectLastProfile;
         AlwaysOnTopSwitch = settings.AlwaysTop;
         DebugLogging = settings.DebugLogging;
 
@@ -46,6 +49,14 @@
     {
         MinimizeOnLaunchSwitch = !MinimizeOnLaunchSwitch;
         ConfigHelper.SetMinimizeOnLaunch(MinimizeOnLaunchSwitch);
+
+        return Task.CompletedTask;
+    }
+
+    private Task SetAutoConnect()
+    {
+        AutoConnectSwitch = !AutoConnectSwitch;
+        ConfigHelper.SetAutoConnectLastProfile(AutoConnectSwitch);
 
         return Task.CompletedTask;
     }
