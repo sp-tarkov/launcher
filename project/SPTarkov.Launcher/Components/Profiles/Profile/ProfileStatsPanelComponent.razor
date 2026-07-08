@@ -1,0 +1,26 @@
+@inject LocaleHelper LocaleHelper
+
+<MudContainer>
+    <MudContainer Class="d-flex flex-row justify-space-between">
+        <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_raids"))" P1Value="@(GetStat("Raids"))" P2="@(LocaleHelper.Get("profile_stats_run_through"))" P2Value="@(GetStat("RunThrough"))"/>
+        <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survived"))" P1Value="@(GetStat("Survived"))" P2="@(LocaleHelper.Get("profile_stats_awol"))" P2Value="@(GetStat("AWOL"))"/>
+        <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kia"))" P1Value="@(GetStat("KIA"))" P2="@(LocaleHelper.Get("profile_stats_mia"))" P2Value="@(GetStat("MIA"))"/>
+        <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_kills"))" P1Value="@(GetStat("Kills"))" P2="@(LocaleHelper.Get("profile_stats_kd"))" P2Value="@(GetStat("KD"))"/>
+    </MudContainer>
+    <MudDivider DividerType="DividerType.Middle" Class="my-2"/>
+    <MudContainer Class="d-flex flex-row justify-space-between">
+        <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_survival_rate"))" P1Value="@(GetStat("SurvivalRate"))" P2="@(LocaleHelper.Get("profile_stats_leave_rate"))" P2Value="@(GetStat("LeaveRate"))"/>
+        <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_average_life_span"))" P1Value="@(GetStat("AverageLifeSpan"))" P2="@(LocaleHelper.Get("profile_stats_survivals_row"))" P2Value="@(GetStat("SurvivalsInARow"))"/>
+        <ProfileStatsSubColComponent P1="@(LocaleHelper.Get("profile_stats_online"))" P1Value="@(GetStat("Online"))" P2="@(LocaleHelper.Get("profile_stats_account_lifetime"))" P2Value="@(GetStat("AccountLifetime"))"/>
+    </MudContainer>
+</MudContainer>
+
+@code {
+    [Parameter]
+    public IReadOnlyDictionary<string, string> Stats { get; set; } = default!;
+
+    private string GetStat(string key)
+    {
+        return Stats is not null && Stats.TryGetValue(key, out var value) ? value : "—";
+    }
+}
