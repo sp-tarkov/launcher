@@ -30,7 +30,7 @@ public class LinuxSevenZip : SevenZip
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            CreateNoWindow =  true,
+            CreateNoWindow = true,
             Arguments = $"l \"{pathToZip}\"",
         };
 
@@ -82,7 +82,6 @@ public class LinuxSevenZip : SevenZip
 
     public async Task<bool> ExtractToDirectoryAsync(string pathToZip, string destination, CancellationToken token)
     {
-
         if (Paths.SevenZip is null)
         {
             throw new ArgumentNullException(nameof(Paths.SevenZip));
@@ -110,7 +109,7 @@ public class LinuxSevenZip : SevenZip
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow =  true,
+                CreateNoWindow = true,
                 Arguments = $"x -o\"{destination}\"  \"{pathToZip}\" ",
             };
 

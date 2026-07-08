@@ -6,5 +6,5 @@ public enum RequestTask
     Profiles,
     Profile,
     Types,
-    Mods
+    Mods,
 }

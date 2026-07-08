@@ -6,11 +6,7 @@ using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Mods;
 
-public class ModManager(
-    ILogger<ModManager> logger,
-    ConfigHelper configHelper,
-    ModHelper modHelper,
-    SevenZip.SevenZip sevenZip)
+public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, ModHelper modHelper, SevenZip.SevenZip sevenZip)
 {
     /// <summary>
     /// TODO: add check if mod is already installed
@@ -20,8 +16,12 @@ public class ModManager(
     /// <param name="cancellationToken"></param>
     /// <param name="dictOfDeps"></param>
     /// <returns></returns>
-    public async Task DownloadMod(ForgeBase forgeMod, ForgeModVersion version, CancellationToken cancellationToken = default,
-        Dictionary<string, Version>? dictOfDeps = null)
+    public async Task DownloadMod(
+        ForgeBase forgeMod,
+        ForgeModVersion version,
+        CancellationToken cancellationToken = default,
+        Dictionary<string, Version>? dictOfDeps = null
+    )
     {
         dictOfDeps ??= new Dictionary<string, Version>();
 
@@ -90,12 +90,15 @@ public class ModManager(
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
         var checkForCorrectFilePath = entries.Any(x =>
-            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar));
+            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar)
+            || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar)
+        );
 
         if (!checkForCorrectFilePath)
         {
-            downloadTask.Error =
-                new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            downloadTask.Error = new Exception(
+                "Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff"
+            );
             await downloadTask.CancellationTokenSource.CancelAsync();
             return null;
         }
@@ -107,7 +110,7 @@ public class ModManager(
             GUID = modGuid,
             IsInstalled = false,
             CanBeUpdated = false,
-            Files = RemoveBasePaths(entries)
+            Files = RemoveBasePaths(entries),
         };
     }
 
@@ -253,8 +256,8 @@ public class ModManager(
         }
 
         // Check if there are any mods that depend on this one, if so, do not uninstall it
-        var checkForDependOnThis =
-            GetMods().Any(x => x.Value.Dependencies != null && x.Value.Dependencies.ContainsKey(guid) && x.Value.IsInstalled);
+        var checkForDependOnThis = GetMods()
+            .Any(x => x.Value.Dependencies != null && x.Value.Dependencies.ContainsKey(guid) && x.Value.IsInstalled);
 
         if (checkForDependOnThis)
         {
@@ -385,12 +388,15 @@ public class ModManager(
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on Windows and bepinex/ on linux
         var checkForCorrectFilePath = entries.Any(x =>
-            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar));
+            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar)
+            || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar)
+        );
 
         if (!checkForCorrectFilePath)
         {
-            updateTask.Error =
-                new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            updateTask.Error = new Exception(
+                "Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff"
+            );
             await cts.CancelAsync();
             return;
         }

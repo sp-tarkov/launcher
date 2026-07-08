@@ -14,27 +14,23 @@ public class ModHelper
     private readonly ConcurrentDictionary<string, IModTask> _modDict = new();
     private readonly SevenZip.SevenZip _sevenZip;
 
-    public ModHelper(
-        ILogger<ModHelper> logger,
-        ConfigHelper configHelper,
-        SevenZip.SevenZip sevenZip
-    )
+    public ModHelper(ILogger<ModHelper> logger, ConfigHelper configHelper, SevenZip.SevenZip sevenZip)
     {
         _logger = logger;
         _configHelper = configHelper;
         _sevenZip = sevenZip;
 
         // leaving default atm, this will be making requests to unknown servers.
-        var handler = new HttpClientHandler
-        {
-            UseCookies = false
-        };
+        var handler = new HttpClientHandler { UseCookies = false };
 
         _httpClient = new HttpClient(handler);
     }
 
-    public async Task<DownloadTask?> StartDownloadTask(ForgeBase mod, ForgeModVersion version,
-        CancellationTokenSource cancellationTokenSource)
+    public async Task<DownloadTask?> StartDownloadTask(
+        ForgeBase mod,
+        ForgeModVersion version,
+        CancellationTokenSource cancellationTokenSource
+    )
     {
         if (mod.GUID is null)
         {
@@ -50,7 +46,7 @@ public class ModHelper
             Progress = 0,
             CancellationTokenSource = cancellationTokenSource,
             Complete = false,
-            Error = null
+            Error = null,
         };
 
         if (!_modDict.TryAdd(mod.GUID, downloadTask))
@@ -77,9 +73,11 @@ public class ModHelper
             }
 
             // Use a download to EFT client to test a long download
-            using var response =
-                await _httpClient.GetAsync(version.Link, HttpCompletionOption.ResponseHeadersRead,
-                    downloadTask.CancellationTokenSource.Token);
+            using var response = await _httpClient.GetAsync(
+                version.Link,
+                HttpCompletionOption.ResponseHeadersRead,
+                downloadTask.CancellationTokenSource.Token
+            );
             response.EnsureSuccessStatusCode();
 
             downloadTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
@@ -203,7 +201,7 @@ public class ModHelper
             TotalToDownload = 0,
             CancellationTokenSource = cancellationTokenSource,
             Complete = false,
-            Error = null
+            Error = null,
         };
 
         if (!_modDict.TryAdd(updateTask.GUID, updateTask))
@@ -226,8 +224,11 @@ public class ModHelper
             }
 
             // Use a download to EFT client to test a long download
-            using var response = await _httpClient.GetAsync(updateTask.Link, HttpCompletionOption.ResponseHeadersRead,
-                updateTask.CancellationTokenSource.Token);
+            using var response = await _httpClient.GetAsync(
+                updateTask.Link,
+                HttpCompletionOption.ResponseHeadersRead,
+                updateTask.CancellationTokenSource.Token
+            );
             response.EnsureSuccessStatusCode();
 
             updateTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
@@ -281,7 +282,7 @@ public class ModHelper
             TotalToDownload = 0,
             Progress = 0,
             Complete = false,
-            Error = null
+            Error = null,
         };
 
         if (!_modDict.TryAdd(installTask.ForgeMod.GUID, installTask))
@@ -289,8 +290,11 @@ public class ModHelper
             _modDict.Remove(installTask.ForgeMod.GUID, out _);
             if (!_modDict.TryAdd(installTask.ForgeMod.GUID, installTask))
             {
-                _logger.LogError("Something seriously went wrong adding this install task: {name}:{guid}", installTask.ForgeMod.Name,
-                    installTask.ForgeMod.GUID);
+                _logger.LogError(
+                    "Something seriously went wrong adding this install task: {name}:{guid}",
+                    installTask.ForgeMod.Name,
+                    installTask.ForgeMod.GUID
+                );
                 return null;
             }
         }
@@ -301,15 +305,18 @@ public class ModHelper
         // check if zip contains bepinex or spt folder for correct starting structure
         // this should be bepinex\ on windows and bepinex/ on linux
         var checkForCorrectFilePath = entries.Any(x =>
-            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar) || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar));
+            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar)
+            || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar)
+        );
 
         // we checked this before, but to be sure
         if (!checkForCorrectFilePath)
         {
             _logger.LogError("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
             installTask.Complete = false;
-            installTask.Error =
-                new Exception("Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff");
+            installTask.Error = new Exception(
+                "Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff"
+            );
             return installTask;
         }
 

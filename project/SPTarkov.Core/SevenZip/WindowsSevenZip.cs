@@ -29,7 +29,7 @@ public class WindowsSevenZip : SevenZip
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            CreateNoWindow =  true,
+            CreateNoWindow = true,
             Arguments = $"l \"{pathToZip}\"",
         };
 
@@ -107,7 +107,7 @@ public class WindowsSevenZip : SevenZip
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow =  true,
+                CreateNoWindow = true,
                 Arguments = $"x -o\"{destination}\"  \"{pathToZip}\"",
             };
 
