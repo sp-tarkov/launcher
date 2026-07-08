@@ -23,11 +23,7 @@ public class HttpHelper
     private readonly ForgeRateLimiter _rateLimiter;
     private bool _internetAccess;
 
-    public HttpHelper(
-        ILogger<HttpHelper> logger,
-        StateHelper stateHelper,
-        ForgeRateLimiter rateLimiter
-    )
+    public HttpHelper(ILogger<HttpHelper> logger, StateHelper stateHelper, ForgeRateLimiter rateLimiter)
     {
         _logger = logger;
         _stateHelper = stateHelper;
@@ -70,20 +66,11 @@ public class HttpHelper
     {
         _logger.LogDebug("Put: {Url}", url);
 
-        var content = new ByteArrayContent(
-            SimpleZlib.CompressToBytes(
-                JsonSerializer.Serialize(request)
-                , zlibConst.Z_BEST_COMPRESSION
-            )
-        );
+        var content = new ByteArrayContent(SimpleZlib.CompressToBytes(JsonSerializer.Serialize(request), zlibConst.Z_BEST_COMPRESSION));
 
         var task = await _httpClient.PutAsync(BuildGameUrl(url), content, token);
 
-        return JsonSerializer.Deserialize<T>(
-            SimpleZlib.Decompress(
-                await task.Content.ReadAsByteArrayAsync(token)
-            )
-        );
+        return JsonSerializer.Deserialize<T>(SimpleZlib.Decompress(await task.Content.ReadAsByteArrayAsync(token)));
     }
 
     public async Task<ForgeModResponse?> ForgeGetMod(string? modId, CancellationToken token)
@@ -141,10 +128,7 @@ public class HttpHelper
 
         if (!task.IsSuccessStatusCode)
         {
-            return new ForgeModsResponse
-            {
-                Success = false
-            };
+            return new ForgeModsResponse { Success = false };
         }
 
         return JsonSerializer.Deserialize<ForgeModsResponse>(response);
@@ -163,10 +147,7 @@ public class HttpHelper
 
         if (!task.IsSuccessStatusCode)
         {
-            return new ForgeUpdateResponse
-            {
-                Success = false
-            };
+            return new ForgeUpdateResponse { Success = false };
         }
 
         return JsonSerializer.Deserialize<ForgeUpdateResponse>(response);
@@ -220,10 +201,15 @@ public class HttpHelper
         var task = await _httpClient.SendAsync(message, tokenToken);
 
         _logger.LogDebug("Pinged Forge");
-
     }
 
-    private NameValueCollection GetParamsCollection(string? search = null, string? sort = null, bool? featured = null, bool? ai = null, string? category = null)
+    private NameValueCollection GetParamsCollection(
+        string? search = null,
+        string? sort = null,
+        bool? featured = null,
+        bool? ai = null,
+        string? category = null
+    )
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         queryString.Add("include", "versions,license,category,source_code_links");
@@ -314,7 +300,6 @@ public class HttpHelper
 
     public bool IsInternetAccessAvailable()
     {
-
         try
         {
             using var ping = new Ping();
@@ -335,8 +320,12 @@ public class HttpHelper
     {
         var message = new HttpRequestMessage(methodType, url);
         message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        message.Headers.UserAgent.Add(new ProductInfoHeaderValue("SinglePlayerTarkovLauncher",
-            $"SPT-{ProgramStatics.SptVersionCompiledFor}-{ProgramStatics.SptCommit}"));
+        message.Headers.UserAgent.Add(
+            new ProductInfoHeaderValue(
+                "SinglePlayerTarkovLauncher",
+                $"SPT-{ProgramStatics.SptVersionCompiledFor}-{ProgramStatics.SptCommit}"
+            )
+        );
 
         return message;
     }

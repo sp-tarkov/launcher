@@ -12,5 +12,5 @@ public enum PatchResultEnum
     Success,
     InputLengthMismatch,
     InputChecksumMismatch,
-    OutputChecksumMismatch
+    OutputChecksumMismatch,
 }

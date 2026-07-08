@@ -1,7 +1,9 @@
 ###############################################################################
 # Set default behavior to automatically normalize line endings.
+# eol=lf keeps the working tree LF on all platforms (incl. Windows) so it
+# matches CSharpier's LF output and .editorconfig (end_of_line = lf).
 ###############################################################################
-* text=auto
+* text=auto eol=lf
 
 ###############################################################################
 # Set default behavior for command prompt diff.

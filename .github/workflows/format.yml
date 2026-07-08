@@ -1,0 +1,32 @@
+name: Format
+
+on:
+  pull_request:
+    branches-ignore:
+      - master
+
+jobs:
+  csharpier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0
+
+      - name: Restore Tool Dependencies
+        run: dotnet tool restore
+
+      - name: CSharpier Format
+        run: dotnet csharpier format .
+
+      - name: Fail if Formatting Changes Are Needed
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "::error::Code formatting issues found. Run 'dotnet tool restore' then 'dotnet csharpier format .' locally, commit the changes, and push to your PR branch. See README.md for details."
+            git --no-pager diff
+            exit 1
+          fi

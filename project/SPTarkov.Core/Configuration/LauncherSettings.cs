@@ -4,13 +4,15 @@ public record LauncherSettings
 {
     public LauncherSettings()
     {
-        Servers.Add(new Server
-        {
-            IpAddress = "127.0.0.1:6969",
-            Name = "LocalHost",
-            ServerId = "1721162719",
-            Locked = true
-        });
+        Servers.Add(
+            new Server
+            {
+                IpAddress = "127.0.0.1:6969",
+                Name = "LocalHost",
+                ServerId = "1721162719",
+                Locked = true,
+            }
+        );
     }
 
     public List<Server> Servers { get; set; } = [];
@@ -46,7 +48,7 @@ public record LauncherSettings
     public LinuxSettings LinuxSettings { get; set; } = new();
 
     /// String is the mods GUID
-    public Dictionary<string, ConfigMod>  Mods { get; set; } = new();
+    public Dictionary<string, ConfigMod> Mods { get; set; } = new();
 
     public bool DebugLogging { get; set; }
 }

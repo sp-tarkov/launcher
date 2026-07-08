@@ -15,6 +15,7 @@ public class ConfigMod
 
     [JsonConverter(typeof(SemVerVersionConverter))]
     public Version? ModVersion { get; set; } = new(0, 0, 0);
+
     [JsonConverter(typeof(SemVerVersionDictConverter))]
     public Dictionary<string, Version>? Dependencies { get; set; } = new();
 }

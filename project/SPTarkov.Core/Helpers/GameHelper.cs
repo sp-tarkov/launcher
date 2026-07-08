@@ -26,10 +26,7 @@ public class GameHelper
 
     private List<string> Patches
     {
-        get
-        {
-            return Directory.GetDirectories(Paths.PatchPath).ToList();
-        }
+        get { return Directory.GetDirectories(Paths.PatchPath).ToList(); }
     }
 
     public GameHelper(
@@ -68,8 +65,7 @@ public class GameHelper
             }
 
             // Fall back to the BSG Launcher registry key if Steam isn't being used
-            var uninstallStringValue = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)
-                ?.GetValue("InstallLocation");
+            var uninstallStringValue = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)?.GetValue("InstallLocation");
             var info = (uninstallStringValue is string key) ? new DirectoryInfo(key) : null;
 
             if (info == null)
@@ -161,8 +157,9 @@ public class GameHelper
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
 
         //start game
-        var args = $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config=" +
-                   $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";
+        var args =
+            $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config="
+            + $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";
 
         _logger.LogInformation($"args: {args}");
 
@@ -170,7 +167,7 @@ public class GameHelper
         {
             Arguments = args,
             UseShellExecute = false,
-            WorkingDirectory = _configHelper.GetConfig().GamePath
+            WorkingDirectory = _configHelper.GetConfig().GamePath,
         };
 
         try
@@ -199,7 +196,7 @@ public class GameHelper
             "-force-gfx-jobs",
             "native",
             $"-token={_stateHelper.SelectedProfile?.ProfileId}",
-            $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}"
+            $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}",
         ];
 
         if (!_wineHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
@@ -318,23 +315,21 @@ public class GameHelper
                 new(Path.Join(_originalGamePath!, "SPT.Launcher.exe")),
                 new(Path.Join(_originalGamePath!, "SPT.Server.exe")),
                 new(Path.Join(_originalGamePath!, "SPT.Server.linux")),
-
                 // bepinex files
                 new(Path.Join(_originalGamePath!, "doorstep_config.ini")),
                 new(Path.Join(_originalGamePath!, "winhttp.dll")),
-
                 // licenses
                 new(Path.Join(_originalGamePath!, "LICENSE-BEPINEX.txt")),
                 new(Path.Join(_originalGamePath!, "LICENSE-ConfigurationManager.txt")),
                 new(Path.Join(_originalGamePath!, "LICENSE-Launcher.txt")),
                 new(Path.Join(_originalGamePath!, "LICENSE-Modules.txt")),
-                new(Path.Join(_originalGamePath!, "LICENSE-Server.txt"))
+                new(Path.Join(_originalGamePath!, "LICENSE-Server.txt")),
             ];
 
             List<DirectoryInfo> directories =
             [
                 new(Path.Join(_originalGamePath!, "SPT_Runtime")),
-                new(Path.Join(_originalGamePath!, "BepInEx"))
+                new(Path.Join(_originalGamePath!, "BepInEx")),
             ];
 
             foreach (var file in files.Where(file => File.Exists(file.FullName)))
@@ -363,7 +358,6 @@ public class GameHelper
         return isInstalledInLive;
     }
 
-
     private void SetupGameFiles()
     {
         var files = new[]
@@ -375,9 +369,8 @@ public class GameHelper
             GetFileForCleanup("Uninstall.exe"),
             GetFileForCleanup("UnityCrashHandler64.exe"),
             GetFileForCleanup("WinPixEventRuntime.dll"),
-
             // Don't allow excluding this from cleanup ever
-            Path.Join(_configHelper.GetConfig().GamePath, Paths.HwechoDllPath)
+            Path.Join(_configHelper.GetConfig().GamePath, Paths.HwechoDllPath),
         };
 
         foreach (var file in files)

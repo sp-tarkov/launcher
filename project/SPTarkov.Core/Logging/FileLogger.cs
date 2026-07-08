@@ -8,8 +8,13 @@ public class FileLogger(string name, string path, SemaphoreSlim locker) : ILogge
     private readonly StringBuilder _sb = new();
     public static LogLevel LogLevel { get; set; } = LogLevel.Information;
 
-    public async void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
-        Func<TState, Exception?, string> formatter)
+    public async void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
+        Func<TState, Exception?, string> formatter
+    )
     {
         if (!IsEnabled(logLevel))
         {
@@ -41,7 +46,8 @@ public class FileLogger(string name, string path, SemaphoreSlim locker) : ILogge
         return logLevel >= LogLevel;
     }
 
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull
+    public IDisposable BeginScope<TState>(TState state)
+        where TState : notnull
     {
         throw new NotImplementedException();
     }

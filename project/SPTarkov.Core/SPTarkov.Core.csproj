@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <Import Project="../Build.props" />
   <PropertyGroup>
     <Authors>Single Player Tarkov</Authors>
@@ -18,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="MudBlazor" Version="8.15.0" />
-    <PackageReference Include="Photino.Blazor" Version="4.0.13"/>
+    <PackageReference Include="Photino.Blazor" Version="4.0.13" />
     <PackageReference Include="SharpHDiffPatch.Core" Version="2.3.0" />
     <!-- Used the same as the installer does -->
     <PackageReference Include="SemanticVersioning" Version="3.0.0" />

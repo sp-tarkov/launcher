@@ -1,2 +1,5 @@
-# Paths are hand-formatted, single-line path declarations
+# Paths are hand-formatted, single-line path declarations. Formatting makes it ugly.
 project/SPTarkov.Core/Spt/Paths.cs
+
+# This is generated on on every build from $(SptVersion); formatting it is pointless.
+project/SPTarkov.Core/Spt/ProgramStatics.Generated.cs

@@ -12,7 +12,7 @@ public class ConfigHelper
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     private readonly Lock _lock = new();
@@ -26,14 +26,12 @@ public class ConfigHelper
         CloseOnEscapeKey = true,
         NoHeader = true,
         FullWidth = true,
-        BackgroundClass = "dialog-backdrop-class"
+        BackgroundClass = "dialog-backdrop-class",
     };
 
     private LauncherSettings? _settings;
 
-    public ConfigHelper(
-        ILogger<ConfigHelper> logger
-    )
+    public ConfigHelper(ILogger<ConfigHelper> logger)
     {
         _logger = logger;
         LoadSettingsFromFile();
@@ -61,8 +59,7 @@ public class ConfigHelper
         {
             _logger.LogDebug("SaveDefaults.");
             Directory.CreateDirectory(Paths.LauncherAssetsPath);
-            File.WriteAllText(Paths.LauncherSettingsPath,
-                JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
+            File.WriteAllText(Paths.LauncherSettingsPath, JsonSerializer.Serialize(new LauncherSettings(), _jsonOptions));
         }
     }
 
@@ -299,11 +296,7 @@ public class ConfigHelper
         lock (_lock)
         {
             _logger.LogDebug("SetPreferredProfile: server {ServerId} profile {ProfileId}", serverId, profileId);
-            _settings!.PreferredProfile = new PreferredProfile
-            {
-                ServerId = serverId,
-                ProfileId = profileId
-            };
+            _settings!.PreferredProfile = new PreferredProfile { ServerId = serverId, ProfileId = profileId };
             SaveConfig();
         }
     }

@@ -48,11 +48,11 @@ public class Launcher
         }
         else
         {
-             throw new PlatformNotSupportedException();
+            throw new PlatformNotSupportedException();
         }
 
-        appBuilder.Services
-            .AddSingleton<ConfigHelper>()
+        appBuilder
+            .Services.AddSingleton<ConfigHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
             .AddSingleton<ForgeRateLimiter>()
@@ -118,9 +118,7 @@ public class Launcher
 
         // Use extension method to get icon from embedded resource
         App.MainWindow.SetIconFile(
-            EmbedProvider.GetDirectoryContents("/")
-                .FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))?
-                .CreateReadStream()!,
+            EmbedProvider.GetDirectoryContents("/").FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))?.CreateReadStream()!,
             "spt-logo.ico"
         );
 
@@ -165,27 +163,25 @@ public class Launcher
         App.MainWindow.RegisterWindowClosingHandler(OnExit);
         App.MainWindow.SetMinimized(true);
 
-        App.MainWindow.RegisterWebMessageReceivedHandler((_, message) =>
-        {
-            if (!message.StartsWith(_openExternalString))
+        App.MainWindow.RegisterWebMessageReceivedHandler(
+            (_, message) =>
             {
-                return;
-            }
-
-            var url = message.Substring(_openExternalString.Length);
-            try
-            {
-                Process.Start(new ProcessStartInfo
+                if (!message.StartsWith(_openExternalString))
                 {
-                    FileName = url,
-                    UseShellExecute = true
-                });
+                    return;
+                }
+
+                var url = message.Substring(_openExternalString.Length);
+                try
+                {
+                    Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to open URL: {ex}", ex);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError("Failed to open URL: {ex}", ex);
-            }
-        });
+        );
     }
 
     private static bool OnExit(object sender, EventArgs e)

@@ -6,9 +6,7 @@ using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
-public class WineHelper(
-    ILogger<WineHelper> logger,
-    ConfigHelper configHelper)
+public class WineHelper(ILogger<WineHelper> logger, ConfigHelper configHelper)
 {
     private const string KeyStartingCharacter = "[";
 
@@ -147,16 +145,8 @@ public class WineHelper(
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = sptPath,
-                Environment =
-                {
-                    { "WINEPREFIX", prefixPath },
-                    { "PROTONPATH", proton },
-                },
-                ArgumentList =
-                {
-                    umuPath,
-                    cmd
-                }
+                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", proton } },
+                ArgumentList = { umuPath, cmd },
             };
         }
         else
@@ -167,16 +157,8 @@ public class WineHelper(
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = sptPath,
-                Environment =
-                {
-                    { "WINEPREFIX", prefixPath },
-                    { "PROTONPATH", proton },
-                },
-                ArgumentList =
-                {
-                    umuPath,
-                    cmd
-                }
+                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", proton } },
+                ArgumentList = { umuPath, cmd },
             };
         }
 
@@ -292,7 +274,7 @@ public class WineHelper(
 
                 if (isValue && reset)
                 {
-                    result.Add((string) name.Clone(), (string) value.Clone());
+                    result.Add((string)name.Clone(), (string)value.Clone());
                     name = string.Empty;
                     value = string.Empty;
                     isName = true;
@@ -318,7 +300,7 @@ public class WineHelper(
             if (!string.IsNullOrEmpty(name))
             {
                 value = stringBuilder.ToString();
-                result.Add((string) name.Clone(), (string) value.Clone());
+                result.Add((string)name.Clone(), (string)value.Clone());
             }
         }
         catch (Exception e)

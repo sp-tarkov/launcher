@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using SPTarkov.Core.Semver;
-using Version = SemanticVersioning.Version;
 using Range = SemanticVersioning.Range;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Forge;
 
