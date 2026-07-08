@@ -256,16 +256,21 @@ public class GameHelper
         {
             var call = await _httpHelper.GameServerGet<SPTVersionResponse>(Urls.Version, CancellationToken.None);
 
-            // TODO: can this be changed to use `using Version = SemanticVersioning.Version;`
-            var serverVersion = new SptVersion(call?.Response!);
+            // Server returns "X.Y.Z" (release) or "X.Y.Z - <bleeding edge text>" (dev build); take the numeric core.
+            var serverVersion = new Version(call?.Response!.Split('-')[0].Trim());
             var coreDllPath = Path.Join(_configHelper.GetConfig().GamePath, Paths.CoreDllPath);
             if (!File.Exists(coreDllPath))
             {
                 _logger.LogError("spt-core.dll missing: {coreDllPath}", coreDllPath);
             }
 
+            // Read the DLL's numeric parts directly; its FileVersion may carry a 4th (revision) segment that SemVer rejects.
             var coreDllVersionInfo = FileVersionInfo.GetVersionInfo(coreDllPath);
-            var dllVersion = new SptVersion(coreDllVersionInfo.FileVersion!);
+            var dllVersion = new Version(
+                coreDllVersionInfo.FileMajorPart,
+                coreDllVersionInfo.FileMinorPart,
+                coreDllVersionInfo.FileBuildPart
+            );
 
             _logger.LogInformation("server version: {serverVersion} - spt-core.dll version: {DllVersion}", serverVersion, dllVersion);
 
@@ -288,7 +293,7 @@ public class GameHelper
             }
 
             // check x.x.'X'
-            if (serverVersion.Build != dllVersion.Build)
+            if (serverVersion.Patch != dllVersion.Patch)
             {
                 return true;
             }

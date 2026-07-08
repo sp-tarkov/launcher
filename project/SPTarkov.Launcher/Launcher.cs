@@ -90,7 +90,7 @@ public class Launcher
         _logger = App.Services.GetRequiredService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetRequiredService<ConfigHelper>();
 
-        // Temp ping for fridge, test api
+        // TODO: Testing server load. Should be removed before release.
         var httpHelper = App.Services.GetRequiredService<HttpHelper>();
         _ = httpHelper.ForgePing();
 
