@@ -9,6 +9,7 @@ public class Urls
     public const string Remove = "/launcher/v2/remove";
     public const string Version = "/launcher/v2/version";
     public const string Mods = "/launcher/v2/mods";
+    public const string ModPages = "/launcher/v2/mod-pages";
     public const string Profiles = "/launcher/v2/profiles";
     public const string Profile = "/launcher/v2/profile";
     public const string Wipe = "/launcher/v2/wipe";
