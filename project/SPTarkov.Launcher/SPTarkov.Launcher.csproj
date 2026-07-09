@@ -15,6 +15,9 @@
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <AssemblyName>SPT.Launcher</AssemblyName>
+
+    <!-- Required by LibraryImport source generator in Helpers/NativeMethods.cs -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-x64'">
@@ -27,7 +30,10 @@
     <ItemGroup>
       <MudBlazorAssets Include="$(NuGetPackageRoot)mudblazor/8.15.0/staticwebassets/MudBlazor.min.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(MudBlazorAssets)" DestinationFiles="@(MudBlazorAssets->'$(ProjectDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy
+      SourceFiles="@(MudBlazorAssets)"
+      DestinationFiles="@(MudBlazorAssets->'$(ProjectDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')"
+    />
   </Target>
 
   <ItemGroup>
@@ -53,13 +59,18 @@
   <Target Name="SPTBuildEvent" AfterTargets="Publish">
     <RemoveDir Directories="$(ProjectDir)../Build" />
     <MakeDir Directories="$(ProjectDir)../Build" />
-
     <!-- Windows -->
-    <Copy Condition="'$(RuntimeIdentifier)' == 'win-x64'" SourceFiles="$(ProjectDir)bin/Release/net10.0/win-x64/publish/SPT.Launcher.exe" DestinationFolder="$(ProjectDir)../Build" />
-
+    <Copy
+      Condition="'$(RuntimeIdentifier)' == 'win-x64'"
+      SourceFiles="$(ProjectDir)bin/Release/net10.0/win-x64/publish/SPT.Launcher.exe"
+      DestinationFolder="$(ProjectDir)../Build"
+    />
     <!-- Linux -->
-    <Copy Condition="'$(RuntimeIdentifier)' == 'linux-x64'" SourceFiles="$(ProjectDir)bin/Release/net10.0/linux-x64/publish/SPT.Launcher.Linux" DestinationFolder="$(ProjectDir)../Build" />
-
+    <Copy
+      Condition="'$(RuntimeIdentifier)' == 'linux-x64'"
+      SourceFiles="$(ProjectDir)bin/Release/net10.0/linux-x64/publish/SPT.Launcher.Linux"
+      DestinationFolder="$(ProjectDir)../Build"
+    />
     <Copy SourceFiles="@(SptData)" DestinationFiles="@(SptData->'$(ProjectDir)../Build/SPT_Data/%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 </Project>

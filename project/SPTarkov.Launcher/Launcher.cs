@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using Photino.Blazor;
-using Photino.NET;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Forge;
@@ -15,6 +14,7 @@ using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
 using SPTarkov.Core.SevenZip;
 using SPTarkov.Launcher.Helpers;
+using SPTarkov.Launcher.Platform;
 
 namespace SPTarkov.Launcher;
 
@@ -30,10 +30,25 @@ public class Launcher
     private static string _openExternalString = "open-external:";
     private static string _appTitle = TitleHelper.AppName;
     private static ILogger<Launcher> _logger = null!;
+    private static TrayHelper _trayHelper = null!;
+    private static bool _exitRequested;
+    private static string? _trayIconPath;
+    private static SingleInstanceGuard _singleInstanceGuard = null!;
+
+    // Photino re-asserts the window while cancelling a close so wait before hiding to tray.
+    private const int HideToTrayDelayMs = 100;
 
     [STAThread]
     private static void Main(string[] args)
     {
+        // Single-instance guard scoped to install location.
+        _singleInstanceGuard = new SingleInstanceGuard();
+        if (!_singleInstanceGuard.TryClaimPrimary())
+        {
+            _singleInstanceGuard.Dispose();
+            return;
+        }
+
         EmbedProvider = new ManifestEmbeddedFileProvider(typeof(Launcher).Assembly, "wwwroot");
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(EmbedProvider, args);
         SevenZip? sevenZip;
@@ -60,6 +75,7 @@ public class Launcher
             .AddSingleton<ModHelper>()
             .AddSingleton<StateHelper>()
             .AddSingleton<TitleHelper>()
+            .AddSingleton<TrayHelper>()
             .AddSingleton<SessionHelper>()
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
@@ -89,12 +105,16 @@ public class Launcher
         sevenZip.Logger = App.Services.GetRequiredService<ILogger<SevenZip>>();
         _logger = App.Services.GetRequiredService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetRequiredService<ConfigHelper>();
+        _trayHelper = App.Services.GetRequiredService<TrayHelper>();
 
         // TODO: Testing server load. Should be removed before release.
         var httpHelper = App.Services.GetRequiredService<HttpHelper>();
         _ = httpHelper.ForgePing();
 
         CustomizeComponent();
+
+        // Listen for a second launch asking us to surface it.
+        _singleInstanceGuard.StartActivationListener(SurfaceMainWindow, _logger);
 
         AppDomain.CurrentDomain.UnhandledException += (_, error) =>
         {
@@ -110,6 +130,13 @@ public class Launcher
             ValidateRuntimeEnvironment(e);
             throw;
         }
+        finally
+        {
+            // Runs on the main thread once the message loop exits.
+            _trayHelper.Dispose();
+            _singleInstanceGuard.Dispose();
+            DeleteTrayIcon();
+        }
     }
 
     private static void CustomizeComponent()
@@ -121,6 +148,9 @@ public class Launcher
             EmbedProvider.GetDirectoryContents("/").FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))?.CreateReadStream()!,
             "spt-logo.ico"
         );
+
+        // Wire "Close To Tray". Launcher owns the window ops, TrayHelper owns the native tray icon.
+        _trayHelper.Configure(ExtractTrayIcon(), onRestore: SurfaceMainWindow, onExit: ExitFromTray);
 
         // Shut photino up
         App.MainWindow.LogVerbosity = 0;
@@ -186,18 +216,104 @@ public class Launcher
 
     private static bool OnExit(object sender, EventArgs e)
     {
-        ConfigHelper.SetClientLocation(App.MainWindow.Top, App.MainWindow.Left);
-        ConfigHelper.SetClientSize(App.MainWindow.Height, App.MainWindow.Width);
-        ConfigHelper.SetFirstRun(false);
+        // When exiting from the tray the window is already hidden, so its size was saved at hide time.
+        if (!_exitRequested)
+        {
+            ConfigHelper.SetClientLocation(App.MainWindow.Top, App.MainWindow.Left);
+            ConfigHelper.SetClientSize(App.MainWindow.Height, App.MainWindow.Width);
+            ConfigHelper.SetFirstRun(false);
+        }
 
-        // See notes in BasicPanelComponent
-        // if (ConfigHelper.GetConfig().CloseToTray)
-        // {
-        //     App.MainWindow.SetMinimized(true);
-        //     return true;
-        // }
+        // Close To Tray. Hide the window instead of exiting.
+        if (!_exitRequested && OperatingSystem.IsWindows() && ConfigHelper.GetConfig().CloseToTray)
+        {
+            HideToTray();
+            return true;
+        }
 
         return false;
+    }
+
+    private static void HideToTray()
+    {
+        _trayHelper.Show();
+
+        // Photino re-shows the window when it cancels the close, so hiding here is immediately undone. Defer the hide onto the UI thread so
+        // it runs after the close has been fully cancelled.
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(HideToTrayDelayMs);
+            App.MainWindow.Invoke(() => WindowNative.ShowWindow(App.MainWindow.WindowHandle, WindowNative.SW_HIDE));
+        });
+    }
+
+    // Brings the window back into focus.
+    private static void SurfaceMainWindow()
+    {
+        _trayHelper.Hide();
+
+        // May run on the tray or single-instance thread.
+        App.MainWindow.Invoke(() =>
+        {
+            var handle = App.MainWindow.WindowHandle;
+            WindowNative.ShowWindow(handle, WindowNative.SW_RESTORE);
+            WindowNative.SetForegroundWindow(handle);
+        });
+    }
+
+    private static void ExitFromTray()
+    {
+        _exitRequested = true;
+        App.MainWindow.Close();
+    }
+
+    private static string ExtractTrayIcon()
+    {
+        // Different installations run concurrently (single-instance is per-install) and share the one user temp dir, so a fixed filename
+        // would let their startup writes race. Keying the name on the process id gives each instance its own file.
+        var tempPath = Path.Join(Path.GetTempPath(), $"spt-logo-{Environment.ProcessId}.ico");
+
+        try
+        {
+            var iconStream = EmbedProvider
+                .GetDirectoryContents("/")
+                .FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))
+                ?.CreateReadStream();
+
+            if (iconStream is not null)
+            {
+                using var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                iconStream.CopyTo(fileStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to extract tray icon: {ex}", ex);
+        }
+
+        _trayIconPath = tempPath;
+        return tempPath;
+    }
+
+    // Removes this instance's tray icon temp file on shutdown. Best-effort.
+    private static void DeleteTrayIcon()
+    {
+        if (_trayIconPath is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (File.Exists(_trayIconPath))
+            {
+                File.Delete(_trayIconPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Failed to remove tray icon temp file: {ex}", ex);
+        }
     }
 
     private static void ValidateRuntimeEnvironment(Exception e)
