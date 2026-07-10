@@ -2,19 +2,7 @@
 
 public record LauncherSettings
 {
-    public LauncherSettings()
-    {
-        Servers.Add(
-            new Server
-            {
-                IpAddress = "127.0.0.1:6969",
-                Name = "Local Server",
-                ServerId = "1721162719",
-                Locked = true,
-            }
-        );
-    }
-
+    // These are user-added servers only. The locked local server comes from Server.Local.
     public List<Server> Servers { get; set; } = [];
 
     public StartLocation StartLocation { get; set; } = new();

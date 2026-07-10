@@ -46,7 +46,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _serverList = ConfigHelper.GetConfig().Servers;
+        _serverList = ConfigHelper.GetServers();
         Launcher.App.MainWindow.SetMinimized(false);
 
         await base.OnInitializedAsync();
@@ -69,7 +69,7 @@
         var preferred = config.PreferredProfile;
 
         // The preferred server must still exist in the saved list.
-        var server = config.Servers.FirstOrDefault(s => s.ServerId == preferred.ServerId);
+        var server = ConfigHelper.GetServers().FirstOrDefault(s => s.ServerId == preferred.ServerId);
         if (server is null)
         {
             ConfigHelper.ClearPreferredProfile();

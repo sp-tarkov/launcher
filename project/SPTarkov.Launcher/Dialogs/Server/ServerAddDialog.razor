@@ -25,7 +25,6 @@
     private void Submit()
     {
         _server.ServerId = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-        _server.Locked = false;
 
         _server.IpAddress = _server.IpAddress.Replace("https://", "");
         _server.IpAddress = _server.IpAddress.Trim();
