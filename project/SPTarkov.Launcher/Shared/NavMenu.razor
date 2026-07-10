@@ -1,39 +1,39 @@
-﻿@implements IDisposable
+@implements IDisposable
 
 @inject LocaleHelper LocaleHelper
 @inject StateHelper StateHelper
 
-<MudNavMenu Class="mud-typography-nowrap">
-    <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="@(LocaleHelper.Get("home"))" Inline="false">
-        <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.ConnectedTv" Match="NavLinkMatch.All" Href="/ServerPageWrapper/false"/>
-    </MudTooltip>
+<MudNavMenu Class="mud-typography-nowrap nav-scroll nav-top">
+    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.ConnectedTv" Href="/ServerPageWrapper/false" Text="@(LocaleHelper.Get("home"))"/>
     @if (StateHelper.AllowServerPage)
     {
-        <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" Text="Server Information Center (SIC)" Inline="false">
-            <MudNavLink Class="sic-icon" Disabled="!StateHelper.AllowServerPage" Match="NavLinkMatch.All" Href="@($"https://{StateHelper.SelectedServer?.IpAddress}/")">
-                <MudImage Src="SICIcon.png" ObjectFit="ObjectFit.Contain" ObjectPosition="ObjectPosition.Center"></MudImage>
-            </MudNavLink>
-        </MudTooltip>
+        @* Group the SIC + mod-page tiles so hovering one can grey out its siblings (see .nav-tiles in app.css). *@
+        <div class="nav-tiles">
+            <NavTile Name="@(LocaleHelper.Get("tray_sic_homepage"))" Url="@SicUrl" Description="@(LocaleHelper.Get("sic_description"))" Disabled="!StateHelper.AllowServerPage" TileClass="sic-tile">
+                SIC
+            </NavTile>
+            @if (StateHelper.ModPages.Count > 0)
+            {
+                <div class="nav-tiles-divider"></div>
+                @foreach (var page in StateHelper.ModPages)
+                {
+                    <ModPageNavItem ModPage="page" ServerAddress="@ServerAddress" Disabled="!StateHelper.AllowServerPage"/>
+                }
+            }
+        </div>
     }
 </MudNavMenu>
 <MudSpacer/>
-<MudNavMenu Class="mud-typography-nowrap">
-    @* <MudTooltip Color="Color.Dark" Arrow="false" Text="@(LocaleHelper.Get("mod_loader"))" Placement="Placement.Right" Inline="false"> *@
-    @*     <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.Reorder" Match="NavLinkMatch.All" Href="/ModLoader"/> *@
-    @* </MudTooltip> *@
-    @* <MudTooltip Color="Color.Dark" Arrow="false" Text="Forge" Placement="Placement.Right" Inline="false"> *@
-    @*     <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.FolderZip" Match="NavLinkMatch.All" Href="/Forge"/> *@
-    @* </MudTooltip> *@
-    <MudTooltip Color="Color.Dark" Arrow="false" Text="@(LocaleHelper.Get("settings"))" Placement="Placement.Right" Inline="false">
-        <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.Settings" Match="NavLinkMatch.All" Href="/Settings"/>
-    </MudTooltip>
-    <MudTooltip Color="Color.Dark" Arrow="false" Text="@(LocaleHelper.Get("info"))" Placement="Placement.Right" Inline="false">
-        <MudNavLink Disabled="!StateHelper.AllowNavigation" IconColor="Color.Default" Icon="@Icons.Material.Filled.Info" Match="NavLinkMatch.All" Href="/Info"/>
-    </MudTooltip>
+<MudNavMenu Class="mud-typography-nowrap nav-bottom">
+    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Settings" Href="/Settings" Text="@(LocaleHelper.Get("settings"))"/>
+    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Info" Href="/Info" Text="@(LocaleHelper.Get("info"))"/>
 </MudNavMenu>
 
 @code
 {
+    private string ServerAddress => StateHelper.SelectedServer?.IpAddress ?? "";
+    private string SicUrl => $"https://{ServerAddress}/";
+
     protected override void OnInitialized()
     {
         StateHelper.OnStateChanged += StateHasChanged;

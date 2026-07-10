@@ -1,0 +1,108 @@
+/* Left-rail navigation. MudBlazor drawer nav links plus the custom tile stack for the SIC and mod-page tiles. */
+
+/* Center each drawer nav item and tighten the side padding so the larger icons have room. */
+.mud-drawer .mud-nav-link {
+    justify-content: center;
+    padding-left: 5px;
+    padding-right: 5px;
+
+    /* Larger Material icons on the icon nav items. */
+    .mud-icon-root {
+        font-size: 1.9rem;
+    }
+}
+
+/* Extra breathing room at the top and bottom of the rail. */
+.nav-top {
+    padding-top: 10px;
+}
+
+.nav-bottom {
+    padding-bottom: 10px;
+}
+
+/* Let the top nav section scroll when a server registers many mod pages. */
+.nav-scroll {
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* A tile is a plain div, not a MudNavLink. Give it similar layout so tiles line up with the icons above and below. */
+.nav-tile-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 5px;
+    margin: 4px 0;
+}
+
+/* Divider between the SIC tile and the mod-page tiles below it. */
+.nav-tiles-divider {
+    height: 1px;
+    margin: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Hovering anywhere in the tile group greys out every tile, then the one actually under the cursor is restored. */
+.nav-tiles {
+    &:hover .nav-tile {
+        filter: grayscale(1);
+        opacity: 0.4;
+    }
+
+    .nav-tile-link:hover .nav-tile {
+        filter: none;
+        opacity: 1;
+    }
+}
+
+/* Square face shared by the SIC tile and every mod-page tile. */
+.nav-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    user-select: none;
+    cursor: pointer;
+    transition: filter 150ms ease, opacity 150ms ease;
+}
+
+/* Native "SIC" text over the brown gradient with tan lettering. */
+.sic-tile {
+    background: linear-gradient(180deg, #513723 0%, #312408 100%);
+    color: #d8c199;
+}
+
+/* Hover tooltip card shared by the SIC and mod-page tiles. */
+.nav-item-tooltip {
+    max-width: 260px;
+    text-align: left;
+
+    .nav-item-tooltip-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #fff;
+    }
+
+    .nav-item-tooltip-url {
+        margin-top: 2px;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+        word-break: break-all;
+    }
+
+    .nav-item-tooltip-desc {
+        margin-top: 6px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.85);
+        white-space: normal;
+    }
+}
