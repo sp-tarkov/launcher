@@ -43,7 +43,7 @@ public class LocaleHelper
                 _listOfLocales.Add(localeDict!);
             }
 
-            SetLocale(_defaultLocale);
+            ApplyLocale(_defaultLocale);
         }
     }
 
@@ -71,10 +71,14 @@ public class LocaleHelper
 
     public void SetLocale(string locale)
     {
+        ApplyLocale(locale);
+        _configHelper.SetLocale(_selectedLocale.GetValueOrDefault("ietf_tag", "en"));
+    }
+
+    private void ApplyLocale(string locale)
+    {
         _selectedLocale =
             _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == locale)
             ?? _listOfLocales.FirstOrDefault(x => x["ietf_tag"] == _defaultLocale)!;
-
-        _configHelper.SetLocale(_selectedLocale.GetValueOrDefault("ietf_tag", "en"));
     }
 }
