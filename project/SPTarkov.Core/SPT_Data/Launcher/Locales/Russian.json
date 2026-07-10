@@ -50,6 +50,7 @@
   "tray_server_pages": "Страницы: {0}",
   "tray_sic_homepage": "Центр информации о сервере",
   "sic_description": "Домашняя страница сервера со ссылками и информацией об этой установке SPT.",
+  "nav_mod_pages": "Моды",
   "tray_exit": "Выход",
   "game_helper_error_1": "SPT установлен в Live",
   "game_helper_error_2": "Несоответствие Core dll",

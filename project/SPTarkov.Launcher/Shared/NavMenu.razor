@@ -15,6 +15,7 @@
         @if (StateHelper.ModPages.Count > 0)
         {
             <div class="nav-tiles-divider"></div>
+            <div class="nav-tiles-label">@(LocaleHelper.Get("nav_mod_pages"))</div>
             @foreach (var page in StateHelper.ModPages)
             {
                 <ModPageNavItem ModPage="page" ServerAddress="@ServerAddress" Disabled="!StateHelper.AllowServerPage"/>

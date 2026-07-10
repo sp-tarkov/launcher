@@ -50,6 +50,7 @@
   "tray_server_pages": "Pagine di {0}",
   "tray_sic_homepage": "Centro informazioni server",
   "sic_description": "La home page del server, con collegamenti e informazioni su questa installazione di SPT.",
+  "nav_mod_pages": "Mod",
   "tray_exit": "Esci",
   "game_helper_error_1": "SPT è installato in Live",
   "game_helper_error_2": "Dll core non corrispondente",

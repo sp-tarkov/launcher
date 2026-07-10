@@ -50,6 +50,7 @@
   "tray_server_pages": "Pages de {0}",
   "tray_sic_homepage": "Centre d'information du serveur",
   "sic_description": "La page d'accueil du serveur, avec des liens et des informations sur cette installation SPT.",
+  "nav_mod_pages": "Mods",
   "tray_exit": "Quitter",
   "game_helper_error_1": "SPT est installé dans Live",
   "game_helper_error_2": "Incompatibilité de la dll principale",

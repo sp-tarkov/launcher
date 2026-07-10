@@ -46,6 +46,7 @@
   "tray_server_pages": "{0}'s Pages",
   "tray_sic_homepage": "Server Information Center",
   "sic_description": "The server's home page, with links and information about this SPT installation.",
+  "nav_mod_pages": "Mods",
   "tray_exit": "Exit",
   "auto_connect_connecting": "Connecting to your last profile...",
   "auto_connect_failed": "Could not auto-connect to your last server.",

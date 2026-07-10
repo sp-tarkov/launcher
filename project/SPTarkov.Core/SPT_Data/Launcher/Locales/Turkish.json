@@ -50,6 +50,7 @@
   "tray_server_pages": "{0} Sayfaları",
   "tray_sic_homepage": "Sunucu Bilgi Merkezi",
   "sic_description": "Bu SPT kurulumuyla ilgili bağlantılar ve bilgiler içeren sunucunun ana sayfası.",
+  "nav_mod_pages": "Mod",
   "tray_exit": "Çıkış",
   "game_helper_error_1": "SPT canlı sürümde yüklü",
   "game_helper_error_2": "Core dll uyumsuzluğu",

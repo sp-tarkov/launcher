@@ -50,6 +50,7 @@
   "tray_server_pages": "{0}의 페이지",
   "tray_sic_homepage": "서버 정보 센터",
   "sic_description": "이 SPT 설치에 대한 링크와 정보를 제공하는 서버 홈페이지입니다.",
+  "nav_mod_pages": "모드",
   "tray_exit": "종료",
   "game_helper_error_1": "SPT가 라이브에 설치됨",
   "game_helper_error_2": "Core dll 불일치",

@@ -76,15 +76,40 @@
     margin: 2px 0;
 }
 
-/* Divider between the SIC tile and the mod-page tiles below it. */
+/* Divider between the SIC tile and the mod-page tiles below it. Spans the flat part of a tile's edge. */
 .nav-tiles-divider {
+    width: var(--nav-tile-flat-width);
     height: 1px;
-    margin: 6px 12px;
+    margin: 6px auto;
     background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Hovering anywhere in the tile group greys out every tile, then the one actually under the cursor is restored. */
+/* Heading over the mod-page tiles. Matches the divider's width and clips rather than widening the rail. */
+.nav-tiles-label {
+    width: var(--nav-tile-flat-width);
+    margin: 0 auto 3px;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 700;
+    font-size: 0.6rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+}
+
 .nav-tiles {
+    --nav-tile-size: 40px;
+    --nav-tile-radius: 4px;
+
+    /* The tile edge between its two rounded corners. The divider and heading are sized to this rather than to the rail, whose usable width
+    is the drawer's 56px mini width less its 2px right border. */
+    --nav-tile-flat-width: calc(var(--nav-tile-size) - 2 * var(--nav-tile-radius));
+
+    /* Hovering anywhere in the tile group greys out every tile, then the one actually under the cursor is restored. */
     &:hover .nav-tile {
         filter: grayscale(1);
         opacity: 0.4;
@@ -101,9 +126,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 4px;
+    width: var(--nav-tile-size);
+    height: var(--nav-tile-size);
+    border-radius: var(--nav-tile-radius);
     color: #fff;
     font-weight: 700;
     font-size: 0.85rem;

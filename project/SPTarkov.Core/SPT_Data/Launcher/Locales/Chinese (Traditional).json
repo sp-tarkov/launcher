@@ -50,6 +50,7 @@
   "tray_server_pages": "{0} 的頁面",
   "tray_sic_homepage": "伺服器資訊中心",
   "sic_description": "伺服器首頁，包含此 SPT 安裝的相關連結與資訊。",
+  "nav_mod_pages": "模組",
   "tray_exit": "結束",
   "game_helper_error_1": "SPT 被安裝在線上客戶端中",
   "game_helper_error_2": "核心 dll 不匹配",
