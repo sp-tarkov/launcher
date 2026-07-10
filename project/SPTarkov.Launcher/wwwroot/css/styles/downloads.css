@@ -1,0 +1,20 @@
+/* Floating mod-download panel and its progress readout. */
+.download-box {
+    position: absolute !important;
+    background-color: rgba(25, 25, 31, 0.7) !important;
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    border-radius: 4px;
+    z-index: 100 !important;
+    top: 50% !important;
+    left: 80px !important;
+    height: 90% !important;
+    width: 300px !important;
+    transform: translateY(-50%) !important;
+}
+
+p.progress-bar {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    border-radius: 4px;
+    padding: 0 1rem;
+}

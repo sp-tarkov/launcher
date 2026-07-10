@@ -145,7 +145,10 @@ public class Launcher
 
         // Use extension method to get icon from embedded resource
         App.MainWindow.SetIconFile(
-            EmbedProvider.GetDirectoryContents("/").FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))?.CreateReadStream()!,
+            EmbedProvider
+                .GetDirectoryContents("images")
+                .FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))
+                ?.CreateReadStream()!,
             "spt-logo.ico"
         );
 
@@ -276,7 +279,7 @@ public class Launcher
         try
         {
             var iconStream = EmbedProvider
-                .GetDirectoryContents("/")
+                .GetDirectoryContents("images")
                 .FirstOrDefault(x => x.Name.ToLower().Contains("spt-logo.ico"))
                 ?.CreateReadStream();
 

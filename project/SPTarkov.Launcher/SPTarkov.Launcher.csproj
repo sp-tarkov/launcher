@@ -11,7 +11,7 @@
     <LangVersion>latestmajor</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <OutputType>WinExe</OutputType>
-    <ApplicationIcon>wwwroot/spt-logo.ico</ApplicationIcon>
+    <ApplicationIcon>wwwroot/images/spt-logo.ico</ApplicationIcon>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <AssemblyName>SPT.Launcher</AssemblyName>
@@ -24,16 +24,14 @@
     <AssemblyName>SPT.Launcher.Linux</AssemblyName>
   </PropertyGroup>
 
-  <!-- Moves the MudBlazor.min.js and css to the wwwroot folder in SPTarkov.Launcher project -->
+  <!-- Copies MudBlazor's static assets from the NuGet package: the stylesheet to wwwroot/css/ and the script to wwwroot/js/ -->
   <!-- If once built, you find the launcher looks broken, its probably because these didnt exist first -->
   <Target Name="CopyMudBlazor" BeforeTargets="PrepareForBuild">
-    <ItemGroup>
-      <MudBlazorAssets Include="$(NuGetPackageRoot)mudblazor/8.15.0/staticwebassets/MudBlazor.min.*" />
-    </ItemGroup>
     <Copy
-      SourceFiles="@(MudBlazorAssets)"
-      DestinationFiles="@(MudBlazorAssets->'$(ProjectDir)wwwroot/%(RecursiveDir)%(Filename)%(Extension)')"
+      SourceFiles="$(NuGetPackageRoot)mudblazor/8.15.0/staticwebassets/MudBlazor.min.css"
+      DestinationFolder="$(ProjectDir)wwwroot/css"
     />
+    <Copy SourceFiles="$(NuGetPackageRoot)mudblazor/8.15.0/staticwebassets/MudBlazor.min.js" DestinationFolder="$(ProjectDir)wwwroot/js" />
   </Target>
 
   <ItemGroup>

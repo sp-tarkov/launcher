@@ -1,0 +1,77 @@
+/* Frosted-glass surfaces: dark translucent fill and blur, shared across Mud's surface components. */
+.mud-paper,
+.mud-button,
+.mud-dialog,
+.mud-drawer,
+.mud-tabs,
+.mud-popover {
+    background-color: rgba(25, 25, 31, 0.7) !important;
+    backdrop-filter: blur(20px);
+}
+
+/* Tab bars are transparent so the frosted .mud-tabs surface shows through. */
+.mud-tabs-tabbar,
+.mud-tabs-tabbar-content {
+    background-color: rgba(25, 25, 31, 0) !important;
+}
+
+.mud-tooltip {
+    background-color: rgba(25, 25, 31, 0.7) !important;
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.118) !important;
+    border-width: 2px;
+    border-style: solid;
+}
+
+.mud-expansion-panels {
+    background-color: rgba(39, 39, 47, 0) !important;
+}
+
+.mud-expand-panel {
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
+}
+
+.mud-scroll-to-top .mud-fab {
+    background-color: rgba(39, 39, 47, 0.5) !important;
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.118) !important;
+    border-width: 2px;
+    border-style: solid;
+}
+
+.mud-pagination-item {
+    background-color: rgba(25, 25, 31, 0.7) !important;
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.118) !important;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 5px;
+
+    &.mud-pagination-item-selected {
+        border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    &:hover {
+        transition: border-color 0.2s ease-in-out;
+        border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+}
+
+/* Strip Mud's default dialog inset so each dialog controls its own padding. */
+.mud-dialog-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Text sits a touch high in MudButton labels; nudge the label down and the start/end icons up so they align. */
+.mud-button-label {
+    position: relative;
+    top: 1px;
+}
+
+.mud-button-icon-start,
+.mud-button-icon-end {
+    position: relative;
+    top: -1px;
+}

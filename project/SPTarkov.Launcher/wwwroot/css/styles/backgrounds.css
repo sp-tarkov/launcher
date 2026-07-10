@@ -1,0 +1,57 @@
+/* Decorative page artwork (rendered as faint <img> elements bled into a corner) plus the shared overlay/backdrop helpers. */
+.background-image-bear {
+    position: absolute;
+    width: 370px;
+    opacity: 2%;
+    top: -80px;
+    left: -60px;
+    rotate: -25deg;
+}
+
+.background-image-server {
+    position: absolute;
+    width: 370px;
+    opacity: 2%;
+    top: -50px;
+    left: -60px;
+    rotate: -25deg;
+}
+
+.background-image-usec {
+    position: absolute;
+    width: 330px;
+    opacity: 2%;
+    top: -10px;
+    left: -18px;
+    rotate: -25deg;
+}
+
+.background-image-settings {
+    position: absolute;
+    width: 512px;
+    opacity: 2%;
+    top: -10px;
+    left: -40px;
+    rotate: 165deg;
+}
+
+img.background-image-cover {
+    object-fit: cover !important;
+}
+
+div.background-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+div.overlay-container {
+    height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+}
+
+/* Blur behind MudBlazor dialogs (applied via DialogOptions BackdropClass). */
+.dialog-backdrop-class {
+    backdrop-filter: blur(10px);
+}
