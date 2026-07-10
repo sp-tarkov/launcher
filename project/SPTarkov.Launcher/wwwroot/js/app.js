@@ -3,6 +3,7 @@
 const scriptsToLoad = [
     '/js/scripts/externalLinks.js',
     '/js/scripts/navigateBack.js',
+    '/js/scripts/navFade.js',
     '/js/scripts/userTabset.js',
 ];
 scriptsToLoad.forEach(function (path) {

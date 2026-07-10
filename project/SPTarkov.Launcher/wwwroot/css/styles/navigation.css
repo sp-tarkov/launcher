@@ -12,19 +12,54 @@
     }
 }
 
-/* Extra breathing room at the top and bottom of the rail. */
+/* The rail is a flex column. Home pinned on top, the tile stack scrolls in the middle, Settings and Info pinned at the bottom. */
 .nav-top {
+    flex: 0 0 auto;
     padding-top: 10px;
 }
 
 .nav-bottom {
+    flex: 0 0 auto;
     padding-bottom: 10px;
 }
 
-/* Let the top nav section scroll when a server registers many mod pages. */
+/* Middle scroll region. Absorbs the leftover height and scrolls its tiles internally. */
 .nav-scroll {
+    flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    scrollbar-width: none;
+
+    /* Fade the top and/or edges when there's more to scroll in that direction. The navFade.js script toggles the two states. */
+    --nav-fade-top: 0px;
+    --nav-fade-bottom: 0px;
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--nav-fade-top),
+        #000 calc(100% - var(--nav-fade-bottom)),
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 var(--nav-fade-top),
+        #000 calc(100% - var(--nav-fade-bottom)),
+        transparent 100%
+    );
+}
+
+.nav-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.nav-scroll.is-scrollable-up {
+    --nav-fade-top: 20px;
+}
+
+.nav-scroll.is-scrollable-down {
+    --nav-fade-bottom: 20px;
 }
 
 /* A tile is a plain div, not a MudNavLink. Give it similar layout so tiles line up with the icons above and below. */
@@ -34,6 +69,11 @@
     justify-content: center;
     padding: 3px 5px;
     margin: 4px 0;
+}
+
+/* Mod-page tiles are packed tighter than the SIC tile. */
+.nav-tile-link:has(.mod-page-badge) {
+    margin: 2px 0;
 }
 
 /* Divider between the SIC tile and the mod-page tiles below it. */
@@ -73,6 +113,11 @@
     user-select: none;
     cursor: pointer;
     transition: filter 150ms ease, opacity 150ms ease;
+}
+
+/* Mod-page tiles are shorter than the shared tile height, keeping the column narrow-and-short so more pages fit. */
+.nav-tile.mod-page-badge {
+    height: 32px;
 }
 
 /* Native "SIC" text over the brown gradient with tan lettering. */
