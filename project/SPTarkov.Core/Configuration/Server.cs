@@ -2,7 +2,7 @@
 
 public record Server
 {
-    public string Name { get; set; } = "LocalHost";
+    public string Name { get; set; } = "Local Server";
 
     public string IpAddress { get; set; } = "127.0.0.1:6969";
 
