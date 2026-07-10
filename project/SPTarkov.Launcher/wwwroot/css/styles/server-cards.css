@@ -1,0 +1,111 @@
+/* Server cards lift on hover so the whole clickable card reads as a button. */
+.server-card {
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Hovering the card brings its muted edit/delete actions up to full opacity. */
+    &:hover .server-card-actions {
+        opacity: 1;
+    }
+}
+
+/* The server the launcher is currently connected to gets a cyan accent so it stands apart from the rest at a glance. */
+.server-card-connected {
+    border-color: rgba(38, 198, 218, 0.7) !important;
+    box-shadow: 0 0 0 1px rgba(38, 198, 218, 0.25), 0 0 18px rgba(38, 198, 218, 0.15);
+
+    &:hover {
+        border-color: rgba(38, 198, 218, 0.9) !important;
+    }
+}
+
+/* Muted lock glyph so it informs without competing with the hash-coloured server icon beside it. */
+.server-card-lock {
+    color: rgba(255, 255, 255, 0.4) !important;
+    display: block;
+}
+
+/* The edit and delete buttons sit beside the server icon. They stay muted like the lock at rest and "pop" when the card is hovered. */
+.server-card-actions {
+    opacity: 0.4;
+    transition: opacity 0.2s ease-in-out;
+
+    .mud-icon-button {
+        display: flex;
+        padding: 2px;
+    }
+}
+
+.server-card-action-delete:hover {
+    color: #ef5350 !important;
+}
+
+/* IP:port is "machine-like" data so render it monospaced. */
+.server-address {
+    font-family: 'Cascadia Code', 'Consolas', 'Roboto Mono', monospace;
+    letter-spacing: 0.02em;
+}
+
+/* Service status indicator. A coloured dot and label in the card header. */
+.server-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    .server-status-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex: 0 0 auto;
+        background-color: #9e9e9e;
+    }
+
+    .server-status-label {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    &.server-status--online {
+        .server-status-dot {
+            background-color: #66bb6a;
+            box-shadow: 0 0 6px rgba(102, 187, 106, 0.8);
+        }
+
+        .server-status-label {
+            color: #66bb6a;
+        }
+    }
+
+    &.server-status--offline .server-status-dot {
+        background-color: #ef5350;
+    }
+
+    &.server-status--connected {
+        .server-status-dot {
+            background-color: #26c6da;
+            box-shadow: 0 0 6px rgba(38, 198, 218, 0.8);
+        }
+
+        .server-status-label {
+            color: #26c6da;
+        }
+    }
+
+    &.server-status--checking .server-status-dot {
+        background-color: #bdbdbd;
+        animation: server-status-pulse 1.2s ease-in-out infinite;
+    }
+}
+
+@keyframes server-status-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+}

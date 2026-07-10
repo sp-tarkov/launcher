@@ -8,7 +8,7 @@ public record LauncherSettings
             new Server
             {
                 IpAddress = "127.0.0.1:6969",
-                Name = "LocalHost",
+                Name = "Local Server",
                 ServerId = "1721162719",
                 Locked = true,
             }
@@ -38,7 +38,7 @@ public record LauncherSettings
 
     public bool AutoConnectLastProfile { get; set; }
 
-    /// The last server/profile the user launched with
+    // The last server/profile the user launched with
     public PreferredProfile? PreferredProfile { get; set; }
 
     public List<string> ExcludeFromCleanup { get; set; } = new();
@@ -47,7 +47,7 @@ public record LauncherSettings
 
     public LinuxSettings LinuxSettings { get; set; } = new();
 
-    /// String is the mods GUID
+    // String is the mods GUID
     public Dictionary<string, ConfigMod> Mods { get; set; } = new();
 
     public bool DebugLogging { get; set; }

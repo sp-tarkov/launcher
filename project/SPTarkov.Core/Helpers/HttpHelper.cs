@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Forge;
 using SPTarkov.Core.Forge.Responses;
 using SPTarkov.Core.SPT;
+using SPTarkov.Core.SPT.Responses;
 
 namespace SPTarkov.Core.Helpers;
 
@@ -60,6 +61,29 @@ public class HttpHelper
         var task = await _httpClient.GetAsync(BuildGameUrl(url), token);
         var json = SimpleZlib.Decompress(await task.Content.ReadAsByteArrayAsync(token));
         return JsonSerializer.Deserialize<T>(json);
+    }
+
+    // Pings a specific server address, independent of the currently-selected server, so a card can show live reachability
+    // for a server it is not connected to. Any failure (unreachable, bad response, cancellation) reads as offline.
+    public async Task<bool> PingServerAsync(string ipAddress, CancellationToken token)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("https://" + ipAddress + Urls.Ping, token);
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            var json = SimpleZlib.Decompress(await response.Content.ReadAsByteArrayAsync(token));
+            var ping = JsonSerializer.Deserialize<SPTPingResponse>(json);
+            return ping?.Response == "Pong!";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "PingServerAsync failed for {IpAddress}", ipAddress);
+            return false;
+        }
     }
 
     public async Task<T?> GameServerPut<T>(string url, object request, CancellationToken token)
