@@ -5,6 +5,8 @@
 @inject ConfigHelper ConfigHelper
 @inject NavigationManager NavigationManager
 @inject TitleHelper TitleHelper
+@inject BrowserBridge BrowserBridge
+@inject IJSRuntime JS
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudPopoverProvider/>
@@ -33,6 +35,7 @@
 </MudLayout>
 
 @code {
+    private DotNetObjectReference<BrowserBridge>? _bridgeRef;
 
     protected override void OnInitialized()
     {
@@ -42,6 +45,16 @@
         RefreshTitle();
 
         base.OnInitialized();
+    }
+
+    // Hand app.js a reference to the .NET BrowserBridge so intercepted external anchor clicks can open in the system browser.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _bridgeRef = DotNetObjectReference.Create(BrowserBridge);
+            await JS.InvokeVoidAsync("registerBrowserBridge", _bridgeRef);
+        }
     }
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -64,5 +77,6 @@
     {
         StateHelper.OnStateChanged -= HandleStateChanged;
         NavigationManager.LocationChanged -= HandleLocationChanged;
+        _bridgeRef?.Dispose();
     }
 }

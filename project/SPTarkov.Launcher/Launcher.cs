@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -27,7 +26,6 @@ public class Launcher
     private static int _visibleStateDuration = 2000;
     private static int _showTransitionDuration = 100;
     private static int _hideTransitionDuration = 100;
-    private static string _openExternalString = "open-external:";
     private static string _appTitle = TitleHelper.AppName;
     private static ILogger<Launcher> _logger = null!;
     private static TrayHelper _trayHelper = null!;
@@ -82,6 +80,7 @@ public class Launcher
             .AddSingleton<WindowsClipboard>()
             .AddSingleton<WineHelper>()
             .AddSingleton<ValidationUtil>()
+            .AddSingleton<BrowserBridge>()
             .AddSingleton(sevenZip)
             .AddLogging(builder =>
             {
@@ -195,26 +194,6 @@ public class Launcher
 
         App.MainWindow.RegisterWindowClosingHandler(OnExit);
         App.MainWindow.SetMinimized(true);
-
-        App.MainWindow.RegisterWebMessageReceivedHandler(
-            (_, message) =>
-            {
-                if (!message.StartsWith(_openExternalString))
-                {
-                    return;
-                }
-
-                var url = message.Substring(_openExternalString.Length);
-                try
-                {
-                    Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Failed to open URL: {ex}", ex);
-                }
-            }
-        );
     }
 
     private static bool OnExit(object sender, EventArgs e)
