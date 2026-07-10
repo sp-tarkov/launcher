@@ -90,8 +90,10 @@ public class Launcher
             })
             .AddMudServices(config =>
             {
-                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopCenter;
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
                 config.SnackbarConfiguration.PreventDuplicates = false;
+                config.SnackbarConfiguration.MaxDisplayedSnackbars = 3;
+                config.SnackbarConfiguration.NewestOnTop = true;
                 config.SnackbarConfiguration.VisibleStateDuration = _visibleStateDuration;
                 config.SnackbarConfiguration.ShowTransitionDuration = _showTransitionDuration;
                 config.SnackbarConfiguration.HideTransitionDuration = _hideTransitionDuration;
