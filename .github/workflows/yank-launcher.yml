@@ -1,0 +1,78 @@
+name: Yank Launcher Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Launcher version to yank (e.g. 4.1.0.3)'
+        required: true
+
+permissions:
+  contents: read
+
+# Serializes every run that rewrites the shared channel manifests in R2.
+concurrency:
+  group: launcher-manifests
+  cancel-in-progress: false
+
+jobs:
+  yank:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0
+
+      - name: Install rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      - name: Fetch current manifests
+        env:
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          RCLONE_CONFIG_R2_REGION: auto
+        run: |
+          set -uo pipefail
+          mkdir -p manifests-in manifests-out
+          BUCKET="${{ secrets.R2_BUCKET_NAME }}"
+
+          present=$(rclone lsf "R2:${BUCKET}/" --s3-no-check-bucket) || { echo "::error::cannot list R2 bucket"; exit 1; }
+
+          for name in stable.json edge.json; do
+            if grep -qx "$name" <<< "$present"; then
+              rclone copy "R2:${BUCKET}/${name}" manifests-in/ --s3-no-check-bucket || { echo "::error::failed to fetch existing ${name}"; exit 1; }
+            fi
+          done
+
+      - name: Write signing key
+        env:
+          SIGNING_KEY: ${{ secrets.LAUNCHER_MANIFEST_PRIVATE_KEY }}
+        run: printf '%s' "$SIGNING_KEY" > signing-key.pem
+
+      - name: Yank and re-sign manifests
+        env:
+          YANK_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          dotnet run --project tools/LauncherManifest -c Release -- \
+            --yank "$YANK_VERSION" \
+            --in-dir manifests-in --out-dir manifests-out --private-key-file signing-key.pem
+
+      - name: Upload manifests to R2
+        env:
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          RCLONE_CONFIG_R2_REGION: auto
+        run: |
+          rclone copy manifests-out "R2:${{ secrets.R2_BUCKET_NAME }}" \
+            --header-upload "Cache-Control: public, max-age=60" --s3-no-check-bucket

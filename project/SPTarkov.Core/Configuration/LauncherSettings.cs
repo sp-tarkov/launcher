@@ -1,4 +1,7 @@
-﻿namespace SPTarkov.Core.Configuration;
+﻿using System.Text.Json.Serialization;
+using SPTarkov.Core.Update;
+
+namespace SPTarkov.Core.Configuration;
 
 public record LauncherSettings
 {
@@ -39,4 +42,12 @@ public record LauncherSettings
     public Dictionary<string, ConfigMod> Mods { get; set; } = new();
 
     public bool DebugLogging { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter<UpdateChannel>))]
+    public UpdateChannel UpdateChannel { get; set; } = UpdateChannel.Stable;
+
+    public bool CheckForUpdatesOnStartup { get; set; } = true;
+
+    // Newest manifest generatedUtc seen per update channel, keyed by channel name.
+    public Dictionary<string, DateTimeOffset> LastSeenManifests { get; set; } = new();
 }

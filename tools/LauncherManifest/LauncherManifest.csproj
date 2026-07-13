@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SPTarkov.Tools.LauncherManifest</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!-- Compiles the launcher's manifest schema and signing code into this tool. -->
+  <ItemGroup>
+    <Compile Include="../../project/SPTarkov.Core/Update/UpdateManifest.cs" Link="Contracts/UpdateManifest.cs" />
+    <Compile Include="../../project/SPTarkov.Core/Update/ReleaseEntry.cs" Link="Contracts/ReleaseEntry.cs" />
+    <Compile Include="../../project/SPTarkov.Core/Update/ReleaseAsset.cs" Link="Contracts/ReleaseAsset.cs" />
+    <Compile Include="../../project/SPTarkov.Core/Update/ManifestSignature.cs" Link="Contracts/ManifestSignature.cs" />
+    <Compile Include="../../project/SPTarkov.Core/Update/UpdatePayload.cs" Link="Contracts/UpdatePayload.cs" />
+  </ItemGroup>
+</Project>

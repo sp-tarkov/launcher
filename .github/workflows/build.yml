@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+    branches-ignore:
+      - master
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0
+
+      - name: Build launcher
+        run: dotnet build project/SPTarkov.Launcher.slnx -c Release
+
+      # The tool compiles SPTarkov.Core source files on its own and is otherwise only built by a release tag.
+      - name: Build manifest tool
+        run: dotnet build tools/LauncherManifest -c Release

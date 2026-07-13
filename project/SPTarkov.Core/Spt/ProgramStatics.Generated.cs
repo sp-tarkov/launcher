@@ -10,4 +10,6 @@ public static partial class ProgramStatics
 {
     private static Version SptVersion { get; } = new("4.1.0");
     private static string SptCommitTag { get; } = "abc123a";
+    private static System.Version LauncherVersionValue { get; } = new("4.1.0.0");
+    private static string LauncherBuildDateRaw { get; } = "0001-01-01T00:00:00Z";
 }

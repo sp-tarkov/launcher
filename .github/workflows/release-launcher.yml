@@ -1,0 +1,209 @@
+name: Release Launcher
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+.[0-9]+-EDGE'
+
+permissions:
+  contents: write
+
+# Serializes every run that rewrites the shared channel manifests in R2.
+concurrency:
+  group: launcher-manifests
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0
+
+      - name: Parse tag
+        id: meta
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" == *-EDGE ]]; then CHANNEL=edge; VERSION="${TAG%-EDGE}"; else CHANNEL=stable; VERSION="$TAG"; fi
+          IFS='.' read -r MAJ MIN PAT REV <<< "$VERSION"
+          if [[ -z "${REV:-}" || ! "$REV" =~ ^[0-9]+$ || "$REV" -lt 1 ]]; then
+            echo "::error::tag $TAG must carry a launcher revision of 1 or greater"; exit 1
+          fi
+          SPT_VERSION="$MAJ.$MIN.$PAT"
+          PROPS_SPT=$(grep -oP '<SptVersion[^>]*>\K[^<]+' project/Build.props)
+          if [[ "$PROPS_SPT" != "$SPT_VERSION" ]]; then
+            echo "::error::tag SPT line $SPT_VERSION does not match Build.props SptVersion $PROPS_SPT"; exit 1
+          fi
+          {
+            echo "tag=$TAG"
+            echo "channel=$CHANNEL"
+            echo "version=$VERSION"
+            echo "spt_version=$SPT_VERSION"
+            echo "revision=$REV"
+            echo "short_sha=$(git rev-parse --short HEAD)"
+            echo "build_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "asset=SPT.Launcher-$VERSION.zip"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish win-x64
+        working-directory: project
+        run: |
+          dotnet publish ./SPTarkov.Launcher/SPTarkov.Launcher.csproj -c Release --self-contained false \
+            --framework net10.0 --runtime win-x64 -p:PublishSingleFile=true \
+            -p:SptVersion=${{ steps.meta.outputs.spt_version }} \
+            -p:LauncherRevision=${{ steps.meta.outputs.revision }} \
+            -p:SptCommitTag=${{ steps.meta.outputs.short_sha }} \
+            -p:LauncherBuildDate=${{ steps.meta.outputs.build_date }}
+          cp Build/SPT.Launcher.exe "$RUNNER_TEMP/SPT.Launcher.exe"
+
+      - name: Publish linux-x64 and assemble payload
+        working-directory: project
+        run: |
+          dotnet publish ./SPTarkov.Launcher/SPTarkov.Launcher.csproj -c Release --self-contained false \
+            --framework net10.0 --runtime linux-x64 -p:PublishSingleFile=true \
+            -p:SptVersion=${{ steps.meta.outputs.spt_version }} \
+            -p:LauncherRevision=${{ steps.meta.outputs.revision }} \
+            -p:SptCommitTag=${{ steps.meta.outputs.short_sha }} \
+            -p:LauncherBuildDate=${{ steps.meta.outputs.build_date }}
+          cp "$RUNNER_TEMP/SPT.Launcher.exe" Build/SPT.Launcher.exe
+          ( cd Build && zip -qr "$GITHUB_WORKSPACE/${{ steps.meta.outputs.asset }}" . )
+
+      # A re-run against a published release swaps in the release's existing immutable asset.
+      - name: Resolve release asset
+        id: release_state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          STATE=absent
+          if DRAFT=$(gh release view "${{ steps.meta.outputs.tag }}" --json isDraft --jq .isDraft 2>/dev/null); then
+            if [[ "$DRAFT" == "true" ]]; then STATE=draft; else STATE=published; fi
+          fi
+
+          if [[ "$STATE" == "published" ]]; then
+            echo "release already published; using its immutable asset"
+            rm -f "${{ steps.meta.outputs.asset }}"
+            gh release download "${{ steps.meta.outputs.tag }}" --pattern "${{ steps.meta.outputs.asset }}" --output "${{ steps.meta.outputs.asset }}"
+          fi
+
+          echo "state=$STATE" >> "$GITHUB_OUTPUT"
+
+      - name: Check payload against the launcher's entry rules
+        run: |
+          set -euo pipefail
+          dotnet run --project tools/LauncherManifest -c Release -- --check-payload "${{ steps.meta.outputs.asset }}"
+
+      - name: Hash payload and delta
+        id: hash
+        run: |
+          set -euo pipefail
+          DELTA="project/SPTarkov.Core/SPT_Data/Launcher/Patches/SPT-core/EscapeFromTarkov_Data/Managed/Assembly-CSharp.dll.delta"
+          {
+            echo "asset_sha=$(sha256sum "${{ steps.meta.outputs.asset }}" | cut -d' ' -f1)"
+            echo "asset_size=$(stat -c%s "${{ steps.meta.outputs.asset }}")"
+            echo "delta_sha=$(sha256sum "$DELTA" | cut -d' ' -f1)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Install rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      - name: Fetch current manifests
+        env:
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          RCLONE_CONFIG_R2_REGION: auto
+        run: |
+          set -uo pipefail
+          mkdir -p manifests-in manifests-out
+          BUCKET="${{ secrets.R2_BUCKET_NAME }}"
+
+          present=$(rclone lsf "R2:${BUCKET}/" --s3-no-check-bucket) || { echo "::error::cannot list R2 bucket; refusing to rebuild manifests from an empty state"; exit 1; }
+
+          for name in stable.json edge.json; do
+            if grep -qx "$name" <<< "$present"; then
+              rclone copy "R2:${BUCKET}/${name}" manifests-in/ --s3-no-check-bucket || { echo "::error::failed to fetch existing ${name}"; exit 1; }
+            fi
+          done
+
+      - name: Generate release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          PREV_TAG=""
+          MANIFEST="manifests-in/${{ steps.meta.outputs.channel }}.json"
+          [[ -f "$MANIFEST" ]] || MANIFEST="manifests-in/edge.json"
+          if [[ -f "$MANIFEST" ]]; then
+            PREV_TAG=$(jq -r '.releases[0].tag // empty' "$MANIFEST")
+          fi
+          if [[ -n "$PREV_TAG" ]]; then
+            gh api "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+              -f tag_name="${{ steps.meta.outputs.tag }}" \
+              -f previous_tag_name="$PREV_TAG" --jq .body > notes.md || true
+          fi
+          [[ -s notes.md ]] || echo "Launcher ${{ steps.meta.outputs.version }}" > notes.md
+
+      - name: Write signing key
+        env:
+          SIGNING_KEY: ${{ secrets.LAUNCHER_MANIFEST_PRIVATE_KEY }}
+        run: printf '%s' "$SIGNING_KEY" > signing-key.pem
+
+      - name: Build and sign manifest
+        run: |
+          set -euo pipefail
+          DOWNLOAD="https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ steps.meta.outputs.tag }}"
+          RELEASE="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${{ steps.meta.outputs.tag }}"
+          dotnet run --project tools/LauncherManifest -c Release -- \
+            --channel "${{ steps.meta.outputs.channel }}" \
+            --launcher-version "${{ steps.meta.outputs.version }}" \
+            --spt-version "${{ steps.meta.outputs.spt_version }}" \
+            --tag "${{ steps.meta.outputs.tag }}" \
+            --commit "${{ steps.meta.outputs.short_sha }}" \
+            --published-utc "${{ steps.meta.outputs.build_date }}" \
+            --delta-sha256 "${{ steps.hash.outputs.delta_sha }}" \
+            --notes-file notes.md \
+            --notes-url "$RELEASE" \
+            --asset-url "$DOWNLOAD/${{ steps.meta.outputs.asset }}" --asset-size "${{ steps.hash.outputs.asset_size }}" --asset-sha256 "${{ steps.hash.outputs.asset_sha }}" \
+            --in-dir manifests-in --out-dir manifests-out --private-key-file signing-key.pem
+
+      # A re-run picks the release up where it stopped: published means done, a leftover draft is finished, anything else is created.
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ steps.release_state.outputs.state }}" == "published" ]]; then
+            echo "release already published; skipping"
+            exit 0
+          fi
+          PRERELEASE=""
+          [[ "${{ steps.meta.outputs.channel }}" == "edge" ]] && PRERELEASE="--prerelease"
+          if [[ "${{ steps.release_state.outputs.state }}" == "absent" ]]; then
+            gh release create "${{ steps.meta.outputs.tag }}" --draft --title "${{ steps.meta.outputs.tag }}" --notes-file notes.md $PRERELEASE
+          fi
+          gh release upload "${{ steps.meta.outputs.tag }}" "${{ steps.meta.outputs.asset }}" --clobber
+          gh release edit "${{ steps.meta.outputs.tag }}" --draft=false
+
+      - name: Upload manifests to R2
+        env:
+          RCLONE_CONFIG_R2_TYPE: s3
+          RCLONE_CONFIG_R2_PROVIDER: Cloudflare
+          RCLONE_CONFIG_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RCLONE_CONFIG_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          RCLONE_CONFIG_R2_REGION: auto
+        run: |
+          rclone copy manifests-out "R2:${{ secrets.R2_BUCKET_NAME }}" \
+            --header-upload "Cache-Control: public, max-age=60" --s3-no-check-bucket

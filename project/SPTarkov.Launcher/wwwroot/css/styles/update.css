@@ -1,0 +1,13 @@
+.update-dialog .mud-dialog-content {
+    padding: 1.25rem !important;
+}
+
+.update-dialog .update-notes {
+    overflow-wrap: anywhere;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.update-dialog .update-notes > :first-child {
+    margin-top: 0;
+}

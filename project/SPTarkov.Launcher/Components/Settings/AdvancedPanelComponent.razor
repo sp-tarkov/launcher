@@ -8,6 +8,8 @@
             <SettingSwitchComponent Switch="@ShowBackgroundSwitch" OptionName="@(LocaleHelper.Get("setting_option_background"))" SwitchFunc="SetBackgroundUsage"/>
         </MudTooltip>
         <SettingLocaleComponent Options="@LocaleOptions" OptionName="@(LocaleHelper.Get("setting_option_language"))"/>
+        <SettingChannelComponent/>
+        <SettingSwitchComponent Switch="@CheckForUpdatesOnStartupSwitch" SwitchFunc="SetCheckForUpdatesOnStartup" OptionName="@(LocaleHelper.Get("setting_option_update_on_startup"))"/>
         <SettingSwitchComponent Switch="@ClearCacheOnLaunchSwitch" SwitchFunc="SetClearCacheOnLaunch" OptionName="@(LocaleHelper.Get("setting_option_clear_cache"))"></SettingSwitchComponent>
         <SettingGamePath />
     </MudPaper>
@@ -17,6 +19,7 @@
 {
     private bool ShowBackgroundSwitch { get; set; }
     private bool ClearCacheOnLaunchSwitch { get; set; }
+    private bool CheckForUpdatesOnStartupSwitch { get; set; }
     private Dictionary<string, string> LocaleOptions { get; set; } = [];
 
     protected override void OnInitialized()
@@ -24,6 +27,7 @@
         var config = ConfigHelper.GetConfig();
         ShowBackgroundSwitch = config.UseBackground;
         ClearCacheOnLaunchSwitch = config.ClearCacheOnLaunch;
+        CheckForUpdatesOnStartupSwitch = config.CheckForUpdatesOnStartup;
 
         LocaleOptions = LocaleHelper.GetAvailableLocales();
         base.OnInitialized();
@@ -33,6 +37,14 @@
     {
         ClearCacheOnLaunchSwitch = !ClearCacheOnLaunchSwitch;
         ConfigHelper.SetClearCacheOnLaunch(ClearCacheOnLaunchSwitch);
+
+        return Task.CompletedTask;
+    }
+
+    private Task SetCheckForUpdatesOnStartup()
+    {
+        CheckForUpdatesOnStartupSwitch = !CheckForUpdatesOnStartupSwitch;
+        ConfigHelper.SetCheckForUpdatesOnStartup(CheckForUpdatesOnStartupSwitch);
 
         return Task.CompletedTask;
     }

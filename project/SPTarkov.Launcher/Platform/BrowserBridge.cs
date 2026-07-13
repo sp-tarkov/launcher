@@ -14,6 +14,12 @@ public sealed class BrowserBridge(ILogger<BrowserBridge> logger)
     [JSInvokable]
     public void OpenExternal(string url)
     {
+        if (!IsWebUrl(url))
+        {
+            logger.LogWarning("Refused to open {Url}: only http and https are opened externally.", url);
+            return;
+        }
+
         try
         {
             Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
@@ -22,5 +28,10 @@ public sealed class BrowserBridge(ILogger<BrowserBridge> logger)
         {
             logger.LogError("Failed to open external URL {Url}: {Ex}", url, ex);
         }
+    }
+
+    private static bool IsWebUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out var uri) && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
     }
 }

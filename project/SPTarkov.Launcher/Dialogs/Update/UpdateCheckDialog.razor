@@ -1,0 +1,246 @@
+@inject ILogger<UpdateCheckDialog> Logger
+@inject LocaleHelper LocaleHelper
+@inject ConfigHelper ConfigHelper
+@inject UpdateClient UpdateClient
+@inject UpdateInstaller UpdateInstaller
+@inject BrowserBridge BrowserBridge
+@inject ISnackbar Snackbar
+
+<MudDialog Class="update-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        @if (_restartRequired)
+        {
+            <div class="d-flex flex-column gap-3">
+                <MudText Typo="Typo.h6">@(LocaleHelper.Get("update_check_title"))</MudText>
+
+                <MudText>@(LocaleHelper.Get("update_install_relaunch_failed"))</MudText>
+
+                <div class="mt-2 d-flex justify-end gap-2">
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Close">@(LocaleHelper.Get("update_check_close"))</MudButton>
+                </div>
+            </div>
+        }
+        else if (_update is null)
+        {
+            <div class="d-flex flex-column gap-3">
+                <MudText Typo="Typo.h6">@(LocaleHelper.Get("update_check_title"))</MudText>
+
+                <MudText>@_statusText</MudText>
+
+                <MudText Typo="Typo.body2" Class="mud-text-secondary">@(LocaleHelper.Get("update_check_channel_label")) @ChannelName</MudText>
+
+                <div class="mt-2 d-flex justify-end gap-2">
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Success" OnClick="Check" Disabled="@_busy">@(LocaleHelper.Get("update_check_button"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Close">@(LocaleHelper.Get("update_check_close"))</MudButton>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                <MudText Typo="Typo.h6">@(LocaleHelper.Get("update_check_available_heading"))</MudText>
+
+                @if (_installing)
+                {
+                    <MudText>@InstallStageText</MudText>
+                    @if (_installStage == UpdateStage.Downloading)
+                    {
+                        <MudProgressLinear Color="Color.Success" Value="@_installPercent"/>
+                    }
+                    else
+                    {
+                        <MudProgressLinear Color="Color.Success" Indeterminate="true"/>
+                    }
+                }
+                else
+                {
+                    <div>
+                        <MudText>@(LocaleHelper.Get("update_check_available")) <b>@_update.Release.LauncherVersion</b></MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">@(LocaleHelper.Get("update_check_current")) @_update.CurrentVersion.ToString()</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">@(LocaleHelper.Get("update_check_channel_label")) @ChannelName</MudText>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(_update.Release.Notes))
+                    {
+                        <MudDivider DividerType="DividerType.Middle" Class="ma-0"/>
+                        <div class="user-markdown update-notes">@MarkdownRenderer.ToHtml(_update.Release.Notes)</div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(_update.Release.NotesUrl))
+                    {
+                        <MudLink Class="cursor-pointer" @onclick="OpenNotes">@(LocaleHelper.Get("update_check_view_notes"))</MudLink>
+                    }
+
+                    <div class="mt-2 d-flex justify-end gap-2">
+                        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="Install">@(LocaleHelper.Get("update_check_install"))</MudButton>
+                        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Close">@(LocaleHelper.Get("update_check_later"))</MudButton>
+                    </div>
+                }
+            </div>
+        }
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    [Parameter]
+    public AvailableUpdate? Preloaded { get; set; }
+
+    private readonly CancellationTokenSource _token = new();
+    private AvailableUpdate? _update;
+    private bool _busy;
+    private bool _installing;
+    private bool _restartRequired;
+    private UpdateStage _installStage;
+    private double _installPercent;
+    private string _statusText = "";
+
+    private string ChannelName =>
+        ConfigHelper.GetConfig().UpdateChannel == UpdateChannel.Edge
+            ? LocaleHelper.Get("update_channel_edge")
+            : LocaleHelper.Get("update_channel_stable");
+
+    private string InstallStageText =>
+        _installStage switch
+        {
+            UpdateStage.Downloading => LocaleHelper.Get("update_install_downloading"),
+            UpdateStage.Restarting => LocaleHelper.Get("update_install_restarting"),
+            _ => LocaleHelper.Get("update_install_applying"),
+        };
+
+    protected override void OnInitialized()
+    {
+        _statusText = LocaleHelper.Get("update_check_prompt");
+        _update = Preloaded;
+    }
+
+    private async Task Check()
+    {
+        if (_busy)
+        {
+            return;
+        }
+
+        _busy = true;
+        _statusText = LocaleHelper.Get("update_check_checking");
+        StateHasChanged();
+
+        try
+        {
+            _update = await UpdateClient.CheckAsync(_token.Token);
+
+            if (_update is null)
+            {
+                Snackbar.Add(LocaleHelper.Get("update_check_none"), Severity.Info);
+                MudDialog.Close(DialogResult.Ok(false));
+                return;
+            }
+        }
+        catch (OperationCanceledException) when (_token.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            Logger.LogError("Update check failed: {Exception}", ex);
+            Snackbar.Add(LocaleHelper.Get("update_check_failed"), Severity.Error);
+            _statusText = LocaleHelper.Get("update_check_prompt");
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task Install()
+    {
+        if (_installing)
+        {
+            return;
+        }
+
+        _installing = true;
+        await SetDismissable(false);
+        StateHasChanged();
+
+        var progress = new Progress<UpdateProgress>(update =>
+        {
+            _installStage = update.Stage;
+            _installPercent = update.Percent;
+            _ = InvokeAsync(StateHasChanged);
+        });
+
+        UpdateFailure failure;
+        try
+        {
+            failure = await UpdateInstaller.InstallAsync(_update!, progress, _token.Token);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Update install failed: {Exception}", ex);
+            failure = UpdateFailure.Apply;
+        }
+
+        // On success the launcher is relaunching; the dialog exits with the process.
+        if (failure == UpdateFailure.None)
+        {
+            return;
+        }
+
+        _installing = false;
+        await SetDismissable(true);
+
+        // A relaunch failure leaves the update committed and waiting on a manual restart.
+        if (failure == UpdateFailure.Relaunch)
+        {
+            _restartRequired = true;
+        }
+        else
+        {
+            Snackbar.Add(FailureMessage(failure), Severity.Error);
+        }
+
+        StateHasChanged();
+    }
+
+    // Toggles backdrop-click and escape-key dismissal, carrying the shared dialog options over unchanged.
+    private async Task SetDismissable(bool dismissable)
+    {
+        var shared = ConfigHelper.DialogOptions;
+        await MudDialog.SetOptionsAsync(
+            new DialogOptions
+            {
+                Position = shared.Position,
+                MaxWidth = shared.MaxWidth,
+                NoHeader = shared.NoHeader,
+                FullWidth = shared.FullWidth,
+                BackgroundClass = shared.BackgroundClass,
+                BackdropClick = dismissable,
+                CloseOnEscapeKey = dismissable,
+            }
+        );
+    }
+
+    private string FailureMessage(UpdateFailure failure) =>
+        failure switch
+        {
+            UpdateFailure.ModTaskInProgress => LocaleHelper.Get("update_install_mods_active"),
+            UpdateFailure.InsufficientSpace => LocaleHelper.Get("update_install_no_space"),
+            UpdateFailure.NotWritable => LocaleHelper.Get("update_install_not_writable"),
+            UpdateFailure.Download => LocaleHelper.Get("update_install_download_failed"),
+            _ => LocaleHelper.Get("update_install_failed"),
+        };
+
+    private void OpenNotes()
+    {
+        if (_update?.Release.NotesUrl is { } url)
+        {
+            BrowserBridge.OpenExternal(url);
+        }
+    }
+
+    private void Close()
+    {
+        _token.Cancel();
+        MudDialog.Cancel();
+    }
+}
