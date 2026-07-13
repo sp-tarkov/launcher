@@ -255,6 +255,17 @@
   "info_spt_desc": "Your community-driven resource for everything related to SPT. Whether you’re new to SPT or a seasoned modder, this wiki aims to be your central hub for information.",
   "server_edit_required_name": "Name is required!",
   "search_category": "Category",
-  "setting_game_path": "Game Path"
+  "setting_game_path": "Game Path",
+  "linux_add_warning": "Please confirm these are correct! they can be changed in the settings menu later",
+  "linux_add_prefix": "Prefix Path",
+  "linux_add_prefix_required": "Prefix path is required",
+  "linux_add_umu": "Umu Path",
+  "linux_add_umu_required": "Umu path is required",
+  "linux_add_launch_settings": "Launch arguments",
+  "linux_add_proton": "Proton Version",
+  "linux_add_proton_required": "Proton Version is required",
+  "linux_add_proton_placeholder": "Proton version to use",
+  "linux_add_launch_settings_placeholder": "MANGOHUD=1",
+  "linux_add_success": "First run Linux settings confirmed"
 
 }

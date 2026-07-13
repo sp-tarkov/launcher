@@ -1,4 +1,5 @@
 @page "/"
+@using SPTarkov.Launcher.Dialogs.Linux
 
 @inject IDialogService DialogService
 @inject ConfigHelper ConfigHelper
@@ -49,8 +50,12 @@
         _serverList = ConfigHelper.GetServers();
         Launcher.App.MainWindow.SetMinimized(false);
 
-        await base.OnInitializedAsync();
+        if (OperatingSystem.IsLinux() && ConfigHelper.GetConfig().FirstRun)
+        {
+            await ShowLinuxFirstRunDialog();
+        }
 
+        await base.OnInitializedAsync();
         await TryAutoConnect();
     }
 
@@ -136,5 +141,24 @@
             _serverList.Add(server);
             ConfigHelper.SetServers(_serverList);
         }
+    }
+
+    private async Task ShowLinuxFirstRunDialog()
+    {
+        var dialogOptions = new DialogOptions
+        {
+            Position = ConfigHelper.DialogOptions.Position,
+            MaxWidth = MaxWidth.Large,
+            BackdropClick = false,
+            CloseOnEscapeKey = false,
+            NoHeader = ConfigHelper.DialogOptions.NoHeader,
+            CloseButton = false,
+            FullScreen = ConfigHelper.DialogOptions.FullScreen,
+            FullWidth = ConfigHelper.DialogOptions.FullWidth,
+            BackgroundClass = ConfigHelper.DialogOptions.BackgroundClass
+        };
+
+        // Open a dialog for linux users, to confirm some settings, they can be changed later via settings menu
+        await DialogService.ShowAsync<LinuxSettingsDialog>("LinuxSettingsDialog", dialogOptions);
     }
 }

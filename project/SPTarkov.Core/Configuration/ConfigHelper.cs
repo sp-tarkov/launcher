@@ -330,4 +330,14 @@ public class ConfigHelper
             SaveConfig();
         }
     }
+
+    public void SetLinuxSettings(LinuxSettings linuxSettings)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetLinuxSettings: {Settings}", linuxSettings);
+            _settings!.LinuxSettings = linuxSettings;
+            SaveConfig();
+        }
+    }
 }
