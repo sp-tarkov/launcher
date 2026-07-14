@@ -71,6 +71,8 @@
   "profile_card_invalid": "Profile is marked as Invalid",
   "profile_card_edit": "Edit this profile",
   "profile_card_delete": "Delete this profile",
+  "profile_card_status_loggedin": "Logged In",
+  "profile_card_status_invalid": "Invalid",
   "setting_option_background": "Use Background Image",
   "setting_option_language": "Language",
   "setting_load_live": "Load Live Settings",

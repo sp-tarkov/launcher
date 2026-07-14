@@ -15,24 +15,24 @@
                 @if (Server.Locked)
                 {
                     <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("server_card_protect"))">
-                        <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Class="server-card-lock"/>
+                        <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Small" Class="card-lock"/>
                     </MudTooltip>
                 }
                 else
                 {
-                    <div class="d-flex align-center gap-1 server-card-actions" @onclick:stopPropagation="true">
+                    <div class="d-flex align-center gap-1 card-actions" @onclick:stopPropagation="true">
                         <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("server_card_edit"))">
                             <MudIconButton Icon="@Icons.Material.Filled.Build" Color="Color.Inherit" Size="Size.Small" OnClick="RunEditTask"/>
                         </MudTooltip>
                         <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("server_card_delete"))">
-                            <MudIconButton Class="server-card-action-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Inherit" Size="Size.Small" OnClick="RunDeleteTask"/>
+                            <MudIconButton Class="card-action-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Inherit" Size="Size.Small" OnClick="RunDeleteTask"/>
                         </MudTooltip>
                     </div>
                 }
             </div>
-            <div class="server-status @StatusModifier() no-pointers">
-                <span class="server-status-dot"></span>
-                <span class="server-status-label">@StatusLabel()</span>
+            <div class="card-status @StatusModifier() no-pointers">
+                <span class="card-status-dot"></span>
+                <span class="card-status-label">@StatusLabel()</span>
             </div>
         </div>
 
@@ -42,7 +42,7 @@
         <MudDivider DividerType="DividerType.FullWidth"/>
 
         <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("server_card_address"))</MudText>
-        <MudText Typo="Typo.h6" Class="server-address no-pointers no-select">@Server.IpAddress</MudText>
+        <MudText Typo="Typo.h6" Class="card-mono no-pointers no-select">@Server.IpAddress</MudText>
 
     </MudPaper>
 </MudItem>
@@ -141,22 +141,22 @@
     {
         if (IsConnected)
         {
-            return "server-status--connected";
+            return "card-status--connected";
         }
 
         return _status switch
         {
-            ServerStatus.Online => "server-status--online",
-            ServerStatus.Offline => "server-status--offline",
-            _ => "server-status--checking",
+            ServerStatus.Online => "card-status--online",
+            ServerStatus.Offline => "card-status--offline",
+            _ => "card-status--checking",
         };
     }
 
     private string CardClassNames()
     {
         return new CssBuilder()
-            .AddClass("pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container cursor-pointer server-card")
-            .AddClass("server-card-connected", IsConnected)
+            .AddClass("pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container cursor-pointer card-interactive")
+            .AddClass("card-selected", IsConnected)
             .Build();
     }
 

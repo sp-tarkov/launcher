@@ -71,6 +71,8 @@
   "profile_card_invalid": "Il profilo è contrassegnato come non valido",
   "profile_card_edit": "Modifica questo profilo",
   "profile_card_delete": "Elimina questo profilo",
+  "profile_card_status_loggedin": "Connesso",
+  "profile_card_status_invalid": "Non valido",
   "setting_option_background": "Usa immagine di sfondo",
   "setting_option_language": "Lingua",
   "setting_load_live": "Carica impostazioni Live",

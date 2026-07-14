@@ -71,6 +71,8 @@
   "profile_card_invalid": "Profil Geçersiz olarak işaretlendi",
   "profile_card_edit": "Bu profili düzenle",
   "profile_card_delete": "Bu profili sil",
+  "profile_card_status_loggedin": "Giriş yapıldı",
+  "profile_card_status_invalid": "Geçersiz",
   "setting_option_background": "Arka Plan Resmi Kullan",
   "setting_option_language": "Dil",
   "setting_load_live": "Canlı Ayarları Yükle",

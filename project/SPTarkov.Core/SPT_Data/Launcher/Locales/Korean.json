@@ -71,6 +71,8 @@
   "profile_card_invalid": "프로필이 유효하지 않음으로 표시됨",
   "profile_card_edit": "이 프로필 수정",
   "profile_card_delete": "이 프로필 삭제",
+  "profile_card_status_loggedin": "로그인됨",
+  "profile_card_status_invalid": "유효하지 않음",
   "setting_option_background": "배경 이미지 사용",
   "setting_option_language": "언어",
   "setting_load_live": "라이브 설정 불러오기",

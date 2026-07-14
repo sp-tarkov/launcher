@@ -71,6 +71,8 @@
   "profile_card_invalid": "El perfil está marcado como inválido",
   "profile_card_edit": "Editar este perfil",
   "profile_card_delete": "Eliminar este perfil",
+  "profile_card_status_loggedin": "Sesión iniciada",
+  "profile_card_status_invalid": "Inválido",
   "setting_option_background": "Usar imagen de fondo",
   "setting_option_language": "Idioma",
   "setting_load_live": "Cargar ajustes de Live",

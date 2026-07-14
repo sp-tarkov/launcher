@@ -71,6 +71,8 @@
   "profile_card_invalid": "プロファイルは無効とマークされています",
   "profile_card_edit": "このプロファイルを編集",
   "profile_card_delete": "このプロファイルを削除",
+  "profile_card_status_loggedin": "ログイン中",
+  "profile_card_status_invalid": "無効",
   "setting_option_background": "背景画像を使用",
   "setting_option_language": "言語",
   "setting_load_live": "Live設定を読み込む",

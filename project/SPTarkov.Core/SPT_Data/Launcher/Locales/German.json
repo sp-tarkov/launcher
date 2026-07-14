@@ -71,6 +71,8 @@
   "profile_card_invalid": "Profil ist als ungültig markiert",
   "profile_card_edit": "Dieses Profil bearbeiten",
   "profile_card_delete": "Dieses Profil löschen",
+  "profile_card_status_loggedin": "Angemeldet",
+  "profile_card_status_invalid": "Ungültig",
   "setting_option_background": "Hintergrundbild verwenden",
   "setting_option_language": "Sprache",
   "setting_load_live": "Live-Einstellungen laden",

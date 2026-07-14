@@ -71,6 +71,8 @@
   "profile_card_invalid": "Профиль помечен как недействительный",
   "profile_card_edit": "Редактировать этот профиль",
   "profile_card_delete": "Удалить этот профиль",
+  "profile_card_status_loggedin": "Вход выполнен",
+  "profile_card_status_invalid": "Недействителен",
   "setting_option_background": "Использовать фоновое изображение",
   "setting_option_language": "Язык",
   "setting_load_live": "Загрузить настройки Live",

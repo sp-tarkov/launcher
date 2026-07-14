@@ -71,6 +71,8 @@
   "profile_card_invalid": "此档案标记为无效",
   "profile_card_edit": "编辑此档案",
   "profile_card_delete": "删除此档案",
+  "profile_card_status_loggedin": "已登录",
+  "profile_card_status_invalid": "无效",
   "setting_option_background": "使用背景图片",
   "setting_option_language": "语言",
   "setting_load_live": "加载线上设置",

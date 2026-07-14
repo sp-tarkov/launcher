@@ -71,6 +71,8 @@
   "profile_card_invalid": "此個人檔案標記為無效",
   "profile_card_edit": "編輯此個人檔案",
   "profile_card_delete": "刪除此個人檔案",
+  "profile_card_status_loggedin": "已登入",
+  "profile_card_status_invalid": "無效",
   "setting_option_background": "使用背景圖片",
   "setting_option_language": "語言",
   "setting_load_live": "載入線上設定",

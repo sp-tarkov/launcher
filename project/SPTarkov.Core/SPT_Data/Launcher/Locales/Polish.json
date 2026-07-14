@@ -71,6 +71,8 @@
   "profile_card_invalid": "Profil oznaczony jako nieprawidłowy",
   "profile_card_edit": "Edytuj ten profil",
   "profile_card_delete": "Usuń ten profil",
+  "profile_card_status_loggedin": "Zalogowano",
+  "profile_card_status_invalid": "Nieprawidłowy",
   "setting_option_background": "Użyj obrazu tła",
   "setting_option_language": "Język",
   "setting_load_live": "Wczytaj ustawienia Live",
