@@ -75,8 +75,8 @@
 
     private bool CardIsClickable => !HideButtons && !MiniProfile.InvalidOrUnloadableProfile;
 
-    // Deterministic per-profile tint for the header glyph, hashed from username and profile id.
-    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor($"{MiniProfile.Username}|{MiniProfile.ProfileId}")};";
+    // Deterministic per-profile tint for the header glyph, hashed from the username.
+    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor(MiniProfile.Username)};";
 
     private bool SideIsUnknown { get; set; }
 

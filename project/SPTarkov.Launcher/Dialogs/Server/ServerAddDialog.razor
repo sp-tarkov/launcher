@@ -1,11 +1,11 @@
 @inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
 
-<MudDialog Class="server-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
+<MudDialog Class="form-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
         <div class="d-flex flex-column gap-3">
             <div class="d-flex align-center gap-3">
-                <div class="server-dialog-icon" style="@ServerIconStyle">
+                <div class="dialog-header-icon" style="@ServerIconStyle">
                     <MudIcon Icon="@Icons.Material.Filled.Dns" Color="Color.Inherit"/>
                 </div>
                 <MudText Typo="Typo.h6">@(LocaleHelper.Get("server_add_title"))</MudText>

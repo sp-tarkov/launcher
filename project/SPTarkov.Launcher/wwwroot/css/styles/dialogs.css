@@ -6,12 +6,12 @@
     align-items: center;
 }
 
-.server-dialog {
+.form-dialog {
     .mud-dialog-content {
         padding: 1.25rem !important;
     }
 
-    .server-dialog-icon {
+    .dialog-header-icon {
         width: 42px;
         height: 42px;
         flex: 0 0 auto;

@@ -49,8 +49,8 @@
     private bool _buttonDisabled;
     private bool ShowWipeCheckbox => !SelectedMiniProfile.Wipe;
 
-    // Deterministic per-profile tint for the name glyph, hashed from username and profile id.
-    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor($"{SelectedMiniProfile.Username}|{SelectedMiniProfile.ProfileId}")};";
+    // Deterministic per-profile tint for the name glyph, hashed from the username.
+    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor(SelectedMiniProfile.Username)};";
 
     protected override void OnInitialized()
     {
