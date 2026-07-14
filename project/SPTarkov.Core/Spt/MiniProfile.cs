@@ -7,6 +7,9 @@ public record MiniProfile
     [JsonPropertyName("username")]
     public string Username { get; set; } = "";
 
+    [JsonPropertyName("nickname")]
+    public string Nickname { get; set; } = "";
+
     [JsonPropertyName("side")]
     public string Side { get; set; } = "";
 
