@@ -205,7 +205,14 @@
             StateHelper.LogoutAndDispose();
         }
 
-        var dialog = await DialogService.ShowAsync<ServerRemoveDialog>("ServerRemoveDialog", ConfigHelper.DialogOptions);
+        var param = new DialogParameters
+        {
+            {
+                "Server", Server
+            }
+        };
+
+        var dialog = await DialogService.ShowAsync<ServerRemoveDialog>("ServerRemoveDialog", param, ConfigHelper.DialogOptions);
         var result = await dialog.Result;
 
         if (result?.Canceled is false)

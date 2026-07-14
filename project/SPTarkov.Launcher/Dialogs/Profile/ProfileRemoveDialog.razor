@@ -17,6 +17,15 @@
             {
                 <MudText>@(LocaleHelper.Get("profile_remove_text"))</MudText>
 
+                <div class="mt-3 pa-3 border-2 border-solid mud-border-lines-default rounded dialog-detail-list">
+                    <MudText Typo="Typo.caption">@(LocaleHelper.Get("profile_card_name"))</MudText>
+                    <MudText Typo="Typo.body2">@MiniProfile.Username</MudText>
+                    <MudText Typo="Typo.caption">@(LocaleHelper.Get("profile_card_level"))</MudText>
+                    <MudText Typo="Typo.body2">@MiniProfile.CurrentLevel</MudText>
+                    <MudText Typo="Typo.caption">@(LocaleHelper.Get("profile_card_id"))</MudText>
+                    <MudText Typo="Typo.body2" Class="card-mono">@MiniProfile.ProfileId</MudText>
+                </div>
+
                 <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
                     <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy danger-button ml-auto" Variant="Variant.Filled" Color="Color.Default" @onclick="RunDeleteTask">@(LocaleHelper.Get("profile_remove_confirm"))</MudButton>
                     <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">@(LocaleHelper.Get("profile_remove_cancel"))</MudButton>
