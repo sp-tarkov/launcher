@@ -11,7 +11,12 @@
         @if (_restartRequired)
         {
             <div class="d-flex flex-column gap-3">
-                <MudText Typo="Typo.h6">@(LocaleHelper.Get("update_check_title"))</MudText>
+                <div class="d-flex align-center gap-3">
+                    <div class="update-header-icon update-header-icon--warning">
+                        <MudIcon Icon="@Icons.Material.Filled.RestartAlt" Color="Color.Warning"/>
+                    </div>
+                    <MudText Typo="Typo.h6">@(LocaleHelper.Get("update_check_title"))</MudText>
+                </div>
 
                 <MudText>@(LocaleHelper.Get("update_install_relaunch_failed"))</MudText>
 
@@ -23,11 +28,20 @@
         else if (_update is null)
         {
             <div class="d-flex flex-column gap-3">
-                <MudText Typo="Typo.h6">@(LocaleHelper.Get("update_check_title"))</MudText>
+                <div class="d-flex align-center gap-3">
+                    <div class="update-header-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.SystemUpdateAlt" Color="Color.Success"/>
+                    </div>
+                    <MudText Typo="Typo.h6" Class="flex-grow-1">@(LocaleHelper.Get("update_check_title"))</MudText>
+                    @ChannelBadge
+                </div>
 
                 <MudText>@_statusText</MudText>
 
-                <MudText Typo="Typo.body2" Class="mud-text-secondary">@(LocaleHelper.Get("update_check_channel_label")) @ChannelName</MudText>
+                @if (_busy)
+                {
+                    <MudProgressLinear Color="Color.Success" Rounded="true" Indeterminate="true"/>
+                }
 
                 <div class="mt-2 d-flex justify-end gap-2">
                     <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Success" OnClick="Check" Disabled="@_busy">@(LocaleHelper.Get("update_check_button"))</MudButton>
@@ -38,39 +52,58 @@
         else
         {
             <div class="d-flex flex-column gap-3">
-                <MudText Typo="Typo.h6">@(LocaleHelper.Get("update_check_available_heading"))</MudText>
+                <div class="d-flex align-center gap-3">
+                    <div class="update-header-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.SystemUpdateAlt" Color="Color.Success"/>
+                    </div>
+                    <MudText Typo="Typo.h6" Class="flex-grow-1">@(LocaleHelper.Get("update_check_available_heading"))</MudText>
+                    @ChannelBadge
+                </div>
+
+                <div class="update-versions rounded border-2 border-solid mud-border-lines-default">
+                    <div class="update-version">
+                        <span class="update-version-number">@_update.CurrentVersion.ToString()</span>
+                        <span class="update-version-label">@(LocaleHelper.Get("update_version_current"))</span>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.ArrowRightAlt" Class="update-version-arrow"/>
+                    <div class="update-version update-version--new">
+                        <span class="update-version-number">@_update.Release.LauncherVersion</span>
+                        <span class="update-version-label">@(LocaleHelper.Get("update_version_new"))</span>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(_update.Release.Notes))
+                {
+                    <div class="user-markdown update-notes rounded border-2 border-solid mud-border-lines-default">@MarkdownRenderer.ToHtml(_update.Release.Notes)</div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(_update.Release.NotesUrl))
+                {
+                    <MudLink Class="update-notes-link cursor-pointer" @onclick="OpenNotes">@(LocaleHelper.Get("update_check_view_notes"))<MudIcon Icon="@Icons.Material.Filled.OpenInNew" Class="update-notes-link-icon"/></MudLink>
+                }
 
                 @if (_installing)
                 {
-                    <MudText>@InstallStageText</MudText>
-                    @if (_installStage == UpdateStage.Downloading)
-                    {
-                        <MudProgressLinear Color="Color.Success" Value="@_installPercent"/>
-                    }
-                    else
-                    {
-                        <MudProgressLinear Color="Color.Success" Indeterminate="true"/>
-                    }
+                    <div>
+                        <div class="d-flex justify-space-between align-center mb-1">
+                            <MudText Typo="Typo.body2">@InstallStageText</MudText>
+                            @if (_installStage == UpdateStage.Downloading)
+                            {
+                                <MudText Typo="Typo.body2" Class="update-progress-percent">@((int)_installPercent)%</MudText>
+                            }
+                        </div>
+                        @if (_installStage == UpdateStage.Downloading)
+                        {
+                            <MudProgressLinear Color="Color.Success" Rounded="true" Value="@_installPercent"/>
+                        }
+                        else
+                        {
+                            <MudProgressLinear Color="Color.Success" Rounded="true" Indeterminate="true"/>
+                        }
+                    </div>
                 }
                 else
                 {
-                    <div>
-                        <MudText>@(LocaleHelper.Get("update_check_available")) <b>@_update.Release.LauncherVersion</b></MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">@(LocaleHelper.Get("update_check_current")) @_update.CurrentVersion.ToString()</MudText>
-                        <MudText Typo="Typo.body2" Class="mud-text-secondary">@(LocaleHelper.Get("update_check_channel_label")) @ChannelName</MudText>
-                    </div>
-
-                    @if (!string.IsNullOrWhiteSpace(_update.Release.Notes))
-                    {
-                        <MudDivider DividerType="DividerType.Middle" Class="ma-0"/>
-                        <div class="user-markdown update-notes">@MarkdownRenderer.ToHtml(_update.Release.Notes)</div>
-                    }
-
-                    @if (!string.IsNullOrWhiteSpace(_update.Release.NotesUrl))
-                    {
-                        <MudLink Class="cursor-pointer" @onclick="OpenNotes">@(LocaleHelper.Get("update_check_view_notes"))</MudLink>
-                    }
-
                     <div class="mt-2 d-flex justify-end gap-2">
                         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="Install">@(LocaleHelper.Get("update_check_install"))</MudButton>
                         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Close">@(LocaleHelper.Get("update_check_later"))</MudButton>
@@ -97,10 +130,18 @@
     private double _installPercent;
     private string _statusText = "";
 
-    private string ChannelName =>
-        ConfigHelper.GetConfig().UpdateChannel == UpdateChannel.Edge
-            ? LocaleHelper.Get("update_channel_edge")
-            : LocaleHelper.Get("update_channel_stable");
+    private bool IsEdgeChannel => ConfigHelper.GetConfig().UpdateChannel == UpdateChannel.Edge;
+
+    private string ChannelName => IsEdgeChannel ? LocaleHelper.Get("update_channel_edge") : LocaleHelper.Get("update_channel_stable");
+
+    private string ChannelTooltip => $"{LocaleHelper.Get("update_check_channel_label")} {ChannelName}";
+
+    private RenderFragment ChannelBadge =>
+        @<MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Top" Text="@ChannelTooltip">
+            <div class="update-channel @(IsEdgeChannel ? "update-channel--edge" : "update-channel--stable")">
+                <span class="update-channel-dot"></span>@ChannelName
+            </div>
+        </MudTooltip>;
 
     private string InstallStageText =>
         _installStage switch
@@ -135,7 +176,6 @@
             {
                 Snackbar.Add(LocaleHelper.Get("update_check_none"), Severity.Info);
                 MudDialog.Close(DialogResult.Ok(false));
-                return;
             }
         }
         catch (OperationCanceledException) when (_token.IsCancellationRequested) { }
