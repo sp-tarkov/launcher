@@ -1,0 +1,12 @@
+<MudPaper Class="pa-5 gap-2 d-flex flex-column mud-height-full mud-background-gray border-2 border-solid mud-border-lines-default setting-on-hover-container" Elevation="3">
+    <MudText Typo="Typo.h6" Class="pl-5 no-select">@Title</MudText>
+    <MudDivider Class="ma-0 flex-grow-0"/>
+    @ChildContent
+</MudPaper>
+
+@code {
+
+    [Parameter] public string Title { get; set; } = "";
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

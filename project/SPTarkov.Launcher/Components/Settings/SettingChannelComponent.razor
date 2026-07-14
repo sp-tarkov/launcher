@@ -12,9 +12,16 @@
         </MudSelect>
     </a>
 </MudContainer>
-<MudDivider DividerType="DividerType.Middle" Class="ma-0"/>
+@if (AddDiv)
+{
+    <MudDivider DividerType="DividerType.Middle" Class="ma-0"/>
+}
 
 @code {
+
+    [Parameter]
+    public bool AddDiv { get; set; }
+
     private UpdateChannel _selected;
 
     protected override void OnInitialized()

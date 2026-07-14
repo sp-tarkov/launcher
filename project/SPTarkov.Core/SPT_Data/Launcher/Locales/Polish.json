@@ -305,5 +305,11 @@
   "update_available_toast_action": "View",
   "setting_option_update_on_startup": "Check for updates on startup",
   "update_install_relaunch_failed": "The update was installed, but the launcher could not restart itself. Close the launcher and open it again.",
-  "update_install_failed": "The update could not be completed."
+  "update_install_failed": "The update could not be completed.",
+  "setting_section_window": "Okno",
+  "setting_section_interface": "Interfejs",
+  "setting_section_game": "Gra",
+  "setting_section_updates": "Aktualizacje",
+  "setting_section_linux": "Linux",
+  "setting_section_troubleshooting": "Rozwiązywanie problemów"
 }

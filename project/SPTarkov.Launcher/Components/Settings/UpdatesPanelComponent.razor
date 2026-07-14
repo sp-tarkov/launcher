@@ -1,0 +1,34 @@
+@inject ConfigHelper ConfigHelper
+@inject LocaleHelper LocaleHelper
+@inject IDialogService DialogService
+
+<SettingsSectionComponent Title="@(LocaleHelper.Get("setting_section_updates"))">
+    <SettingChannelComponent/>
+    <SettingSwitchComponent Switch="@CheckForUpdatesOnStartupSwitch" OptionName="@(LocaleHelper.Get("setting_option_update_on_startup"))" SwitchFunc="SetCheckForUpdatesOnStartup"/>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy mt-auto" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CheckForUpdates">@(LocaleHelper.Get("update_check_menu"))</MudButton>
+</SettingsSectionComponent>
+
+@code
+{
+    private bool CheckForUpdatesOnStartupSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CheckForUpdatesOnStartupSwitch = ConfigHelper.GetConfig().CheckForUpdatesOnStartup;
+
+        base.OnInitialized();
+    }
+
+    private Task SetCheckForUpdatesOnStartup()
+    {
+        CheckForUpdatesOnStartupSwitch = !CheckForUpdatesOnStartupSwitch;
+        ConfigHelper.SetCheckForUpdatesOnStartup(CheckForUpdatesOnStartupSwitch);
+
+        return Task.CompletedTask;
+    }
+
+    private async Task CheckForUpdates()
+    {
+        await DialogService.ShowAsync<UpdateCheckDialog>(LocaleHelper.Get("update_check_title"), ConfigHelper.DialogOptions);
+    }
+}
