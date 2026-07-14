@@ -24,7 +24,7 @@
                 <MudCheckBox T="bool" Value="CheckboxForWipe" ValueChanged="OnWipeCheckboxChanged" Class="wipe-checkbox" Disabled="@_buttonDisabled">@(LocaleHelper.Get("profile_wipe_checkbox"))</MudCheckBox>
             </MudPaper>
         }
-        <MudButton Class="@($"mud-button-border-copy border-2 border-solid mud-button-inner-text-copy{(CheckboxForWipe ? " wipe-danger-button" : "")}")" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="@(CheckboxForWipe ? Color.Inherit : Color.Success)">@(CheckboxForWipe ? LocaleHelper.Get("profile_wipe_and_start") : LocaleHelper.Get("profile_start_game"))</MudButton>
+        <MudButton Class="@($"mud-button-border-copy border-2 border-solid mud-button-inner-text-copy{(CheckboxForWipe ? " danger-button" : "")}")" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="@(CheckboxForWipe ? Color.Inherit : Color.Success)">@(CheckboxForWipe ? LocaleHelper.Get("profile_wipe_and_start") : LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
         <ProfileLevelComponent CurrentExp="SelectedMiniProfile.CurrentExp" CurrentLevel="SelectedMiniProfile.CurrentLevel" NeededExp="SelectedMiniProfile.NextLevel"/>

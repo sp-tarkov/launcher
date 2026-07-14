@@ -62,3 +62,12 @@ a.download-on-hover {
 .mud-button-inner-text-copy {
     color: rgba(255, 255, 255, 0.698) !important;
 }
+
+/* Compound .mud-button selector keeps the red fill ahead of the frosted .mud-button surface override. */
+.mud-button.danger-button {
+    background-color: #c62828 !important;
+    color: #000 !important;
+    border-color: #7f1d1d !important;
+    white-space: nowrap;
+    box-shadow: none !important;
+}

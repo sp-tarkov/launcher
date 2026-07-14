@@ -1,12 +1,3 @@
-/* Compound .mud-button selector keeps the red fill ahead of the frosted .mud-button surface override. */
-.mud-button.wipe-danger-button {
-    background-color: #c62828 !important;
-    color: #000 !important;
-    border-color: #7f1d1d !important;
-    white-space: nowrap;
-    box-shadow: none !important;
-}
-
 /* Restore real padding inside the wipe dialog. */
 .wipe-dialog .mud-dialog-content {
     padding: 1.25rem !important;

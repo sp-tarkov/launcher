@@ -3,8 +3,8 @@
         <MudContainer Class="py-4">
             <MudText>Are you sure you want to leave? Any unsaved data will be lost.</MudText>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-auto" @onclick="Submit">Leave</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">Cancel</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy danger-button ml-auto" Variant="Variant.Filled" Color="Color.Default" @onclick="Submit">Leave</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">Cancel</MudButton>
             </MudContainer>
         </MudContainer>
     </DialogContent>
