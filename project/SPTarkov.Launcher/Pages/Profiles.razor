@@ -25,15 +25,22 @@
         {
             case 0 when IsConnected:
                 <MudItem sm="12">
-                    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
-                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_empty_warning"))</MudAlert>
+                    <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
+                        <MudContainer Class="d-flex flex-column align-center gap-2 py-12">
+                            <MudIcon Icon="@Icons.Material.Filled.PersonSearch" Style="font-size: 4rem;" Class="mud-text-secondary"/>
+                            <MudText Typo="Typo.h6" Align="Align.Center">@(LocaleHelper.Get("profiles_empty_title"))</MudText>
+                            <MudText Align="Align.Center" Class="mud-text-secondary">@(LocaleHelper.Get("profiles_empty_subtitle"))</MudText>
+                        </MudContainer>
                     </MudPaper>
                 </MudItem>
                 break;
             case 0 when !IsConnected:
                 <MudItem sm="12">
-                    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container">
-                        <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">@(LocaleHelper.Get("profiles_connect_warning"))</MudAlert>
+                    <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
+                        <MudContainer Class="d-flex flex-column align-center gap-2 py-12">
+                            <MudIcon Icon="@Icons.Material.Filled.LinkOff" Style="font-size: 4rem;" Class="mud-text-secondary"/>
+                            <MudText Typo="Typo.h6" Align="Align.Center">@(LocaleHelper.Get("profiles_connect_warning"))</MudText>
+                        </MudContainer>
                     </MudPaper>
                 </MudItem>
                 break;
