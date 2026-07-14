@@ -22,10 +22,10 @@
                 @if (!HideButtons)
                 {
                     <div class="d-flex align-center gap-1 card-actions" @onclick:stopPropagation="true">
-                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("profile_copy_id"))">
+                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="@(LocaleHelper.Get("profile_copy_id"))">
                             <MudIconButton Disabled="!IsWindows" Icon="@Icons.Material.Filled.FileCopy" Color="Color.Inherit" Size="Size.Small" OnClick="CopyProfileId"/>
                         </MudTooltip>
-                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("profile_card_delete"))">
+                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="@(LocaleHelper.Get("profile_card_delete"))">
                             <MudIconButton Class="card-action-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Inherit" Size="Size.Small" OnClick="RunDeleteTask"/>
                         </MudTooltip>
                     </div>
@@ -46,17 +46,17 @@
         </div>
 
         <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_name")):</MudText>
-        <MudText Typo="Typo.h6" Class="no-pointers no-select">@MiniProfile.Username</MudText>
+        <MudText Typo="Typo.h6" Class="text-overflow no-pointers no-select">@MiniProfile.Username</MudText>
 
         <MudDivider DividerType="DividerType.FullWidth"/>
 
         <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_edition")):</MudText>
-        <MudText Typo="Typo.h6" Class="no-pointers no-select">@MiniProfile.Edition</MudText>
+        <MudText Typo="Typo.h6" Class="text-overflow no-pointers no-select">@MiniProfile.Edition</MudText>
 
         <MudDivider DividerType="DividerType.FullWidth"/>
 
         <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_id")):</MudText>
-        <MudText Typo="Typo.body1" Class="card-mono no-pointers no-select">@MiniProfile.ProfileId</MudText>
+        <MudText Typo="Typo.body1" Class="text-overflow card-mono no-pointers no-select">@MiniProfile.ProfileId</MudText>
     </MudPaper>
 </MudItem>
 

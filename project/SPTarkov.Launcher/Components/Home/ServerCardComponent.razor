@@ -21,10 +21,10 @@
                 else
                 {
                     <div class="d-flex align-center gap-1 card-actions" @onclick:stopPropagation="true">
-                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("server_card_edit"))">
+                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="@(LocaleHelper.Get("server_card_edit"))">
                             <MudIconButton Icon="@Icons.Material.Filled.Build" Color="Color.Inherit" Size="Size.Small" OnClick="RunEditTask"/>
                         </MudTooltip>
-                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("server_card_delete"))">
+                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="@(LocaleHelper.Get("server_card_delete"))">
                             <MudIconButton Class="card-action-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Inherit" Size="Size.Small" OnClick="RunDeleteTask"/>
                         </MudTooltip>
                     </div>
@@ -37,12 +37,12 @@
         </div>
 
         <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("server_card_name"))</MudText>
-        <MudText Typo="Typo.h6" Class="no-pointers no-select">@Server.Name</MudText>
+        <MudText Typo="Typo.h6" Class="text-overflow no-pointers no-select">@Server.Name</MudText>
 
         <MudDivider DividerType="DividerType.FullWidth"/>
 
         <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("server_card_address"))</MudText>
-        <MudText Typo="Typo.h6" Class="card-mono no-pointers no-select">@Server.IpAddress</MudText>
+        <MudText Typo="Typo.h6" Class="text-overflow card-mono no-pointers no-select">@Server.IpAddress</MudText>
 
     </MudPaper>
 </MudItem>
