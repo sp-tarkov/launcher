@@ -250,6 +250,8 @@
   "linux_wine_prefix": "Wine Prefix",
   "linux_launch_settings": "Launch Settings",
   "profile_copy_id": "Copy Profile ID",
+  "profile_copy_id_success": "Copied profile ID to clipboard",
+  "profile_copy_id_error": "Unable to copy profile ID to clipboard",
   "info_spt_desc": "Your community-driven resource for everything related to SPT. Whether you’re new to SPT or a seasoned modder, this wiki aims to be your central hub for information.",
   "server_edit_required_name": "Name is required!",
   "search_category": "Category",

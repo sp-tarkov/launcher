@@ -125,12 +125,12 @@ public partial class WindowsClipboard(ILogger<WindowsClipboard> logger)
         }
     }
 
-    public void CopyText(string text)
+    public bool CopyText(string text)
     {
         if (string.IsNullOrEmpty(text))
         {
             logger.LogWarning("CopyText called with empty string.");
-            return;
+            return false;
         }
 
         // Add a null terminator for Windows clipboard format
@@ -141,14 +141,15 @@ public partial class WindowsClipboard(ILogger<WindowsClipboard> logger)
         if (hGlobal == IntPtr.Zero)
         {
             logger.LogError("GlobalAlloc failed, error: {error}", Marshal.GetLastWin32Error());
-            return;
+            return false;
         }
 
         var ptr = GlobalLock(hGlobal);
         if (ptr == IntPtr.Zero)
         {
             logger.LogError("GlobalLock failed, error: {error}", Marshal.GetLastWin32Error());
-            return;
+            GlobalFree(hGlobal);
+            return false;
         }
 
         // Copy the text into the allocated memory
@@ -158,27 +159,32 @@ public partial class WindowsClipboard(ILogger<WindowsClipboard> logger)
         if (!OpenClipboard(IntPtr.Zero))
         {
             logger.LogError("Failed to open clipboard, error: {error}", Marshal.GetLastWin32Error());
-            return;
+            GlobalFree(hGlobal);
+            return false;
         }
 
         if (!EmptyClipboard())
         {
             logger.LogError("Failed to empty clipboard, error: {error}", Marshal.GetLastWin32Error());
             CloseClipboard();
-            return;
+            GlobalFree(hGlobal);
+            return false;
         }
 
         if (SetClipboardData(CfUnicodetext, hGlobal) == IntPtr.Zero)
         {
             logger.LogError("SetClipboardData failed, error: {error}", Marshal.GetLastWin32Error());
-            // You shouldn’t free hGlobal here because ownership transfers to the clipboard if successful.
-            // But if SetClipboardData fails, free the memory.
-            return;
+            CloseClipboard();
+            GlobalFree(hGlobal);
+            return false;
         }
 
+        // On success, system owns hGlobal, so don't free it.
         if (!CloseClipboard())
         {
             logger.LogError("Failed to close clipboard, error: {error}", Marshal.GetLastWin32Error());
         }
+
+        return true;
     }
 }
