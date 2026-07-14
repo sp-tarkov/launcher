@@ -2,11 +2,11 @@
 @inject LocaleHelper LocaleHelper
 
 <SettingsSectionComponent Title="@(LocaleHelper.Get("setting_section_linux"))">
-    <SettingSwitchComponent AddDiv="false" Disabled="true" OptionName="GameMode" Switch="@GameModeSwitch" SwitchFunc="SetGameMode"/>
     <SettingLinuxPrefixComponent Disabled="false" AddDiv="false"/>
-    @* <SettingLinuxUmuComponent Disabled="false" AddDiv="false" /> *@
-    <SettingLinuxProtonComponent Disabled="false" AddDiv="false"/>
+    <SettingLinuxUmuComponent Disabled="false" AddDiv="false" />
     <SettingLinuxLaunchComponent Disabled="false" AddDiv="false"/>
+    <SettingLinuxProtonComponent Disabled="false" AddDiv="false"/>
+    <SettingSwitchComponent AddDiv="false" Disabled="true" OptionName="GameMode" Switch="@GameModeSwitch" SwitchFunc="SetGameMode"/>
 </SettingsSectionComponent>
 
 @code
