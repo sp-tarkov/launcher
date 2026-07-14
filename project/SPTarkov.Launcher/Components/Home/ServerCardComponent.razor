@@ -7,7 +7,7 @@
 @implements IDisposable
 
 <MudItem md="4">
-    <MudPaper Elevation="2" Class="@CardClassNames()" @onclick="RunLoginTask">
+    <MudPaper Elevation="2" Class="pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container cursor-pointer card-interactive" @onclick="RunLoginTask">
 
         <div class="d-flex align-center justify-space-between no-select">
             <div class="d-flex align-center gap-2">
@@ -69,9 +69,6 @@
     // Cancelled on dispose to stop the status poll and any in-flight probe.
     private readonly CancellationTokenSource _disposeCts = new();
 
-    // This card represents the server the launcher is currently connected to.
-    private bool IsConnected => StateHelper.SelectedServer?.ServerId == Server.ServerId;
-
     // Deterministic per-server tint for the header glyph, hashed from name and address.
     private string ServerIconStyle => $"color: {ModPageVisual.GetColor($"{Server.Name}|{Server.IpAddress}")};";
 
@@ -101,11 +98,6 @@
 
     private async Task RefreshStatusAsync(CancellationToken token)
     {
-        if (IsConnected)
-        {
-            return; // Connection already tracked
-        }
-
         using var probeCts = CancellationTokenSource.CreateLinkedTokenSource(token);
         probeCts.CancelAfter(_statusProbeTimeout);
 
@@ -124,11 +116,6 @@
 
     private string StatusLabel()
     {
-        if (IsConnected)
-        {
-            return LocaleHelper.Get("server_card_connected");
-        }
-
         return _status switch
         {
             ServerStatus.Online => LocaleHelper.Get("server_card_status_online"),
@@ -139,25 +126,12 @@
 
     private string StatusModifier()
     {
-        if (IsConnected)
-        {
-            return "card-status--connected";
-        }
-
         return _status switch
         {
             ServerStatus.Online => "card-status--online",
             ServerStatus.Offline => "card-status--offline",
             _ => "card-status--checking",
         };
-    }
-
-    private string CardClassNames()
-    {
-        return new CssBuilder()
-            .AddClass("pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container cursor-pointer card-interactive")
-            .AddClass("card-selected", IsConnected)
-            .Build();
     }
 
     public void Dispose()
@@ -202,12 +176,6 @@
     {
         if (StateHelper.SelectedServer != null)
         {
-            if (StateHelper.SelectedServer.ServerId == Server.ServerId)
-            {
-                StateHelper.LogoutAndDispose();
-                return;
-            }
-
             StateHelper.LogoutAndDispose();
         }
 

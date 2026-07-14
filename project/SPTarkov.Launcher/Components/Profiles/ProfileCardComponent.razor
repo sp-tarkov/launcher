@@ -40,13 +40,6 @@
                         </div>
                     </MudTooltip>
                 }
-                else if (!HideButtons && LoggedIn)
-                {
-                    <div class="card-status card-status--connected no-pointers">
-                        <span class="card-status-dot"></span>
-                        <span class="card-status-label">@(LocaleHelper.Get("profile_card_status_loggedin"))</span>
-                    </div>
-                }
                 <span class="card-meta no-pointers">@(LocaleHelper.Get("profile_card_level")) @MiniProfile.CurrentLevel</span>
             </div>
         </div>
@@ -81,9 +74,6 @@
 
     private bool CardIsClickable => !HideButtons && !MiniProfile.InvalidOrUnloadableProfile;
 
-    // This card represents the profile the launcher is currently logged into.
-    private bool LoggedIn => StateHelper.SelectedProfile?.ProfileId == MiniProfile.ProfileId;
-
     // Deterministic per-profile tint for the header glyph, hashed from username and profile id.
     private string ProfileIconStyle => $"color: {ModPageVisual.GetColor($"{MiniProfile.Username}|{MiniProfile.ProfileId}")};";
 
@@ -99,7 +89,6 @@
         return new CssBuilder()
             .AddClass("pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container info-card-height")
             .AddClass("cursor-pointer card-interactive", CardIsClickable)
-            .AddClass("card-selected", !HideButtons && LoggedIn)
             .Build();
     }
 
@@ -141,15 +130,6 @@
         if (!CardIsClickable)
         {
             return;
-        }
-
-        if (StateHelper.SelectedProfile != null)
-        {
-            if (StateHelper.SelectedProfile.ProfileId == MiniProfile.ProfileId)
-            {
-                StateHelper.SelectedProfile = null;
-                return;
-            }
         }
 
         var dialogParams = new DialogParameters
