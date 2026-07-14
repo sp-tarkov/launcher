@@ -314,5 +314,6 @@
   "setting_section_game": "游戏",
   "setting_section_updates": "更新",
   "setting_section_linux": "Linux",
-  "setting_section_troubleshooting": "故障排除"
+  "setting_section_troubleshooting": "故障排除",
+  "linux_add_confirm": "Confirm?"
 }

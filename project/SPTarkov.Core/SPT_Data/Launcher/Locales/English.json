@@ -314,5 +314,6 @@
   "setting_section_game": "Game",
   "setting_section_updates": "Updates",
   "setting_section_linux": "Linux",
-  "setting_section_troubleshooting": "Troubleshooting"
+  "setting_section_troubleshooting": "Troubleshooting",
+  "linux_add_confirm": "Confirm?"
 }

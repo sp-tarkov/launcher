@@ -275,10 +275,7 @@
   "linux_add_proton_required": "Proton Version is required",
   "linux_add_proton_placeholder": "Proton version to use",
   "linux_add_launch_settings_placeholder": "MANGOHUD=1",
-  "linux_add_success": "First run Linux settings confirmed"
-,
-  "setting_game_path": "Game Path"
-,
+  "linux_add_success": "First run Linux settings confirmed",
   "setting_option_update_channel": "Update Channel",
   "update_channel_stable": "Stable",
   "update_channel_edge": "Edge",
@@ -317,5 +314,6 @@
   "setting_section_game": "Jeu",
   "setting_section_updates": "Mises à jour",
   "setting_section_linux": "Linux",
-  "setting_section_troubleshooting": "Dépannage"
+  "setting_section_troubleshooting": "Dépannage",
+  "linux_add_confirm": "Confirm?"
 }
