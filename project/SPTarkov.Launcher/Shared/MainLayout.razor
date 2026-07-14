@@ -97,7 +97,7 @@
                         options.OnClick = _ =>
                             DialogService.ShowAsync<UpdateCheckDialog>(
                                 LocaleHelper.Get("update_check_title"),
-                                new DialogParameters { { "Preloaded", update } },
+                                new DialogParameters { { "Update", update } },
                                 ConfigHelper.DialogOptions
                             );
                     }

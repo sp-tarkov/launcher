@@ -1,7 +1,6 @@
 @inject ILogger<UpdateCheckDialog> Logger
 @inject LocaleHelper LocaleHelper
 @inject ConfigHelper ConfigHelper
-@inject UpdateClient UpdateClient
 @inject UpdateInstaller UpdateInstaller
 @inject BrowserBridge BrowserBridge
 @inject ISnackbar Snackbar
@@ -25,30 +24,6 @@
                 </div>
             </div>
         }
-        else if (_update is null)
-        {
-            <div class="d-flex flex-column gap-3">
-                <div class="d-flex align-center gap-3">
-                    <div class="update-header-icon">
-                        <MudIcon Icon="@Icons.Material.Filled.SystemUpdateAlt" Color="Color.Success"/>
-                    </div>
-                    <MudText Typo="Typo.h6" Class="flex-grow-1">@(LocaleHelper.Get("update_check_title"))</MudText>
-                    @ChannelBadge
-                </div>
-
-                <MudText>@_statusText</MudText>
-
-                @if (_busy)
-                {
-                    <MudProgressLinear Color="Color.Success" Rounded="true" Indeterminate="true"/>
-                }
-
-                <div class="mt-2 d-flex justify-end gap-2">
-                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Success" OnClick="Check" Disabled="@_busy">@(LocaleHelper.Get("update_check_button"))</MudButton>
-                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Close">@(LocaleHelper.Get("update_check_close"))</MudButton>
-                </div>
-            </div>
-        }
         else
         {
             <div class="d-flex flex-column gap-3">
@@ -62,22 +37,22 @@
 
                 <div class="update-versions rounded border-2 border-solid mud-border-lines-default">
                     <div class="update-version">
-                        <span class="update-version-number">@_update.CurrentVersion.ToString()</span>
+                        <span class="update-version-number">@Update.CurrentVersion.ToString()</span>
                         <span class="update-version-label">@(LocaleHelper.Get("update_version_current"))</span>
                     </div>
                     <MudIcon Icon="@Icons.Material.Filled.ArrowRightAlt" Class="update-version-arrow"/>
                     <div class="update-version update-version--new">
-                        <span class="update-version-number">@_update.Release.LauncherVersion</span>
+                        <span class="update-version-number">@Update.Release.LauncherVersion</span>
                         <span class="update-version-label">@(LocaleHelper.Get("update_version_new"))</span>
                     </div>
                 </div>
 
-                @if (!string.IsNullOrWhiteSpace(_update.Release.Notes))
+                @if (!string.IsNullOrWhiteSpace(Update.Release.Notes))
                 {
-                    <div class="user-markdown update-notes rounded border-2 border-solid mud-border-lines-default">@MarkdownRenderer.ToHtml(_update.Release.Notes)</div>
+                    <div class="user-markdown update-notes rounded border-2 border-solid mud-border-lines-default">@MarkdownRenderer.ToHtml(Update.Release.Notes)</div>
                 }
 
-                @if (!string.IsNullOrWhiteSpace(_update.Release.NotesUrl))
+                @if (!string.IsNullOrWhiteSpace(Update.Release.NotesUrl))
                 {
                     <MudLink Class="update-notes-link cursor-pointer" @onclick="OpenNotes">@(LocaleHelper.Get("update_check_view_notes"))<MudIcon Icon="@Icons.Material.Filled.OpenInNew" Class="update-notes-link-icon"/></MudLink>
                 }
@@ -119,16 +94,13 @@
     private IMudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter]
-    public AvailableUpdate? Preloaded { get; set; }
+    public AvailableUpdate Update { get; set; } = default!;
 
     private readonly CancellationTokenSource _token = new();
-    private AvailableUpdate? _update;
-    private bool _busy;
     private bool _installing;
     private bool _restartRequired;
     private UpdateStage _installStage;
     private double _installPercent;
-    private string _statusText = "";
 
     private bool IsEdgeChannel => ConfigHelper.GetConfig().UpdateChannel == UpdateChannel.Edge;
 
@@ -151,46 +123,6 @@
             _ => LocaleHelper.Get("update_install_applying"),
         };
 
-    protected override void OnInitialized()
-    {
-        _statusText = LocaleHelper.Get("update_check_prompt");
-        _update = Preloaded;
-    }
-
-    private async Task Check()
-    {
-        if (_busy)
-        {
-            return;
-        }
-
-        _busy = true;
-        _statusText = LocaleHelper.Get("update_check_checking");
-        StateHasChanged();
-
-        try
-        {
-            _update = await UpdateClient.CheckAsync(_token.Token);
-
-            if (_update is null)
-            {
-                Snackbar.Add(LocaleHelper.Get("update_check_none"), Severity.Info);
-                MudDialog.Close(DialogResult.Ok(false));
-            }
-        }
-        catch (OperationCanceledException) when (_token.IsCancellationRequested) { }
-        catch (Exception ex)
-        {
-            Logger.LogError("Update check failed: {Exception}", ex);
-            Snackbar.Add(LocaleHelper.Get("update_check_failed"), Severity.Error);
-            _statusText = LocaleHelper.Get("update_check_prompt");
-        }
-        finally
-        {
-            _busy = false;
-        }
-    }
-
     private async Task Install()
     {
         if (_installing)
@@ -212,7 +144,7 @@
         UpdateFailure failure;
         try
         {
-            failure = await UpdateInstaller.InstallAsync(_update!, progress, _token.Token);
+            failure = await UpdateInstaller.InstallAsync(Update, progress, _token.Token);
         }
         catch (Exception ex)
         {
@@ -272,7 +204,7 @@
 
     private void OpenNotes()
     {
-        if (_update?.Release.NotesUrl is { } url)
+        if (Update.Release.NotesUrl is { } url)
         {
             BrowserBridge.OpenExternal(url);
         }
