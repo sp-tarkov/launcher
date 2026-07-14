@@ -5,3 +5,21 @@
     row-gap: 0.25rem;
     align-items: center;
 }
+
+.server-dialog {
+    .mud-dialog-content {
+        padding: 1.25rem !important;
+    }
+
+    .server-dialog-icon {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: color-mix(in srgb, currentColor 12%, transparent);
+        border: 2px solid color-mix(in srgb, currentColor 40%, transparent);
+    }
+}
