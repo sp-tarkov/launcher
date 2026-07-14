@@ -3,7 +3,7 @@
 @inject IDialogService DialogService
 
 <MudContainer Class="pa-0">
-    <a class="d-flex justify-center align-center cursor-pointer setting-on-hover py-2 pl-5">
+    <a class="d-flex justify-center align-center cursor-pointer setting-on-hover py-2 px-5">
         <MudText Class="no-select">@(LocaleHelper.Get("setting_option_update_channel"))</MudText>
         <MudSpacer/>
         <MudSelect T="UpdateChannel" Value="_selected" Clearable="false" ValueChanged="OnChannelChange">

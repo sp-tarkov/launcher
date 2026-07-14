@@ -3,8 +3,9 @@
 
 <MudContainer Class="pa-0">
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
-        <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("setting_game_path"))" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense"/>
-        <MudIconButton Color="@(NewValue == OldValue ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save" Disabled="@(NewValue == OldValue)" OnClick="OnTextSaved" />
+        <MudTextField Value="ConfigHelper.GetConfig().GamePath" Label="@(LocaleHelper.Get("setting_game_path"))" Variant="Variant.Outlined" Immediate="true"
+                      Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info"
+                      OnAdornmentClick="SetGamePath"/>
     </MudLink>
 </MudContainer>
 @if (AddDiv)
@@ -14,13 +15,11 @@
 
 @code {
 
-    protected override Task OnInitializedAsync()
-    {
-        OldValue = ConfigHelper.GetConfig().GamePath ?? "";
-        NewValue = OldValue;
+    [Parameter]
+    public bool Disabled { get; set; }
 
-        return base.OnInitializedAsync();
-    }
+    [Parameter]
+    public bool AddDiv { get; set; }
 
     private string GetLinkClasses()
     {
@@ -29,7 +28,7 @@
             .AddClass("justify-center")
             .AddClass("align-center")
             .AddClass("py-2")
-            .AddClass("pl-5");
+            .AddClass("px-5");
 
         if (!Disabled)
         {
@@ -39,17 +38,18 @@
         return classes.Build();
     }
 
-    private string OldValue { get; set; } = "";
-    private string NewValue { get; set; } = "";
-
-    [Parameter] public bool Disabled { get; set; }
-
-    [Parameter] public bool AddDiv { get; set; }
-
-    private void OnTextSaved()
+    private async Task SetGamePath()
     {
-        OldValue = NewValue;
-        ConfigHelper.SetGamePath(NewValue);
+        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+
+        // no folder was selected
+        if (!folder.Any())
+        {
+            return;
+        }
+
+        ConfigHelper.SetGamePath(folder.FirstOrDefault()!);
         StateHasChanged();
     }
+
 }
