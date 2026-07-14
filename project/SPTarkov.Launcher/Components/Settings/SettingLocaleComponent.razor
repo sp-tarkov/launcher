@@ -3,7 +3,7 @@
 @inject NavigationManager NavigationManager
 
 <MudContainer Class="pa-0">
-    <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 pl-5">
+    <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 px-5">
         <MudText Class="no-select">@OptionName</MudText>
         <MudSpacer/>
         <MudSelect T="string" Value="_selectedOption" Disabled="@Disabled" Clearable="false" ValueChanged="v => OnLocaleChange(v)">
