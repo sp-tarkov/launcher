@@ -109,15 +109,10 @@
     is the drawer's 56px mini width less its 2px right border. */
     --nav-tile-flat-width: calc(var(--nav-tile-size) - 2 * var(--nav-tile-radius));
 
-    /* Hovering anywhere in the tile group greys out every tile, then the one actually under the cursor is restored. */
-    &:hover .nav-tile {
+    /* While a tile is hovered, every other tile in the group greys out. */
+    &:has(.nav-tile-link:hover) .nav-tile-link:not(:hover) .nav-tile {
         filter: grayscale(1);
         opacity: 0.4;
-    }
-
-    .nav-tile-link:hover .nav-tile {
-        filter: none;
-        opacity: 1;
     }
 }
 
