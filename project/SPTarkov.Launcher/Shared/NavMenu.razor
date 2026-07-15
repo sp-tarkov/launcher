@@ -15,11 +15,11 @@
         @if (StateHelper.ModPages.Count > 0)
         {
             <div class="nav-tiles-divider"></div>
-            <div class="nav-tiles-label">@(LocaleHelper.Get("nav_mod_pages"))</div>
-            @foreach (var page in StateHelper.ModPages)
-            {
-                <ModPageNavItem ModPage="page" ServerAddress="@ServerAddress" Disabled="!StateHelper.AllowServerPage"/>
-            }
+            <div class="nav-tile-link" @onpointerenter="StateHelper.HoldModPagesPanel" @onpointerleave="StateHelper.ReleaseModPagesPanel">
+                <div class="nav-tile mod-pages-tile">
+                    <MudIcon Icon="@Icons.Material.Filled.Extension" Size="Size.Small"/>
+                </div>
+            </div>
         }
     </div>
 }

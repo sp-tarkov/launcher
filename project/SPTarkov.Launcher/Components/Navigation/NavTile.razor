@@ -1,10 +1,11 @@
-@* A square left-rail tile (the SIC tile and each mod page) with a rich hover card. *@
+@* A square left-rail tile with a rich hover card. Hovering it dismisses the mod-pages panel. *@
 
 @inject BrowserBridge Bridge
+@inject StateHelper StateHelper
 
 <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" ShowOnClick="false" Inline="false" @bind-Visible="_visible">
     <ChildContent>
-        <div class="nav-tile-link" @onclick="OpenExternal">
+        <div class="nav-tile-link" @onclick="OpenExternal" @onpointerenter="CloseModPagesPanel">
             <div class="nav-tile @TileClass" style="@TileStyle">@ChildContent</div>
         </div>
     </ChildContent>
@@ -50,5 +51,10 @@
 
         _visible = false;
         Bridge.OpenExternal(Url);
+    }
+
+    private void CloseModPagesPanel()
+    {
+        StateHelper.SetModPagesPanelOpen(false);
     }
 }

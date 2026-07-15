@@ -1,8 +1,12 @@
-@* A left-rail icon link with a text tooltip. *@
+@* A left-rail icon link with a text tooltip. Hovering it dismisses the mod-pages panel. *@
 
-<MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" ShowOnClick="false" Inline="false" Text="@Text" @bind-Visible="_visible">
-    <MudNavLink Disabled="Disabled" IconColor="Color.Default" Icon="@Icon" Match="NavLinkMatch.All" Href="@Href" OnClick="Close"/>
-</MudTooltip>
+@inject StateHelper StateHelper
+
+<div @onpointerenter="CloseModPagesPanel">
+    <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" ShowOnClick="false" Inline="false" Text="@Text" @bind-Visible="_visible">
+        <MudNavLink Disabled="Disabled" IconColor="Color.Default" Icon="@Icon" Match="NavLinkMatch.All" Href="@Href" OnClick="Close"/>
+    </MudTooltip>
+</div>
 
 @code {
     private bool _visible;
@@ -25,5 +29,10 @@
     private void Close()
     {
         _visible = false;
+    }
+
+    private void CloseModPagesPanel()
+    {
+        StateHelper.SetModPagesPanelOpen(false);
     }
 }
