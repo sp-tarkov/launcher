@@ -18,9 +18,9 @@
 </MudContainer>
 
 @code {
-    private ForgeModResponse SearchResponse { get; set; } = default!;
-    private ForgeVersionResponse VersionResponse { get; set; } = default!;
-    private ForgeAddonResponse AddonResponse { get; set; } = default!;
+    private ForgeModResponse? SearchResponse { get; set; }
+    private ForgeVersionResponse? VersionResponse { get; set; }
+    private ForgeAddonResponse? AddonResponse { get; set; }
     private bool SearchInProgress { get; set; }
 
     [Parameter]
@@ -28,16 +28,39 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        VersionResponse = null;
+        AddonResponse = null;
+
         await SearchForMod();
+        await SearchForLatestVersion();
+        await SearchForModAddons(ModId);
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SearchForLatestVersion()
+    {
+        try
+        {
+            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var response = await HttpHelper.ForgeGetLatestCompatibleModVersion(ModId, token.Token);
+
+            if (response?.Data?.Count > 0)
+            {
+                VersionResponse = response;
+                StateHasChanged();
+                return;
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Exception thrown from ForgeHelper.SearchForLatestVersion {Exception}", e);
+        }
 
         var firstVersion = SearchResponse?.Data?.Versions?.FirstOrDefault();
         if (firstVersion != null)
         {
             await SearchForModVersion(ModId, firstVersion.Id.ToString());
         }
-
-        await SearchForModAddons(ModId);
-        await base.OnInitializedAsync();
     }
 
     private async Task SearchForMod()

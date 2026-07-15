@@ -125,6 +125,20 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeVersionResponse>(response);
     }
 
+    public async Task<ForgeVersionResponse?> ForgeGetLatestCompatibleModVersion(string modId, CancellationToken token)
+    {
+        await _rateLimiter.WaitAsync(token);
+
+        var paramsToUse = ParamsCollectionForVersions(sptVersion: ProgramStatics.SptVersionCompiledFor.ToString(), sort: "-version");
+        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}");
+        var task = await _httpClient.SendAsync(message, token);
+        var response = await task.Content.ReadAsStringAsync(token);
+
+        _logger.LogDebug("ForgeGetLatestCompatibleModVersion Response: {Response}", response);
+
+        return JsonSerializer.Deserialize<ForgeVersionResponse>(response);
+    }
+
     public async Task<ForgeModsResponse?> ForgeGetMods(
         CancellationToken token,
         string search = "",
@@ -268,7 +282,7 @@ public class HttpHelper
         return queryString;
     }
 
-    private NameValueCollection ParamsCollectionForVersions(string? versionId = null)
+    private NameValueCollection ParamsCollectionForVersions(string? versionId = null, string? sptVersion = null, string? sort = null)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         queryString.Add("include", "dependencies,virus_total_links");
@@ -276,6 +290,16 @@ public class HttpHelper
         if (!string.IsNullOrEmpty(versionId))
         {
             queryString.Add("filter[id]", versionId);
+        }
+
+        if (!string.IsNullOrEmpty(sptVersion))
+        {
+            queryString.Add("filter[spt_version]", sptVersion);
+        }
+
+        if (!string.IsNullOrEmpty(sort))
+        {
+            queryString.Add("sort", sort);
         }
 
         return queryString;

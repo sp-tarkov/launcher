@@ -24,12 +24,15 @@
     else
     {
         <MudGrid>
-            <MudItem sm="12" Class="d-flex flex-row">
+            <MudItem sm="12" Class="d-flex flex-row align-center">
                 <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" IconColor="Color.Error" Color="Color.Dark" Size="Size.Medium" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="NavigateBack">
                     @(LocaleHelper.Get("mod_navigate_back"))
                 </MudButton>
                 <MudSpacer/>
-                <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" OnClick="StartDownloadModTask">
+                <MudTooltip Arrow="false" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" RootClass="mr-3" Text="@CompatibilityTooltip">
+                    <MudIcon Icon="@CompatibilityIcon" Color="@CompatibilityColor" Class="d-block"/>
+                </MudTooltip>
+                <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="@CompatibilityColor" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@(!IsVersionCompatible)" OnClick="StartDownloadModTask">
                     @($"{LocaleHelper.Get("mod_download_latest")} ({ForgeModVersion.Version})")
                 </MudButton>
             </MudItem>
@@ -60,6 +63,15 @@
                 </MudCard>
             </MudItem>
             <MudItem sm="4" Class="pt-4">
+                @if (!IsVersionCompatible)
+                {
+                    <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
+                        <MudCardContent>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_notice_title"))</MudText>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_spt_incompatible_notice"))</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                }
                 @if (ForgeMod.ShowsProfileBindingNotice)
                 {
                     <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
@@ -125,6 +137,11 @@
                             </MudText>
                         }
 
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_spt_version"))</MudText>
+                        <MudTooltip Arrow="false" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" Text="@CompatibilityTooltip">
+                            <MudText Typo="Typo.caption" Color="@CompatibilityColor" Class="pb-2 text-overflow">@(ForgeModVersion?.SptVersionConstraint?.ToString() ?? LocaleHelper.Get("mod_none"))</MudText>
+                        </MudTooltip>
+
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_fika_Compatible"))</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.FikaCompatible ?? false ? LocaleHelper.Get("mod_yes") : LocaleHelper.Get("mod_no"))</MudText>
 
@@ -152,14 +169,14 @@
                         }
                     </MudCardContent>
                 </MudCard>
-                @if (ForgeModAddons?.Any() ?? false)
+                @if (IsVersionCompatible && HasCompatibleAddons)
                 {
                     <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default mt-4">
                         <MudCardContent Class="d-flex flex-column align-start">
                             <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_addons"))</MudText>
                             @foreach (var addon in ForgeModAddons)
                             {
-                                @if (addon.Versions is null || !addon.Versions.Select(x => x.ModVersionConstraint?.IsSatisfied(ForgeModVersion.Version)).Any())
+                                @if (GetCompatibleAddonVersion(addon) is not { } addonVersion)
                                 {
                                     continue;
                                 }
@@ -169,7 +186,7 @@
                                         <MudImage Class="flex-shrink-0" Width="50" Height="50" Src="@addon.GetThumbnail()"/>
                                         <MudContainer Class="flex-1 gap-3 px-2 overflow-hidden">
                                             <MudText Class="no-select text-overflow" Typo="Typo.h6">@addon.Name</MudText>
-                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"{LocaleHelper.Get("mod_requires")} {addon.Versions?.First().Version} - {addon.Owner?.Name}")</MudText>
+                                            <MudText Class="no-select text-overflow" Typo="Typo.caption">@($"{LocaleHelper.Get("mod_requires")} {addonVersion.Version} - {addon.Owner?.Name}")</MudText>
                                         </MudContainer>
                                     </MudLink>
                                 </MudTooltip>
@@ -187,6 +204,26 @@
     [Parameter] public ForgeBase ForgeMod { get; set; } = default!;
     [Parameter] public ForgeModVersion ForgeModVersion { get; set; } = default!;
     [Parameter] public List<ForgeBase> ForgeModAddons { get; set; } = [];
+
+    private bool IsVersionCompatible => ForgeModVersion?.SptVersionConstraint?.IsSatisfied(ProgramStatics.SptVersionCompiledFor, true) ?? false;
+
+    private string CompatibilityIcon => IsVersionCompatible ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Warning;
+
+    private Color CompatibilityColor => IsVersionCompatible ? Color.Success : Color.Warning;
+
+    private string CompatibilityTooltip => LocaleHelper.Get(IsVersionCompatible ? "mod_spt_compatible" : "mod_spt_incompatible");
+
+    private bool HasCompatibleAddons => ForgeModAddons?.Any(addon => GetCompatibleAddonVersion(addon) is not null) ?? false;
+
+    private ForgeModVersion? GetCompatibleAddonVersion(ForgeBase addon)
+    {
+        if (ForgeModVersion is null)
+        {
+            return null;
+        }
+
+        return addon.Versions?.FirstOrDefault(v => v.ModVersionConstraint?.IsSatisfied(ForgeModVersion.Version, true) ?? false);
+    }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
