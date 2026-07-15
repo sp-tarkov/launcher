@@ -5,9 +5,15 @@ namespace SPTarkov.Core.SPT;
 
 public static partial class ProgramStatics
 {
+    // Development override for the SPT version the Forge and mod manager use.
+    // TODO: This needs to be removed for any 4.1 launch.
+    private static readonly Version? ForcedForgeSptVersion = Version.Parse("4.0.13");
+
     public static Version SptVersionCompiledFor
     {
-        get { return SptVersion; }
+        // TODO: This needs to be reverted for any 4.1 launch.
+        // get { return SptVersion; }
+        get { return ForcedForgeSptVersion ?? SptVersion; }
     }
 
     public static string SptCommit
