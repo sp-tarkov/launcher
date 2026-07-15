@@ -18,7 +18,7 @@
         {
             <MudItem sm="12" Class="mb-6">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
-                    <SearchComponent @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" Categories="@Categories?.Data" SearchFunc="@SearchUpdate"/>
+                    <SearchComponent @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" Categories="@Categories" SearchFunc="@SearchUpdate"/>
 
                     @if (SearchResponse?.Meta?.LastPage is not null && SearchResponse?.Data?.Count > 0)
                     {
@@ -70,7 +70,7 @@
     private ForgeModsResponse? SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
     private CancellationTokenSource? SearchCts { get; set; }
-    private ForgeCategoriesResponse? Categories { get; set; }
+    private List<ForgeCategory>? Categories => StateHelper.ListOfCategoriesAvailable;
     private bool GettingCategories { get; set; }
 
     private int PaginationValue
@@ -198,7 +198,8 @@
         try
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            Categories = await HttpHelper.ForgeGetCategories(token.Token);
+            var response = await HttpHelper.ForgeGetCategories(token.Token);
+            StateHelper.ListOfCategoriesAvailable = response?.Data;
         }
         catch (ForgeRetryException e)
         {
