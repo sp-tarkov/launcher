@@ -65,11 +65,12 @@
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.SearchForMod {Exception}", e);
-            return;
         }
-
-        SearchInProgress = false;
-        StateHasChanged();
+        finally
+        {
+            SearchInProgress = false;
+            StateHasChanged();
+        }
     }
 
     private async Task SearchForModVersion(string modId, string versionId)
@@ -86,19 +87,20 @@
             }
 
             VersionResponse = response;
+
+            if (!VersionResponse.Success)
+            {
+                Logger.LogError("Getting Mod version failed {modId}:{versionId} for reason: {code}:{message}", modId, versionId, VersionResponse.Code, VersionResponse.Message);
+            }
         }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.SearchForModVersion {Exception}", e);
-            return;
         }
-
-        if (!VersionResponse.Success)
+        finally
         {
-            Logger.LogError("Getting Mod version failed {modId}:{versionId} for reason: {code}:{message}", modId, versionId, VersionResponse.Code, VersionResponse.Message);
+            StateHasChanged();
         }
-
-        StateHasChanged();
     }
 
     private async Task SearchForModAddons(string modId)
@@ -115,18 +117,19 @@
             }
 
             AddonResponse = response;
+
+            if (!AddonResponse.Success)
+            {
+                Logger.LogError("Getting Mod Addons failed {modId}", modId);
+            }
         }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.SearchForModAddons {Exception}", e);
-            return;
         }
-
-        if (!AddonResponse.Success)
+        finally
         {
-            Logger.LogError("Getting Mod Addons failed {modId}", modId);
+            StateHasChanged();
         }
-
-        StateHasChanged();
     }
 }

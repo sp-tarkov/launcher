@@ -202,17 +202,16 @@
         catch (ForgeRetryException e)
         {
             Logger.LogError(e.Message);
-            GettingCategories = false;
-            return;
         }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.ForgeGetCategories {Exception}", e);
-            return;
         }
-
-        GettingCategories = false;
-        StateHasChanged();
+        finally
+        {
+            GettingCategories = false;
+            StateHasChanged();
+        }
     }
 
     private async Task SearchForMods(int? page = null)
@@ -230,31 +229,31 @@
         {
             var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             SearchResponse = await HttpHelper.ForgeGetMods(token.Token, SearchValue, SortValue, (int)page, FilterValue, AiValue, CategoryValue);
+
+            if (!SearchResponse!.Success)
+            {
+                Logger.LogError("Something failed");
+                Logger.LogError("Request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", SearchValue, SortValue, page, FilterValue, AiValue);
+                Logger.LogError("Response: {SearchResponse}", SearchResponse);
+
+                SearchResponse = null;
+            }
+
+            PaginationValue = (int) page;
+            StateHelper.CurrentPagination = PaginationValue;
         }
         catch (ForgeRetryException e)
         {
             Logger.LogError(e.Message);
-            SearchInProgress = false;
-            return;
         }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.SearchForMods {Exception}", e);
-            return;
         }
-
-        if (!SearchResponse!.Success)
+        finally
         {
-            Logger.LogError("Something failed");
-            Logger.LogError("Request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", SearchValue, SortValue, page, FilterValue, AiValue);
-            Logger.LogError("Response: {SearchResponse}", SearchResponse);
-
-            SearchResponse = null;
+            SearchInProgress = false;
+            StateHasChanged();
         }
-
-        PaginationValue = (int) page;
-        StateHelper.CurrentPagination = PaginationValue;
-        SearchInProgress = false;
-        StateHasChanged();
     }
 }
