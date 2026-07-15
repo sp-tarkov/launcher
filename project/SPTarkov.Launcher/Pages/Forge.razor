@@ -8,9 +8,9 @@
 @inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
-    @if (NetAvailable)
+    @if (NetAvailable != false)
     {
-        @if (GettingCategories)
+        @if (NetAvailable is null || GettingCategories)
         {
             <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" Width="100%" />
         }
@@ -32,7 +32,7 @@
         }
     }
 
-    @if (!NetAvailable)
+    @if (NetAvailable == false)
     {
         <MudItem sm="12">
             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No Internet access found, please fix and refresh!</MudAlert>
@@ -66,7 +66,7 @@
 </MudContainer>
 
 @code {
-    private bool NetAvailable { get; set; }
+    private bool? NetAvailable { get; set; }
     private ForgeModsResponse? SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
     private CancellationTokenSource? SearchCts { get; set; }
@@ -166,9 +166,17 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        NetAvailable = HttpHelper.IsInternetAccessAvailable();
+        await CheckInternetAccess();
+    }
 
-        if (!NetAvailable)
+    private async Task CheckInternetAccess()
+    {
+        NetAvailable = null;
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        NetAvailable = await HttpHelper.ForgePing(cts.Token);
+
+        if (NetAvailable == false)
         {
             return;
         }
@@ -179,11 +187,6 @@
         }
 
         await SearchForMods();
-    }
-
-    private void CheckInternetAccess()
-    {
-        NetAvailable = HttpHelper.IsInternetAccessAvailable();
     }
 
     private async Task SearchUpdate()

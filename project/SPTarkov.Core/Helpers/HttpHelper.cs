@@ -1,7 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http.Headers;
-using System.Net.NetworkInformation;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -22,7 +21,6 @@ public class HttpHelper
     private readonly ILogger<HttpHelper> _logger;
     private readonly StateHelper _stateHelper;
     private readonly ForgeRateLimiter _rateLimiter;
-    private bool _internetAccess;
 
     public HttpHelper(ILogger<HttpHelper> logger, StateHelper stateHelper, ForgeRateLimiter rateLimiter)
     {
@@ -231,14 +229,24 @@ public class HttpHelper
         return JsonSerializer.Deserialize<ForgeCategoriesResponse>(response);
     }
 
-    public async Task ForgePing(CancellationToken tokenToken = default)
+    public async Task<bool> ForgePing(CancellationToken token = default)
     {
-        await _rateLimiter.WaitAsync(tokenToken);
+        try
+        {
+            await _rateLimiter.WaitAsync(token);
 
-        var message = BuildMessage(HttpMethod.Get, Urls.ForgePing);
-        var task = await _httpClient.SendAsync(message, tokenToken);
+            var message = BuildMessage(HttpMethod.Get, Urls.ForgePing);
+            var response = await _httpClient.SendAsync(message, token);
 
-        _logger.LogDebug("Pinged Forge");
+            _logger.LogDebug("ForgePing: {StatusCode}", response.StatusCode);
+
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception e)
+        {
+            _logger.LogDebug(e, "ForgePing failed");
+            return false;
+        }
     }
 
     private NameValueCollection GetParamsCollection(
@@ -344,24 +352,6 @@ public class HttpHelper
             default:
                 return null;
         }
-    }
-
-    public bool IsInternetAccessAvailable()
-    {
-        try
-        {
-            using var ping = new Ping();
-            var result = ping.Send("8.8.8.8", 1000); // Google's DNS server
-            _internetAccess = result.Status == IPStatus.Success;
-        }
-        catch
-        {
-            _internetAccess = false;
-        }
-
-        _logger.LogDebug("IsInternetAccessAvailable: {InternetAccess}", _internetAccess);
-
-        return _internetAccess;
     }
 
     private HttpRequestMessage BuildMessage(HttpMethod methodType, string url)
