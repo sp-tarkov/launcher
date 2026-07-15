@@ -69,6 +69,7 @@
     private bool NetAvailable { get; set; }
     private ForgeModsResponse? SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
+    private CancellationTokenSource? SearchCts { get; set; }
     private ForgeCategoriesResponse? Categories { get; set; }
     private bool GettingCategories { get; set; }
 
@@ -216,19 +217,23 @@
 
     private async Task SearchForMods(int? page = null)
     {
-        if (SearchInProgress)
-        {
-            // do this to stop multiple requests happening at the same time
-            return;
-        }
+        SearchCts?.Cancel();
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        SearchCts = cts;
 
         SearchInProgress = true;
         page ??= StateHelper.CurrentPagination;
 
         try
         {
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            SearchResponse = await HttpHelper.ForgeGetMods(token.Token, SearchValue, SortValue, (int)page, FilterValue, AiValue, CategoryValue);
+            var response = await HttpHelper.ForgeGetMods(cts.Token, SearchValue, SortValue, (int)page, FilterValue, AiValue, CategoryValue);
+
+            if (SearchCts != cts)
+            {
+                return;
+            }
+
+            SearchResponse = response;
 
             if (!SearchResponse!.Success)
             {
@@ -239,8 +244,11 @@
                 SearchResponse = null;
             }
 
-            PaginationValue = (int) page;
-            StateHelper.CurrentPagination = PaginationValue;
+            StateHelper.CurrentPagination = (int)page;
+        }
+        catch (OperationCanceledException) when (SearchCts != cts)
+        {
+            // superseded by a newer search; the newer request renders its own results
         }
         catch (ForgeRetryException e)
         {
@@ -252,8 +260,14 @@
         }
         finally
         {
-            SearchInProgress = false;
-            StateHasChanged();
+            if (SearchCts == cts)
+            {
+                SearchCts = null;
+                SearchInProgress = false;
+                StateHasChanged();
+            }
+
+            cts.Dispose();
         }
     }
 }
