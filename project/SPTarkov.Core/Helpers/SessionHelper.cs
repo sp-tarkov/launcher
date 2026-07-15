@@ -12,6 +12,7 @@ public enum ConnectStep
     Ping,
     Profiles,
     Types,
+    ModPages,
 }
 
 // Outcome of a SessionHelper.ConnectToServerAsync attempt.
@@ -41,8 +42,8 @@ public class SessionHelper(ILogger<SessionHelper> logger, HttpHelper httpHelper,
 {
     private static readonly TimeSpan _requestTimeout = TimeSpan.FromSeconds(10);
 
-    // Selects the server, then pings it and fetches its profile list and profile types, storing them on StateHelper. Failures are reported
-    // via the returned ConnectResult, not thrown. On failure, partial state is left in place for the caller to clean up.
+    // Selects the server, then pings it and fetches its profile list, profile types, and mod pages, storing them on StateHelper. Failures
+    // are reported via the returned ConnectResult, not thrown. On failure, partial state is left in place for the caller to clean up.
     public async Task<ConnectResult> ConnectToServerAsync(
         Server server,
         IProgress<ConnectStep>? progress = null,
@@ -50,6 +51,7 @@ public class SessionHelper(ILogger<SessionHelper> logger, HttpHelper httpHelper,
     )
     {
         stateHelper.SetSelectedServer(server);
+        stateHelper.ModPages = [];
 
         var step = ConnectStep.Ping;
         try
@@ -81,6 +83,15 @@ public class SessionHelper(ILogger<SessionHelper> logger, HttpHelper httpHelper,
                 cts.CancelAfter(_requestTimeout);
                 var types = await httpHelper.GameServerGet<SPTTypesResponse>(Urls.Types, cts.Token);
                 stateHelper.ProfileTypes = types?.Response!;
+            }
+
+            step = ConnectStep.ModPages;
+            progress?.Report(ConnectStep.ModPages);
+            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+            {
+                cts.CancelAfter(_requestTimeout);
+                var modPages = await httpHelper.GameServerGet<SPTModPagesResponse>(Urls.ModPages, cts.Token);
+                stateHelper.ModPages = modPages?.Response ?? [];
             }
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)

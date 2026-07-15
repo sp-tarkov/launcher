@@ -11,8 +11,12 @@
 @inject IDialogService DialogService
 
 <MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
-    <MudContainer Class="pa-0 pb-4 d-flex flex-row justify-space-between">
+    <MudContainer Class="pa-0 mb-4 d-flex flex-row justify-space-between relative">
         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
+        <div class="profile-name-overlay d-flex flex-row align-center gap-2 no-pointers no-select">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" Style="@ProfileIconStyle"/>
+            <MudText Typo="Typo.h5">@(SelectedMiniProfile.Nickname == "unknown" ? "No character created yet" : SelectedMiniProfile.Username)</MudText>
+        </div>
         <MudSpacer/>
         @if (ShowWipeCheckbox)
         {
@@ -20,10 +24,11 @@
                 <MudCheckBox T="bool" Value="CheckboxForWipe" ValueChanged="OnWipeCheckboxChanged" Class="wipe-checkbox" Disabled="@_buttonDisabled">@(LocaleHelper.Get("profile_wipe_checkbox"))</MudCheckBox>
             </MudPaper>
         }
-        <MudButton Class="@($"mud-button-border-copy border-2 border-solid mud-button-inner-text-copy{(CheckboxForWipe ? " wipe-danger-button" : "")}")" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="@(CheckboxForWipe ? Color.Inherit : Color.Success)">@(CheckboxForWipe ? LocaleHelper.Get("profile_wipe_and_start") : LocaleHelper.Get("profile_start_game"))</MudButton>
+        <MudButton Class="@($"mud-button-border-copy border-2 border-solid mud-button-inner-text-copy{(CheckboxForWipe ? " danger-button" : "")}")" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="@(CheckboxForWipe ? Color.Inherit : Color.Success)">@(CheckboxForWipe ? LocaleHelper.Get("profile_wipe_and_start") : LocaleHelper.Get("profile_start_game"))</MudButton>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
-        <ProfileLevelComponent CurrentExp="SelectedMiniProfile.CurrentExp" CurrentLevel="SelectedMiniProfile.CurrentLevel" NeededExp="SelectedMiniProfile.NextLevel"/>
+        <ProfileCardComponent MiniProfile="SelectedMiniProfile" HideButtons="true"/>
+        <ProfileStatsComponent MiniProfile="SelectedMiniProfile"/>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4">
         <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
@@ -34,8 +39,7 @@
         </MudPaper>
     </MudContainer>
     <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
-        <ProfileCardComponent MiniProfile="SelectedMiniProfile" HideButtons="true"/>
-        <ProfileStatsComponent MiniProfile="SelectedMiniProfile"/>
+        <ProfileLevelComponent CurrentExp="SelectedMiniProfile.CurrentExp" CurrentLevel="SelectedMiniProfile.CurrentLevel" NeededExp="SelectedMiniProfile.NextLevel"/>
     </MudContainer>
 </MudContainer>
 
@@ -44,6 +48,9 @@
     private MiniProfile SelectedMiniProfile { get; set; } = default!;
     private bool _buttonDisabled;
     private bool ShowWipeCheckbox => !SelectedMiniProfile.Wipe;
+
+    // Deterministic per-profile tint for the name glyph, hashed from the username.
+    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor(SelectedMiniProfile.Username)};";
 
     protected override void OnInitialized()
     {

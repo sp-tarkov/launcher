@@ -1,0 +1,31 @@
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="update-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <div class="d-flex flex-column gap-3">
+            <MudText Typo="Typo.h6" Color="Color.Warning">@(LocaleHelper.Get("update_edge_warning_heading"))</MudText>
+
+            <MudText>@(LocaleHelper.Get("update_edge_warning_text"))</MudText>
+
+            <div class="mt-2 d-flex justify-end gap-2">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy danger-button" Variant="Variant.Filled" Color="Color.Default" @onclick="Confirm">@(LocaleHelper.Get("update_edge_warning_confirm"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" @onclick="Cancel">@(LocaleHelper.Get("update_edge_warning_cancel"))</MudButton>
+            </div>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private void Confirm()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+}

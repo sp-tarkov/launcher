@@ -3,8 +3,9 @@
 
 <MudContainer Class="pa-0">
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
-        <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("linux_wine_prefix"))" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense"/>
-        <MudIconButton Color="@(NewValue == OldValue ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save" Disabled="@(NewValue == OldValue)" OnClick="OnTextSaved" />
+        <MudTextField Value="@ConfigHelper.GetConfig().LinuxSettings.PrefixPath" Label="@(LocaleHelper.Get("linux_wine_prefix"))"
+                      Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info" OnAdornmentClick="SetPrefixPath"/>
     </MudLink>
 </MudContainer>
 @if (AddDiv)
@@ -13,15 +14,12 @@
 }
 
 @code {
-    // TODO: Add validation to this
 
-    protected override Task OnInitializedAsync()
-    {
-        OldValue = ConfigHelper.GetConfig().LinuxSettings.PrefixPath ?? "";
-        NewValue = $"{OldValue}";
+    [Parameter]
+    public bool Disabled { get; set; }
 
-        return base.OnInitializedAsync();
-    }
+    [Parameter]
+    public bool AddDiv { get; set; }
 
     private string GetLinkClasses()
     {
@@ -30,7 +28,7 @@
             .AddClass("justify-center")
             .AddClass("align-center")
             .AddClass("py-2")
-            .AddClass("pl-5");
+            .AddClass("px-5");
 
         if (!Disabled)
         {
@@ -40,17 +38,18 @@
         return classes.Build();
     }
 
-    private string OldValue { get; set; } = "";
-    private string NewValue { get; set; } = "";
-
-    [Parameter] public bool Disabled { get; set; }
-
-    [Parameter] public bool AddDiv { get; set; }
-
-    private void OnTextSaved()
+    private async Task SetPrefixPath()
     {
-        OldValue = NewValue;
-        ConfigHelper.SetLinuxPrefixPath(NewValue);
+        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+
+        // no folder was selected
+        if (!folder.Any())
+        {
+            return;
+        }
+
+        ConfigHelper.SetLinuxPrefixPath(folder.FirstOrDefault()!);
         StateHasChanged();
     }
+
 }

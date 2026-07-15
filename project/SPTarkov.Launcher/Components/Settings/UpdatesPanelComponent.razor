@@ -1,0 +1,79 @@
+@implements IDisposable
+@inject ConfigHelper ConfigHelper
+@inject LocaleHelper LocaleHelper
+@inject IDialogService DialogService
+@inject UpdateClient UpdateClient
+@inject ISnackbar Snackbar
+@inject ILogger<UpdatesPanelComponent> Logger
+
+<SettingsSectionComponent Title="@(LocaleHelper.Get("setting_section_updates"))">
+    <SettingChannelComponent/>
+    <SettingSwitchComponent Switch="@CheckForUpdatesOnStartupSwitch" OptionName="@(LocaleHelper.Get("setting_option_update_on_startup"))" SwitchFunc="SetCheckForUpdatesOnStartup"/>
+    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy mt-auto" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CheckForUpdates" Disabled="@_checking">@(LocaleHelper.Get("update_check_menu"))</MudButton>
+</SettingsSectionComponent>
+
+@code
+{
+    private readonly CancellationTokenSource _token = new();
+    private bool _checking;
+
+    private bool CheckForUpdatesOnStartupSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CheckForUpdatesOnStartupSwitch = ConfigHelper.GetConfig().CheckForUpdatesOnStartup;
+
+        base.OnInitialized();
+    }
+
+    private Task SetCheckForUpdatesOnStartup()
+    {
+        CheckForUpdatesOnStartupSwitch = !CheckForUpdatesOnStartupSwitch;
+        ConfigHelper.SetCheckForUpdatesOnStartup(CheckForUpdatesOnStartupSwitch);
+
+        return Task.CompletedTask;
+    }
+
+    private async Task CheckForUpdates()
+    {
+        if (_checking)
+        {
+            return;
+        }
+
+        _checking = true;
+
+        try
+        {
+            var update = await UpdateClient.CheckAsync(_token.Token);
+
+            if (update is null)
+            {
+                Snackbar.Add(LocaleHelper.Get("update_check_none"), Severity.Info);
+                return;
+            }
+
+            await DialogService.ShowAsync<UpdateCheckDialog>(
+                LocaleHelper.Get("update_check_title"),
+                new DialogParameters { { "Update", update } },
+                ConfigHelper.DialogOptions
+            );
+        }
+        catch (OperationCanceledException) when (_token.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            Logger.LogError("Update check failed: {Exception}", ex);
+            Snackbar.Add(LocaleHelper.Get("update_check_failed"), Severity.Error);
+        }
+        finally
+        {
+            _checking = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _token.Cancel();
+        _token.Dispose();
+    }
+}

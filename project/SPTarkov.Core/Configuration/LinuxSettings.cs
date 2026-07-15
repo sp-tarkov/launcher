@@ -3,7 +3,7 @@ namespace SPTarkov.Core.Configuration;
 public record LinuxSettings
 {
     // /home/cwx/Games/tarkov
-    public string? PrefixPath { get; set; } = Directory.GetCurrentDirectory().Split("/drive_c").FirstOrDefault();
+    public string PrefixPath { get; set; } = Directory.GetCurrentDirectory().Split("/drive_c").FirstOrDefault();
 
     // /home/cwx/.local/share/spt-additions/runtime/umu-run
     public string UmuPath { get; set; } =
@@ -13,7 +13,7 @@ public record LinuxSettings
     public string LaunchSettings { get; set; } = "";
 
     // "GE-Proton10-24" "GE-Proton10-20"
-    public string ProtonVersion { get; set; } = "GE-Proton10-28";
+    public string ProtonVersion { get; set; } = "GE-Proton11-1";
 
     public bool GameMode { get; set; }
 }

@@ -1,20 +1,11 @@
-﻿namespace SPTarkov.Core.Configuration;
+﻿using System.Text.Json.Serialization;
+using SPTarkov.Core.Update;
+
+namespace SPTarkov.Core.Configuration;
 
 public record LauncherSettings
 {
-    public LauncherSettings()
-    {
-        Servers.Add(
-            new Server
-            {
-                IpAddress = "127.0.0.1:6969",
-                Name = "LocalHost",
-                ServerId = "1721162719",
-                Locked = true,
-            }
-        );
-    }
-
+    // These are user-added servers only. The locked local server comes from Server.Local.
     public List<Server> Servers { get; set; } = [];
 
     public StartLocation StartLocation { get; set; } = new();
@@ -38,7 +29,7 @@ public record LauncherSettings
 
     public bool AutoConnectLastProfile { get; set; }
 
-    /// The last server/profile the user launched with
+    // The last server/profile the user launched with
     public PreferredProfile? PreferredProfile { get; set; }
 
     public List<string> ExcludeFromCleanup { get; set; } = new();
@@ -47,8 +38,16 @@ public record LauncherSettings
 
     public LinuxSettings LinuxSettings { get; set; } = new();
 
-    /// String is the mods GUID
+    // String is the mods GUID
     public Dictionary<string, ConfigMod> Mods { get; set; } = new();
 
     public bool DebugLogging { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter<UpdateChannel>))]
+    public UpdateChannel UpdateChannel { get; set; } = UpdateChannel.Stable;
+
+    public bool CheckForUpdatesOnStartup { get; set; } = true;
+
+    // Newest manifest generatedUtc seen per update channel, keyed by channel name.
+    public Dictionary<string, DateTimeOffset> LastSeenManifests { get; set; } = new();
 }

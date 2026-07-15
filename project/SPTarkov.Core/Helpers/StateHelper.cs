@@ -9,6 +9,7 @@ public class StateHelper(ILogger<StateHelper> logger)
 {
     public List<MiniProfile> ProfileList = [];
     public Dictionary<string, string> ProfileTypes = new();
+    public List<ModPage> ModPages = [];
     public MiniProfile? SelectedProfile;
     public Server? SelectedServer;
 
@@ -33,6 +34,7 @@ public class StateHelper(ILogger<StateHelper> logger)
         logger.LogInformation("Logged out of server {SelectedServerIpAddress} and disposed", SelectedServer?.IpAddress ?? "Unknown");
         ProfileTypes = new Dictionary<string, string>();
         ProfileList = [];
+        ModPages = [];
         SelectedProfile = null;
         SelectedServer = null;
     }

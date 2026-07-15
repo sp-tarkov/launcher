@@ -1,10 +1,11 @@
-﻿@inject IDialogService DialogService
+@inject IDialogService DialogService
 @inject ConfigHelper ConfigHelper
 @inject StateHelper StateHelper
 @inject NavigationManager NavigationManager
 @inject ILogger<ProfileCardComponent> Logger
 @inject LocaleHelper LocaleHelper
 @inject WindowsClipboard WindowsClipboard
+@inject ISnackbar Snackbar
 
 <MudItem sm="4">
     <MudPaper Elevation="2" Class="@CardClassNames()" @onclick="RunLoginTask">
@@ -14,47 +15,48 @@
                 <MudImage Src=@(ImageName()) Elevation="0" Class=@(ImageClassNames())/>
             }
         </div>
+
+        <div class="d-flex align-center justify-space-between no-select">
+            <div class="d-flex align-center gap-2">
+                <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" Style="@ProfileIconStyle" Class="no-pointers"/>
+                @if (!HideButtons)
+                {
+                    <div class="d-flex align-center gap-1 card-actions" @onclick:stopPropagation="true">
+                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="@(LocaleHelper.Get("profile_copy_id"))">
+                            <MudIconButton Disabled="!IsWindows" Icon="@Icons.Material.Filled.FileCopy" Color="Color.Inherit" Size="Size.Small" OnClick="CopyProfileId"/>
+                        </MudTooltip>
+                        <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" ShowOnHover="true" ShowOnFocus="false" ShowOnClick="false" Text="@(LocaleHelper.Get("profile_card_delete"))">
+                            <MudIconButton Class="card-action-delete" Icon="@Icons.Material.Filled.Delete" Color="Color.Inherit" Size="Size.Small" OnClick="RunDeleteTask"/>
+                        </MudTooltip>
+                    </div>
+                }
+            </div>
+            <div class="d-flex align-center gap-3">
+                @if (MiniProfile.InvalidOrUnloadableProfile)
+                {
+                    <MudTooltip Color="Color.Dark" Arrow="false" Inline="false" Placement="Placement.Top" Text="@(LocaleHelper.Get("profile_card_invalid"))">
+                        <div class="card-status card-status--offline">
+                            <span class="card-status-dot"></span>
+                            <span class="card-status-label">@(LocaleHelper.Get("profile_card_status_invalid"))</span>
+                        </div>
+                    </MudTooltip>
+                }
+                <span class="card-meta no-pointers">@(LocaleHelper.Get("profile_card_level")) @MiniProfile.CurrentLevel</span>
+            </div>
+        </div>
+
         <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_name")):</MudText>
-        <MudText Typo="Typo.h6">@MiniProfile.Username</MudText>
-        <MudDivider DividerType="DividerType.Middle"/>
-        <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_level")):</MudText>
-        <MudText Typo="Typo.h6">@MiniProfile.CurrentLevel</MudText>
-        <MudDivider DividerType="DividerType.Middle"/>
+        <MudText Typo="Typo.h6" Class="text-overflow no-pointers no-select">@MiniProfile.Username</MudText>
+
+        <MudDivider DividerType="DividerType.FullWidth"/>
+
         <MudText Class="mb-n4 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_edition")):</MudText>
-        <MudText Typo="Typo.h6">@MiniProfile.Edition</MudText>
-        <MudDivider DividerType="DividerType.Middle"/>
+        <MudText Typo="Typo.h6" Class="text-overflow no-pointers no-select">@MiniProfile.Edition</MudText>
+
+        <MudDivider DividerType="DividerType.FullWidth"/>
+
         <MudText Class="mb-n3 no-pointers no-select" Typo="Typo.caption">@(LocaleHelper.Get("profile_card_id")):</MudText>
-        <MudText Typo="Typo.body1">@MiniProfile.ProfileId</MudText>
-
-        @if (!HideButtons)
-        {
-            <MudContainer Class="justify-end d-flex pa-0">
-
-                <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" Text="@(LocaleHelper.Get("profile_copy_id"))">
-                    <MudIconButton Disabled="!IsWindows" Class="mr-1" Color="Color.Info" Icon="@Icons.Material.Filled.FileCopy" Size="Size.Small" OnClick="CopyProfileId"/>
-                </MudTooltip>
-
-                <MudSpacer/>
-
-                @if (!MiniProfile.InvalidOrUnloadableProfile)
-                {
-                    <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Left" Text="@(LoggedIn ? LocaleHelper.Get("profile_card_logout") : LocaleHelper.Get("profile_card_login"))">
-                        <MudIconButton Class="mr-1" Color="Color.Success" Icon="@(!LoggedIn ? Icons.Material.Filled.Login : Icons.Material.Filled.Logout)" Size="Size.Small" OnClick="RunLoginTask"/>
-                    </MudTooltip>
-                }
-                else
-                {
-                    <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_invalid"))">
-                        <MudIconButton Class="mr-1" Color="Color.Error" Icon="@Icons.Material.Filled.Recycling" Size="Size.Small"/>
-                    </MudTooltip>
-                }
-
-                <MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Left" Text="@(LocaleHelper.Get("profile_card_delete"))">
-                    <MudIconButton Color="Color.Error" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" OnClick="RunDeleteTask"/>
-                </MudTooltip>
-
-            </MudContainer>
-        }
+        <MudText Typo="Typo.body1" Class="text-overflow card-mono no-pointers no-select">@MiniProfile.ProfileId</MudText>
     </MudPaper>
 </MudItem>
 
@@ -73,8 +75,10 @@
 
     private bool CardIsClickable => !HideButtons && !MiniProfile.InvalidOrUnloadableProfile;
 
+    // Deterministic per-profile tint for the header glyph, hashed from the username.
+    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor(MiniProfile.Username)};";
+
     private bool SideIsUnknown { get; set; }
-    private bool LoggedIn { get; set; }
 
     private string GetSideAsString()
     {
@@ -84,8 +88,8 @@
     private string CardClassNames()
     {
         return new CssBuilder()
-            .AddClass("pa-4 d-flex flex-column flex-none gap-2 mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height")
-            .AddClass("cursor-pointer", CardIsClickable)
+            .AddClass("pa-4 d-flex flex-column flex-none gap-2 border-2 border-solid mud-border-lines-default card-container info-card-height")
+            .AddClass("cursor-pointer card-interactive", CardIsClickable)
             .Build();
     }
 
@@ -109,14 +113,13 @@
             return "";
         }
 
-        return $"side_{side}.png";
+        return $"/images/side_{side}.png";
     }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        LoggedIn = StateHelper.SelectedProfile != null && StateHelper.SelectedProfile.ProfileId == MiniProfile.ProfileId;
         if (MiniProfile.Side.ToLower() == "unknown")
         {
             SideIsUnknown = true;
@@ -128,16 +131,6 @@
         if (!CardIsClickable)
         {
             return;
-        }
-
-        if (StateHelper.SelectedProfile != null)
-        {
-            if (StateHelper.SelectedProfile.ProfileId == MiniProfile.ProfileId)
-            {
-                StateHelper.SelectedProfile = null;
-                LoggedIn = false;
-                return;
-            }
         }
 
         var dialogParams = new DialogParameters
@@ -153,7 +146,6 @@
         if (result?.Canceled is false)
         {
             StateHelper.SetSelectedProfile(MiniProfile);
-            LoggedIn = StateHelper.SelectedProfile != null;
 
             Logger.LogDebug("Navigating to /ServerPageWrapper/false");
             NavigationManager.NavigateTo("/ServerPageWrapper/false");
@@ -186,8 +178,15 @@
             return;
         }
 
-        WindowsClipboard.CopyText(MiniProfile.ProfileId);
-        Logger.LogDebug("Copied profile id to clipboard: {id}", MiniProfile.ProfileId);
+        if (WindowsClipboard.CopyText(MiniProfile.ProfileId))
+        {
+            Logger.LogDebug("Copied profile id to clipboard: {id}", MiniProfile.ProfileId);
+            Snackbar.Add(LocaleHelper.Get("profile_copy_id_success"), Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(LocaleHelper.Get("profile_copy_id_error"), Severity.Error);
+        }
     }
 
 }

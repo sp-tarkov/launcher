@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using SPTarkov.Core.Logging;
 using SPTarkov.Core.SPT;
+using SPTarkov.Core.Update;
 
 namespace SPTarkov.Core.Configuration;
 
@@ -50,6 +51,15 @@ public class ConfigHelper
             }
 
             _settings = JsonSerializer.Deserialize<LauncherSettings>(File.ReadAllText(Paths.LauncherSettingsPath));
+
+            // Settings files written by earlier builds (pushed out to BE) persisted the built-in server.
+            // GetServers rebuilds it from code, so drop the stale copy to avoid showing it twice.
+            // TODO: This can be removed after release of 4.1.0. Just want it for BE clean-up.
+            var dropped = _settings!.Servers.RemoveAll(server => server.ServerId == Server.LocalServerId);
+            if (dropped > 0)
+            {
+                _logger.LogDebug("Dropped {Count} persisted built-in server entries.", dropped);
+            }
         }
     }
 
@@ -111,12 +121,23 @@ public class ConfigHelper
         }
     }
 
+    public List<Server> GetServers()
+    {
+        lock (_lock)
+        {
+            // The built-in local server first, then whatever the user has added.
+            return [Server.Local, .. _settings!.Servers];
+        }
+    }
+
     public void SetServers(List<Server> servers)
     {
         lock (_lock)
         {
-            _logger.LogDebug("SetServers: {ServersCount}", servers.Count);
-            _settings!.Servers = servers;
+            var userServers = servers.Where(server => server.ServerId != Server.LocalServerId).ToList();
+
+            _logger.LogDebug("SetServers: {ServersCount}", userServers.Count);
+            _settings!.Servers = userServers;
             SaveConfig();
         }
     }
@@ -307,6 +328,60 @@ public class ConfigHelper
         {
             _logger.LogDebug("ClearPreferredProfile");
             _settings!.PreferredProfile = null;
+            SaveConfig();
+        }
+    }
+
+    public void SetLinuxSettings(LinuxSettings linuxSettings)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetLinuxSettings: {Settings}", linuxSettings);
+            _settings!.LinuxSettings = linuxSettings;
+            SaveConfig();
+        }
+    }
+
+    public void SetUpdateChannel(UpdateChannel channel)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetUpdateChannel: {Channel}", channel);
+            _settings!.UpdateChannel = channel;
+            SaveConfig();
+        }
+    }
+
+    public void SetCheckForUpdatesOnStartup(bool checkForUpdatesOnStartup)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetCheckForUpdatesOnStartup: {CheckForUpdatesOnStartup}", checkForUpdatesOnStartup);
+            _settings!.CheckForUpdatesOnStartup = checkForUpdatesOnStartup;
+            SaveConfig();
+        }
+    }
+
+    public DateTimeOffset? GetLastSeenManifestUtc(UpdateChannel channel)
+    {
+        lock (_lock)
+        {
+            return _settings!.LastSeenManifests.TryGetValue(channel.ToString(), out var seen) ? seen : null;
+        }
+    }
+
+    public void SetLastSeenManifestUtc(UpdateChannel channel, DateTimeOffset generatedUtc)
+    {
+        lock (_lock)
+        {
+            var key = channel.ToString();
+
+            if (_settings!.LastSeenManifests.TryGetValue(key, out var existing) && existing == generatedUtc)
+            {
+                return;
+            }
+
+            _settings.LastSeenManifests[key] = generatedUtc;
             SaveConfig();
         }
     }

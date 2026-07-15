@@ -1,0 +1,23 @@
+@* Shared hover card for left-rail nav tiles. *@
+
+<div class="nav-item-tooltip">
+    <div class="nav-item-tooltip-name">@Name</div>
+    <div class="nav-item-tooltip-url">@Url</div>
+    @if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <div class="nav-item-tooltip-desc">@Description</div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string Name { get; set; } = "";
+
+    [Parameter]
+    [EditorRequired]
+    public string Url { get; set; } = "";
+
+    [Parameter]
+    public string? Description { get; set; }
+}

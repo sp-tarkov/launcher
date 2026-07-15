@@ -5,6 +5,14 @@
 @inject ConfigHelper ConfigHelper
 @inject NavigationManager NavigationManager
 @inject TitleHelper TitleHelper
+@inject BrowserBridge BrowserBridge
+@inject IJSRuntime JS
+@inject LocaleHelper LocaleHelper
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@inject UpdateClient UpdateClient
+@inject UpdateNotice UpdateNotice
+@inject ILogger<MainLayout> Logger
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudPopoverProvider/>
@@ -18,7 +26,7 @@
 <MudContainer Class="no-select overlay-container unset absolute">
     @if (ConfigHelper.GetConfig().UseBackground)
     {
-        <MudImage Src="./bg.jpg" Class="no-select fixed mud-height-full mud-width-full background-image-cover"/>
+        <MudImage Src="/images/bg.jpg" Class="no-select fixed mud-height-full mud-width-full background-image-cover"/>
     }
     <div class="no-select fixed mud-height-full mud-width-full background-overlay"></div>
 </MudContainer>
@@ -33,6 +41,7 @@
 </MudLayout>
 
 @code {
+    private DotNetObjectReference<BrowserBridge>? _bridgeRef;
 
     protected override void OnInitialized()
     {
@@ -42,6 +51,63 @@
         RefreshTitle();
 
         base.OnInitialized();
+    }
+
+    // Hand app.js a reference to the .NET BrowserBridge so intercepted external anchor clicks can open in the system browser.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _bridgeRef = DotNetObjectReference.Create(BrowserBridge);
+            await JS.InvokeVoidAsync("registerBrowserBridge", _bridgeRef);
+
+            if (UpdateNotice.JustUpdatedVersion is { } updatedVersion)
+            {
+                Snackbar.Add(LocaleHelper.Get("update_success").Replace("{version}", updatedVersion), Severity.Success);
+                UpdateNotice.JustUpdatedVersion = null;
+            }
+
+            if (ConfigHelper.GetConfig().CheckForUpdatesOnStartup)
+            {
+                _ = CheckForUpdateOnStartupAsync();
+            }
+        }
+    }
+
+    private async Task CheckForUpdateOnStartupAsync()
+    {
+        try
+        {
+            var update = await UpdateClient.CheckAsync(CancellationToken.None);
+            if (update is null)
+            {
+                return;
+            }
+
+            await InvokeAsync(() =>
+            {
+                Snackbar.Add(
+                    LocaleHelper.Get("update_available_toast").Replace("{version}", update.Release.LauncherVersion),
+                    Severity.Info,
+                    options =>
+                    {
+                        options.RequireInteraction = true;
+                        options.Action = LocaleHelper.Get("update_available_toast_action");
+                        options.ActionColor = Color.Primary;
+                        options.OnClick = _ =>
+                            DialogService.ShowAsync<UpdateCheckDialog>(
+                                LocaleHelper.Get("update_check_title"),
+                                new DialogParameters { { "Update", update } },
+                                ConfigHelper.DialogOptions
+                            );
+                    }
+                );
+            });
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Startup update check failed: {Exception}", ex);
+        }
     }
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -64,5 +130,6 @@
     {
         StateHelper.OnStateChanged -= HandleStateChanged;
         NavigationManager.LocationChanged -= HandleLocationChanged;
+        _bridgeRef?.Dispose();
     }
 }

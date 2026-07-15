@@ -1,0 +1,28 @@
+/* Restore real padding inside the wipe dialog. */
+.wipe-dialog .mud-dialog-content {
+    padding: 1.25rem !important;
+}
+
+.wipe-warning-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    list-style: disc outside;
+    color: var(--mud-palette-text-primary);
+}
+
+.wipe-control {
+    box-sizing: border-box;
+}
+
+.wipe-checkbox {
+    .mud-icon-button {
+        padding: 0;
+        margin-right: 0.5rem;
+    }
+
+    /* The checkbox glyph sits a touch high, like the MudButton labels. Nudge it down to align with its text. */
+    .mud-checkbox-span {
+        position: relative;
+        top: 1px;
+    }
+}

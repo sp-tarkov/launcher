@@ -2,8 +2,9 @@
 
 <MudContainer Class="pa-0">
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
-        <MudTextField @bind-Value="NewValue" Label="Umu Path" Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense"/>
-        <MudIconButton Color="@(NewValue == OldValue ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save" Disabled="@(NewValue == OldValue)" OnClick="OnTextSaved" />
+        <MudTextField Value="@ConfigHelper.GetConfig().LinuxSettings.UmuPath" Label="Umu Path" Variant="Variant.Outlined" Immediate="true"
+                      Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Folder"
+                      AdornmentColor="Color.Info" OnAdornmentClick="SetUmuPath"/>
     </MudLink>
 </MudContainer>
 @if (AddDiv)
@@ -12,15 +13,11 @@
 }
 
 @code {
-    // TODO: Add validation to this
+    [Parameter]
+    public bool Disabled { get; set; }
 
-    protected override Task OnInitializedAsync()
-    {
-        OldValue = ConfigHelper.GetConfig().LinuxSettings.UmuPath;
-        NewValue = $"{OldValue}";
-
-        return base.OnInitializedAsync();
-    }
+    [Parameter]
+    public bool AddDiv { get; set; }
 
     private string GetLinkClasses()
     {
@@ -29,7 +26,7 @@
             .AddClass("justify-center")
             .AddClass("align-center")
             .AddClass("py-2")
-            .AddClass("pl-5");
+            .AddClass("px-5");
 
         if (!Disabled)
         {
@@ -39,17 +36,18 @@
         return classes.Build();
     }
 
-    private string OldValue { get; set; } = "";
-    private string NewValue { get; set; } = "";
-
-    [Parameter] public bool Disabled { get; set; }
-
-    [Parameter] public bool AddDiv { get; set; }
-
-    private void OnTextSaved()
+    private async Task SetUmuPath()
     {
-        OldValue = NewValue;
-        ConfigHelper.SetLinuxUmuPath(NewValue);
+        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+
+        // no folder was selected
+        if (!folder.Any())
+        {
+            return;
+        }
+
+        ConfigHelper.SetLinuxUmuPath(folder.FirstOrDefault()!);
         StateHasChanged();
     }
+
 }

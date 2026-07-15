@@ -1,0 +1,52 @@
+@inject LocaleHelper LocaleHelper
+@inject ConfigHelper ConfigHelper
+@inject IDialogService DialogService
+
+<MudContainer Class="pa-0">
+    <a class="d-flex justify-center align-center cursor-pointer setting-on-hover py-2 px-5">
+        <MudText Class="no-select">@(LocaleHelper.Get("setting_option_update_channel"))</MudText>
+        <MudSpacer/>
+        <MudSelect T="UpdateChannel" Value="_selected" Clearable="false" ValueChanged="OnChannelChange">
+            <MudSelectItem Value="UpdateChannel.Stable">@(LocaleHelper.Get("update_channel_stable"))</MudSelectItem>
+            <MudSelectItem Value="UpdateChannel.Edge">@(LocaleHelper.Get("update_channel_edge"))</MudSelectItem>
+        </MudSelect>
+    </a>
+</MudContainer>
+@if (AddDiv)
+{
+    <MudDivider DividerType="DividerType.Middle" Class="ma-0"/>
+}
+
+@code {
+
+    [Parameter]
+    public bool AddDiv { get; set; }
+
+    private UpdateChannel _selected;
+
+    protected override void OnInitialized()
+    {
+        _selected = ConfigHelper.GetConfig().UpdateChannel;
+        base.OnInitialized();
+    }
+
+    private async Task OnChannelChange(UpdateChannel channel)
+    {
+        if (channel == UpdateChannel.Edge)
+        {
+            var dialog = await DialogService.ShowAsync<EdgeChannelWarningDialog>(LocaleHelper.Get("update_edge_warning_title"), ConfigHelper.DialogOptions);
+            var result = await dialog.Result;
+
+            if (result?.Canceled is not false)
+            {
+                _selected = UpdateChannel.Stable;
+                StateHasChanged();
+                return;
+            }
+        }
+
+        _selected = channel;
+        ConfigHelper.SetUpdateChannel(channel);
+        StateHasChanged();
+    }
+}

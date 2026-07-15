@@ -1,21 +1,42 @@
-﻿@inject ILogger<SettingsTopPanelComponent> Logger
+@inject ILogger<TroubleshootingPanelComponent> Logger
 @inject ConfigHelper ConfigHelper
 @inject StateHelper StateHelper
 @inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
 @inject WindowsClipboard Clipboard
 
-<MudContainer Class="pa-0 pb-4 d-flex justify-start gap-2">
-    @* TODO: Disabled inline with Master Branch will come back to this *@
-    <MudButton Disabled="true" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
-    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
-    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
-    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="!IsWindows" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
-</MudContainer>
+<SettingsSectionComponent Title="@(LocaleHelper.Get("setting_section_troubleshooting"))">
+    <SettingSwitchComponent Switch="@DebugLogging" OptionName="@(LocaleHelper.Get("setting_debug_logging"))" SwitchFunc="SetDebugLogging"/>
+    <MudDivider Class="ma-0 flex-grow-0"/>
+    <MudContainer Class="pa-0 d-flex flex-wrap justify-start gap-2">
+        @* TODO: Disabled inline with Master Branch will come back to this *@
+        <MudButton Disabled="true" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="!IsWindows" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
+    </MudContainer>
+</SettingsSectionComponent>
 
 @code {
 
+    private bool DebugLogging { get; set; }
+
     private bool IsWindows => OperatingSystem.IsWindows();
+
+    protected override void OnInitialized()
+    {
+        DebugLogging = ConfigHelper.GetConfig().DebugLogging;
+
+        base.OnInitialized();
+    }
+
+    private Task SetDebugLogging()
+    {
+        DebugLogging = !DebugLogging;
+        ConfigHelper.SetDebugLogging(DebugLogging);
+
+        return Task.CompletedTask;
+    }
 
     private void LoadLiveSettings()
     {

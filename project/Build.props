@@ -1,13 +1,20 @@
 <Project>
     <PropertyGroup>
         <!-- SPT specific  -->
-        <!-- TODO: Change back to 4.1.0 before release-->
-        <SptVersion Condition="'$(SptVersion)' == ''">4.0.13</SptVersion>
+        <SptVersion Condition="'$(SptVersion)' == ''">4.1.0</SptVersion>
         <SptCommitTag Condition="'$(SptCommitTag)' == ''">abc123a</SptCommitTag>
-        <Version>$(SptVersion)</Version>
-        <AssemblyVersion>$(SptVersion)</AssemblyVersion>
-        <FileVersion>$(SptVersion)</FileVersion>
-        <InformationalVersion>$(SptVersion)</InformationalVersion>
+
+        <!-- Launcher revision - Always 0 in source - Overridden by the release workflow. -->
+        <LauncherRevision Condition="'$(LauncherRevision)' == ''">0</LauncherRevision>
+
+        <!-- UTC build stamp - Overridden by the release workflow. -->
+        <LauncherBuildDate Condition="'$(LauncherBuildDate)' == ''">0001-01-01T00:00:00Z</LauncherBuildDate>
+
+        <Version>$(SptVersion).$(LauncherRevision)</Version>
+        <AssemblyVersion>$(SptVersion).$(LauncherRevision)</AssemblyVersion>
+        <FileVersion>$(SptVersion).$(LauncherRevision)</FileVersion>
+        <InformationalVersion>$(SptVersion).$(LauncherRevision)+$(SptCommitTag)</InformationalVersion>
+
         <!-- Project settings -->
         <TargetFramework>net10.0</TargetFramework>
         <LangVersion>latest</LangVersion>

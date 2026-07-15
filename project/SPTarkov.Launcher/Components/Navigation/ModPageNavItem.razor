@@ -1,0 +1,22 @@
+@* One mod-registered page as a left-rail tile. *@
+
+<NavTile Name="@ModPage.Name" Url="@Url" Description="@ModPage.Description" Disabled="Disabled" TileClass="mod-page-badge" TileStyle="@BadgeStyle">
+    @Initials
+</NavTile>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public ModPage ModPage { get; set; } = default!;
+
+    [Parameter]
+    [EditorRequired]
+    public string ServerAddress { get; set; } = "";
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private string Url => $"https://{ServerAddress}{ModPage.HomePage}";
+    private string Initials => ModPageVisual.GetInitials(ModPage.Name);
+    private string BadgeStyle => $"background-color: {ModPageVisual.GetColor(ModPage.Name)};";
+}

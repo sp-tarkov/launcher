@@ -1,34 +1,49 @@
-﻿@inject ISnackbar Snackbar
+@inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
 
-<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+<MudDialog Class="form-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
-        <MudContainer Class="py-4">
-            <MudForm Model="Server" @bind-IsValid="@_success" Class="gap-2 mt-3">
-                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_edit_name"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required_name"))" Variant="Variant.Outlined" Margin="Margin.Dense"/>
-                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense" HelperText="IPAddress:Port or sub.domain:Port" HelperTextOnFocus="true"/>
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-center gap-3">
+                <div class="dialog-header-icon" style="@ServerIconStyle">
+                    <MudIcon Icon="@Icons.Material.Filled.Dns" Color="Color.Inherit"/>
+                </div>
+                <MudText Typo="Typo.h6">@(LocaleHelper.Get("server_edit_title"))</MudText>
+            </div>
+
+            <MudText>@(LocaleHelper.Get("server_edit_text"))</MudText>
+
+            <MudForm Model="Server" Class="gap-3">
+                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_edit_name"))" HelperText="@(LocaleHelper.Get("server_add_name_help"))" ShrinkLabel="true" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required_name"))" Variant="Variant.Outlined" Margin="Margin.Dense" OnKeyDown="SubmitOnEnter"/>
+                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" HelperText="@(LocaleHelper.Get("server_add_address_help"))" ShrinkLabel="true" Placeholder="127.0.0.1:6969" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense" OnKeyDown="SubmitOnEnter"/>
             </MudForm>
-            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
-                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" OnClick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
+
+            <div class="mt-2 d-flex justify-end gap-2">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!CanSubmit)" OnClick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">@(LocaleHelper.Get("server_edit_cancel"))</MudButton>
-            </MudContainer>
-        </MudContainer>
+            </div>
+        </div>
     </DialogContent>
 </MudDialog>
 
 @code {
-    private bool _success;
-
     [Parameter]
     public Server Server { get; set; } = default!;
 
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
 
-    protected override void OnInitialized()
+    private bool CanSubmit => !string.IsNullOrWhiteSpace(Server.Name) && !string.IsNullOrWhiteSpace(Server.IpAddress);
+
+    // Matches the tint the server card icon gets in the listing.
+    private string ServerIconStyle => $"color: {ModPageVisual.GetColor($"{Server.Name}|{Server.IpAddress}")};";
+
+    private void SubmitOnEnter(KeyboardEventArgs args)
     {
-        _success = !string.IsNullOrEmpty(Server.Name) && !string.IsNullOrEmpty(Server.IpAddress);
-        base.OnInitialized();
+        if (args.Key == "Enter" && CanSubmit)
+        {
+            Submit();
+        }
     }
 
     private void Submit()
