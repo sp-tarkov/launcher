@@ -323,5 +323,8 @@
   "forge_offline_title": "Доступ к интернету не найден",
   "forge_offline_subtitle": "Проверьте подключение, затем обновите, чтобы повторить попытку.",
   "forge_offline_refresh": "Обновить",
-  "forge_search_failed": "Не удалось загрузить моды с Forge. Попробуйте снова чуть позже."
+  "forge_search_failed": "Не удалось загрузить моды с Forge. Попробуйте снова чуть позже.",
+  "forge_no_results_title": "Моды для SPT {0} не найдены",
+  "forge_no_results_subtitle": "Измените поисковый запрос или фильтры либо загляните позже.",
+  "forge_no_results_clear": "Сбросить фильтры"
 }

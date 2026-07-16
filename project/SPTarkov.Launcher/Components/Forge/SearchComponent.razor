@@ -3,7 +3,7 @@
 <MudContainer Class="d-flex flex-column px-0 mb-4">
     <MudGrid Class="search-component">
         <MudItem sm="12">
-            <MudTextField @bind-Value="SearchValue" Label="@(LocaleHelper.Get("search_title"))" Variant="Variant.Outlined" Adornment="Adornment.End"
+            <MudTextField @ref="SearchField" @bind-Value="SearchValue" Label="@(LocaleHelper.Get("search_title"))" Variant="Variant.Outlined" Adornment="Adornment.End"
                           AdornmentIcon="@Icons.Material.Filled.Search"  Clearable="true"
                           DebounceInterval="500" OnDebounceIntervalElapsed="SearchFunc" />
         </MudItem>
@@ -53,6 +53,8 @@
         get;
         set
         {
+            value ??= "";
+
             if (field == value)
             {
                 return;
@@ -147,4 +149,11 @@
 
     [Parameter]
     public List<ForgeCategory>? Categories { get; set; }
+
+    private MudTextField<string>? SearchField { get; set; }
+
+    public Task ClearSearchText()
+    {
+        return SearchField?.Clear() ?? Task.CompletedTask;
+    }
 }

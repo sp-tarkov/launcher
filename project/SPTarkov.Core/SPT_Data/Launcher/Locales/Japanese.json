@@ -323,5 +323,8 @@
   "forge_offline_title": "インターネット接続が見つかりません",
   "forge_offline_subtitle": "接続を確認してから、更新して再試行してください。",
   "forge_offline_refresh": "更新",
-  "forge_search_failed": "Forgeからmodを読み込めませんでした。しばらくしてからもう一度お試しください。"
+  "forge_search_failed": "Forgeからmodを読み込めませんでした。しばらくしてからもう一度お試しください。",
+  "forge_no_results_title": "SPT {0}向けのmodが見つかりませんでした",
+  "forge_no_results_subtitle": "検索条件やフィルターを調整するか、後でもう一度確認してください。",
+  "forge_no_results_clear": "フィルターをクリア"
 }

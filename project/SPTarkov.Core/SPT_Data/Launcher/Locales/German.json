@@ -323,5 +323,8 @@
   "forge_offline_title": "Kein Internetzugang gefunden",
   "forge_offline_subtitle": "Überprüfe deine Verbindung und aktualisiere dann, um es erneut zu versuchen.",
   "forge_offline_refresh": "Aktualisieren",
-  "forge_search_failed": "Mods konnten nicht vom Forge geladen werden. Versuche es gleich erneut."
+  "forge_search_failed": "Mods konnten nicht vom Forge geladen werden. Versuche es gleich erneut.",
+  "forge_no_results_title": "Keine Mods für SPT {0} gefunden",
+  "forge_no_results_subtitle": "Passe deine Suche oder Filter an oder schau später noch einmal vorbei.",
+  "forge_no_results_clear": "Filter zurücksetzen"
 }

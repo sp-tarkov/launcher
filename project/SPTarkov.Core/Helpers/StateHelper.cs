@@ -13,12 +13,20 @@ public class StateHelper(ILogger<StateHelper> logger)
     public MiniProfile? SelectedProfile;
     public Server? SelectedServer;
 
+    public const string DefaultSearch = "";
+    public const string DefaultFilter = "Include";
+    public const string DefaultAi = "Exclude";
+    public const string DefaultCategory = "all-cat";
+
     public int CurrentPagination = 1;
-    public string CurrentSearch = "";
+    public string CurrentSearch = DefaultSearch;
     public string CurrentSort = "-downloads";
-    public string CurrentFilter = "Include";
-    public string CurrentAi = "Exclude";
-    public string CurrentCategory = "all-cat";
+    public string CurrentFilter = DefaultFilter;
+    public string CurrentAi = DefaultAi;
+    public string CurrentCategory = DefaultCategory;
+
+    public bool HasNonDefaultForgeFilters =>
+        CurrentSearch != DefaultSearch || CurrentFilter != DefaultFilter || CurrentAi != DefaultAi || CurrentCategory != DefaultCategory;
 
     public List<ForgeCategory>? ListOfCategoriesAvailable;
 
@@ -69,5 +77,13 @@ public class StateHelper(ILogger<StateHelper> logger)
     {
         AllowServerPage = state;
         NotifyStateChanged();
+    }
+
+    public void ResetForgeFilters()
+    {
+        CurrentSearch = DefaultSearch;
+        CurrentFilter = DefaultFilter;
+        CurrentAi = DefaultAi;
+        CurrentCategory = DefaultCategory;
     }
 }

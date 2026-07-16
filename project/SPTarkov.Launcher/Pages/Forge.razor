@@ -19,7 +19,7 @@
         {
             <MudItem sm="12" Class="mb-6">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
-                    <SearchComponent @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" Categories="@Categories" SearchFunc="@SearchUpdate"/>
+                    <SearchComponent @ref="SearchComponentRef" @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" Categories="@Categories" SearchFunc="@SearchUpdate"/>
 
                     @if (SearchResponse?.Meta?.LastPage is not null && SearchResponse?.Data?.Count > 0)
                     {
@@ -63,9 +63,21 @@
             }
         </MudGrid>
     }
-    else if (SearchResponse?.Data?.Count == 0)
+    else
     {
-        // decide if i actually wanna put something here
+        <MudItem sm="12">
+            <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
+                <MudContainer Class="d-flex flex-column align-center gap-2 py-12">
+                    <MudIcon Icon="@Icons.Material.Filled.SearchOff" Style="font-size: 4rem;" Class="mud-text-secondary"/>
+                    <MudText Typo="Typo.h6" Align="Align.Center">@NoResultsTitle</MudText>
+                    <MudText Align="Align.Center" Class="mud-text-secondary">@(LocaleHelper.Get("forge_no_results_subtitle"))</MudText>
+                    @if (StateHelper.HasNonDefaultForgeFilters)
+                    {
+                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.FilterAltOff" OnClick="ClearFilters" Class="mt-2">@(LocaleHelper.Get("forge_no_results_clear"))</MudButton>
+                    }
+                </MudContainer>
+            </MudPaper>
+        </MudItem>
     }
 
 </MudContainer>
@@ -77,6 +89,8 @@
     private CancellationTokenSource? SearchCts { get; set; }
     private List<ForgeCategory>? Categories => StateHelper.ListOfCategoriesAvailable;
     private bool GettingCategories { get; set; }
+    private SearchComponent? SearchComponentRef { get; set; }
+    private string NoResultsTitle => string.Format(LocaleHelper.Get("forge_no_results_title"), ProgramStatics.SptVersionCompiledFor);
 
     private int PaginationValue
     {
@@ -197,6 +211,18 @@
     private async Task SearchUpdate()
     {
         await SearchForMods(1);
+    }
+
+    private async Task ClearFilters()
+    {
+        StateHelper.ResetForgeFilters();
+
+        if (SearchComponentRef is not null)
+        {
+            await SearchComponentRef.ClearSearchText();
+        }
+
+        await SearchUpdate();
     }
 
     private async Task GetCategories()

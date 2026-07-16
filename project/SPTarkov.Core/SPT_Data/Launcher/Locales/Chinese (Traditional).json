@@ -323,5 +323,8 @@
   "forge_offline_title": "未偵測到網際網路連線",
   "forge_offline_subtitle": "請檢查網路連線，然後重新整理再試一次。",
   "forge_offline_refresh": "重新整理",
-  "forge_search_failed": "無法從 Forge 載入模組。請稍後再試。"
+  "forge_search_failed": "無法從 Forge 載入模組。請稍後再試。",
+  "forge_no_results_title": "找不到適用於 SPT {0} 的模組",
+  "forge_no_results_subtitle": "請嘗試調整搜尋或篩選條件，或稍後再來查看。",
+  "forge_no_results_clear": "清除篩選"
 }

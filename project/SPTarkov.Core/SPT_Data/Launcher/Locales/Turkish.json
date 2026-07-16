@@ -323,5 +323,8 @@
   "forge_offline_title": "İnternet erişimi bulunamadı",
   "forge_offline_subtitle": "Bağlantınızı kontrol edin, ardından yeniden denemek için yenileyin.",
   "forge_offline_refresh": "Yenile",
-  "forge_search_failed": "Forge'dan modlar yüklenemedi. Birazdan tekrar deneyin."
+  "forge_search_failed": "Forge'dan modlar yüklenemedi. Birazdan tekrar deneyin.",
+  "forge_no_results_title": "SPT {0} için mod bulunamadı",
+  "forge_no_results_subtitle": "Aramanızı veya filtrelerinizi değiştirin ya da daha sonra tekrar kontrol edin.",
+  "forge_no_results_clear": "Filtreleri temizle"
 }

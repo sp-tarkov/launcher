@@ -323,5 +323,8 @@
   "forge_offline_title": "Aucun accès à Internet détecté",
   "forge_offline_subtitle": "Vérifiez votre connexion, puis actualisez pour réessayer.",
   "forge_offline_refresh": "Actualiser",
-  "forge_search_failed": "Impossible de charger les mods depuis le Forge. Réessayez dans un instant."
+  "forge_search_failed": "Impossible de charger les mods depuis le Forge. Réessayez dans un instant.",
+  "forge_no_results_title": "Aucun mod trouvé pour SPT {0}",
+  "forge_no_results_subtitle": "Ajustez votre recherche ou vos filtres, ou revenez plus tard.",
+  "forge_no_results_clear": "Effacer les filtres"
 }
