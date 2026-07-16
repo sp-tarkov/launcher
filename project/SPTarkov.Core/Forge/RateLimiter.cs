@@ -1,21 +1,25 @@
-﻿using System.Threading.RateLimiting;
+using System.Threading.RateLimiting;
+using Microsoft.Extensions.Logging;
 
 namespace SPTarkov.Core.Forge;
 
 public class ForgeRateLimiter : IAsyncDisposable
 {
+    private readonly ILogger<ForgeRateLimiter> _logger;
     private readonly RateLimiter _burst; // 40r/10s
     private readonly RateLimiter _sustained; // 200r/60s
 
-    public ForgeRateLimiter()
+    public ForgeRateLimiter(ILogger<ForgeRateLimiter> logger)
     {
+        _logger = logger;
+
         _burst = new SlidingWindowRateLimiter(
             new SlidingWindowRateLimiterOptions
             {
                 PermitLimit = 35,
                 Window = TimeSpan.FromSeconds(10),
                 SegmentsPerWindow = 1,
-                QueueLimit = 1,
+                QueueLimit = int.MaxValue,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             }
         );
@@ -26,7 +30,7 @@ public class ForgeRateLimiter : IAsyncDisposable
                 PermitLimit = 160,
                 Window = TimeSpan.FromSeconds(60),
                 SegmentsPerWindow = 1,
-                QueueLimit = 1,
+                QueueLimit = int.MaxValue,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             }
         );
@@ -34,17 +38,24 @@ public class ForgeRateLimiter : IAsyncDisposable
 
     public async Task WaitAsync(CancellationToken ct = default)
     {
-        // Must acquire both — whichever is tighter will naturally throttle
-        using var sustainedLease = await _sustained.AcquireAsync(1, ct);
-        if (!sustainedLease.IsAcquired)
-        {
-            Console.WriteLine(_sustained.GetStatistics());
-        }
+        // Acquire both and whichever is tighter will throttle.
+        await AcquireAsync(_sustained, "sustained", ct);
+        await AcquireAsync(_burst, "burst", ct);
+    }
 
-        using var burstLease = await _burst.AcquireAsync(1, ct);
-        if (!burstLease.IsAcquired)
+    private async Task AcquireAsync(RateLimiter limiter, string name, CancellationToken ct)
+    {
+        using var lease = await limiter.AcquireAsync(1, ct);
+        if (!lease.IsAcquired)
         {
-            Console.WriteLine(_sustained.GetStatistics());
+            var stats = limiter.GetStatistics();
+            _logger.LogWarning(
+                "Failed to acquire Forge {Name} rate limit lease (available: {Available}, queued: {Queued})",
+                name,
+                stats?.CurrentAvailablePermits,
+                stats?.CurrentQueuedCount
+            );
+            throw new InvalidOperationException($"Failed to acquire Forge {name} rate limit lease");
         }
     }
 
