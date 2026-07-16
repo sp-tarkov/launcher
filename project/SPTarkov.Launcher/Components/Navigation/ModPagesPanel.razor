@@ -1,0 +1,83 @@
+@* A full-height panel pinned to the right edge of the nav rail, listing every mod-registered page. Rendered from MainLayout as a sibling
+   of the drawer; opened via StateHelper by hovering the mod-pages tile in the rail, and held open only while the tile or panel is
+   hovered. *@
+
+@implements IDisposable
+
+@inject LocaleHelper LocaleHelper
+@inject StateHelper StateHelper
+@inject BrowserBridge Bridge
+@inject NavigationManager NavigationManager
+
+@if (StateHelper.AllowServerPage && StateHelper.ModPages.Count > 0)
+{
+    @* MudBlazor pushes div siblings of the mini drawer right by the drawer width; an aside is exempt. *@
+    <aside class="mod-pages-panel mud-background-gray mud-elevation-5 border-r-2 border-solid mud-border-lines-default @(StateHelper.ModPagesPanelOpen ? "is-open" : null)" @onpointerenter="StateHelper.HoldModPagesPanel" @onpointerleave="StateHelper.ReleaseModPagesPanel">
+        <div class="mod-pages-panel-header">
+            <div>
+                <MudText Typo="Typo.h6">@(LocaleHelper.Get("mod_pages_title"))</MudText>
+                <div class="mod-pages-panel-subtitle">@(LocaleHelper.Get("mod_pages_subtitle"))</div>
+            </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small" OnClick="Close"/>
+        </div>
+        <MudDivider/>
+        <div class="mod-pages-panel-list">
+            @foreach (var modPage in StateHelper.ModPages)
+            {
+                <div class="@EntryClass(modPage)" @onclick="@(() => OpenExternal(modPage))">
+                    <div class="mod-pages-panel-badge" style="@BadgeStyle(modPage)">@ModPageVisual.GetInitials(modPage.Name)</div>
+                    <div class="mod-pages-panel-text">
+                        <div class="mod-pages-panel-name">@modPage.Name</div>
+                        @if (!string.IsNullOrWhiteSpace(modPage.Description))
+                        {
+                            <div class="mod-pages-panel-desc">@modPage.Description</div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </aside>
+}
+
+@code {
+    private string ServerAddress => StateHelper.SelectedServer?.IpAddress ?? "";
+
+    protected override void OnInitialized()
+    {
+        StateHelper.OnStateChanged += StateHasChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
+        base.OnInitialized();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        StateHelper.SetModPagesPanelOpen(false);
+    }
+
+    private static string BadgeStyle(ModPage modPage)
+    {
+        return $"background-color: {ModPageVisual.GetColor(modPage.Name)};";
+    }
+
+    private static string EntryClass(ModPage modPage)
+    {
+        return string.IsNullOrWhiteSpace(modPage.Description) ? "mod-pages-panel-entry is-centered" : "mod-pages-panel-entry";
+    }
+
+    private void Close()
+    {
+        StateHelper.SetModPagesPanelOpen(false);
+    }
+
+    private void OpenExternal(ModPage modPage)
+    {
+        Bridge.OpenExternal($"https://{ServerAddress}{modPage.HomePage}");
+        Close();
+    }
+
+    public void Dispose()
+    {
+        StateHelper.OnStateChanged -= StateHasChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+}

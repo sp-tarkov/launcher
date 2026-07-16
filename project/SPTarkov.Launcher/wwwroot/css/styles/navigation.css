@@ -71,34 +71,12 @@
     margin: 4px 0;
 }
 
-/* Mod-page tiles are packed tighter than the SIC tile. */
-.nav-tile-link:has(.mod-page-badge) {
-    margin: 2px 0;
-}
-
-/* Divider between the SIC tile and the mod-page tiles below it. Spans the flat part of a tile's edge. */
+/* Divider between the SIC tile and the mod-pages tile below it. Spans the flat part of a tile's edge. */
 .nav-tiles-divider {
     width: var(--nav-tile-flat-width);
     height: 1px;
     margin: 6px auto;
     background-color: rgba(255, 255, 255, 0.12);
-}
-
-/* Heading over the mod-page tiles. Matches the divider's width and clips rather than widening the rail. */
-.nav-tiles-label {
-    width: var(--nav-tile-flat-width);
-    margin: 0 auto 3px;
-    overflow: hidden;
-    color: rgba(255, 255, 255, 0.3);
-    font-weight: 700;
-    font-size: 0.6rem;
-    line-height: 1;
-    letter-spacing: 0.04em;
-    text-align: center;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
-    white-space: nowrap;
-    user-select: none;
 }
 
 .nav-tiles {
@@ -108,15 +86,9 @@
     /* The tile edge between its two rounded corners. The divider and heading are sized to this rather than to the rail, whose usable width
     is the drawer's 56px mini width less its 2px right border. */
     --nav-tile-flat-width: calc(var(--nav-tile-size) - 2 * var(--nav-tile-radius));
-
-    /* While a tile is hovered, every other tile in the group greys out. */
-    &:has(.nav-tile-link:hover) .nav-tile-link:not(:hover) .nav-tile {
-        filter: grayscale(1);
-        opacity: 0.4;
-    }
 }
 
-/* Square face shared by the SIC tile and every mod-page tile. */
+/* Square face shared by the SIC and mod-pages tiles. */
 .nav-tile {
     display: flex;
     align-items: center;
@@ -132,18 +104,121 @@
     text-transform: uppercase;
     user-select: none;
     cursor: pointer;
-    transition: filter 150ms ease, opacity 150ms ease;
+    transition: filter 150ms ease;
 }
 
-/* Mod-page tiles are shorter than the shared tile height, keeping the column narrow-and-short so more pages fit. */
-.nav-tile.mod-page-badge {
-    height: 32px;
+/* A hovered tile brightens without affecting its neighbours. */
+.nav-tile-link:hover .nav-tile {
+    filter: brightness(1.2);
 }
 
 /* Native "SIC" text over the brown gradient with tan lettering. */
 .sic-tile {
     background: linear-gradient(180deg, #513723 0%, #312408 100%);
     color: #d8c199;
+}
+
+.nav-tile.mod-pages-tile {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Full-height panel pinned to the right edge of the rail. */
+.mod-pages-panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: var(--mud-drawer-width-mini-left, 56px);
+    z-index: var(--mud-zindex-drawer, 1100);
+    display: flex;
+    flex-direction: column;
+    width: 340px;
+    max-width: calc(100vw - 56px);
+    transform: translateX(-12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform 150ms ease, opacity 150ms ease, visibility 150ms;
+
+    &.is-open {
+        transform: none;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mod-pages-panel-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 12px 12px 12px 16px;
+    }
+
+    .mod-pages-panel-subtitle {
+        margin-top: 2px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .mod-pages-panel-list {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 8px;
+    }
+
+    .mod-pages-panel-entry {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 10px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.06);
+        }
+
+        /* Entries without a description centre the badge on the name. */
+        &.is-centered {
+            align-items: center;
+        }
+    }
+
+    /* Square initials badge matching the mod's derived colour. */
+    .mod-pages-panel-badge {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        color: #fff;
+        font-weight: 700;
+        font-size: 0.8rem;
+        line-height: 1;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        user-select: none;
+    }
+
+    .mod-pages-panel-text {
+        min-width: 0;
+    }
+
+    .mod-pages-panel-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        line-height: 1.2;
+        color: #fff;
+    }
+
+    .mod-pages-panel-desc {
+        margin-top: 2px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        white-space: normal;
+    }
 }
 
 /* Hover tooltip card shared by the SIC and mod-page tiles. */

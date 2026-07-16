@@ -7,6 +7,9 @@ namespace SPTarkov.Core.Helpers;
 
 public class StateHelper(ILogger<StateHelper> logger)
 {
+    private const int ModPagesPanelCloseDelayMs = 300;
+    private long _modPagesPanelHoverVersion;
+
     public List<MiniProfile> ProfileList = [];
     public Dictionary<string, string> ProfileTypes = new();
     public List<ModPage> ModPages = [];
@@ -32,6 +35,7 @@ public class StateHelper(ILogger<StateHelper> logger)
 
     public bool AllowNavigation { get; set; } = true;
     public bool AllowServerPage { get; set; } = false;
+    public bool ModPagesPanelOpen { get; set; } = false;
 
     public bool AutoConnectAttempted { get; set; } = false; // Startup auto-connect guard
 
@@ -45,6 +49,7 @@ public class StateHelper(ILogger<StateHelper> logger)
         ModPages = [];
         SelectedProfile = null;
         SelectedServer = null;
+        ModPagesPanelOpen = false;
     }
 
     public void SetSelectedServer(Server? server)
@@ -85,5 +90,35 @@ public class StateHelper(ILogger<StateHelper> logger)
         CurrentFilter = DefaultFilter;
         CurrentAi = DefaultAi;
         CurrentCategory = DefaultCategory;
+    }
+
+    public void SetModPagesPanelOpen(bool state)
+    {
+        if (ModPagesPanelOpen == state)
+        {
+            return;
+        }
+
+        ModPagesPanelOpen = state;
+        NotifyStateChanged();
+    }
+
+    // Keeps the mod-pages panel open while the nav tile or the panel itself is hovered.
+    public void HoldModPagesPanel()
+    {
+        _modPagesPanelHoverVersion++;
+        SetModPagesPanelOpen(true);
+    }
+
+    // Closes the mod-pages panel after a short delay, unless another hover has held it open since.
+    public async Task ReleaseModPagesPanel()
+    {
+        var version = _modPagesPanelHoverVersion;
+        await Task.Delay(ModPagesPanelCloseDelayMs);
+
+        if (version == _modPagesPanelHoverVersion)
+        {
+            SetModPagesPanelOpen(false);
+        }
     }
 }

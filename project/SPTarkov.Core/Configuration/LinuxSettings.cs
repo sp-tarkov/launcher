@@ -3,7 +3,7 @@ namespace SPTarkov.Core.Configuration;
 public record LinuxSettings
 {
     // /home/cwx/Games/tarkov
-    public string PrefixPath { get; set; } = Directory.GetCurrentDirectory().Split("/drive_c").FirstOrDefault();
+    public string PrefixPath { get; set; } = Directory.GetCurrentDirectory().Split("/drive_c")[0];
 
     // /home/cwx/.local/share/spt-additions/runtime/umu-run
     public string UmuPath { get; set; } =
