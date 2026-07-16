@@ -319,5 +319,8 @@
   "setting_section_updates": "Actualizaciones",
   "setting_section_linux": "Linux",
   "setting_section_troubleshooting": "Solución de problemas",
-  "linux_add_confirm": "Confirm?"
+  "linux_add_confirm": "Confirm?",
+  "forge_offline_title": "No se encontró acceso a Internet",
+  "forge_offline_subtitle": "Compruebe su conexión y actualice para volver a intentarlo.",
+  "forge_offline_refresh": "Actualizar"
 }

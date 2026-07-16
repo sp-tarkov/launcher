@@ -319,5 +319,8 @@
   "setting_section_updates": "Mises à jour",
   "setting_section_linux": "Linux",
   "setting_section_troubleshooting": "Dépannage",
-  "linux_add_confirm": "Confirm?"
+  "linux_add_confirm": "Confirm?",
+  "forge_offline_title": "Aucun accès à Internet détecté",
+  "forge_offline_subtitle": "Vérifiez votre connexion, puis actualisez pour réessayer.",
+  "forge_offline_refresh": "Actualiser"
 }

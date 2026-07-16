@@ -319,5 +319,8 @@
   "setting_section_updates": "Обновления",
   "setting_section_linux": "Linux",
   "setting_section_troubleshooting": "Устранение неполадок",
-  "linux_add_confirm": "Confirm?"
+  "linux_add_confirm": "Confirm?",
+  "forge_offline_title": "Доступ к интернету не найден",
+  "forge_offline_subtitle": "Проверьте подключение, затем обновите, чтобы повторить попытку.",
+  "forge_offline_refresh": "Обновить"
 }

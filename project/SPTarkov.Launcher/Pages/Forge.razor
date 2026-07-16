@@ -35,10 +35,14 @@
     @if (NetAvailable == false)
     {
         <MudItem sm="12">
-            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined">No Internet access found, please fix and refresh!</MudAlert>
-        </MudItem>
-        <MudItem sm="12" Class="mt-4 d-flex justify-center align-center">
-            <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="CheckInternetAccess">Refresh</MudButton>
+            <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
+                <MudContainer Class="d-flex flex-column align-center gap-2 py-12">
+                    <MudIcon Icon="@Icons.Material.Filled.WifiOff" Style="font-size: 4rem;" Class="mud-text-secondary"/>
+                    <MudText Typo="Typo.h6" Align="Align.Center">@(LocaleHelper.Get("forge_offline_title"))</MudText>
+                    <MudText Align="Align.Center" Class="mud-text-secondary">@(LocaleHelper.Get("forge_offline_subtitle"))</MudText>
+                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="CheckInternetAccess" Class="mt-2">@(LocaleHelper.Get("forge_offline_refresh"))</MudButton>
+                </MudContainer>
+            </MudPaper>
         </MudItem>
     }
 

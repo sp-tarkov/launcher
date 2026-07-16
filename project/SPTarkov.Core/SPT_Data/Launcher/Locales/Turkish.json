@@ -319,5 +319,8 @@
   "setting_section_updates": "Güncellemeler",
   "setting_section_linux": "Linux",
   "setting_section_troubleshooting": "Sorun Giderme",
-  "linux_add_confirm": "Confirm?"
+  "linux_add_confirm": "Confirm?",
+  "forge_offline_title": "İnternet erişimi bulunamadı",
+  "forge_offline_subtitle": "Bağlantınızı kontrol edin, ardından yeniden denemek için yenileyin.",
+  "forge_offline_refresh": "Yenile"
 }

@@ -319,5 +319,8 @@
   "setting_section_updates": "更新",
   "setting_section_linux": "Linux",
   "setting_section_troubleshooting": "故障排除",
-  "linux_add_confirm": "Confirm?"
+  "linux_add_confirm": "Confirm?",
+  "forge_offline_title": "未检测到互联网连接",
+  "forge_offline_subtitle": "请检查网络连接，然后刷新重试。",
+  "forge_offline_refresh": "刷新"
 }

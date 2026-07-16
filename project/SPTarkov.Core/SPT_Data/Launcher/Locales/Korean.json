@@ -319,5 +319,8 @@
   "setting_section_updates": "업데이트",
   "setting_section_linux": "Linux",
   "setting_section_troubleshooting": "문제 해결",
-  "linux_add_confirm": "Confirm?"
+  "linux_add_confirm": "Confirm?",
+  "forge_offline_title": "인터넷 연결을 찾을 수 없습니다",
+  "forge_offline_subtitle": "연결을 확인한 후 새로 고침하여 다시 시도하세요.",
+  "forge_offline_refresh": "새로 고침"
 }
