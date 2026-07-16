@@ -37,6 +37,9 @@ public class HttpHelper
         _httpClient.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
     }
 
+    private static readonly HttpRequestOptionsKey<bool> AllowUntrustedCertificate = new("AllowUntrustedCertificate");
+
+    // Accepts untrusted certificates only for requests marked as game-server traffic (self-signed local SPT servers).
     private static bool CertificateValidationCallback(
         HttpRequestMessage httpRequestMessage,
         X509Certificate2? x509Certificate2,
@@ -44,7 +47,19 @@ public class HttpHelper
         SslPolicyErrors sslPolicyErrors
     )
     {
-        return true;
+        if (sslPolicyErrors == SslPolicyErrors.None)
+        {
+            return true;
+        }
+
+        return httpRequestMessage.Options.TryGetValue(AllowUntrustedCertificate, out var allowUntrusted) && allowUntrusted;
+    }
+
+    private static HttpRequestMessage BuildGameServerMessage(HttpMethod methodType, string url, HttpContent? content = null)
+    {
+        var message = new HttpRequestMessage(methodType, url) { Content = content };
+        message.Options.Set(AllowUntrustedCertificate, true);
+        return message;
     }
 
     private string BuildGameUrl(string url)
@@ -56,7 +71,7 @@ public class HttpHelper
     {
         _logger.LogDebug("Get: {Url}", url);
 
-        var task = await _httpClient.GetAsync(BuildGameUrl(url), token);
+        var task = await _httpClient.SendAsync(BuildGameServerMessage(HttpMethod.Get, BuildGameUrl(url)), token);
         var json = SimpleZlib.Decompress(await task.Content.ReadAsByteArrayAsync(token));
         return JsonSerializer.Deserialize<T>(json);
     }
@@ -67,7 +82,7 @@ public class HttpHelper
     {
         try
         {
-            var response = await _httpClient.GetAsync("https://" + ipAddress + Urls.Ping, token);
+            var response = await _httpClient.SendAsync(BuildGameServerMessage(HttpMethod.Get, "https://" + ipAddress + Urls.Ping), token);
             if (!response.IsSuccessStatusCode)
             {
                 return false;
@@ -90,7 +105,7 @@ public class HttpHelper
 
         var content = new ByteArrayContent(SimpleZlib.CompressToBytes(JsonSerializer.Serialize(request), zlibConst.Z_BEST_COMPRESSION));
 
-        var task = await _httpClient.PutAsync(BuildGameUrl(url), content, token);
+        var task = await _httpClient.SendAsync(BuildGameServerMessage(HttpMethod.Put, BuildGameUrl(url), content), token);
 
         return JsonSerializer.Deserialize<T>(SimpleZlib.Decompress(await task.Content.ReadAsByteArrayAsync(token)));
     }
