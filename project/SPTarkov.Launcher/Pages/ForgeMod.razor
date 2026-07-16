@@ -1,5 +1,7 @@
 ﻿@page "/ForgeMod/{ModId}"
 
+@implements IDisposable
+
 @inject HttpHelper HttpHelper
 @inject ILogger<ForgeMod> Logger
 @inject TitleHelper TitleHelper
@@ -22,28 +24,53 @@
     private ForgeVersionResponse? VersionResponse { get; set; }
     private ForgeAddonResponse? AddonResponse { get; set; }
     private bool SearchInProgress { get; set; }
+    private CancellationTokenSource? LoadCancellation { get; set; }
 
     [Parameter]
     public string ModId { get; set; } = "";
 
     protected override async Task OnParametersSetAsync()
     {
+        LoadCancellation?.Cancel();
+        LoadCancellation?.Dispose();
+        LoadCancellation = new CancellationTokenSource();
+        var loadToken = LoadCancellation.Token;
+        var modId = ModId;
+
         SearchResponse = null;
         VersionResponse = null;
         AddonResponse = null;
 
-        await SearchForMod();
-        await SearchForLatestVersion();
-        await SearchForModAddons(ModId);
-        await base.OnInitializedAsync();
+        await SearchForMod(modId, loadToken);
+        await SearchForLatestVersion(modId, loadToken);
+        await SearchForModAddons(modId, loadToken);
     }
 
-    private async Task SearchForLatestVersion()
+    public void Dispose()
+    {
+        LoadCancellation?.Cancel();
+        LoadCancellation?.Dispose();
+        LoadCancellation = null;
+    }
+
+    private static CancellationTokenSource CreateTimeoutSource(CancellationToken loadToken)
+    {
+        var source = CancellationTokenSource.CreateLinkedTokenSource(loadToken);
+        source.CancelAfter(TimeSpan.FromSeconds(10));
+        return source;
+    }
+
+    private async Task SearchForLatestVersion(string modId, CancellationToken loadToken)
     {
         try
         {
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var response = await HttpHelper.ForgeGetLatestCompatibleModVersion(ModId, token.Token);
+            using var token = CreateTimeoutSource(loadToken);
+            var response = await HttpHelper.ForgeGetLatestCompatibleModVersion(modId, token.Token);
+
+            if (loadToken.IsCancellationRequested)
+            {
+                return;
+            }
 
             if (response?.Data?.Count > 0)
             {
@@ -51,6 +78,11 @@
                 StateHasChanged();
                 return;
             }
+        }
+        catch (OperationCanceledException) when (loadToken.IsCancellationRequested)
+        {
+            // Expected when navigating to another mod. Stale result is discarded.
+            return;
         }
         catch (Exception e)
         {
@@ -60,22 +92,27 @@
         var firstVersion = SearchResponse?.Data?.Versions?.FirstOrDefault();
         if (firstVersion != null)
         {
-            await SearchForModVersion(ModId, firstVersion.Id.ToString());
+            await SearchForModVersion(modId, firstVersion.Id.ToString(), loadToken);
         }
     }
 
-    private async Task SearchForMod()
+    private async Task SearchForMod(string modId, CancellationToken loadToken)
     {
         SearchInProgress = true;
 
         try
         {
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var response = await HttpHelper.ForgeGetMod(ModId, token.Token);
+            using var token = CreateTimeoutSource(loadToken);
+            var response = await HttpHelper.ForgeGetMod(modId, token.Token);
+
+            if (loadToken.IsCancellationRequested)
+            {
+                return;
+            }
 
             if (response is null)
             {
-                Logger.LogError("Getting mod {modId} returned no response", ModId);
+                Logger.LogError("Getting mod {modId} returned no response", modId);
                 return;
             }
 
@@ -83,8 +120,12 @@
 
             if (SearchResponse.Data is not null)
             {
-                TitleHelper.Apply($"ForgeMod/{ModId}", SearchResponse.Data.Name);
+                TitleHelper.Apply($"ForgeMod/{modId}", SearchResponse.Data.Name);
             }
+        }
+        catch (OperationCanceledException) when (loadToken.IsCancellationRequested)
+        {
+            // Expected when navigating to another mod. Stale result is discarded.
         }
         catch (Exception e)
         {
@@ -92,17 +133,25 @@
         }
         finally
         {
-            SearchInProgress = false;
-            StateHasChanged();
+            if (!loadToken.IsCancellationRequested)
+            {
+                SearchInProgress = false;
+                StateHasChanged();
+            }
         }
     }
 
-    private async Task SearchForModVersion(string modId, string versionId)
+    private async Task SearchForModVersion(string modId, string versionId, CancellationToken loadToken)
     {
         try
         {
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var token = CreateTimeoutSource(loadToken);
             var response = await HttpHelper.ForgeGetModVersion(modId, versionId, token.Token);
+
+            if (loadToken.IsCancellationRequested)
+            {
+                return;
+            }
 
             if (response is null)
             {
@@ -117,22 +166,34 @@
                 Logger.LogError("Getting Mod version failed {modId}:{versionId} for reason: {code}:{message}", modId, versionId, VersionResponse.Code, VersionResponse.Message);
             }
         }
+        catch (OperationCanceledException) when (loadToken.IsCancellationRequested)
+        {
+            // Expected when navigating to another mod. Stale result is discarded.
+        }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.SearchForModVersion {Exception}", e);
         }
         finally
         {
-            StateHasChanged();
+            if (!loadToken.IsCancellationRequested)
+            {
+                StateHasChanged();
+            }
         }
     }
 
-    private async Task SearchForModAddons(string modId)
+    private async Task SearchForModAddons(string modId, CancellationToken loadToken)
     {
         try
         {
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var token = CreateTimeoutSource(loadToken);
             var response = await HttpHelper.ForgeGetModAddons(modId, token.Token);
+
+            if (loadToken.IsCancellationRequested)
+            {
+                return;
+            }
 
             if (response is null)
             {
@@ -147,13 +208,20 @@
                 Logger.LogError("Getting Mod Addons failed {modId}", modId);
             }
         }
+        catch (OperationCanceledException) when (loadToken.IsCancellationRequested)
+        {
+            // Expected when navigating to another mod. Stale result is discarded.
+        }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.SearchForModAddons {Exception}", e);
         }
         finally
         {
-            StateHasChanged();
+            if (!loadToken.IsCancellationRequested)
+            {
+                StateHasChanged();
+            }
         }
     }
 }
