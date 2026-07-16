@@ -158,11 +158,11 @@ public class WindowsSevenZip : SevenZip
     {
         token.ThrowIfCancellationRequested();
 
-        // With the -slt switch, 7-Zip lists the archive's own properties first, then a dashed divider (----------),
-        // then one "Path = <name>" line per entry. Skip everything up to the divider so the archive's own path isn't
-        // read as an entry.
+        // With the -slt switch, 7-Zip lists the archive's own properties first, then a dashed divider,
+        // then one "Path = <name>" line per entry. The header echoes the archive comment verbatim, which
+        // can contain forged divider and "Path = " lines; 7-Zip always emits its real divider last. Keep
+        // only the entries after the final divider by clearing the list on every dashed divider.
         var entries = new List<string>();
-        var pastArchiveHeader = false;
 
         foreach (var rawLine in outputResult.Split('\n'))
         {
@@ -170,14 +170,9 @@ public class WindowsSevenZip : SevenZip
 
             var line = rawLine.TrimEnd('\r');
 
-            if (!pastArchiveHeader)
+            if (line.Length >= 5 && line.All(c => c == '-'))
             {
-                // The archive-properties separator is "--"; the entry divider is longer.
-                if (line.Length >= 5 && line.All(c => c == '-'))
-                {
-                    pastArchiveHeader = true;
-                }
-
+                entries.Clear();
                 continue;
             }
 
