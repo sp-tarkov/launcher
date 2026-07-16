@@ -322,5 +322,6 @@
   "linux_add_confirm": "Confirm?",
   "forge_offline_title": "インターネット接続が見つかりません",
   "forge_offline_subtitle": "接続を確認してから、更新して再試行してください。",
-  "forge_offline_refresh": "更新"
+  "forge_offline_refresh": "更新",
+  "forge_search_failed": "Forgeからmodを読み込めませんでした。しばらくしてからもう一度お試しください。"
 }

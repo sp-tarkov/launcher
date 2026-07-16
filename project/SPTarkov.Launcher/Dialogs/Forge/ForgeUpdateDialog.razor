@@ -73,23 +73,14 @@
 
         var response = await HttpHelper.ForgeGetUpdate(listOfModsToCheck, ProgramStatics.SptVersionCompiledFor.ToString(), Token.Token);
 
-        if (response is null)
+        if (response is null || !response.Success)
         {
-            Logger.LogWarning("Forge ForgeGetUpdate response is null");
-        }
-
-        if (response!.Success)
-        {
-            Logger.LogInformation("Forge ForgeGetUpdate Authenticated");
-        }
-
-        if (!response.Success)
-        {
-            Logger.LogWarning("Forge ForgeGetUpdate NOT - Authenticated");
-            Token?.Dispose();
+            Logger.LogWarning("Forge ForgeGetUpdate failed");
             AbortOrFail(failString);
+            return null;
         }
 
+        Logger.LogInformation("Forge ForgeGetUpdate Authenticated");
         return response;
     }
 

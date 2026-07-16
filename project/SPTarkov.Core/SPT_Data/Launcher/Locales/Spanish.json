@@ -322,5 +322,6 @@
   "linux_add_confirm": "Confirm?",
   "forge_offline_title": "No se encontró acceso a Internet",
   "forge_offline_subtitle": "Compruebe su conexión y actualice para volver a intentarlo.",
-  "forge_offline_refresh": "Actualizar"
+  "forge_offline_refresh": "Actualizar",
+  "forge_search_failed": "No se pudieron cargar los mods desde el Forge. Vuelva a intentarlo en un momento."
 }

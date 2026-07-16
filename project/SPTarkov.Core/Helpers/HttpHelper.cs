@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Security;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
@@ -112,44 +113,20 @@ public class HttpHelper
 
     public async Task<ForgeModResponse?> ForgeGetMod(string? modId, CancellationToken token)
     {
-        await _rateLimiter.WaitAsync(token);
-
         var paramsToUse = GetParamsCollection();
-        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}?{paramsToUse}");
-        var task = await _httpClient.SendAsync(message, token);
-        var response = await task.Content.ReadAsStringAsync(token);
-
-        _logger.LogDebug("ForgeGetMod Response: {Response}", response);
-
-        return JsonSerializer.Deserialize<ForgeModResponse>(response);
+        return await ForgeGet<ForgeModResponse>($"{Urls.ForgeMod}/{modId}?{paramsToUse}", token);
     }
 
     public async Task<ForgeVersionResponse?> ForgeGetModVersion(string modId, string versionId, CancellationToken token)
     {
-        await _rateLimiter.WaitAsync(token);
-
         var paramsToUse = ParamsCollectionForVersions(versionId);
-        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}");
-        var task = await _httpClient.SendAsync(message, token);
-        var response = await task.Content.ReadAsStringAsync(token);
-
-        _logger.LogDebug("ForgeGetModVersion Response: {Response}", response);
-
-        return JsonSerializer.Deserialize<ForgeVersionResponse>(response);
+        return await ForgeGet<ForgeVersionResponse>($"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}", token);
     }
 
     public async Task<ForgeVersionResponse?> ForgeGetLatestCompatibleModVersion(string modId, CancellationToken token)
     {
-        await _rateLimiter.WaitAsync(token);
-
         var paramsToUse = ParamsCollectionForVersions(sptVersion: ProgramStatics.SptVersionCompiledFor.ToString(), sort: "-version");
-        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}");
-        var task = await _httpClient.SendAsync(message, token);
-        var response = await task.Content.ReadAsStringAsync(token);
-
-        _logger.LogDebug("ForgeGetLatestCompatibleModVersion Response: {Response}", response);
-
-        return JsonSerializer.Deserialize<ForgeVersionResponse>(response);
+        return await ForgeGet<ForgeVersionResponse>($"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}", token);
     }
 
     public async Task<ForgeModsResponse?> ForgeGetMods(
@@ -162,96 +139,37 @@ public class HttpHelper
         string? category = null
     )
     {
-        await _rateLimiter.WaitAsync(token);
-
         var paramsToUse = GetParamsCollection(search, sort, ConvertOptionToBool(includeFeatured), ConvertOptionToBool(includeAi), category);
-        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeMods}?page={page}&{paramsToUse}");
-        var task = await _httpClient.SendAsync(message, token);
-        var response = await task.Content.ReadAsStringAsync(token);
-
-        _logger.LogDebug("ForgeGetMods Response: {Response}", response);
-
-        if (task.StatusCode == HttpStatusCode.TooManyRequests)
-        {
-            _httpClient.CancelPendingRequests();
-            throw new ForgeRetryException("Too many requests made to the forge", null);
-        }
-
-        if (!task.IsSuccessStatusCode)
-        {
-            return new ForgeModsResponse { Success = false };
-        }
-
-        return JsonSerializer.Deserialize<ForgeModsResponse>(response);
+        return await ForgeGet<ForgeModsResponse>($"{Urls.ForgeMods}?page={page}&{paramsToUse}", token);
     }
 
     public async Task<ForgeUpdateResponse?> ForgeGetUpdate(List<string> modGuidsWithVersions, string sptVersion, CancellationToken token)
     {
-        await _rateLimiter.WaitAsync(token);
-
         var paramsToUse = ParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
-        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeUpdate}?{paramsToUse}");
-        var task = await _httpClient.SendAsync(message, token);
-        var response = await task.Content.ReadAsStringAsync(token);
-
-        _logger.LogDebug("ForgeGetUpdate Response: {Response}", response);
-
-        if (!task.IsSuccessStatusCode)
-        {
-            return new ForgeUpdateResponse { Success = false };
-        }
-
-        return JsonSerializer.Deserialize<ForgeUpdateResponse>(response);
+        return await ForgeGet<ForgeUpdateResponse>($"{Urls.ForgeUpdate}?{paramsToUse}", token);
     }
 
     public async Task<ForgeAddonResponse?> ForgeGetModAddons(string modId, CancellationToken token)
     {
-        await _rateLimiter.WaitAsync(token);
-
         var paramsToUse = ParamsCollectionForAddons(modId);
-        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeAddons}?{paramsToUse}");
-        var task = await _httpClient.SendAsync(message, token);
-        var response = await task.Content.ReadAsStringAsync(token);
-
-        _logger.LogDebug("ForgeGetModAddons Response: {Response}", response);
-
-        return JsonSerializer.Deserialize<ForgeAddonResponse>(response);
+        return await ForgeGet<ForgeAddonResponse>($"{Urls.ForgeAddons}?{paramsToUse}", token);
     }
 
     public async Task<ForgeAddonDetailsResponse?> ForgeGetModAddonDetails(string addonId, CancellationToken token)
     {
-        await _rateLimiter.WaitAsync(token);
-
-        var message = BuildMessage(HttpMethod.Get, $"{Urls.ForgeAddonDetails}/{addonId}");
-        var task = await _httpClient.SendAsync(message, token);
-        var response = await task.Content.ReadAsStringAsync(token);
-
-        _logger.LogDebug("ForgeGetModAddon Response: {Response}", response);
-
-        return JsonSerializer.Deserialize<ForgeAddonDetailsResponse>(response);
+        return await ForgeGet<ForgeAddonDetailsResponse>($"{Urls.ForgeAddonDetails}/{addonId}", token);
     }
 
-    public async Task<ForgeCategoriesResponse?> ForgeGetCategories(CancellationToken tokenToken)
+    public async Task<ForgeCategoriesResponse?> ForgeGetCategories(CancellationToken token)
     {
-        await _rateLimiter.WaitAsync(tokenToken);
-
-        var message = BuildMessage(HttpMethod.Get, Urls.ForgeCategories);
-        var task = await _httpClient.SendAsync(message, tokenToken);
-        var response = await task.Content.ReadAsStringAsync(tokenToken);
-
-        _logger.LogDebug("ForgeGetCategories Response: {Response}", response);
-
-        return JsonSerializer.Deserialize<ForgeCategoriesResponse>(response);
+        return await ForgeGet<ForgeCategoriesResponse>(Urls.ForgeCategories, token);
     }
 
     public async Task<bool> ForgePing(CancellationToken token = default)
     {
         try
         {
-            await _rateLimiter.WaitAsync(token);
-
-            var message = BuildMessage(HttpMethod.Get, Urls.ForgePing);
-            var response = await _httpClient.SendAsync(message, token);
+            var response = await ForgeSend(Urls.ForgePing, token);
 
             _logger.LogDebug("ForgePing: {StatusCode}", response.StatusCode);
 
@@ -262,6 +180,64 @@ public class HttpHelper
             _logger.LogDebug(e, "ForgePing failed");
             return false;
         }
+    }
+
+    private const int MaxRateLimitRetries = 3;
+    private static readonly TimeSpan MaxRetryAfterDelay = TimeSpan.FromSeconds(30);
+
+    // Sends a rate-limited Forge request, retrying 429 responses after the server's Retry-After delay.
+    private async Task<HttpResponseMessage> ForgeSend(string url, CancellationToken token)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            await _rateLimiter.WaitAsync(token);
+
+            var response = await _httpClient.SendAsync(BuildMessage(HttpMethod.Get, url), token);
+            if (response.StatusCode != HttpStatusCode.TooManyRequests || attempt >= MaxRateLimitRetries)
+            {
+                return response;
+            }
+
+            var delay = RetryDelay(response, attempt);
+            _logger.LogWarning(
+                "Forge rate limited request to {Url}, retrying in {Delay:0.#}s (attempt {Attempt}/{MaxAttempts})",
+                url,
+                delay.TotalSeconds,
+                attempt + 1,
+                MaxRateLimitRetries
+            );
+            response.Dispose();
+            await Task.Delay(delay, token);
+        }
+    }
+
+    private static TimeSpan RetryDelay(HttpResponseMessage response, int attempt)
+    {
+        var retryAfter = response.Headers.RetryAfter;
+        var delay = retryAfter?.Delta ?? retryAfter?.Date - DateTimeOffset.UtcNow;
+        if (delay is not { } serverDelay || serverDelay <= TimeSpan.Zero)
+        {
+            return TimeSpan.FromSeconds(1 << attempt);
+        }
+
+        return serverDelay < MaxRetryAfterDelay ? serverDelay : MaxRetryAfterDelay;
+    }
+
+    private async Task<T?> ForgeGet<T>(string url, CancellationToken token, [CallerMemberName] string caller = "")
+        where T : class
+    {
+        var response = await ForgeSend(url, token);
+        var body = await response.Content.ReadAsStringAsync(token);
+
+        _logger.LogDebug("{Caller} Response: {Response}", caller, body);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("{Caller} failed with status code {StatusCode}", caller, response.StatusCode);
+            return null;
+        }
+
+        return JsonSerializer.Deserialize<T>(body);
     }
 
     private NameValueCollection GetParamsCollection(

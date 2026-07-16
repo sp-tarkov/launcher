@@ -322,5 +322,6 @@
   "linux_add_confirm": "Confirm?",
   "forge_offline_title": "未检测到互联网连接",
   "forge_offline_subtitle": "请检查网络连接，然后刷新重试。",
-  "forge_offline_refresh": "刷新"
+  "forge_offline_refresh": "刷新",
+  "forge_search_failed": "无法从 Forge 加载模组。请稍后再试。"
 }

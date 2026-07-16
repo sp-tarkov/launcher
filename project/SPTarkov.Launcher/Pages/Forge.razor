@@ -6,6 +6,7 @@
 @inject ConfigHelper ConfigHelper
 @inject ILogger<Forge> Logger
 @inject LocaleHelper LocaleHelper
+@inject ISnackbar Snackbar
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     @if (NetAvailable != false)
@@ -208,10 +209,6 @@
             var response = await HttpHelper.ForgeGetCategories(token.Token);
             StateHelper.ListOfCategoriesAvailable = response?.Data;
         }
-        catch (ForgeRetryException e)
-        {
-            Logger.LogError(e.Message);
-        }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.ForgeGetCategories {Exception}", e);
@@ -241,15 +238,16 @@
                 return;
             }
 
-            SearchResponse = response;
-
-            if (!SearchResponse!.Success)
+            if (response is null || !response.Success)
             {
-                Logger.LogError("Something failed");
-                Logger.LogError("Request info: Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", SearchValue, SortValue, page, FilterValue, AiValue);
-                Logger.LogError("Response: {SearchResponse}", SearchResponse);
+                Logger.LogError("Forge mod search failed. Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", SearchValue, SortValue, page, FilterValue, AiValue);
 
                 SearchResponse = null;
+                Snackbar.Add(LocaleHelper.Get("forge_search_failed"), Severity.Error);
+            }
+            else
+            {
+                SearchResponse = response;
             }
 
             StateHelper.CurrentPagination = (int)page;
@@ -258,13 +256,14 @@
         {
             // superseded by a newer search; the newer request renders its own results
         }
-        catch (ForgeRetryException e)
-        {
-            Logger.LogError(e.Message);
-        }
         catch (Exception e)
         {
             Logger.LogError("Exception thrown from ForgeHelper.SearchForMods {Exception}", e);
+
+            if (SearchCts == cts)
+            {
+                Snackbar.Add(LocaleHelper.Get("forge_search_failed"), Severity.Error);
+            }
         }
         finally
         {

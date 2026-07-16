@@ -322,5 +322,6 @@
   "linux_add_confirm": "Confirm?",
   "forge_offline_title": "未偵測到網際網路連線",
   "forge_offline_subtitle": "請檢查網路連線，然後重新整理再試一次。",
-  "forge_offline_refresh": "重新整理"
+  "forge_offline_refresh": "重新整理",
+  "forge_search_failed": "無法從 Forge 載入模組。請稍後再試。"
 }
