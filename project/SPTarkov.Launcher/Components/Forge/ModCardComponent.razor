@@ -31,7 +31,7 @@
     else
     {
         <MudLink Color="Color.Default" Underline="Underline.Hover" Href="@($"/ForgeMod/{ForgeMod.Id}")">
-            <MudCard Class="info-card-height mud-background-gray border-2 border-solid mud-border-lines-default">
+            <MudCard Class="info-card-height d-flex flex-column mud-background-gray border-2 border-solid mud-border-lines-default">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         @if (ForgeMod.TryGetProfileAvatar(out var url))
@@ -61,6 +61,12 @@
                 <MudCardContent>
                     <MudText Typo="Typo.body2">@ForgeMod.GetModTeaser()</MudText>
                 </MudCardContent>
+                @if (ForgeMod.Category is not null)
+                {
+                    <MudCardActions Class="mt-auto">
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@ForgeMod.Category.Title</MudChip>
+                    </MudCardActions>
+                }
             </MudCard>
         </MudLink>
     }

@@ -47,8 +47,14 @@ public record ForgeBase
     [JsonPropertyName("contains_ai_content")]
     public bool? ContainsAiContent { get; set; }
 
+    [JsonPropertyName("custom_ai_disclosure")]
+    public string? CustomAiDisclosure { get; set; }
+
     [JsonPropertyName("category_id")]
     public int? CategoryId { get; set; }
+
+    [JsonPropertyName("category")]
+    public ForgeCategory? Category { get; set; }
 
     [JsonPropertyName("published_at")]
     public string? PublishedAt { get; set; }
@@ -76,6 +82,9 @@ public record ForgeBase
 
     [JsonPropertyName("shows_profile_binding_notice")]
     public bool ShowsProfileBindingNotice { get; set; }
+
+    [JsonPropertyName("cheat_notice")]
+    public bool CheatNotice { get; set; }
 
     public char? GetAvatarLetter()
     {

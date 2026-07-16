@@ -19,6 +19,9 @@ public record ForgeModVersion
     [JsonPropertyName("link")]
     public required string Link { get; set; }
 
+    [JsonPropertyName("content_length")]
+    public long? ContentLength { get; set; }
+
     [JsonPropertyName("downloads")]
     public int? Downloads { get; set; }
 
@@ -71,5 +74,24 @@ public record ForgeModVersion
     public string GetPublishedDateFormatted()
     {
         return GetDateString(PublishedAt!);
+    }
+
+    public string? GetContentLengthFormatted()
+    {
+        if (ContentLength is not > 0)
+        {
+            return null;
+        }
+
+        string[] units = ["B", "KB", "MB", "GB"];
+        double size = ContentLength.Value;
+        var unit = 0;
+        while (size >= 1024 && unit < units.Length - 1)
+        {
+            size /= 1024;
+            unit++;
+        }
+
+        return $"{size:0.#} {units[unit]}";
     }
 }

@@ -63,6 +63,16 @@
                 </MudCard>
             </MudItem>
             <MudItem sm="4" Class="pt-4">
+                @if (ForgeMod.CheatNotice)
+                {
+                    <MudCard Class="border-2 border-solid mud-alert-outlined-error mb-4">
+                        <MudCardContent>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_warning_title"))</MudText>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_cheat_notice_text"))</MudText>
+                            <MudText Typo="Typo.caption" Inline="true"><MudLink Typo="Typo.caption" Underline="Underline.Always" Href="https://forge.sp-tarkov.com/content-guidelines#anti-cheat-policy"> @(LocaleHelper.Get("mod_cheat_notice_link"))</MudLink></MudText>
+                        </MudCardContent>
+                    </MudCard>
+                }
                 @if (!IsVersionCompatible)
                 {
                     <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
@@ -79,6 +89,15 @@
                             <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_notice_title"))</MudText>
                             <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_notice_text"))</MudText>
                             <MudText Typo="Typo.caption" Inline="true"><MudLink Typo="Typo.caption" Underline="Underline.Always" Href="https://wiki.sp-tarkov.com/Profiles#mods"> @(LocaleHelper.Get("mod_notice_link"))</MudLink></MudText>
+                        </MudCardContent>
+                    </MudCard>
+                }
+                @if (HasAiDisclosure)
+                {
+                    <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
+                        <MudCardContent>
+                            <MudText Typo="Typo.caption">@(LocaleHelper.Get("mod_ai_disclosure_title"))</MudText>
+                            <div class="user-markdown">@((MarkupString)ForgeMod.CustomAiDisclosure!)</div>
                         </MudCardContent>
                     </MudCard>
                 }
@@ -102,6 +121,9 @@
                                 @(LocaleHelper.Get("mod_none"))
                             }
                         </MudText>
+
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_category"))</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.Category?.Title ?? LocaleHelper.Get("mod_none"))</MudText>
 
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_source_code"))</MudText>
                         @if (ForgeMod.SourceCodeLinks?.Any() ?? false)
@@ -141,6 +163,9 @@
                         <MudTooltip Arrow="false" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" Text="@CompatibilityTooltip">
                             <MudText Typo="Typo.caption" Color="@CompatibilityColor" Class="pb-2 text-overflow">@(ForgeModVersion?.SptVersionConstraint?.ToString() ?? LocaleHelper.Get("mod_none"))</MudText>
                         </MudTooltip>
+
+                        <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_file_size"))</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeModVersion?.GetContentLengthFormatted() ?? LocaleHelper.Get("mod_none"))</MudText>
 
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_fika_Compatible"))</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.FikaCompatible ?? false ? LocaleHelper.Get("mod_yes") : LocaleHelper.Get("mod_no"))</MudText>
@@ -214,6 +239,8 @@
     private string CompatibilityTooltip => LocaleHelper.Get(IsVersionCompatible ? "mod_spt_compatible" : "mod_spt_incompatible");
 
     private bool HasCompatibleAddons => ForgeModAddons?.Any(addon => GetCompatibleAddonVersion(addon) is not null) ?? false;
+
+    private bool HasAiDisclosure => !string.IsNullOrWhiteSpace(ForgeMod?.CustomAiDisclosure);
 
     private ForgeModVersion? GetCompatibleAddonVersion(ForgeBase addon)
     {

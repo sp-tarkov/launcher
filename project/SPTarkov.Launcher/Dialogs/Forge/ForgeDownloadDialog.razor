@@ -10,6 +10,13 @@
             <MudPaper Class="mud-background-gray border-2 border-solid mud-alert-outlined-warning mb-4 pa-2">
                 <MudText>@(LocaleHelper.Get("download_dialog_read_me"))</MudText>
             </MudPaper>
+            @if (Mod.CheatNotice)
+            {
+                <MudPaper Class="mud-background-gray border-2 border-solid mud-alert-outlined-error mb-4 pa-2">
+                    <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_warning_title")) </MudText>
+                    <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_cheat_notice_text"))</MudText>
+                </MudPaper>
+            }
             @if (Mod.ShowsProfileBindingNotice)
             {
                 <MudPaper Class="mud-background-gray border-2 border-solid mud-alert-outlined-warning mb-4 pa-2">
@@ -34,6 +41,10 @@
                         }
                 </MudPaper>
             }
+            @if (FileSize is not null)
+            {
+                <MudText Typo="Typo.caption" Class="mb-2">@($"{LocaleHelper.Get("mod_file_size")}: {FileSize}")</MudText>
+            }
             <MudContainer Class="mb-4 pa-0">
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunDownloadTask" Disabled="@_requestInProgress">@(LocaleHelper.Get("mod_download"))</MudButton>
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">@(LocaleHelper.Get("forge_update_close"))</MudButton>
@@ -49,6 +60,8 @@
     private bool _requestInProgress;
     private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
+
+    private string? FileSize => Version?.GetContentLengthFormatted();
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
