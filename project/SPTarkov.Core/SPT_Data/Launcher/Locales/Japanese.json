@@ -326,5 +326,7 @@
   "forge_search_failed": "Forgeからmodを読み込めませんでした。しばらくしてからもう一度お試しください。",
   "forge_no_results_title": "SPT {0}向けのmodが見つかりませんでした",
   "forge_no_results_subtitle": "検索条件やフィルターを調整するか、後でもう一度確認してください。",
-  "forge_no_results_clear": "フィルターをクリア"
+  "forge_no_results_clear": "フィルターをクリア",
+  "forge_error_title": "問題が発生しました",
+  "forge_error_retry": "再試行"
 }

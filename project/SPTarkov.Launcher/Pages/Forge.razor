@@ -6,7 +6,6 @@
 @inject ConfigHelper ConfigHelper
 @inject ILogger<Forge> Logger
 @inject LocaleHelper LocaleHelper
-@inject ISnackbar Snackbar
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     @if (NetAvailable != false)
@@ -42,6 +41,20 @@
                     <MudText Typo="Typo.h6" Align="Align.Center">@(LocaleHelper.Get("forge_offline_title"))</MudText>
                     <MudText Align="Align.Center" Class="mud-text-secondary">@(LocaleHelper.Get("forge_offline_subtitle"))</MudText>
                     <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="CheckInternetAccess" Class="mt-2">@(LocaleHelper.Get("forge_offline_refresh"))</MudButton>
+                </MudContainer>
+            </MudPaper>
+        </MudItem>
+    }
+
+    else if (SearchFailed)
+    {
+        <MudItem sm="12">
+            <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
+                <MudContainer Class="d-flex flex-column align-center gap-2 py-12">
+                    <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Style="font-size: 4rem;" Class="mud-text-secondary"/>
+                    <MudText Typo="Typo.h6" Align="Align.Center">@(LocaleHelper.Get("forge_error_title"))</MudText>
+                    <MudText Align="Align.Center" Class="mud-text-secondary">@(LocaleHelper.Get("forge_search_failed"))</MudText>
+                    <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="CheckInternetAccess" Class="mt-2">@(LocaleHelper.Get("forge_error_retry"))</MudButton>
                 </MudContainer>
             </MudPaper>
         </MudItem>
@@ -86,6 +99,7 @@
     private bool? NetAvailable { get; set; }
     private ForgeModsResponse? SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
+    private bool SearchFailed { get; set; }
     private CancellationTokenSource? SearchCts { get; set; }
     private List<ForgeCategory>? Categories => StateHelper.ListOfCategoriesAvailable;
     private bool GettingCategories { get; set; }
@@ -191,6 +205,7 @@
     private async Task CheckInternetAccess()
     {
         NetAvailable = null;
+        SearchFailed = false;
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         NetAvailable = await HttpHelper.ForgePing(cts.Token);
@@ -253,6 +268,7 @@
         SearchCts = cts;
 
         SearchInProgress = true;
+        SearchFailed = false;
         page ??= StateHelper.CurrentPagination;
 
         try
@@ -269,7 +285,7 @@
                 Logger.LogError("Forge mod search failed. Search: {Search}, SortValue: {SortValue}, page: {page}, FilterValue: {FilterValue}, AiValue: {AiValue}", SearchValue, SortValue, page, FilterValue, AiValue);
 
                 SearchResponse = null;
-                Snackbar.Add(LocaleHelper.Get("forge_search_failed"), Severity.Error);
+                SearchFailed = true;
             }
             else
             {
@@ -288,7 +304,8 @@
 
             if (SearchCts == cts)
             {
-                Snackbar.Add(LocaleHelper.Get("forge_search_failed"), Severity.Error);
+                SearchResponse = null;
+                SearchFailed = true;
             }
         }
         finally

@@ -326,5 +326,7 @@
   "forge_search_failed": "Не удалось загрузить моды с Forge. Попробуйте снова чуть позже.",
   "forge_no_results_title": "Моды для SPT {0} не найдены",
   "forge_no_results_subtitle": "Измените поисковый запрос или фильтры либо загляните позже.",
-  "forge_no_results_clear": "Сбросить фильтры"
+  "forge_no_results_clear": "Сбросить фильтры",
+  "forge_error_title": "Что-то пошло не так",
+  "forge_error_retry": "Попробовать снова"
 }

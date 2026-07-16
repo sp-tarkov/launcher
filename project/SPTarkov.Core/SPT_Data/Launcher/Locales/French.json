@@ -326,5 +326,7 @@
   "forge_search_failed": "Impossible de charger les mods depuis le Forge. Réessayez dans un instant.",
   "forge_no_results_title": "Aucun mod trouvé pour SPT {0}",
   "forge_no_results_subtitle": "Ajustez votre recherche ou vos filtres, ou revenez plus tard.",
-  "forge_no_results_clear": "Effacer les filtres"
+  "forge_no_results_clear": "Effacer les filtres",
+  "forge_error_title": "Une erreur s'est produite",
+  "forge_error_retry": "Réessayer"
 }

@@ -326,5 +326,7 @@
   "forge_search_failed": "Forge에서 모드를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
   "forge_no_results_title": "SPT {0}용 모드를 찾을 수 없습니다",
   "forge_no_results_subtitle": "검색어나 필터를 조정하거나 나중에 다시 확인해 주세요.",
-  "forge_no_results_clear": "필터 초기화"
+  "forge_no_results_clear": "필터 초기화",
+  "forge_error_title": "문제가 발생했습니다",
+  "forge_error_retry": "다시 시도"
 }

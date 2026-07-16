@@ -326,5 +326,7 @@
   "forge_search_failed": "无法从 Forge 加载模组。请稍后再试。",
   "forge_no_results_title": "未找到适用于 SPT {0} 的模组",
   "forge_no_results_subtitle": "请尝试调整搜索或筛选条件，或稍后再来查看。",
-  "forge_no_results_clear": "清除筛选"
+  "forge_no_results_clear": "清除筛选",
+  "forge_error_title": "出了点问题",
+  "forge_error_retry": "重试"
 }

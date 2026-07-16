@@ -326,5 +326,7 @@
   "forge_search_failed": "Nie udało się wczytać modów z Forge. Spróbuj ponownie za chwilę.",
   "forge_no_results_title": "Nie znaleziono modów dla SPT {0}",
   "forge_no_results_subtitle": "Zmień wyszukiwanie lub filtry albo sprawdź ponownie później.",
-  "forge_no_results_clear": "Wyczyść filtry"
+  "forge_no_results_clear": "Wyczyść filtry",
+  "forge_error_title": "Coś poszło nie tak",
+  "forge_error_retry": "Spróbuj ponownie"
 }
