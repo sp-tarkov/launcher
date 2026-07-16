@@ -268,8 +268,14 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
 
         if (mod.Files != null)
         {
-            foreach (var modFilePath in mod.Files.Select(file => Path.Join(configHelper.GetConfig().GamePath, file)))
+            foreach (var file in mod.Files)
             {
+                var modFilePath = ResolveInstalledFilePath(file);
+                if (modFilePath is null)
+                {
+                    continue;
+                }
+
                 // first one will likely delete most but do all to be sure
                 if (Directory.Exists(modFilePath))
                 {
@@ -321,8 +327,14 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
 
         if (mod.Files != null)
         {
-            foreach (var modFilePath in mod.Files.Select(file => Path.Join(configHelper.GetConfig().GamePath, file)))
+            foreach (var file in mod.Files)
             {
+                var modFilePath = ResolveInstalledFilePath(file);
+                if (modFilePath is null)
+                {
+                    continue;
+                }
+
                 // first one will likely delete most but do all to be sure
                 if (Directory.Exists(modFilePath))
                 {
@@ -410,6 +422,33 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         File.Delete(ogPath + ".bak");
 
         modHelper.RemoveModTask(updateTask);
+    }
+
+    // Resolves a stored mod file path against the game directory.
+    private string? ResolveInstalledFilePath(string file)
+    {
+        var gameRoot = Path.GetFullPath(configHelper.GetConfig().GamePath);
+        var gameRootWithSeparator = gameRoot.EndsWith(Path.DirectorySeparatorChar) ? gameRoot : gameRoot + Path.DirectorySeparatorChar;
+
+        string fullPath;
+        try
+        {
+            fullPath = Path.GetFullPath(Path.Join(gameRoot, file));
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("Skipping mod file with an invalid path {file}: {message}", file, e.Message);
+            return null;
+        }
+
+        var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        if (!fullPath.StartsWith(gameRootWithSeparator, comparison))
+        {
+            logger.LogWarning("Skipping mod file outside the game directory: {file}", file);
+            return null;
+        }
+
+        return fullPath;
     }
 
     private List<string> RemoveBasePaths(List<string> originalPaths)
