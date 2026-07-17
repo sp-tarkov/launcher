@@ -155,6 +155,16 @@ resharper_convert_to_auto_property_highlighting = none
 dotnet_diagnostic.CS1591.severity = none
 dotnet_diagnostic.CA1822.severity = none
 
+# Suppress inspections
+[ValidationUtil.cs]
+generated_code = true
+resharper_enforce_if_statement_braces_highlighting = none
+resharper_enforce_using_statement_braces_highlighting = none
+resharper_inconsistent_naming_highlighting = none
+resharper_field_can_be_made_read_only_local_highlighting = none
+resharper_convert_to_primary_constructor_highlighting = none
+resharper_convert_to_using_declaration_highlighting = none
+
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
 indent_size = 2
