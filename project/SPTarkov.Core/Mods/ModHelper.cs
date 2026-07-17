@@ -91,7 +91,7 @@ public class ModHelper
             var fileStream = File.Create(modFilePath);
 
             var buffer = new byte[8192];
-            float totalRead = 0;
+            long totalRead = 0;
             int bytesRead;
 
             var lastReportTime = DateTime.UtcNow;
@@ -105,7 +105,7 @@ public class ModHelper
 
                 if ((now - lastReportTime).TotalSeconds >= 1 || totalRead == downloadTask.TotalToDownload)
                 {
-                    downloadTask.Progress = totalRead / downloadTask.TotalToDownload * 100;
+                    downloadTask.Progress = (float)totalRead / downloadTask.TotalToDownload * 100;
                     lastReportTime = now;
                 }
             }
@@ -242,7 +242,7 @@ public class ModHelper
             var fileStream = File.Create(modFilePath);
 
             var buffer = new byte[8192];
-            float totalRead = 0;
+            long totalRead = 0;
             int bytesRead;
 
             var lastReportTime = DateTime.UtcNow;
@@ -256,7 +256,7 @@ public class ModHelper
 
                 if ((now - lastReportTime).TotalSeconds >= 1 || totalRead == updateTask.TotalToDownload)
                 {
-                    updateTask.Progress = totalRead / updateTask.TotalToDownload * 100;
+                    updateTask.Progress = (float)totalRead / updateTask.TotalToDownload * 100;
                     lastReportTime = now;
                 }
             }
