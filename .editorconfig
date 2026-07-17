@@ -157,7 +157,6 @@ dotnet_diagnostic.CA1822.severity = none
 
 # Suppress inspections
 [ValidationUtil.cs]
-generated_code = true
 resharper_enforce_if_statement_braces_highlighting = none
 resharper_enforce_using_statement_braces_highlighting = none
 resharper_inconsistent_naming_highlighting = none

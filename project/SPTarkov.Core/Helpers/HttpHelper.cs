@@ -224,7 +224,7 @@ public class HttpHelper
         await _rateLimiter.WaitAsync(tokenToken);
 
         var message = BuildMessage(HttpMethod.Get, Urls.ForgePing);
-        var task = await _httpClient.SendAsync(message, tokenToken);
+        await _httpClient.SendAsync(message, tokenToken);
 
         _logger.LogDebug("Pinged Forge");
     }
