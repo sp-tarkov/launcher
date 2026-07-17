@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject TitleHelper TitleHelper
 @inject BrowserBridge BrowserBridge
-@inject IJSRuntime JS
+@inject IJSRuntime JsRuntime
 @inject LocaleHelper LocaleHelper
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
@@ -60,7 +60,7 @@
         if (firstRender)
         {
             _bridgeRef = DotNetObjectReference.Create(BrowserBridge);
-            await JS.InvokeVoidAsync("registerBrowserBridge", _bridgeRef);
+            await JsRuntime.InvokeVoidAsync("registerBrowserBridge", _bridgeRef);
 
             if (UpdateNotice.JustUpdatedVersion is { } updatedVersion)
             {
