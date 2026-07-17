@@ -34,7 +34,7 @@ public record ReleaseEntry
     [JsonPropertyName("notes")]
     public string? Notes { get; init; }
 
-    // The payload archive holding both platform binaries.
+    /// <summary>The payload archive holding both platform binaries.</summary>
     [JsonPropertyName("asset")]
     public required ReleaseAsset Asset { get; init; }
 }

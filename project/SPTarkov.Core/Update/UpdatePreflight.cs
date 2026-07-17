@@ -3,7 +3,7 @@ using SPTarkov.Core.Mods;
 
 namespace SPTarkov.Core.Update;
 
-// Checks that an update can be applied. Returns UpdateFailure.None when it can.
+/// <summary>Checks that an update can be applied. <see cref="Check"/> returns <see cref="UpdateFailure.None"/> when it can.</summary>
 public class UpdatePreflight(ILogger<UpdatePreflight> logger, ModHelper modHelper)
 {
     public UpdateFailure Check(long payloadSize)

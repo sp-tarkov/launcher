@@ -8,7 +8,7 @@ public enum UpdatePhase
     Cleanup,
 }
 
-// Progress marker written by UpdateTransaction and read by UpdateRecovery on the next launch.
+/// <summary>Progress marker written by <see cref="UpdateTransaction"/> and read by <see cref="UpdateRecovery"/> on the next launch.</summary>
 public record UpdateState
 {
     public required string Version { get; init; }

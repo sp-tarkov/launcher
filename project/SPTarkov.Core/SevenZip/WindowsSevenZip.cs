@@ -153,11 +153,7 @@ public class WindowsSevenZip : SevenZip
         return true;
     }
 
-    /// <summary>
-    /// TODO: maybe a regex wizard can do this better
-    /// </summary>
-    /// <param name="outputResult"></param>
-    /// <returns></returns>
+    /// <summary>Parses 7-Zip list output into archive entry paths.</summary>
     private async Task<List<string>> ParseEntries(string outputResult, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();

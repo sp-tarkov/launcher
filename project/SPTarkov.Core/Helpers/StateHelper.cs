@@ -87,14 +87,14 @@ public class StateHelper(ILogger<StateHelper> logger)
         NotifyStateChanged();
     }
 
-    // Keeps the mod-pages panel open while the nav tile or the panel itself is hovered.
+    /// <summary>Keeps the mod-pages panel open while the nav tile or the panel itself is hovered.</summary>
     public void HoldModPagesPanel()
     {
         _modPagesPanelHoverVersion++;
         SetModPagesPanelOpen(true);
     }
 
-    // Closes the mod-pages panel after a short delay, unless another hover has held it open since.
+    /// <summary>Closes the mod-pages panel after a short delay, unless another hover has held it open since.</summary>
     public async Task ReleaseModPagesPanel()
     {
         var version = _modPagesPanelHoverVersion;

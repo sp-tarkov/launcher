@@ -4,13 +4,13 @@ using Microsoft.Extensions.Logging;
 
 namespace SPTarkov.Core.Update;
 
-// The self-update commit/rollback protocol.
+/// <summary>The self-update commit/rollback protocol.</summary>
 public class UpdateTransaction(ILogger<UpdateTransaction> logger)
 {
     private const int DeleteRetries = 12;
     private const int DeleteDelayMs = 250;
 
-    // Wipes any previous transaction's staging and marks a new update as staged.
+    /// <summary>Wipes any previous transaction's staging and marks a new update as staged.</summary>
     public void Begin(string version)
     {
         if (Directory.Exists(UpdateLayout.Staging))
@@ -22,7 +22,7 @@ public class UpdateTransaction(ILogger<UpdateTransaction> logger)
         WriteState(new UpdateState { Version = version, Phase = UpdatePhase.Staged });
     }
 
-    // Applies the extracted payload to the install, rolling back and rethrowing if any step fails.
+    /// <summary>Applies the extracted payload to the install, rolling back and rethrowing if any step fails.</summary>
     public void Commit(string version)
     {
         File.Delete(UpdateLayout.OldExePath);
@@ -78,21 +78,21 @@ public class UpdateTransaction(ILogger<UpdateTransaction> logger)
         return File.Exists(UpdateLayout.OldExePath) && File.Exists(UpdateLayout.RunningExePath);
     }
 
-    // Keeps the new build. Drops the pre-update backups.
+    /// <summary>Keeps the new build. Drops the pre-update backups.</summary>
     public void RollForward()
     {
         RestoreExeIfMissing();
         DeleteBackups();
     }
 
-    // Returns to the pre-update build. Puts the old exe back and restores every backed-up file.
+    /// <summary>Returns to the pre-update build. Puts the old exe back and restores every backed-up file.</summary>
     public void RollBack()
     {
         RestoreExeIfMissing();
         RestoreBackups();
     }
 
-    // Restores the exe if only the old one survived, then drops the old exe and the staging directory.
+    /// <summary>Restores the exe if only the old one survived, then drops the old exe and the staging directory.</summary>
     public void Cleanup(UpdateState state)
     {
         RestoreExeIfMissing();

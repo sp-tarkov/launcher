@@ -32,7 +32,7 @@ public static partial class ProgramStatics
         }
     }
 
-    // Base64 SubjectPublicKeyInfo of the ECDSA P-256 key that verifies update manifests.
+    /// <summary>Base64 SubjectPublicKeyInfo of the ECDSA P-256 key that verifies update manifests.</summary>
     public const string UpdateSigningPublicKey =
         "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENNtehjqF8s+cKtwvS9fKFJHsKTN7dNrjKu3Rq5ByH7oc02Uktd2hdrU2bgQslAT3i6pFSt6Szfh64ZBRqQwM6Q==";
 }

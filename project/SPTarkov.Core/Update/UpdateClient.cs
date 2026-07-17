@@ -14,7 +14,9 @@ public class UpdateClient(ILogger<UpdateClient> logger, ConfigHelper configHelpe
     // Uses the default handler, which validates certificates.
     private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(30) };
 
-    // Returns the newest applicable release, or null when there is nothing to offer. Transport and manifest failures throw.
+    /// <summary>
+    /// Returns the newest applicable release, or <c>null</c> when there is nothing to offer. Transport and manifest failures throw.
+    /// </summary>
     public async Task<AvailableUpdate?> CheckAsync(CancellationToken token)
     {
         var channel = configHelper.GetConfig().UpdateChannel;

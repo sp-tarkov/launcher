@@ -8,15 +8,16 @@ namespace SPTarkov.Launcher.Helpers;
 /// </summary>
 public static class ModPageVisual
 {
-    // Returns a CSS hex colour derived from the name. Hue varies with the name; saturation and lightness are fixed so the white initials
-    // stay legible against the badge on the dark rail.
+    /// <summary>Returns a CSS hex colour derived from the name. Hue varies with the name; saturation and lightness are fixed.</summary>
     public static string GetColor(string name)
     {
         var hue = Hash(name) % 360u;
         return HslToHex(hue, 0.55, 0.45);
     }
 
-    // Returns 1-2 uppercase initials. The first letters of the first two words, or the first two characters of a single word.
+    /// <summary>
+    /// Returns 1-2 uppercase initials. The first letters of the first two words, or the first two characters of a single word.
+    /// </summary>
     public static string GetInitials(string name)
     {
         if (string.IsNullOrWhiteSpace(name))

@@ -7,29 +7,26 @@ namespace SPTarkov.Launcher.Platform;
 /// </summary>
 internal static partial class WindowNative
 {
-    // ShowWindow command that hides the window and drops it from the taskbar.
+    /// <summary><see cref="ShowWindow"/> command that hides the window and drops it from the taskbar.</summary>
     internal const int SW_HIDE = 0;
 
-    // ShowWindow command that activates and displays the window, restoring it from a minimized state. Used to bring the window back from
-    // the tray regardless of whether it was minimized when hidden.
+    /// <summary><see cref="ShowWindow"/> command that activates and displays the window, restoring it from a minimized state.</summary>
     internal const int SW_RESTORE = 9;
 
-    // Sets a window's show state.
+    /// <summary>Sets a window's show state.</summary>
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static partial bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-    // Brings the window to the foreground and gives it focus. Windows only lets a process do this in limited circumstances, which is what
-    // AllowSetForegroundWindow below unblocks for the single-instance case.
+    /// <summary>Brings the window to the foreground and gives it focus; Windows only allows this in limited circumstances.</summary>
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static partial bool SetForegroundWindow(IntPtr hWnd);
 
-    // Passed to AllowSetForegroundWindow to permit *any* process to take the foreground on our behalf.
+    /// <summary>Passed to <see cref="AllowSetForegroundWindow"/> to permit any process to take the foreground on our behalf.</summary>
     internal const uint ASFW_ANY = 0xFFFFFFFF;
 
-    // Lets a would-be second instance grant the running instance permission to take the foreground when it surfaces its window (Windows
-    // otherwise blocks a background process from stealing focus).
+    /// <summary>Grants the given process permission to take the foreground.</summary>
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static partial bool AllowSetForegroundWindow(uint dwProcessId);
