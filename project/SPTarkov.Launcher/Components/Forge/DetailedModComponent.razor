@@ -33,7 +33,7 @@
                     <MudIcon Icon="@CompatibilityIcon" Color="@CompatibilityColor" Class="d-block"/>
                 </MudTooltip>
                 <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="@CompatibilityColor" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@(!IsVersionCompatible)" OnClick="StartDownloadModTask">
-                    @($"{LocaleHelper.Get("mod_download_latest")} ({ForgeModVersion.Version})")
+                    @DownloadLatestLabel
                 </MudButton>
             </MudItem>
             <MudItem sm="8" Class="pt-4">
@@ -237,6 +237,11 @@
     private Color CompatibilityColor => IsVersionCompatible ? Color.Success : Color.Warning;
 
     private string CompatibilityTooltip => LocaleHelper.Get(IsVersionCompatible ? "mod_spt_compatible" : "mod_spt_incompatible");
+
+    private string DownloadLatestLabel =>
+        ForgeModVersion is null
+            ? LocaleHelper.Get("mod_download_latest")
+            : $"{LocaleHelper.Get("mod_download_latest")} ({ForgeModVersion.Version})";
 
     private bool HasCompatibleAddons => ForgeModAddons?.Any(addon => GetCompatibleAddonVersion(addon) is not null) ?? false;
 
