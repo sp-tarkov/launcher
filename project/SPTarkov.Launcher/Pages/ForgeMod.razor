@@ -10,17 +10,17 @@
         {
             <DetailedModComponent IsSkeleton="true"/>
         }
-        else if (SearchResponse?.Data is not null)
+        else if (SearchResponse.Data is not null && VersionResponse.Data?.FirstOrDefault() is { } version)
         {
-            <DetailedModComponent ForgeMod="@SearchResponse?.Data" ForgeModVersion="@VersionResponse?.Data?.FirstOrDefault()" ForgeModAddons="@AddonResponse?.Data"/>
+            <DetailedModComponent ForgeMod="@SearchResponse.Data" ForgeModVersion="@version" ForgeModAddons="@(AddonResponse?.Data ?? [])"/>
         }
     </MudGrid>
 </MudContainer>
 
 @code {
-    private ForgeModResponse SearchResponse { get; set; } = default!;
-    private ForgeVersionResponse VersionResponse { get; set; } = default!;
-    private ForgeAddonResponse AddonResponse { get; set; } = default!;
+    private ForgeModResponse? SearchResponse { get; set; }
+    private ForgeVersionResponse? VersionResponse { get; set; }
+    private ForgeAddonResponse? AddonResponse { get; set; }
     private bool SearchInProgress { get; set; }
 
     [Parameter]

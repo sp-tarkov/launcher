@@ -122,7 +122,7 @@
             Snackbar.Add(message, Severity.Error);
         }
 
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
         _requestInProgress = false;
     }
@@ -131,7 +131,7 @@
     {
         UserCancel = true;
         _requestInProgress = false;
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
     }
 }

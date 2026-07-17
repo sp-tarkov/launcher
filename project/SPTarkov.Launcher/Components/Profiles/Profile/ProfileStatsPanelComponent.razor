@@ -21,6 +21,6 @@
 
     private string GetStat(string key)
     {
-        return Stats is not null && Stats.TryGetValue(key, out var value) ? value : "—";
+        return Stats.TryGetValue(key, out var value) ? value : "—";
     }
 }

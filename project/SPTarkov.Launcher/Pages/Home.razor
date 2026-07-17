@@ -97,7 +97,7 @@
         }
 
         // The saved profile must still exist and be loadable.
-        var profile = StateHelper.ProfileList?.FirstOrDefault(p => p.ProfileId == preferred.ProfileId);
+        var profile = StateHelper.ProfileList.FirstOrDefault(p => p.ProfileId == preferred.ProfileId);
         if (profile is null || profile.InvalidOrUnloadableProfile)
         {
             // Only clear if it's missing. The user *may* be able to fix a broken one?
