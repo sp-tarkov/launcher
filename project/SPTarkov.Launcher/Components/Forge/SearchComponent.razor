@@ -5,7 +5,7 @@
         <MudItem sm="12">
             <MudTextField @ref="SearchField" @bind-Value="SearchValue" Label="@(LocaleHelper.Get("search_title"))" Variant="Variant.Outlined" Adornment="Adornment.End"
                           AdornmentIcon="@Icons.Material.Filled.Search"  Clearable="true"
-                          DebounceInterval="500" OnDebounceIntervalElapsed="SearchFunc" />
+                          DebounceInterval="500" />
         </MudItem>
         <MudItem Class="pt-3" sm="3">
             <MudSelect @bind-Value="SortValue" Label="@(LocaleHelper.Get("search_sort"))" Variant="Variant.Outlined" Dense="true" AdornmentIcon="@Icons.Material.Filled.Sort" >
@@ -143,9 +143,6 @@
 
     [Parameter]
     public EventCallback<string> CategoryValueChanged { get; set; }
-
-    [Parameter]
-    public Func<Task> SearchFunc { get; set; } = () => Task.CompletedTask;
 
     [Parameter]
     public List<ForgeCategory>? Categories { get; set; }

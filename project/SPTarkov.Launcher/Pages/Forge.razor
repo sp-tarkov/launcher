@@ -18,7 +18,7 @@
         {
             <MudItem sm="12" Class="mb-6">
                 <MudCard Class="mud-background-gray border-2 border-solid mud-border-lines-default px-4 pt-4 pb-2">
-                    <SearchComponent @ref="SearchComponentRef" @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" Categories="@Categories" SearchFunc="@SearchUpdate"/>
+                    <SearchComponent @ref="SearchComponentRef" @bind-SearchValue="SearchValue" @bind-FilterValue="FilterValue" @bind-SortValue="SortValue" @bind-AiValue="AiValue" @bind-CategoryValue="CategoryValue" Categories="@Categories"/>
 
                     @if (SearchResponse?.Meta?.LastPage is not null && SearchResponse?.Data?.Count > 0)
                     {
