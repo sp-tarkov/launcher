@@ -200,7 +200,7 @@ public class ModHelper
         {
             Name = mod.CurrentVersion.Name!,
             Version = mod.RecommendedVersion.Version!,
-            GUID = mod.CurrentVersion.GUID!,
+            GUID = mod.CurrentVersion.GUID,
             Link = mod.RecommendedVersion.Link!,
             Progress = 0,
             TotalToDownload = 0,
