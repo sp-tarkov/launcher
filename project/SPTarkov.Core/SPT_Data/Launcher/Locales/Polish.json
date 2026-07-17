@@ -48,7 +48,7 @@
   "tray_sic_homepage": "Centrum informacji serwera",
   "sic_description": "Strona główna serwera z odnośnikami i informacjami o tej instalacji SPT.",
   "mod_pages_title": "Strony modów",
-  "mod_pages_subtitle": "Strony udostępniane przez mody zainstalowane na tym serwerze.",
+  "mod_pages_subtitle": "Strony udostępniane przez mody aktualnie zainstalowane na tym serwerze.",
   "tray_exit": "Zamknij",
   "game_helper_error_1": "SPT jest zainstalowany w Live",
   "game_helper_error_2": "Niezgodność pliku dll",

@@ -48,7 +48,7 @@
   "tray_sic_homepage": "Centro de información del servidor",
   "sic_description": "La página de inicio del servidor, con enlaces e información sobre esta instalación de SPT.",
   "mod_pages_title": "Páginas de mods",
-  "mod_pages_subtitle": "Páginas proporcionadas por los mods instalados en este servidor.",
+  "mod_pages_subtitle": "Páginas proporcionadas por los mods actualmente instalados en este servidor.",
   "tray_exit": "Salir",
   "game_helper_error_1": "SPT está instalado en Live",
   "game_helper_error_2": "Discrepancia en dll del núcleo",

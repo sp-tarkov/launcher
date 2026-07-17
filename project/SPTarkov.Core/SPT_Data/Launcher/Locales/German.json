@@ -48,7 +48,7 @@
   "tray_sic_homepage": "Server-Informationszentrum",
   "sic_description": "Die Startseite des Servers mit Links und Informationen zu dieser SPT-Installation.",
   "mod_pages_title": "Mod-Seiten",
-  "mod_pages_subtitle": "Seiten, die von den auf diesem Server installierten Mods bereitgestellt werden.",
+  "mod_pages_subtitle": "Seiten, die von den derzeit auf diesem Server installierten Mods bereitgestellt werden.",
   "tray_exit": "Beenden",
   "game_helper_error_1": "SPT ist im Live-Ordner installiert",
   "game_helper_error_2": "Core-DLL stimmt nicht überein",
