@@ -5,10 +5,24 @@
 @inject HttpHelper HttpHelper
 @inject ILogger<ForgeMod> Logger
 @inject TitleHelper TitleHelper
+@inject LocaleHelper LocaleHelper
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     <MudGrid>
-        @if (SearchResponse is null || SearchInProgress || VersionResponse is null)
+        @if (SearchFailed)
+        {
+            <MudItem sm="12">
+                <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
+                    <MudContainer Class="d-flex flex-column align-center gap-2 py-12">
+                        <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" Style="font-size: 4rem;" Class="mud-text-secondary"/>
+                        <MudText Typo="Typo.h6" Align="Align.Center">@(LocaleHelper.Get("forge_error_title"))</MudText>
+                        <MudText Align="Align.Center" Class="mud-text-secondary">@(LocaleHelper.Get("forge_search_failed"))</MudText>
+                        <MudButton Size="Size.Small" Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Refresh" OnClick="LoadMod" Class="mt-2">@(LocaleHelper.Get("forge_error_retry"))</MudButton>
+                    </MudContainer>
+                </MudPaper>
+            </MudItem>
+        }
+        else if (SearchResponse is null || SearchInProgress || VersionResponse is null)
         {
             <DetailedModComponent IsSkeleton="true"/>
         }
@@ -24,12 +38,18 @@
     private ForgeVersionResponse? VersionResponse { get; set; }
     private ForgeAddonResponse? AddonResponse { get; set; }
     private bool SearchInProgress { get; set; }
+    private bool SearchFailed { get; set; }
     private CancellationTokenSource? LoadCancellation { get; set; }
 
     [Parameter]
     public string ModId { get; set; } = "";
 
     protected override async Task OnParametersSetAsync()
+    {
+        await LoadMod();
+    }
+
+    private async Task LoadMod()
     {
         LoadCancellation?.Cancel();
         LoadCancellation?.Dispose();
@@ -40,9 +60,34 @@
         SearchResponse = null;
         VersionResponse = null;
         AddonResponse = null;
+        SearchFailed = false;
 
         await SearchForMod(modId, loadToken);
+
+        if (loadToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (SearchResponse?.Data is null)
+        {
+            SearchFailed = true;
+            return;
+        }
+
         await SearchForLatestVersion(modId, loadToken);
+
+        if (loadToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (VersionResponse is null)
+        {
+            SearchFailed = true;
+            return;
+        }
+
         await SearchForModAddons(modId, loadToken);
     }
 
