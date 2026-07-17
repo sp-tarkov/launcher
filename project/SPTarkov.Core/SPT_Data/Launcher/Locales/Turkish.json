@@ -48,7 +48,7 @@
   "tray_sic_homepage": "Sunucu Bilgi Merkezi",
   "sic_description": "Bu SPT kurulumuyla ilgili bağlantılar ve bilgiler içeren sunucunun ana sayfası.",
   "mod_pages_title": "Mod Sayfaları",
-  "mod_pages_subtitle": "Bu sunucuda yüklü modların sağladığı sayfalar.",
+  "mod_pages_subtitle": "Bu sunucuda şu anda yüklü olan modların sağladığı sayfalar.",
   "tray_exit": "Çıkış",
   "game_helper_error_1": "SPT canlı sürümde yüklü",
   "game_helper_error_2": "Core dll uyumsuzluğu",

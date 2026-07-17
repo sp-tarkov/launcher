@@ -48,7 +48,7 @@
   "tray_sic_homepage": "サーバー情報センター",
   "sic_description": "このSPTインストールに関するリンクと情報が掲載されたサーバーのホームページです。",
   "mod_pages_title": "MODページ",
-  "mod_pages_subtitle": "このサーバーにインストールされたMODが提供するページです。",
+  "mod_pages_subtitle": "このサーバーに現在インストールされているMODが提供するページです。",
   "tray_exit": "終了",
   "game_helper_error_1": "SPTがLiveにインストールされています",
   "game_helper_error_2": "Core.dllの不一致",

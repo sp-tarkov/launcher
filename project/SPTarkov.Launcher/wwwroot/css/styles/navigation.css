@@ -159,6 +159,10 @@
         color: rgba(255, 255, 255, 0.6);
     }
 
+    > .mud-divider {
+        flex-grow: 0;
+    }
+
     .mod-pages-panel-list {
         flex: 1 1 auto;
         min-height: 0;
