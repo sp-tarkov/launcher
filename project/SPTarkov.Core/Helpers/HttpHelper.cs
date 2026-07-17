@@ -77,8 +77,10 @@ public class HttpHelper
         return JsonSerializer.Deserialize<T>(json);
     }
 
-    // Pings a specific server address, independent of the currently-selected server, so a card can show live reachability
-    // for a server it is not connected to. Any failure (unreachable, bad response, cancellation) reads as offline.
+    /// <summary>
+    /// Pings a specific server address, independent of the currently-selected server. Any failure (unreachable, bad response,
+    /// cancellation) reads as offline.
+    /// </summary>
     public async Task<bool> PingServerAsync(string ipAddress, CancellationToken token)
     {
         try

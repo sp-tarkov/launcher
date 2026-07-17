@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SPTarkov.Core.Update;
 
-// Completes or rolls back an interrupted update, best-effort.
+/// <summary>Completes or rolls back an interrupted update, best-effort.</summary>
 public class UpdateRecovery(ILogger<UpdateRecovery> logger, UpdateTransaction transaction)
 {
     public string? Run()

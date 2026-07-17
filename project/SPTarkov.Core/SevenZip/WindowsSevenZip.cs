@@ -154,6 +154,7 @@ public class WindowsSevenZip : SevenZip
         return true;
     }
 
+    /// <summary>Parses 7-Zip list output into archive entry paths.</summary>
     private Task<List<string>> ParseEntries(string outputResult, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();

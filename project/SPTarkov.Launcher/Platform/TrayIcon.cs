@@ -26,7 +26,9 @@ namespace SPTarkov.Launcher.Platform;
 /// </remarks>
 internal sealed class TrayIcon : IDisposable
 {
-    // Entry of the context menu. The same struct models all three menu shapes: a normal clickable item, a separator line, a submenu.
+    /// <summary>
+    /// Entry of the context menu. The same struct models all three menu shapes: a normal clickable item, a separator line, a submenu.
+    /// </summary>
     internal readonly record struct MenuItem(string? Label, Action? OnClick, IReadOnlyList<MenuItem>? Children = null)
     {
         internal static MenuItem Separator
@@ -34,7 +36,7 @@ internal sealed class TrayIcon : IDisposable
             get { return new MenuItem(null, null); }
         }
 
-        // A labelled item that opens a nested menu of children.
+        /// <summary>A labelled item that opens a nested menu of children.</summary>
         internal static MenuItem Submenu(string label, IReadOnlyList<MenuItem> children)
         {
             return new MenuItem(label, null, children);
@@ -45,7 +47,7 @@ internal sealed class TrayIcon : IDisposable
             get { return Label is null; }
         }
 
-        // True when this entry opens a nested menu rather than firing an action.
+        /// <summary><c>true</c> when this entry opens a nested menu rather than firing an action.</summary>
         internal bool IsSubmenu
         {
             get { return Children is { Count: > 0 }; }

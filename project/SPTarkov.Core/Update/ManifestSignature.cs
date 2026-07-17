@@ -4,7 +4,7 @@ namespace SPTarkov.Core.Update;
 
 public static class ManifestSignature
 {
-    // Produces a DER-encoded ECDSA P-256/SHA-256 signature over the manifest bytes.
+    /// <summary>Produces a DER-encoded ECDSA P-256/SHA-256 signature over the manifest bytes.</summary>
     public static byte[] Sign(byte[] data, string privateKeyPem)
     {
         using var ecdsa = ECDsa.Create();
@@ -12,7 +12,7 @@ public static class ManifestSignature
         return ecdsa.SignData(data, HashAlgorithmName.SHA256, DSASignatureFormat.Rfc3279DerSequence);
     }
 
-    // Verifies a DER-encoded ECDSA P-256/SHA-256 signature.
+    /// <summary>Verifies a DER-encoded ECDSA P-256/SHA-256 signature.</summary>
     public static bool Verify(byte[] data, byte[] signatureDer, string publicKeyBase64)
     {
         if (string.IsNullOrWhiteSpace(publicKeyBase64))

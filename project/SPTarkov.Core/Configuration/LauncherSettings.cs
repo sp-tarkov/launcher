@@ -5,7 +5,7 @@ namespace SPTarkov.Core.Configuration;
 
 public record LauncherSettings
 {
-    // These are user-added servers only. The locked local server comes from Server.Local.
+    /// <summary>User-added servers only. The locked local server comes from <see cref="Server.Local"/>.</summary>
     public List<Server> Servers { get; set; } = [];
 
     public StartLocation StartLocation { get; set; } = new();
@@ -14,7 +14,7 @@ public record LauncherSettings
 
     public bool FirstRun { get; set; } = true;
 
-    // because we are 1 folder deeper than the game path, get parent dir
+    /// <summary>The SPT install directory: the parent of the launcher's working directory.</summary>
     public string GamePath { get; set; } = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
 
     public bool CloseToTray { get; set; }
@@ -29,7 +29,7 @@ public record LauncherSettings
 
     public bool AutoConnectLastProfile { get; set; }
 
-    // The last server/profile the user launched with
+    /// <summary>The last server/profile the user launched with.</summary>
     public PreferredProfile? PreferredProfile { get; set; }
 
     public List<string> ExcludeFromCleanup { get; set; } = new();
@@ -38,7 +38,7 @@ public record LauncherSettings
 
     public LinuxSettings LinuxSettings { get; set; } = new();
 
-    // String is the mods GUID
+    /// <summary>Tracked mods, keyed by mod GUID.</summary>
     public Dictionary<string, ConfigMod> Mods { get; set; } = new();
 
     public bool DebugLogging { get; set; }
@@ -48,6 +48,6 @@ public record LauncherSettings
 
     public bool CheckForUpdatesOnStartup { get; set; } = true;
 
-    // Newest manifest generatedUtc seen per update channel, keyed by channel name.
+    /// <summary>Newest manifest <c>generatedUtc</c> seen per update channel, keyed by channel name.</summary>
     public Dictionary<string, DateTimeOffset> LastSeenManifests { get; set; } = new();
 }

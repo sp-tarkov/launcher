@@ -82,12 +82,19 @@ public class WineHelper(ILogger<WineHelper> logger, ConfigHelper configHelper)
         return string.Concat(configHelper.GetConfig().LinuxSettings.PrefixPath, "/", s);
     }
 
-    // Example commands (to explain what would be possible using umu-run):
-    // _wineHelper.RunInPrefix("EscapeFromTarkov.exe", args) -- Launch any executable in the current working dir
-    // _wineHelper.RunInPrefix("winecfg", args) -- Launch the winecfg menu
-    // _wineHelper.RunInPrefix("winetricks", "-q win11") -- To set the windows version of the prefix to Windows 11
-    // _wineHelper.RunInPrefix("winetricks", "-q dotnetdesktop9") -- To install .NET Desktop 9 automatically
-    // _wineHelper.RunInPrefix("regedit") -- To launch the regedit tool (Pretty much the same as on windows)
+    /// <summary>
+    /// Runs an executable or Wine tool (<c>winecfg</c>, <c>winetricks</c>, <c>regedit</c>, etc.) inside the configured Wine/Proton
+    /// prefix via <c>umu-run</c>.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// RunInPrefix("EscapeFromTarkov.exe", args);           // launch any executable in the current working dir
+    /// RunInPrefix("winecfg");                              // open the winecfg menu
+    /// RunInPrefix("winetricks", ["-q", "win11"]);          // set the prefix's Windows version to Windows 11
+    /// RunInPrefix("winetricks", ["-q", "dotnetdesktop9"]); // install .NET Desktop 9
+    /// RunInPrefix("regedit");                              // open the regedit tool
+    /// </code>
+    /// </example>
     public bool RunInPrefix(string cmd = "", List<string>? args = null)
     {
         // This looks something like: "/home/{username}/Games/tarkov"

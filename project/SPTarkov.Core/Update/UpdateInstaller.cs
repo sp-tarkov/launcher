@@ -43,7 +43,7 @@ public class UpdateInstaller(
     private int _installActive;
     private bool _restartPending;
 
-    // The handler releases the single-instance lock, starts the new build, and closes this process.
+    /// <summary>Sets the relaunch handler: it releases the single-instance lock, starts the new build, and closes this process.</summary>
     public void SetRelaunchHandler(Action relaunch)
     {
         _relaunch = relaunch;

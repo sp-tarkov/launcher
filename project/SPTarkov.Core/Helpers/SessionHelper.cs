@@ -15,7 +15,7 @@ public enum ConnectStep
     ModPages,
 }
 
-// Outcome of a SessionHelper.ConnectToServerAsync attempt.
+/// <summary>Outcome of a <see cref="SessionHelper.ConnectToServerAsync"/> attempt.</summary>
 public record ConnectResult
 {
     public bool Success { get; init; }
@@ -42,8 +42,11 @@ public class SessionHelper(ILogger<SessionHelper> logger, HttpHelper httpHelper,
 {
     private static readonly TimeSpan _requestTimeout = TimeSpan.FromSeconds(10);
 
-    // Selects the server, then pings it and fetches its profile list, profile types, and mod pages, storing them on StateHelper. Failures
-    // are reported via the returned ConnectResult, not thrown. On failure, partial state is left in place for the caller to clean up.
+    /// <summary>
+    /// Selects the server, then pings it and fetches its profile list, profile types, and mod pages, storing them on
+    /// <see cref="StateHelper"/>. Failures are reported via the returned <see cref="ConnectResult"/>, not thrown. On failure, partial
+    /// state is left in place for the caller to clean up.
+    /// </summary>
     public async Task<ConnectResult> ConnectToServerAsync(
         Server server,
         IProgress<ConnectStep>? progress = null,
@@ -113,7 +116,7 @@ public class SessionHelper(ILogger<SessionHelper> logger, HttpHelper httpHelper,
         return ConnectResult.Ok();
     }
 
-    // Logs into an existing profile by username and, on success, sets it as the selected profile.
+    /// <summary>Logs into an existing profile by username and, on success, sets it as the selected profile.</summary>
     public async Task<bool> LoginToProfileAsync(MiniProfile profile, CancellationToken cancellationToken = default)
     {
         try
@@ -138,7 +141,7 @@ public class SessionHelper(ILogger<SessionHelper> logger, HttpHelper httpHelper,
         }
     }
 
-    // Authenticates by username, fetches the resulting profile, and sets it as the selected profile.
+    /// <summary>Authenticates by username, fetches the resulting profile, and sets it as the selected profile.</summary>
     public async Task<MiniProfile?> LoginWithDetailsAsync(string username, CancellationToken cancellationToken = default)
     {
         try

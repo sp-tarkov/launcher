@@ -1,6 +1,6 @@
 namespace SPTarkov.Core.Update;
 
-// The entries an update payload may contain: launcher executables and files under SPT_Data/Launcher.
+/// <summary>The entries an update payload may contain: launcher executables and files under <c>SPT_Data/Launcher</c>.</summary>
 public static class UpdatePayload
 {
     public const string WindowsExe = "SPT.Launcher.exe";
