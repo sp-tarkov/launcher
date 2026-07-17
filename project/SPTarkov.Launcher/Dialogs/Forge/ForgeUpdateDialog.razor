@@ -4,6 +4,8 @@
 @inject ILogger<ForgeDownloadDialog> Logger
 @inject HttpHelper HttpHelper
 @inject LocaleHelper LocaleHelper
+@inject ForgeRateLimiter RateLimiter
+@implements IDisposable
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -52,8 +54,22 @@
     protected override Task OnInitializedAsync()
     {
         _taskText = LocaleHelper.Get("forge_update_check");
+        RateLimiter.RateLimitChanged += OnRateLimitChanged;
 
         return base.OnInitializedAsync();
+    }
+
+    private void OnRateLimitChanged()
+    {
+        if (!_requestInProgress)
+        {
+            return;
+        }
+
+        _taskText = RateLimiter.TimeRemaining is { } remaining
+            ? string.Format(LocaleHelper.Get("forge_rate_limited_subtitle"), (int)Math.Ceiling(remaining.TotalSeconds))
+            : LocaleHelper.Get("forge_update_checking");
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task<ForgeUpdateResponse?> CallForge(string taskText = "", string failString = "")
@@ -90,7 +106,7 @@
         Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
         try
         {
-            ForgeUpdateResponse = await CallForge(LocaleHelper.Get("forge_update_checking"), LocaleHelper.Get("forge_update_failed"));
+            ForgeUpdateResponse = await CallForge(LocaleHelper.Get("forge_update_checking"), LocaleHelper.Get("forge_update_failed_1"));
             // we abort if failed so no need to check result
             CheckedForUpdates = true;
 
@@ -169,6 +185,11 @@
         _requestInProgress = false;
         Token?.Cancel();
         MudDialog.Cancel();
+    }
+
+    public void Dispose()
+    {
+        RateLimiter.RateLimitChanged -= OnRateLimitChanged;
     }
 
 }

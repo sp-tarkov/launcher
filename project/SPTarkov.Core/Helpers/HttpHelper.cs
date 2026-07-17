@@ -193,12 +193,20 @@ public class HttpHelper
             await _rateLimiter.WaitAsync(token);
 
             var response = await _httpClient.SendAsync(BuildMessage(HttpMethod.Get, url), token);
-            if (response.StatusCode != HttpStatusCode.TooManyRequests || attempt >= MaxRateLimitRetries)
+            if (response.StatusCode != HttpStatusCode.TooManyRequests)
             {
+                _rateLimiter.ClearServerRateLimit();
                 return response;
             }
 
             var delay = RetryDelay(response, attempt);
+            _rateLimiter.ReportServerRateLimit(delay);
+
+            if (attempt >= MaxRateLimitRetries)
+            {
+                return response;
+            }
+
             _logger.LogWarning(
                 "Forge rate limited request to {Url}, retrying in {Delay:0.#}s (attempt {Attempt}/{MaxAttempts})",
                 url,

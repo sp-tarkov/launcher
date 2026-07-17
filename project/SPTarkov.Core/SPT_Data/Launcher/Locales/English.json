@@ -251,6 +251,8 @@
   "forge_update_run": "Update Mods",
   "forge_update_cancel": "Cancel",
   "forge_update_checking": "Checking for updates",
+  "forge_rate_limited_title": "Too many requests",
+  "forge_rate_limited_subtitle": "The Forge is busy. Retrying in {0} seconds.",
   "forge_update_failed_1": "Failed to check for updates",
   "forge_update_none": "No update detected",
   "forge_update_detected": "Below mods have available updates!",

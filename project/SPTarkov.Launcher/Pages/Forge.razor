@@ -6,6 +6,8 @@
 @inject ConfigHelper ConfigHelper
 @inject ILogger<Forge> Logger
 @inject LocaleHelper LocaleHelper
+@inject ForgeRateLimiter RateLimiter
+@implements IDisposable
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     @if (NetAvailable != false)
@@ -32,7 +34,20 @@
         }
     }
 
-    @if (NetAvailable == false)
+    @if (RateLimited)
+    {
+        <MudItem sm="12">
+            <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
+                <MudContainer Class="d-flex flex-column align-center gap-2 py-12">
+                    <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Style="font-size: 4rem;" Class="mud-text-secondary"/>
+                    <MudText Typo="Typo.h6" Align="Align.Center">@(LocaleHelper.Get("forge_rate_limited_title"))</MudText>
+                    <MudText Align="Align.Center" Class="mud-text-secondary">@RateLimitedSubtitle</MudText>
+                </MudContainer>
+            </MudPaper>
+        </MudItem>
+    }
+
+    else if (NetAvailable == false)
     {
         <MudItem sm="12">
             <MudPaper Elevation="2" Class="pa-4 border-2 border-solid mud-border-lines-default card-container">
@@ -100,11 +115,14 @@
     private ForgeModsResponse? SearchResponse { get; set; }
     private bool SearchInProgress { get; set; }
     private bool SearchFailed { get; set; }
+    private bool RateLimited { get; set; }
+    private System.Threading.Timer? RateLimitTicker { get; set; }
     private CancellationTokenSource? SearchCts { get; set; }
     private List<ForgeCategory>? Categories => StateHelper.ListOfCategoriesAvailable;
     private bool GettingCategories { get; set; }
     private SearchComponent? SearchComponentRef { get; set; }
     private string NoResultsTitle => string.Format(LocaleHelper.Get("forge_no_results_title"), ProgramStatics.SptVersionCompiledFor);
+    private string RateLimitedSubtitle => string.Format(LocaleHelper.Get("forge_rate_limited_subtitle"), (int)Math.Ceiling(RateLimiter.TimeRemaining?.TotalSeconds ?? 0));
 
     private int PaginationValue
     {
@@ -199,11 +217,85 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        RateLimiter.RateLimitChanged += OnRateLimitChanged;
         await CheckInternetAccess();
+    }
+
+    private void OnRateLimitChanged()
+    {
+        if (RateLimiter.TimeRemaining is { } remaining)
+        {
+            RateLimited = true;
+            ExtendSearchTimeout(remaining);
+            StartRateLimitTicker();
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        if (RateLimited)
+        {
+            ExitRateLimitedState();
+        }
+    }
+
+    // Reschedules the active search timeout to outlast the rate limit wait.
+    private void ExtendSearchTimeout(TimeSpan remaining)
+    {
+        try
+        {
+            SearchCts?.CancelAfter(remaining + TimeSpan.FromSeconds(10));
+        }
+        catch (ObjectDisposedException)
+        {
+            // Newer search disposed this cts.
+        }
+    }
+
+    private void StartRateLimitTicker()
+    {
+        RateLimitTicker ??= new System.Threading.Timer(_ => OnRateLimitTick(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    private void StopRateLimitTicker()
+    {
+        RateLimitTicker?.Dispose();
+        RateLimitTicker = null;
+    }
+
+    private void OnRateLimitTick()
+    {
+        if (RateLimiter.TimeRemaining is null)
+        {
+            ExitRateLimitedState();
+            return;
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ExitRateLimitedState()
+    {
+        RateLimited = false;
+        StopRateLimitTicker();
+
+        if (SearchInProgress)
+        {
+            InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        InvokeAsync(CheckInternetAccess);
     }
 
     private async Task CheckInternetAccess()
     {
+        if (RateLimiter.TimeRemaining is not null)
+        {
+            RateLimited = true;
+            StartRateLimitTicker();
+            return;
+        }
+
         NetAvailable = null;
         SearchFailed = false;
 
@@ -319,5 +411,11 @@
 
             cts.Dispose();
         }
+    }
+
+    public void Dispose()
+    {
+        RateLimiter.RateLimitChanged -= OnRateLimitChanged;
+        StopRateLimitTicker();
     }
 }
