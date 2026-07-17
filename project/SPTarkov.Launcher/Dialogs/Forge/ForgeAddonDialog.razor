@@ -88,11 +88,18 @@
     {
         _requestInProgress = true;
         Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
+
+        var version = AddonDetails?.Versions?.FirstOrDefault();
+        if (AddonDetails is null || version is null)
+        {
+            AbortOrFail();
+            return;
+        }
+
         var dictOfDeps = new Dictionary<string, Version>();
         try
         {
-            var version = AddonDetails?.Versions?.FirstOrDefault();
-            if (version?.Dependencies != null && version.Dependencies.Any())
+            if (version.Dependencies != null && version.Dependencies.Any())
             {
                 foreach (var dep in version.Dependencies)
                 {
@@ -117,7 +124,7 @@
                 }
             }
 
-            // ModManager.DownloadMod(version, Version, Token.Token, dictOfDeps);
+            _ = ModManager.DownloadMod(AddonDetails, version, Token.Token, dictOfDeps);
         }
         catch (Exception)
         {
