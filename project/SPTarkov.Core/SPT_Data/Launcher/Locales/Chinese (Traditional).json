@@ -194,6 +194,7 @@
   "mod_cheat_notice_text": "This mod provides functionality similar to traditional multiplayer cheats but was designed exclusively for use with SPT. Attempting to use this software on live EFT servers will not work and will result in an immediate and permanent ban from EFT and SPT.",
   "mod_cheat_notice_link": "Content Guidelines.",
   "mod_ai_disclosure_title": "AI Content Disclosure:",
+  "mod_ai_disclosure_text": "This mod includes AI-generated content.",
   "mod_category": "Category",
   "mod_file_size": "File Size",
   "featured": "Featured",

@@ -97,7 +97,14 @@
                     <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
                         <MudCardContent>
                             <MudText Typo="Typo.caption">@(LocaleHelper.Get("mod_ai_disclosure_title"))</MudText>
-                            <div class="user-markdown">@((MarkupString)ForgeMod.CustomAiDisclosure!)</div>
+                            @if (HasCustomAiDisclosure)
+                            {
+                                <div class="user-markdown">@((MarkupString)ForgeMod.CustomAiDisclosure!)</div>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.caption">@(LocaleHelper.Get("mod_ai_disclosure_text"))</MudText>
+                            }
                         </MudCardContent>
                     </MudCard>
                 }
@@ -245,7 +252,9 @@
 
     private bool HasCompatibleAddons => ForgeModAddons?.Any(addon => GetCompatibleAddonVersion(addon) is not null) ?? false;
 
-    private bool HasAiDisclosure => !string.IsNullOrWhiteSpace(ForgeMod?.CustomAiDisclosure);
+    private bool HasAiDisclosure => ForgeMod?.ContainsAiContent == true || HasCustomAiDisclosure;
+
+    private bool HasCustomAiDisclosure => !string.IsNullOrWhiteSpace(ForgeMod?.CustomAiDisclosure);
 
     private ForgeModVersion? GetCompatibleAddonVersion(ForgeBase addon)
     {
