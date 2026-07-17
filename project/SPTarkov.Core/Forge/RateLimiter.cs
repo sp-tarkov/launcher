@@ -17,7 +17,7 @@ public class ForgeRateLimiter : IAsyncDisposable
     private DateTimeOffset? _clientLimitedUntil;
     private int _clientWaiters;
 
-    // Raised when the rate limit state changes: a wait begins, is extended, or clears.
+    /// <summary>Raised when the rate limit state changes: a wait begins, is extended, or clears.</summary>
     public event Action? RateLimitChanged;
 
     public ForgeRateLimiter(ILogger<ForgeRateLimiter> logger)
@@ -47,7 +47,7 @@ public class ForgeRateLimiter : IAsyncDisposable
         );
     }
 
-    // Estimated time left on the current rate limit wait, or null when requests can flow.
+    /// <summary>Estimated time left on the current rate limit wait, or <c>null</c> when requests can flow.</summary>
     public TimeSpan? TimeRemaining
     {
         get
@@ -70,7 +70,7 @@ public class ForgeRateLimiter : IAsyncDisposable
         await AcquireAsync(_burst, "burst", BurstWindow, ct);
     }
 
-    // Records a server 429 backoff so TimeRemaining covers the Retry-After delay.
+    /// <summary>Records a server 429 backoff; <see cref="TimeRemaining"/> then covers the <c>Retry-After</c> delay.</summary>
     public void ReportServerRateLimit(TimeSpan retryAfter)
     {
         var until = DateTimeOffset.UtcNow + retryAfter;
@@ -82,7 +82,7 @@ public class ForgeRateLimiter : IAsyncDisposable
         RateLimitChanged?.Invoke();
     }
 
-    // Clears the server 429 backoff once a request gets through again.
+    /// <summary>Clears the server 429 backoff once a request gets through again.</summary>
     public void ClearServerRateLimit()
     {
         lock (_stateLock)
