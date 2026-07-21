@@ -154,7 +154,7 @@ public class GameHelper
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
 
-        //start game
+        // Start game
         var args =
             $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config="
             + $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";

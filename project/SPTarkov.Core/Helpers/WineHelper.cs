@@ -75,11 +75,21 @@ public class WineHelper(ILogger<WineHelper> logger, ConfigHelper configHelper)
         return string.Concat(configHelper.GetConfig().LinuxSettings.PrefixPath, pathWithoutDrive);
     }
 
+    /// <summary>
+    /// reconstruct path used when installing EFT on linux to work on linux, using symlinks in dosdevice in the winePrefix
+    /// </summary>
+    /// <param name="windowsLikePath"></param>
+    /// <returns></returns>
     public string FixWithPrefixValidation(string? windowsLikePath)
     {
-        var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
-        var s = Path.Join("drive_c", pathWithoutDrive);
-        return string.Concat(configHelper.GetConfig().LinuxSettings.PrefixPath, "/", s);
+        var pathAndDrive = windowsLikePath?.Replace(@"\\", "/").Split(":");
+        var s = Path.Join(
+            configHelper.GetConfig().LinuxSettings.PrefixPath,
+            "dosdevices",
+            $"{pathAndDrive![0].ToLower()}:", // [0] is drive letter.
+            pathAndDrive[1] // [1] path to game on that drive
+        );
+        return s;
     }
 
     /// <summary>
