@@ -316,5 +316,7 @@
   "setting_section_updates": "Aktualizacje",
   "setting_section_linux": "Linux",
   "setting_section_troubleshooting": "Rozwiązywanie problemów",
-  "linux_add_confirm": "Confirm?"
+  "linux_add_confirm": "Confirm?",
+  "game_helper_error_7": "Connection was Refused/Lost to Server",
+  "game_helper_error_8": "Unknown error occured, please report to SPT"
 }

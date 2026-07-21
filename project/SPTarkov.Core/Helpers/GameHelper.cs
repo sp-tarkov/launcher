@@ -98,8 +98,6 @@ public class GameHelper
 
         if (await IsCoreDllVersionMismatched())
         {
-            _logger.LogError("Core dll mismatch");
-            ErrorMessage = _localeHelper.Get("game_helper_error_2");
             return false;
         }
 
@@ -275,34 +273,29 @@ public class GameHelper
             _logger.LogInformation("server version: {serverVersion} - spt-core.dll version: {DllVersion}", serverVersion, dllVersion);
 
             // Edge case, running on locally built modules dlls, ignore check and return ok
-            if (dllVersion.Major == 1)
+            if (
+                dllVersion.Major != 1
+                && serverVersion.Major == dllVersion.Major
+                && serverVersion.Minor == dllVersion.Minor
+                && serverVersion.Patch == dllVersion.Patch
+            )
             {
-                return false;
+                return false; // Versions match, hooray
             }
 
-            // check 'X'.x.x
-            if (serverVersion.Major != dllVersion.Major)
-            {
-                return true;
-            }
-
-            // check x.'X'.x
-            if (serverVersion.Minor != dllVersion.Minor)
-            {
-                return true;
-            }
-
-            // check x.x.'X'
-            if (serverVersion.Patch != dllVersion.Patch)
-            {
-                return true;
-            }
-
-            return false; // Versions match, hooray
+            _logger.LogError("Core dll mismatch");
+            ErrorMessage = _localeHelper.Get("game_helper_error_2");
+            return false;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError("Connection lost/refused: {ex}", ex);
+            ErrorMessage = _localeHelper.Get("game_helper_error_7");
         }
         catch (Exception ex)
         {
             _logger.LogError("Exception occured: {ex}", ex);
+            ErrorMessage = _localeHelper.Get("game_helper_error_8");
         }
 
         return true;
