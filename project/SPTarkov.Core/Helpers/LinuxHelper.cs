@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Configuration;
@@ -6,7 +7,7 @@ using SPTarkov.Core.SPT;
 
 namespace SPTarkov.Core.Helpers;
 
-public class WineHelper(ILogger<WineHelper> logger, ConfigHelper configHelper)
+public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
 {
     private const string KeyStartingCharacter = "[";
 
@@ -356,4 +357,7 @@ public class WineHelper(ILogger<WineHelper> logger, ConfigHelper configHelper)
 
         return Task.FromResult(listStripped);
     }
+
+    [DllImport("libc", EntryPoint = "setenv", SetLastError = true)]
+    public static extern int SetEnvironmentVariableNative(string name, string value, int overwrite);
 }

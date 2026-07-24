@@ -1,7 +1,7 @@
 @inject ISnackbar Snackbar
 @inject LocaleHelper LocaleHelper
 @inject ConfigHelper ConfigHelper
-@inject WineHelper WineHelper
+@inject LinuxHelper LinuxHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
     <DialogContent>
@@ -57,7 +57,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        ProtonList = await WineHelper.GetProtonVersions();
+        ProtonList = await LinuxHelper.GetProtonVersions();
         LinuxSettings!.ProtonVersion = ProtonList.FirstOrDefault("GE-Proton11-1");
 
         await base.OnParametersSetAsync();

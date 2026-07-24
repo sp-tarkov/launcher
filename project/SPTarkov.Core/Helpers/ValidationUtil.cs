@@ -14,11 +14,11 @@ public class ValidationUtil
     string c2 = "build";
     string c3 = "3932890";
     int v0;
-    private WineHelper _wineHelper;
+    private LinuxHelper _linuxHelper;
 
-    public ValidationUtil(WineHelper wineHelper)
+    public ValidationUtil(LinuxHelper linuxHelper)
     {
-        _wineHelper = wineHelper;
+        _linuxHelper = linuxHelper;
     }
 
     public bool Validate()
@@ -30,7 +30,7 @@ public class ValidationUtil
             {
                 b1 = false;
                 if (OperatingSystem.IsLinux())
-                    v1 = _wineHelper.FixWithPrefixValidation(_wineHelper.FindWineRegValue(Paths.UninstallEftRegKey, "InstallLocation"));
+                    v1 = _linuxHelper.FixWithPrefixValidation(_linuxHelper.FindWineRegValue(Paths.UninstallEftRegKey, "InstallLocation"));
                 else
                     v1 = Registry.LocalMachine.OpenSubKey(c0, false)?.GetValue("InstallLocation");
             }
@@ -81,7 +81,7 @@ public class ValidationUtil
         var h = string.Empty;
         if (OperatingSystem.IsLinux())
         {
-            var n = _wineHelper.FindWineRegValue(c1, "InstallPath");
+            var n = _linuxHelper.FindWineRegValue(c1, "InstallPath");
             if (n != null)
                 h = n;
 

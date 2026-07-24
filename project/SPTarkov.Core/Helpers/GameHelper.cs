@@ -18,7 +18,7 @@ public class GameHelper
     private readonly HttpHelper _httpHelper;
     private readonly FilePatcher _filePatcher;
     private readonly LocaleHelper _localeHelper;
-    private readonly WineHelper _wineHelper;
+    private readonly LinuxHelper _linuxHelper;
     private readonly ValidationUtil _validationUtil;
 
     private string? _originalGamePath;
@@ -36,7 +36,7 @@ public class GameHelper
         FilePatcher filePatcher,
         HttpHelper httpHelper,
         LocaleHelper localeHelper,
-        WineHelper wineHelper,
+        LinuxHelper linuxHelper,
         ValidationUtil validationUtil
     )
     {
@@ -46,7 +46,7 @@ public class GameHelper
         _filePatcher = filePatcher;
         _httpHelper = httpHelper;
         _localeHelper = localeHelper;
-        _wineHelper = wineHelper;
+        _linuxHelper = linuxHelper;
         _validationUtil = validationUtil;
         _originalGamePath = DetectOriginalGamePath();
     }
@@ -79,7 +79,7 @@ public class GameHelper
         // as running with linux requires wine, we can now
         if (OperatingSystem.IsLinux())
         {
-            return _wineHelper.GetOriginalGamePath();
+            return _linuxHelper.GetOriginalGamePath();
         }
 
         throw new Exception("Unsupported operating system");
@@ -197,7 +197,7 @@ public class GameHelper
             $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}",
         ];
 
-        if (!_wineHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
+        if (!_linuxHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
         {
             return false;
         }
