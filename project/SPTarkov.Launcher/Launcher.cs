@@ -60,6 +60,12 @@ public class Launcher
         else if (OperatingSystem.IsLinux())
         {
             sevenZip = new LinuxSevenZip();
+
+            // Linux and Nvidia have issues with webkit, to fix those issues set an env variable
+            // https://github.com/NVIDIA/egl-wayland/blob/master/src/wayland-egldisplay.c#L1241
+            // https://bugs.webkit.org/show_bug.cgi?id=280210
+            // this should only affect nvidia users, so no need to condition on AMD/INTEL
+            Environment.SetEnvironmentVariable("__NV_DISABLE_EXPLICIT_SYNC", "1");
         }
         else
         {
