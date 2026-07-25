@@ -4,6 +4,7 @@
 
 .no-select {
     user-select: none;
+    -webkit-user-select: none;
 }
 
 .text-overflow {
