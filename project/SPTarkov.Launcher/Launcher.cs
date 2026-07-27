@@ -34,6 +34,7 @@ public class Launcher
     private static bool _exitRequested;
     private static string? _trayIconPath;
     private static SingleInstanceGuard _singleInstanceGuard = null!;
+    private static readonly string TemporaryFilesPath = Path.Join(Path.GetTempPath(), "SPT.Launcher");
 
     // Photino re-asserts the window while cancelling a close so wait before hiding to tray.
     private const int HideToTrayDelayMs = 100;
@@ -179,7 +180,8 @@ public class Launcher
 
     private static void CustomizeComponent()
     {
-        App.MainWindow.SetTitle(_appTitle);
+        Directory.CreateDirectory(TemporaryFilesPath);
+        App.MainWindow.SetTemporaryFilesPath(TemporaryFilesPath).SetTitle(_appTitle);
 
         // Use extension method to get icon from embedded resource
         App.MainWindow.SetIconFile(
@@ -317,7 +319,7 @@ public class Launcher
     {
         // Different installations run concurrently (single-instance is per-install) and share the one user temp dir, so a fixed filename
         // would let their startup writes race. Keying the name on the process id gives each instance its own file.
-        var tempPath = Path.Join(Path.GetTempPath(), $"spt-logo-{Environment.ProcessId}.ico");
+        var tempPath = Path.Join(TemporaryFilesPath, $"spt-logo-{Environment.ProcessId}.ico");
 
         try
         {
