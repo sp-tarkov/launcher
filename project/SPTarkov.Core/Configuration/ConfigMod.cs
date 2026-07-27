@@ -9,7 +9,6 @@ public class ConfigMod
     public string Name { get; init; } = "unknown";
     public string GUID { get; set; } = "com.unknown.mod";
     public bool IsInstalled { get; set; }
-    public bool IsInstalling { get; set; }
     public bool CanBeUpdated { get; set; }
     public List<string>? Files { get; set; } = [];
 

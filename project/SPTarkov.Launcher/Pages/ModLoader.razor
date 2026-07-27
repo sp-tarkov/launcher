@@ -116,7 +116,7 @@
                 }
                 @foreach (var (guid, mod) in ModManager.GetMods())
                 {
-                    if (mod.IsInstalled || mod.IsInstalling)
+                    if (mod.IsInstalled || ModHelper.GetModTasks().ContainsKey(guid))
                     {
                         continue;
                     }

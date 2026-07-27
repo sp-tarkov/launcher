@@ -131,7 +131,6 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
         var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
-        configMod.IsInstalling = true;
         logger.LogInformation("Installing mod: {guid}", guid);
 
         try
@@ -142,7 +141,6 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
             {
                 // TODO: something fucked up, do something or cancelled
                 logger.LogError("install task failed for mod {mod}: {e}", guid, installTask?.Error);
-                configMod.IsInstalling = false;
                 return false;
             }
 
@@ -151,12 +149,10 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         catch (Exception e)
         {
             logger.LogWarning("install task failed for reason:  {reason}", e.Message);
-            configMod.IsInstalling = false;
             return false;
         }
 
         logger.LogInformation("Installed mod: {guid}", guid);
-        configMod.IsInstalling = false;
         configMod.IsInstalled = true;
         configHelper.AddMod(configMod);
 
