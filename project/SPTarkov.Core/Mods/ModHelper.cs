@@ -212,7 +212,7 @@ public class ModHelper
         if (!_modDict.TryAdd(updateTask.GUID, updateTask))
         {
             _modDict.Remove(updateTask.GUID, out _);
-            if (!_modDict.TryAdd(updateTask.Name, updateTask))
+            if (!_modDict.TryAdd(updateTask.GUID, updateTask))
             {
                 _logger.LogError("Something seriously went wrong adding this update task: {name}:{guid}", updateTask.Name, updateTask.GUID);
                 return null;
