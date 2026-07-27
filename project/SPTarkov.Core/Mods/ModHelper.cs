@@ -87,8 +87,8 @@ public class ModHelper
 
             downloadTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
 
-            var contentStream = await response.Content.ReadAsStreamAsync(downloadTask.CancellationTokenSource.Token);
-            var fileStream = File.Create(modFilePath);
+            await using var contentStream = await response.Content.ReadAsStreamAsync(downloadTask.CancellationTokenSource.Token);
+            await using var fileStream = File.Create(modFilePath);
 
             var buffer = new byte[8192];
             long totalRead = 0;
@@ -109,17 +109,12 @@ public class ModHelper
                     lastReportTime = now;
                 }
             }
-
-            await contentStream.FlushAsync();
-            contentStream.Close();
-
-            await fileStream.FlushAsync();
-            fileStream.Close();
         }
         catch (Exception e)
         {
             downloadTask.Error = e;
             await downloadTask.CancellationTokenSource.CancelAsync();
+            TryDeleteFile(modFilePath);
             return downloadTask;
         }
 
@@ -194,6 +189,21 @@ public class ModHelper
         return _modDict;
     }
 
+    private void TryDeleteFile(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning("Unable to delete partial download {path}: {message}", path, e.Message);
+        }
+    }
+
     public async Task<UpdateTask?> StartUpdateTask(ForgeModUpdate mod, CancellationTokenSource cancellationTokenSource)
     {
         var updateTask = new UpdateTask
@@ -238,8 +248,8 @@ public class ModHelper
 
             updateTask.TotalToDownload = response.Content.Headers.ContentLength ?? -1;
 
-            var contentStream = await response.Content.ReadAsStreamAsync(updateTask.CancellationTokenSource.Token);
-            var fileStream = File.Create(modFilePath);
+            await using var contentStream = await response.Content.ReadAsStreamAsync(updateTask.CancellationTokenSource.Token);
+            await using var fileStream = File.Create(modFilePath);
 
             var buffer = new byte[8192];
             long totalRead = 0;
@@ -260,17 +270,12 @@ public class ModHelper
                     lastReportTime = now;
                 }
             }
-
-            await contentStream.FlushAsync();
-            contentStream.Close();
-
-            await fileStream.FlushAsync();
-            fileStream.Close();
         }
         catch (Exception e)
         {
             updateTask.Error = e;
             await updateTask.CancellationTokenSource.CancelAsync();
+            TryDeleteFile(modFilePath);
             return updateTask;
         }
 
