@@ -87,31 +87,28 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
 
         var entries = await sevenZip.GetEntriesAsync(modFilePath, downloadTask.CancellationTokenSource.Token);
 
-        // check if zip contains bepinex or spt folder for correct starting structure
-        // this should be bepinex\ on windows and bepinex/ on linux
+        // Check if archive contains BepInEx or SPT_Runtime folder
         var checkForCorrectFilePath = entries.Any(x =>
             x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar)
             || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar)
         );
 
-        if (!checkForCorrectFilePath)
+        if (checkForCorrectFilePath)
         {
-            downloadTask.Error = new Exception(
-                "Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff"
-            );
-            await downloadTask.CancellationTokenSource.CancelAsync();
-            return null;
+            return new ConfigMod
+            {
+                Name = downloadTask.ForgeMod.Name,
+                ModVersion = downloadTask.Version.Version,
+                GUID = modGuid,
+                IsInstalled = false,
+                CanBeUpdated = false,
+                Files = RemoveBasePaths(entries),
+            };
         }
 
-        return new ConfigMod
-        {
-            Name = downloadTask.ForgeMod.Name,
-            ModVersion = downloadTask.Version.Version,
-            GUID = modGuid,
-            IsInstalled = false,
-            CanBeUpdated = false,
-            Files = RemoveBasePaths(entries),
-        };
+        downloadTask.Error = new Exception("Archive does not contain a BepInEx or SPT_Runtime folder. Unsupported structure.");
+        await downloadTask.CancellationTokenSource.CancelAsync();
+        return null;
     }
 
     public Dictionary<string, ConfigMod> GetMods()
@@ -360,13 +357,6 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         cancellationToken.ThrowIfCancellationRequested();
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        // copy current version to be .bak
-        if (!configHelper.GetConfig().Mods.ContainsKey(mod.CurrentVersion.GUID))
-        {
-            logger.LogError("key not found: {key}", mod.CurrentVersion.GUID);
-            return;
-        }
-
         if (!configHelper.GetConfig().Mods.TryGetValue(mod.CurrentVersion.GUID, out var configMod))
         {
             logger.LogError("unable to get key: {key}", mod.CurrentVersion.GUID);
@@ -374,50 +364,85 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         }
 
         var ogPath = Path.Join(Paths.ModCache, mod.CurrentVersion.GUID);
+        var bakPath = ogPath + ".bak";
 
-        File.Copy(ogPath, ogPath + ".bak", true);
-
-        if (!File.Exists(ogPath + ".bak"))
+        // copy current version to be .bak
+        try
         {
-            logger.LogError("unable to find: {file} after copy", ogPath + ".bak");
+            File.Copy(ogPath, bakPath, true);
+        }
+        catch (Exception e)
+        {
+            logger.LogError("unable to back up {file}: {message}", ogPath, e.Message);
             return;
         }
 
         var updateTask = await modHelper.StartUpdateTask(mod, cts);
 
-        if (updateTask == null)
+        if (updateTask is not { Complete: true } || updateTask.Error != null)
         {
-            logger.LogError("Update task failed for mod {mod}", mod.CurrentVersion.Name);
+            logger.LogError("Update task failed for mod {mod}: {e}", mod.CurrentVersion.Name, updateTask?.Error);
+            RestoreCacheBackup(bakPath, ogPath);
             return;
         }
 
-        var entries = await sevenZip.GetEntriesAsync(ogPath, cts.Token);
-
-        // check if zip contains bepinex or spt folder for correct starting structure
-        // this should be bepinex\ on Windows and bepinex/ on linux
-        var checkForCorrectFilePath = entries.Any(x =>
-            x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar)
-            || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar)
-        );
-
-        if (!checkForCorrectFilePath)
+        try
         {
-            updateTask.Error = new Exception(
-                "Zip does not contain a bepinex or spt folder, unsupported structure, please report to SPT staff"
+            var entries = await sevenZip.GetEntriesAsync(ogPath, cts.Token);
+
+            // Check if archive contains BepInEx or SPT_Runtime folder
+            var checkForCorrectFilePath = entries.Any(x =>
+                x.ToLower().Contains("bepinex" + Path.DirectorySeparatorChar)
+                || x.ToLower().Contains("spt_runtime" + Path.DirectorySeparatorChar)
             );
-            await cts.CancelAsync();
+
+            if (!checkForCorrectFilePath)
+            {
+                updateTask.Error = new Exception("Archive does not contain a BepInEx or SPT_Runtime folder. Unsupported structure.");
+                RestoreCacheBackup(bakPath, ogPath);
+                return;
+            }
+
+            // Update config for latest version
+            configMod.ModVersion = mod.RecommendedVersion.Version;
+            configMod.Files = RemoveBasePaths(entries);
+            configHelper.AddMod(configMod);
+        }
+        catch (Exception e)
+        {
+            logger.LogError("Update failed for mod {mod}: {e}", mod.CurrentVersion.Name, e);
+            updateTask.Error = e;
+            RestoreCacheBackup(bakPath, ogPath);
             return;
         }
-
-        // update config for latest version
-        configMod.ModVersion = mod.RecommendedVersion.Version;
-        configMod.Files = RemoveBasePaths(entries);
-        configHelper.AddMod(configMod);
 
         // delete old zip with .bak
-        File.Delete(ogPath + ".bak");
+        try
+        {
+            File.Delete(bakPath);
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("Unable to delete backup {file}: {message}", bakPath, e.Message);
+        }
 
         modHelper.RemoveModTask(updateTask);
+    }
+
+    // Moves the cache backup back over the original zip.
+    private void RestoreCacheBackup(string bakPath, string ogPath)
+    {
+        try
+        {
+            if (File.Exists(bakPath))
+            {
+                File.Move(bakPath, ogPath, true);
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("Unable to restore backup {file}: {message}", bakPath, e.Message);
+        }
     }
 
     // Resolves a stored mod file path against the game directory.
@@ -438,16 +463,16 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         }
 
         var comparison = OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-        if (!fullPath.StartsWith(gameRootWithSeparator, comparison))
+        if (fullPath.StartsWith(gameRootWithSeparator, comparison))
         {
-            logger.LogWarning("Skipping mod file outside the game directory: {file}", file);
-            return null;
+            return fullPath;
         }
 
-        return fullPath;
+        logger.LogWarning("Skipping mod file outside the game directory: {file}", file);
+        return null;
     }
 
-    private List<string> RemoveBasePaths(List<string> originalPaths)
+    private static List<string> RemoveBasePaths(List<string> originalPaths)
     {
         return originalPaths.Where(x => !Paths.ArchiveFileInfoToIgnore.Contains(x)).ToList();
     }
