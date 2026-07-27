@@ -100,7 +100,8 @@ public class WindowsSevenZip : SevenZip
 
         try
         {
-            // launching extraction on a zip is `x -o"Destination" "PathToZip"`
+            // launching extraction on a zip is `x -aoa -y -o"Destination" "PathToZip"`
+            // -aoa overwrites existing files and -y assumes yes on all queries, so 7-Zip never prompts
             var process = new ProcessStartInfo
             {
                 FileName = Path.Join(Paths.SevenZip, "7za.exe"),
@@ -109,7 +110,7 @@ public class WindowsSevenZip : SevenZip
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,
-                Arguments = $"x -o\"{destination}\"  \"{pathToZip}\"",
+                Arguments = $"x -aoa -y -o\"{destination}\" \"{pathToZip}\"",
             };
 
             var processResult = Process.Start(process);
