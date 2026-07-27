@@ -328,11 +328,18 @@ public class ModHelper
                 return installTask;
             }
 
-            await _sevenZip.ExtractToDirectoryAsync(
+            var extracted = await _sevenZip.ExtractToDirectoryAsync(
                 modFilePath,
                 _configHelper.GetConfig().GamePath,
                 installTask.CancellationTokenSource.Token
             );
+
+            if (!extracted)
+            {
+                _logger.LogError("Extraction failed for mod {name}:{guid}", mod.Name, mod.GUID);
+                installTask.Error = new Exception($"Extraction failed for mod {mod.Name}");
+                return installTask;
+            }
         }
         catch (Exception e)
         {
