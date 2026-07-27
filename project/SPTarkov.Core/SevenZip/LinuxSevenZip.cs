@@ -135,7 +135,7 @@ public class LinuxSevenZip : SevenZip
                 }
             });
 
-            var output = await processResult.StandardOutput.ReadToEndAsync(token);
+            await processResult.StandardOutput.ReadToEndAsync(token);
             var error = await processResult.StandardError.ReadToEndAsync(token);
 
             await processResult.WaitForExitAsync(token);

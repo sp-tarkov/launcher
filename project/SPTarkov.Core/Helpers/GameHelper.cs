@@ -18,7 +18,7 @@ public class GameHelper
     private readonly HttpHelper _httpHelper;
     private readonly FilePatcher _filePatcher;
     private readonly LocaleHelper _localeHelper;
-    private readonly WineHelper _wineHelper;
+    private readonly LinuxHelper _linuxHelper;
     private readonly ValidationUtil _validationUtil;
 
     private string? _originalGamePath;
@@ -36,7 +36,7 @@ public class GameHelper
         FilePatcher filePatcher,
         HttpHelper httpHelper,
         LocaleHelper localeHelper,
-        WineHelper wineHelper,
+        LinuxHelper linuxHelper,
         ValidationUtil validationUtil
     )
     {
@@ -46,7 +46,7 @@ public class GameHelper
         _filePatcher = filePatcher;
         _httpHelper = httpHelper;
         _localeHelper = localeHelper;
-        _wineHelper = wineHelper;
+        _linuxHelper = linuxHelper;
         _validationUtil = validationUtil;
         _originalGamePath = DetectOriginalGamePath();
     }
@@ -79,7 +79,7 @@ public class GameHelper
         // as running with linux requires wine, we can now
         if (OperatingSystem.IsLinux())
         {
-            return _wineHelper.GetOriginalGamePath();
+            return _linuxHelper.GetOriginalGamePath();
         }
 
         throw new Exception("Unsupported operating system");
@@ -98,8 +98,6 @@ public class GameHelper
 
         if (await IsCoreDllVersionMismatched())
         {
-            _logger.LogError("Core dll mismatch");
-            ErrorMessage = _localeHelper.Get("game_helper_error_2");
             return false;
         }
 
@@ -156,7 +154,7 @@ public class GameHelper
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
 
-        //start game
+        // Start game
         var args =
             $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config="
             + $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";
@@ -199,7 +197,7 @@ public class GameHelper
             $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}",
         ];
 
-        if (!_wineHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
+        if (!_linuxHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
         {
             return false;
         }
@@ -275,34 +273,29 @@ public class GameHelper
             _logger.LogInformation("server version: {serverVersion} - spt-core.dll version: {DllVersion}", serverVersion, dllVersion);
 
             // Edge case, running on locally built modules dlls, ignore check and return ok
-            if (dllVersion.Major == 1)
+            if (
+                dllVersion.Major != 1
+                && serverVersion.Major == dllVersion.Major
+                && serverVersion.Minor == dllVersion.Minor
+                && serverVersion.Patch == dllVersion.Patch
+            )
             {
-                return false;
+                return false; // Versions match, hooray
             }
 
-            // check 'X'.x.x
-            if (serverVersion.Major != dllVersion.Major)
-            {
-                return true;
-            }
-
-            // check x.'X'.x
-            if (serverVersion.Minor != dllVersion.Minor)
-            {
-                return true;
-            }
-
-            // check x.x.'X'
-            if (serverVersion.Patch != dllVersion.Patch)
-            {
-                return true;
-            }
-
-            return false; // Versions match, hooray
+            _logger.LogError("Core dll mismatch");
+            ErrorMessage = _localeHelper.Get("game_helper_error_2");
+            return false;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError("Connection lost/refused: {ex}", ex);
+            ErrorMessage = _localeHelper.Get("game_helper_error_7");
         }
         catch (Exception ex)
         {
             _logger.LogError("Exception occured: {ex}", ex);
+            ErrorMessage = _localeHelper.Get("game_helper_error_8");
         }
 
         return true;

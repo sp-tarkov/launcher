@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
@@ -32,6 +33,7 @@ public partial class WindowsClipboard(ILogger<WindowsClipboard> logger)
     private static partial bool GlobalUnlock(IntPtr hMem);
 
     [LibraryImport("kernel32.dll", SetLastError = true)]
+    [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Local")]
     private static partial IntPtr GlobalFree(IntPtr hMem);
 
     private const uint CfHdrop = 15;

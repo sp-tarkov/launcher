@@ -338,5 +338,7 @@
   "forge_no_results_subtitle": "Passe deine Suche oder Filter an oder schau später noch einmal vorbei.",
   "forge_no_results_clear": "Filter zurücksetzen",
   "forge_error_title": "Etwas ist schiefgelaufen",
-  "forge_error_retry": "Erneut versuchen"
+  "forge_error_retry": "Erneut versuchen",
+  "game_helper_error_7": "Connection was Refused/Lost to Server",
+  "game_helper_error_8": "Unknown error occured, please report to SPT"
 }

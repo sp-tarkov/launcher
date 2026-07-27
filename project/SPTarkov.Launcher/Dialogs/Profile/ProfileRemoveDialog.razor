@@ -111,7 +111,7 @@
                 return false;
             }
 
-            Token?.Dispose();
+            Token.Dispose();
             return true;
         }
         catch (Exception)
@@ -123,7 +123,7 @@
 
     private void Submit()
     {
-        Snackbar.Add($"{LocaleHelper.Get("profile_remove_task_success")}: {MiniProfile?.Username}!", Severity.Success);
+        Snackbar.Add($"{LocaleHelper.Get("profile_remove_task_success")}: {MiniProfile.Username}!", Severity.Success);
         MudDialog.Close(DialogResult.Ok(MiniProfile));
     }
 
@@ -136,7 +136,7 @@
             Snackbar.Add(message, Severity.Error);
         }
 
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
         _requestInProgress = false;
     }
@@ -145,7 +145,7 @@
     {
         UserCancel = true;
         _requestInProgress = false;
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
     }
 

@@ -338,5 +338,7 @@
   "forge_no_results_subtitle": "검색어나 필터를 조정하거나 나중에 다시 확인해 주세요.",
   "forge_no_results_clear": "필터 초기화",
   "forge_error_title": "문제가 발생했습니다",
-  "forge_error_retry": "다시 시도"
+  "forge_error_retry": "다시 시도",
+  "game_helper_error_7": "Connection was Refused/Lost to Server",
+  "game_helper_error_8": "Unknown error occured, please report to SPT"
 }

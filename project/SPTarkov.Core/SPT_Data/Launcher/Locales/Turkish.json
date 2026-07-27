@@ -338,5 +338,7 @@
   "forge_no_results_subtitle": "Aramanızı veya filtrelerinizi değiştirin ya da daha sonra tekrar kontrol edin.",
   "forge_no_results_clear": "Filtreleri temizle",
   "forge_error_title": "Bir şeyler ters gitti",
-  "forge_error_retry": "Tekrar dene"
+  "forge_error_retry": "Tekrar dene",
+  "game_helper_error_7": "Connection was Refused/Lost to Server",
+  "game_helper_error_8": "Unknown error occured, please report to SPT"
 }

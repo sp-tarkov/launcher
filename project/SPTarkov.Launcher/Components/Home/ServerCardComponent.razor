@@ -61,8 +61,8 @@
         Offline,
     }
 
-    private static readonly TimeSpan _statusProbeTimeout = TimeSpan.FromSeconds(3);
-    private static readonly TimeSpan _statusPollInterval = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan StatusProbeTimeout = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan StatusPollInterval = TimeSpan.FromSeconds(15);
 
     private ServerStatus _status = ServerStatus.Checking;
 
@@ -78,10 +78,10 @@
         _ = PollStatusAsync(_disposeCts.Token);
     }
 
-    // Probe now and every _statusPollInterval thereafter until the component is disposed.
+    // Probe now and every StatusPollInterval thereafter until the component is disposed.
     private async Task PollStatusAsync(CancellationToken token)
     {
-        using var timer = new PeriodicTimer(_statusPollInterval);
+        using var timer = new PeriodicTimer(StatusPollInterval);
 
         try
         {
@@ -99,7 +99,7 @@
     private async Task RefreshStatusAsync(CancellationToken token)
     {
         using var probeCts = CancellationTokenSource.CreateLinkedTokenSource(token);
-        probeCts.CancelAfter(_statusProbeTimeout);
+        probeCts.CancelAfter(StatusProbeTimeout);
 
         var online = await HttpHelper.PingServerAsync(Server.IpAddress, probeCts.Token);
         _status = online ? ServerStatus.Online : ServerStatus.Offline;

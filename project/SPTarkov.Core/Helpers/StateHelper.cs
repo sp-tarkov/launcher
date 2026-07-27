@@ -34,10 +34,10 @@ public class StateHelper(ILogger<StateHelper> logger)
     public List<ForgeCategory>? ListOfCategoriesAvailable;
 
     public bool AllowNavigation { get; set; } = true;
-    public bool AllowServerPage { get; set; } = false;
-    public bool ModPagesPanelOpen { get; set; } = false;
+    public bool AllowServerPage { get; set; }
+    public bool ModPagesPanelOpen { get; set; }
 
-    public bool AutoConnectAttempted { get; set; } = false; // Startup auto-connect guard
+    public bool AutoConnectAttempted { get; set; } // Startup auto-connect guard
 
     public event Action? OnStateChanged;
 

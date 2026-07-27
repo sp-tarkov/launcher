@@ -34,6 +34,7 @@ public class Launcher
     private static bool _exitRequested;
     private static string? _trayIconPath;
     private static SingleInstanceGuard _singleInstanceGuard = null!;
+    private static readonly string TemporaryFilesPath = Path.Join(Path.GetTempPath(), "SPT.Launcher");
 
     // Photino re-asserts the window while cancelling a close so wait before hiding to tray.
     private const int HideToTrayDelayMs = 100;
@@ -41,6 +42,8 @@ public class Launcher
     [STAThread]
     private static void Main(string[] args)
     {
+        SetNvidiaLinuxEnv();
+
         // Single-instance guard scoped to install location.
         _singleInstanceGuard = new SingleInstanceGuard();
         if (!_singleInstanceGuard.TryClaimPrimary())
@@ -80,7 +83,7 @@ public class Launcher
             .AddSingleton<LocaleHelper>()
             .AddSingleton<FilePatcher>()
             .AddSingleton<WindowsClipboard>()
-            .AddSingleton<WineHelper>()
+            .AddSingleton<LinuxHelper>()
             .AddSingleton<ValidationUtil>()
             .AddSingleton<BrowserBridge>()
             .AddSingleton<UpdateClient>()
@@ -153,9 +156,32 @@ public class Launcher
         }
     }
 
+    private static void SetNvidiaLinuxEnv()
+    {
+        if (!OperatingSystem.IsLinux())
+        {
+            return;
+        }
+
+        // Linux and Nvidia have issues with webkit, to fix those issues set an env variable
+        // https://github.com/NVIDIA/egl-wayland/blob/master/src/wayland-egldisplay.c#L1241
+        // https://bugs.webkit.org/show_bug.cgi?id=280210
+        // this should only affect nvidia users, so no need to condition on AMD/INTEL
+        // Environment.SetEnvironmentVariable("__NV_DISABLE_EXPLICIT_SYNC", "1");
+        // this doesn't work completely on Unix, FML. going deeper.
+
+        if (LinuxHelper.SetEnvironmentVariableNative("__NV_DISABLE_EXPLICIT_SYNC", "1", 1) != 0)
+        {
+            throw new InvalidOperationException(
+                $"Failed to set __NV_DISABLE_EXPLICIT_SYNC: error number: {Marshal.GetLastPInvokeErrorMessage()}"
+            );
+        }
+    }
+
     private static void CustomizeComponent()
     {
-        App.MainWindow.SetTitle(_appTitle);
+        Directory.CreateDirectory(TemporaryFilesPath);
+        App.MainWindow.SetTemporaryFilesPath(TemporaryFilesPath).SetTitle(_appTitle);
 
         // Use extension method to get icon from embedded resource
         App.MainWindow.SetIconFile(
@@ -293,7 +319,7 @@ public class Launcher
     {
         // Different installations run concurrently (single-instance is per-install) and share the one user temp dir, so a fixed filename
         // would let their startup writes race. Keying the name on the process id gives each instance its own file.
-        var tempPath = Path.Join(Path.GetTempPath(), $"spt-logo-{Environment.ProcessId}.ico");
+        var tempPath = Path.Join(TemporaryFilesPath, $"spt-logo-{Environment.ProcessId}.ico");
 
         try
         {

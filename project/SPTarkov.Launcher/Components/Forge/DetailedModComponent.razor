@@ -150,7 +150,7 @@
                         }
 
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_virustotal"))</MudText>
-                        @if (ForgeModVersion?.VirusTotalLinks?.Any() ?? false)
+                        @if (ForgeModVersion.VirusTotalLinks?.Any() ?? false)
                         {
                             @foreach (var link in ForgeModVersion.VirusTotalLinks)
                             {
@@ -178,7 +178,7 @@
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.FikaCompatible ?? false ? LocaleHelper.Get("mod_yes") : LocaleHelper.Get("mod_no"))</MudText>
 
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_dependencies"))</MudText>
-                        @if (ForgeModVersion?.Dependencies?.Any() ?? false)
+                        @if (ForgeModVersion.Dependencies?.Any() ?? false)
                         {
                             @foreach (var dep in ForgeModVersion.Dependencies)
                             {

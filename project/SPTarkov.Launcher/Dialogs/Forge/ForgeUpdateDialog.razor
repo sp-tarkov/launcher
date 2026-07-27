@@ -1,5 +1,4 @@
 ﻿@inject ISnackbar Snackbar
-@inject IJSRuntime JsRuntime
 @inject ModManager ModManager
 @inject ILogger<ForgeDownloadDialog> Logger
 @inject HttpHelper HttpHelper
@@ -49,7 +48,7 @@
     private string _taskText = "";
     private bool CheckedForUpdates { get; set; }
     private ForgeUpdateResponse? ForgeUpdateResponse { get; set; }
-    private bool NoModsToUpdate { get; set; } = false;
+    private bool NoModsToUpdate { get; set; }
 
     protected override Task OnInitializedAsync()
     {
@@ -174,7 +173,7 @@
             Snackbar.Add(message, Severity.Error);
         }
 
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
         _requestInProgress = false;
     }
@@ -183,7 +182,7 @@
     {
         UserCancel = true;
         _requestInProgress = false;
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
     }
 

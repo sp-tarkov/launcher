@@ -1,6 +1,6 @@
 @inject LocaleHelper LocaleHelper
 @inject ConfigHelper ConfigHelper
-@inject WineHelper WineHelper
+@inject LinuxHelper LinuxHelper
 
 <MudContainer Class="pa-0">
     <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 px-5">
@@ -25,7 +25,7 @@
     {
         _selectedOption = ConfigHelper.GetConfig().LinuxSettings.ProtonVersion;
         OptionName = LocaleHelper.Get("linux_proton_version");
-        Options = await WineHelper.GetProtonVersions();
+        Options = await LinuxHelper.GetProtonVersions();
         await base.OnInitializedAsync();
     }
 

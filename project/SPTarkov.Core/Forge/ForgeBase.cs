@@ -97,9 +97,9 @@ public record ForgeBase
         return !string.IsNullOrEmpty(url);
     }
 
-    public string? GetModName()
+    public string GetModName()
     {
-        return Name?.UppercaseFirst();
+        return Name.UppercaseFirst();
     }
 
     public string? GetModdersName()

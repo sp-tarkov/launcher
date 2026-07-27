@@ -87,7 +87,10 @@ public class UpdatePreflight(ILogger<UpdatePreflight> logger, ModHelper modHelpe
                         File.Delete(leftover);
                     }
                 }
-                catch (Exception) { }
+                catch
+                {
+                    // Best-effort cleanup.
+                }
             }
         }
     }

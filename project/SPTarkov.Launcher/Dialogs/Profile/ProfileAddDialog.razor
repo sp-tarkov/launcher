@@ -84,7 +84,7 @@
 
     private async Task RunAddTask()
     {
-        var result = false;
+        bool result;
         _requestInProgress = true;
         try
         {
@@ -139,7 +139,7 @@
                 return false;
             }
 
-            Token?.Dispose();
+            Token.Dispose();
             return true;
         }
         catch (Exception)
@@ -151,7 +151,7 @@
 
     private void Submit()
     {
-        Snackbar.Add($"{LocaleHelper.Get("profile_add_task_success")}: {Request?.Username}!", Severity.Success);
+        Snackbar.Add($"{LocaleHelper.Get("profile_add_task_success")}: {Request.Username}!", Severity.Success);
         MudDialog.Close(DialogResult.Ok(true));
     }
 
@@ -164,7 +164,7 @@
             Snackbar.Add(message, Severity.Error);
         }
 
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
         _requestInProgress = false;
     }
@@ -173,7 +173,7 @@
     {
         UserCancel = true;
         _requestInProgress = false;
-        Token?.Cancel();
+        Token.Cancel();
         MudDialog.Cancel();
     }
 

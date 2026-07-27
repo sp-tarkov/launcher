@@ -338,5 +338,7 @@
   "forge_no_results_subtitle": "請嘗試調整搜尋或篩選條件，或稍後再來查看。",
   "forge_no_results_clear": "清除篩選",
   "forge_error_title": "發生錯誤",
-  "forge_error_retry": "重試"
+  "forge_error_retry": "重試",
+  "game_helper_error_7": "Connection was Refused/Lost to Server",
+  "game_helper_error_8": "Unknown error occured, please report to SPT"
 }

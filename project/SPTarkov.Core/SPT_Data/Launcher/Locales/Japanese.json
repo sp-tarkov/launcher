@@ -338,5 +338,7 @@
   "forge_no_results_subtitle": "検索条件やフィルターを調整するか、後でもう一度確認してください。",
   "forge_no_results_clear": "フィルターをクリア",
   "forge_error_title": "問題が発生しました",
-  "forge_error_retry": "再試行"
+  "forge_error_retry": "再試行",
+  "game_helper_error_7": "Connection was Refused/Lost to Server",
+  "game_helper_error_8": "Unknown error occured, please report to SPT"
 }
