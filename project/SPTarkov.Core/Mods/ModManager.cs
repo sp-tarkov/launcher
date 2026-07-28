@@ -20,7 +20,6 @@ public class ModManager(
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
-    // TODO: add check if mod is already installed
     public async Task DownloadMod(
         ForgeBase forgeMod,
         ForgeModVersion version,
@@ -29,6 +28,19 @@ public class ModManager(
     )
     {
         dictOfDeps ??= new Dictionary<string, Version>();
+
+        ConfigMod? existing = null;
+        if (forgeMod.GUID is not null)
+        {
+            GetMods().TryGetValue(forgeMod.GUID, out existing);
+        }
+
+        // Downloading a different version of an installed mod is an update
+        if (existing is { IsInstalled: true } && !Equals(existing.ModVersion, version.Version))
+        {
+            await UpdateMod(BuildVersionChangeUpdate(existing, forgeMod, version), cancellationToken);
+            return;
+        }
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
@@ -59,7 +71,8 @@ public class ModManager(
 
             modHelper.RemoveModTask(downloadTask);
 
-            configMod.Dependencies = dictOfDeps;
+            configMod.Dependencies = dictOfDeps.Count > 0 ? dictOfDeps : existing?.Dependencies ?? dictOfDeps;
+            configMod.IsInstalled = existing is { IsInstalled: true };
             modStore.AddMod(configMod);
         }
         catch (Exception e) // callers fire-and-forget this task, errors must catch here for display/logging
@@ -362,7 +375,10 @@ public class ModManager(
         // copy current version to be .bak
         try
         {
-            File.Copy(ogPath, bakPath, true);
+            if (File.Exists(ogPath))
+            {
+                File.Copy(ogPath, bakPath, true);
+            }
         }
         catch (Exception e)
         {
@@ -450,6 +466,30 @@ public class ModManager(
         {
             logger.LogError("Unable to install the updated version of mod {guid}", configMod.GUID);
         }
+    }
+
+    // Builds an update request that moves an installed mod to the given version.
+    private static ForgeModUpdate BuildVersionChangeUpdate(ConfigMod existing, ForgeBase forgeMod, ForgeModVersion version)
+    {
+        return new ForgeModUpdate
+        {
+            CurrentVersion = new UpdateMod
+            {
+                GUID = existing.GUID,
+                Name = existing.Name,
+                Version = existing.ModVersion,
+            },
+            RecommendedVersion = new UpdateMod
+            {
+                Id = version.Id,
+                ModId = forgeMod.Id,
+                GUID = existing.GUID,
+                Name = forgeMod.Name,
+                Version = version.Version,
+                Link = version.Link,
+            },
+            UpdateReason = "version change",
+        };
     }
 
     // Moves the cache backup back over the original zip.

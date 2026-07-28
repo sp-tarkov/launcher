@@ -257,6 +257,11 @@ public class ModHelper
 
         try
         {
+            if (!Directory.Exists(Paths.ModCache))
+            {
+                Directory.CreateDirectory(Paths.ModCache);
+            }
+
             if (File.Exists(modFilePath))
             {
                 File.Delete(modFilePath);
