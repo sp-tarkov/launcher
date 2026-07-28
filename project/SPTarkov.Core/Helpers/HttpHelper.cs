@@ -167,6 +167,27 @@ public class HttpHelper
         return await ForgeGet<ForgeCategoriesResponse>(Urls.ForgeCategories, token);
     }
 
+    // Gets the verified archive file listing for a mod version. A 404 means verification is not available.
+    public async Task<ForgeFileTreeResponse?> ForgeGetModVersionFileTree(int modId, int versionId, CancellationToken token)
+    {
+        using var response = await ForgeSend($"{Urls.ForgeMod}/{modId}/versions/{versionId}/file-tree", token);
+
+        if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            _logger.LogDebug("No file tree available for mod {ModId} version {VersionId}", modId, versionId);
+            return null;
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("ForgeGetModVersionFileTree failed with status code {StatusCode}", response.StatusCode);
+            return null;
+        }
+
+        var body = await response.Content.ReadAsStringAsync(token);
+        return JsonSerializer.Deserialize<ForgeFileTreeResponse>(body);
+    }
+
     public async Task<bool> ForgePing(CancellationToken token = default)
     {
         try

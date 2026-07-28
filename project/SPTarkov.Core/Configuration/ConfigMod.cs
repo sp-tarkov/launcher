@@ -8,9 +8,12 @@ public class ConfigMod
 {
     public string Name { get; init; } = "unknown";
     public string GUID { get; set; } = "com.unknown.mod";
+    public int? ModId { get; set; }
+    public int? VersionId { get; set; }
     public bool IsInstalled { get; set; }
     public bool CanBeUpdated { get; set; }
     public List<string>? Files { get; set; } = [];
+    public List<string>? PreexistingFiles { get; set; }
 
     [JsonConverter(typeof(SemVerVersionConverter))]
     public Version? ModVersion { get; set; } = new(0, 0, 0);

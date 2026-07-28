@@ -204,6 +204,30 @@ public class ModHelper
         }
     }
 
+    // Downloads an archive straight to the given path, replacing any existing file.
+    public async Task<bool> TryRedownloadArchive(string link, string filePath, CancellationToken token)
+    {
+        try
+        {
+            TryDeleteFile(filePath);
+
+            using var response = await _httpClient.GetAsync(link, HttpCompletionOption.ResponseHeadersRead, token);
+            response.EnsureSuccessStatusCode();
+
+            await using var contentStream = await response.Content.ReadAsStreamAsync(token);
+            await using var fileStream = File.Create(filePath);
+            await contentStream.CopyToAsync(fileStream, token);
+
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning("Re-download failed for {link}: {message}", link, e.Message);
+            TryDeleteFile(filePath);
+            return false;
+        }
+    }
+
     public async Task<UpdateTask?> StartUpdateTask(ForgeModUpdate mod, CancellationTokenSource cancellationTokenSource)
     {
         var updateTask = new UpdateTask

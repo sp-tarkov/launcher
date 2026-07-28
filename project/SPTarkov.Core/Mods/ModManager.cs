@@ -1,21 +1,25 @@
 ﻿using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Forge;
+using SPTarkov.Core.Helpers;
 using SPTarkov.Core.SPT;
 using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Mods;
 
-public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, ModHelper modHelper, SevenZip.SevenZip sevenZip)
+public class ModManager(
+    ILogger<ModManager> logger,
+    ConfigHelper configHelper,
+    ModHelper modHelper,
+    SevenZip.SevenZip sevenZip,
+    HttpHelper httpHelper
+)
 {
-    /// <summary>
-    /// TODO: add check if mod is already installed
-    /// </summary>
-    /// <param name="forgeMod"></param>
-    /// <param name="version"></param>
-    /// <param name="cancellationToken"></param>
-    /// <param name="dictOfDeps"></param>
-    /// <returns></returns>
+    private static readonly StringComparer _pathComparer = OperatingSystem.IsWindows()
+        ? StringComparer.OrdinalIgnoreCase
+        : StringComparer.Ordinal;
+
+    // TODO: add check if mod is already installed
     public async Task DownloadMod(
         ForgeBase forgeMod,
         ForgeModVersion version,
@@ -85,7 +89,20 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
             return null;
         }
 
-        var entries = await sevenZip.GetEntriesAsync(modFilePath, downloadTask.CancellationTokenSource.Token);
+        var entries = await GetArchiveEntries(
+            modFilePath,
+            downloadTask.ForgeMod.Id,
+            downloadTask.Version.Id,
+            downloadTask.Version.Link,
+            downloadTask.CancellationTokenSource.Token
+        );
+
+        if (entries == null)
+        {
+            downloadTask.Error = new Exception("Unable to read the archive contents.");
+            await downloadTask.CancellationTokenSource.CancelAsync();
+            return null;
+        }
 
         // Check if archive contains BepInEx or SPT_Runtime folder
         var checkForCorrectFilePath = entries.Any(x =>
@@ -100,6 +117,8 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
                 Name = downloadTask.ForgeMod.Name,
                 ModVersion = downloadTask.Version.Version,
                 GUID = modGuid,
+                ModId = downloadTask.ForgeMod.Id,
+                VersionId = downloadTask.Version.Id,
                 IsInstalled = false,
                 CanBeUpdated = false,
                 Files = RemoveBasePaths(entries),
@@ -130,11 +149,13 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
         logger.LogInformation("Installing mod: {guid}", guid);
 
+        configMod.PreexistingFiles = SnapshotPreexistingFiles(configMod);
+
         try
         {
             var installTask = await modHelper.StartInstallTask(configMod, cts);
 
-            if (installTask == null || !installTask.Complete || installTask.Error != null)
+            if (installTask is not { Complete: true } || installTask.Error != null)
             {
                 // TODO: something fucked up, do something or cancelled
                 logger.LogError("install task failed for mod {mod}: {e}", guid, installTask?.Error);
@@ -259,28 +280,10 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
             return false;
         }
 
-        if (mod.Files != null)
+        if (!RemoveInstalledFiles(mod))
         {
-            foreach (var file in mod.Files)
-            {
-                var modFilePath = ResolveInstalledFilePath(file);
-                if (modFilePath is null)
-                {
-                    continue;
-                }
-
-                // first one will likely delete most but do all to be sure
-                if (Directory.Exists(modFilePath))
-                {
-                    Directory.Delete(modFilePath, true);
-                }
-
-                // this will return false on directories
-                if (File.Exists(modFilePath))
-                {
-                    File.Delete(modFilePath);
-                }
-            }
+            logger.LogWarning("Some files could not be removed for mod {guid}, uninstall can be retried", guid);
+            return false;
         }
 
         logger.LogInformation("uninstalled mod: {guid}", guid);
@@ -318,35 +321,25 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
             return;
         }
 
-        if (mod.Files != null)
+        if (mod.IsInstalled && !RemoveInstalledFiles(mod))
         {
-            foreach (var file in mod.Files)
-            {
-                var modFilePath = ResolveInstalledFilePath(file);
-                if (modFilePath is null)
-                {
-                    continue;
-                }
-
-                // first one will likely delete most but do all to be sure
-                if (Directory.Exists(modFilePath))
-                {
-                    Directory.Delete(modFilePath, true);
-                }
-
-                if (File.Exists(modFilePath))
-                {
-                    File.Delete(modFilePath);
-                }
-            }
+            logger.LogWarning("Some files could not be removed for mod {guid}, delete can be retried", guid);
+            return;
         }
 
         logger.LogInformation("Deleted mod: {guid}", guid);
 
-        if (File.Exists(Path.Join(Paths.ModCache, guid)))
+        try
         {
-            logger.LogInformation("deleted zip for mod {guid}", guid);
-            File.Delete(Path.Join(Paths.ModCache, guid));
+            if (File.Exists(Path.Join(Paths.ModCache, guid)))
+            {
+                logger.LogInformation("deleted zip for mod {guid}", guid);
+                File.Delete(Path.Join(Paths.ModCache, guid));
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("Unable to delete zip for mod {guid}: {message}", guid, e.Message);
         }
 
         configHelper.RemoveMod(guid);
@@ -388,7 +381,20 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
 
         try
         {
-            var entries = await sevenZip.GetEntriesAsync(ogPath, cts.Token);
+            var entries = await GetArchiveEntries(
+                ogPath,
+                mod.RecommendedVersion.ModId,
+                mod.RecommendedVersion.Id,
+                mod.RecommendedVersion.Link,
+                cts.Token
+            );
+
+            if (entries == null)
+            {
+                updateTask.Error = new Exception("Unable to read the archive contents.");
+                RestoreCacheBackup(bakPath, ogPath);
+                return;
+            }
 
             // Check if archive contains BepInEx or SPT_Runtime folder
             var checkForCorrectFilePath = entries.Any(x =>
@@ -405,6 +411,8 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
 
             // Update config for latest version
             configMod.ModVersion = mod.RecommendedVersion.Version;
+            configMod.ModId = mod.RecommendedVersion.ModId ?? configMod.ModId;
+            configMod.VersionId = mod.RecommendedVersion.Id ?? configMod.VersionId;
             configMod.Files = RemoveBasePaths(entries);
             configHelper.AddMod(configMod);
         }
@@ -443,6 +451,155 @@ public class ModManager(ILogger<ModManager> logger, ConfigHelper configHelper, M
         {
             logger.LogWarning("Unable to restore backup {file}: {message}", bakPath, e.Message);
         }
+    }
+
+    // Gets the archive file listing: the local 7-Zip listing first, the Forge file tree second, a fresh re-download last.
+    private async Task<List<string>?> GetArchiveEntries(
+        string archivePath,
+        int? modId,
+        int? versionId,
+        string? link,
+        CancellationToken token
+    )
+    {
+        try
+        {
+            return await sevenZip.GetEntriesAsync(archivePath, token);
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("Unable to list archive {archive}: {message}", archivePath, e.Message);
+        }
+
+        if (modId is not null && versionId is not null)
+        {
+            try
+            {
+                var fileTree = await httpHelper.ForgeGetModVersionFileTree(modId.Value, versionId.Value, token);
+                if (fileTree?.Data?.Files is { Count: > 0 } files)
+                {
+                    if (fileTree.Data.Truncated)
+                    {
+                        logger.LogWarning(
+                            "File tree for mod {modId} version {versionId} is truncated, the manifest may be incomplete",
+                            modId,
+                            versionId
+                        );
+                    }
+
+                    return files.Select(x => x.Replace('/', Path.DirectorySeparatorChar)).ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogWarning("File tree request failed for mod {modId} version {versionId}: {message}", modId, versionId, e.Message);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(link) && await modHelper.TryRedownloadArchive(link, archivePath, token))
+        {
+            try
+            {
+                return await sevenZip.GetEntriesAsync(archivePath, token);
+            }
+            catch (Exception e)
+            {
+                logger.LogWarning("Unable to list re-downloaded archive {archive}: {message}", archivePath, e.Message);
+            }
+        }
+
+        return null;
+    }
+
+    // Records which manifest paths already exist on disk before extraction.
+    private List<string> SnapshotPreexistingFiles(ConfigMod mod)
+    {
+        var preexisting = new List<string>();
+
+        if (mod.Files == null)
+        {
+            return preexisting;
+        }
+
+        foreach (var file in mod.Files)
+        {
+            var fullPath = ResolveInstalledFilePath(file);
+            if (fullPath is null)
+            {
+                continue;
+            }
+
+            if (File.Exists(fullPath) || Directory.Exists(fullPath))
+            {
+                preexisting.Add(file);
+            }
+        }
+
+        return preexisting;
+    }
+
+    // Deletes the manifest files the installation created, then prunes manifest directories left empty.
+    private bool RemoveInstalledFiles(ConfigMod mod)
+    {
+        if (mod.Files == null)
+        {
+            return true;
+        }
+
+        var preexisting = new HashSet<string>(mod.PreexistingFiles ?? [], _pathComparer);
+        var directories = new List<string>();
+        var failures = 0;
+
+        foreach (var file in mod.Files)
+        {
+            if (preexisting.Contains(file))
+            {
+                continue;
+            }
+
+            var fullPath = ResolveInstalledFilePath(file);
+            if (fullPath is null)
+            {
+                continue;
+            }
+
+            if (Directory.Exists(fullPath))
+            {
+                directories.Add(fullPath);
+                continue;
+            }
+
+            try
+            {
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogWarning("Unable to delete mod file {file}: {message}", fullPath, e.Message);
+                failures++;
+            }
+        }
+
+        foreach (var directory in directories.OrderByDescending(x => x.Length))
+        {
+            try
+            {
+                if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+                {
+                    Directory.Delete(directory);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogWarning("Unable to delete mod directory {directory}: {message}", directory, e.Message);
+                failures++;
+            }
+        }
+
+        return failures == 0;
     }
 
     // Resolves a stored mod file path against the game directory.
