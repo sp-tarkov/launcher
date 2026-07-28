@@ -7,6 +7,8 @@
 @inject ModHelper ModHelper
 @inject ConfigHelper ConfigHelper
 @inject LocaleHelper LocaleHelper
+@inject StateHelper StateHelper
+@inject NavigationManager NavigationManager
 
 <MudContainer Class="px-4 my-2 page-animation-switch" MaxWidth="MaxWidth.Large">
     <MudGrid Spacing="4" Justify="Justify.SpaceEvenly">
@@ -212,6 +214,14 @@
 
 @code {
     private Timer? _progressTimer;
+
+    protected override void OnInitialized()
+    {
+        if (!StateHelper.IsLocalServerSelected)
+        {
+            NavigationManager.NavigateTo("/ServerPageWrapper/false");
+        }
+    }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {

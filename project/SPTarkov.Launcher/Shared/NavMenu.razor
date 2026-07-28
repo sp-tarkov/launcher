@@ -28,8 +28,11 @@ else
     <MudSpacer/>
 }
 <MudNavMenu Class="mud-typography-nowrap nav-bottom">
-    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Reorder" Href="/ModLoader" Text="@(LocaleHelper.Get("mod_loader"))"/>
-    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.FolderZip" Href="/Forge" Text="Forge"/>
+    @if (StateHelper.IsLocalServerSelected)
+    {
+        <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Reorder" Href="/ModLoader" Text="@(LocaleHelper.Get("mod_loader"))"/>
+        <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.FolderZip" Href="/Forge" Text="Forge"/>
+    }
     <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Settings" Href="/Settings" Text="@(LocaleHelper.Get("settings"))"/>
     <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Info" Href="/Info" Text="@(LocaleHelper.Get("info"))"/>
 </MudNavMenu>

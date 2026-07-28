@@ -5,6 +5,7 @@
 @inject ILogger<Forge> Logger
 @inject LocaleHelper LocaleHelper
 @inject ForgeRateLimiter RateLimiter
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
@@ -214,6 +215,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (!StateHelper.IsLocalServerSelected)
+        {
+            NavigationManager.NavigateTo("/ServerPageWrapper/false");
+            return;
+        }
+
         await base.OnInitializedAsync();
         RateLimiter.RateLimitChanged += OnRateLimitChanged;
         await CheckInternetAccess();

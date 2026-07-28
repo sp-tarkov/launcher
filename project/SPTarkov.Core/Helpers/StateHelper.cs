@@ -37,6 +37,9 @@ public class StateHelper(ILogger<StateHelper> logger)
     public bool AllowServerPage { get; set; }
     public bool ModPagesPanelOpen { get; set; }
 
+    // Mod management is only available while the locked local server is selected.
+    public bool IsLocalServerSelected => SelectedServer is { Locked: true };
+
     public bool AutoConnectAttempted { get; set; } // Startup auto-connect guard
 
     public event Action? OnStateChanged;
@@ -50,11 +53,13 @@ public class StateHelper(ILogger<StateHelper> logger)
         SelectedProfile = null;
         SelectedServer = null;
         ModPagesPanelOpen = false;
+        NotifyStateChanged();
     }
 
     public void SetSelectedServer(Server? server)
     {
         SelectedServer = server;
+        NotifyStateChanged();
     }
 
     public void SetSelectedProfile(MiniProfile? miniProfile)

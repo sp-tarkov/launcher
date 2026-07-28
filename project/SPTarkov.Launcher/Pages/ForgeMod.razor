@@ -6,6 +6,8 @@
 @inject ILogger<ForgeMod> Logger
 @inject TitleHelper TitleHelper
 @inject LocaleHelper LocaleHelper
+@inject StateHelper StateHelper
+@inject NavigationManager NavigationManager
 
 <MudContainer Class="px-4 mt-2 mb-6" MaxWidth="MaxWidth.Large">
     <MudGrid>
@@ -46,6 +48,12 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (!StateHelper.IsLocalServerSelected)
+        {
+            NavigationManager.NavigateTo("/ServerPageWrapper/false");
+            return;
+        }
+
         await LoadMod();
     }
 
