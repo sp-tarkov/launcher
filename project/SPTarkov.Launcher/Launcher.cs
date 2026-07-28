@@ -76,6 +76,7 @@ public class Launcher
             .AddSingleton<ForgeRateLimiter>()
             .AddSingleton<ModManager>()
             .AddSingleton<ModHelper>()
+            .AddSingleton<ModTrackingStore>()
             .AddSingleton<StateHelper>()
             .AddSingleton<TitleHelper>()
             .AddSingleton<TrayHelper>()

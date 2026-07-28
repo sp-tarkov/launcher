@@ -11,6 +11,7 @@ public class ModManager(
     ILogger<ModManager> logger,
     ConfigHelper configHelper,
     ModHelper modHelper,
+    ModTrackingStore modStore,
     SevenZip.SevenZip sevenZip,
     HttpHelper httpHelper
 )
@@ -59,7 +60,7 @@ public class ModManager(
             modHelper.RemoveModTask(downloadTask);
 
             configMod.Dependencies = dictOfDeps;
-            configHelper.AddMod(configMod);
+            modStore.AddMod(configMod);
         }
         catch (Exception e) // callers fire-and-forget this task, errors must catch here for display/logging
         {
@@ -132,7 +133,7 @@ public class ModManager(
 
     public Dictionary<string, ConfigMod> GetMods()
     {
-        return configHelper.GetConfig().Mods;
+        return modStore.GetMods();
     }
 
     public async Task<bool> InstallMod(string guid, CancellationToken cancellationToken = default)
@@ -172,7 +173,7 @@ public class ModManager(
 
         logger.LogInformation("Installed mod: {guid}", guid);
         configMod.IsInstalled = true;
-        configHelper.AddMod(configMod);
+        modStore.AddMod(configMod);
 
         await InstallModDependencies(guid);
 
@@ -257,13 +258,13 @@ public class ModManager(
 
     public async Task<bool> UninstallMod(string guid)
     {
-        if (!configHelper.GetConfig().Mods.ContainsKey(guid))
+        if (!GetMods().ContainsKey(guid))
         {
             logger.LogError("key not found: {key}", guid);
             return false;
         }
 
-        if (!configHelper.GetConfig().Mods.TryGetValue(guid, out var mod))
+        if (!GetMods().TryGetValue(guid, out var mod))
         {
             logger.LogError("unable to get key: {key}", guid);
             return false;
@@ -291,7 +292,7 @@ public class ModManager(
         var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
         configMod.IsInstalled = false;
 
-        configHelper.AddMod(configMod);
+        modStore.AddMod(configMod);
         await UninstallModDependencies(guid);
 
         return true;
@@ -299,13 +300,13 @@ public class ModManager(
 
     public void DeleteMod(string guid)
     {
-        if (!configHelper.GetConfig().Mods.ContainsKey(guid))
+        if (!GetMods().ContainsKey(guid))
         {
             logger.LogError("key not found: {key}", guid);
             return;
         }
 
-        if (!configHelper.GetConfig().Mods.TryGetValue(guid, out var mod))
+        if (!GetMods().TryGetValue(guid, out var mod))
         {
             logger.LogError("unable to get key: {key}", guid);
             return;
@@ -342,7 +343,7 @@ public class ModManager(
             logger.LogWarning("Unable to delete zip for mod {guid}: {message}", guid, e.Message);
         }
 
-        configHelper.RemoveMod(guid);
+        modStore.RemoveMod(guid);
     }
 
     public async Task UpdateMod(ForgeModUpdate mod, CancellationToken cancellationToken = default)
@@ -350,7 +351,7 @@ public class ModManager(
         cancellationToken.ThrowIfCancellationRequested();
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-        if (!configHelper.GetConfig().Mods.TryGetValue(mod.CurrentVersion.GUID, out var configMod))
+        if (!GetMods().TryGetValue(mod.CurrentVersion.GUID, out var configMod))
         {
             logger.LogError("unable to get key: {key}", mod.CurrentVersion.GUID);
             return;
@@ -414,7 +415,7 @@ public class ModManager(
             configMod.ModId = mod.RecommendedVersion.ModId ?? configMod.ModId;
             configMod.VersionId = mod.RecommendedVersion.Id ?? configMod.VersionId;
             configMod.Files = RemoveBasePaths(entries);
-            configHelper.AddMod(configMod);
+            modStore.AddMod(configMod);
         }
         catch (Exception e)
         {

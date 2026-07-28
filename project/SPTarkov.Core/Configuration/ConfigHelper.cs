@@ -242,35 +242,6 @@ public class ConfigHelper
         }
     }
 
-    public void AddMod(ConfigMod mod)
-    {
-        lock (_lock)
-        {
-            _logger.LogDebug("AddMod: {Mod}", mod.Name);
-            if (!_settings!.Mods.TryAdd(mod.GUID, mod))
-            {
-                _settings!.Mods[mod.GUID] = mod;
-            }
-
-            SaveConfig();
-        }
-    }
-
-    public void RemoveMod(string guid)
-    {
-        lock (_lock)
-        {
-            _logger.LogDebug("RemoveMod: {Mod}", guid);
-            if (!_settings!.Mods.ContainsKey(guid))
-            {
-                _logger.LogError("key {key} not found", guid);
-            }
-
-            _settings!.Mods.Remove(guid);
-            SaveConfig();
-        }
-    }
-
     public void SetDebugLogging(bool debugLogging)
     {
         lock (_lock)

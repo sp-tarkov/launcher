@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+
 namespace SPTarkov.Core.SPT;
 
 public class Paths
@@ -11,6 +14,11 @@ public class Paths
 
     private static readonly string _userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static readonly string _applicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+    private static readonly string _localApplicationData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+    // Per-install launcher data folder in the user's application data directory, keyed by a hash of the install location.
+    public static readonly string LauncherDataPath = Path.Join(_localApplicationData, "SPT", "Launcher", InstallHash());
+    public static readonly string ModsDataPath = Path.Join(LauncherDataPath, "mods.dat");
 
     public static readonly string ModCache = Path.Join(_runtimeRoot, "user", "Launcher", "ModCache");
     public static readonly string ProtonPath = Path.Join(_userProfile, ".local", "share", "Steam", "compatibilitytools.d");
@@ -37,4 +45,10 @@ public class Paths
         Path.Join("SPT_Runtime", "user"),
         Path.Join("SPT_Runtime", "user", "mods"),
     };
+
+    private static string InstallHash()
+    {
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(Path.GetFullPath(_runtimeRoot).ToLowerInvariant()));
+        return Convert.ToHexString(bytes, 0, 16);
+    }
 }

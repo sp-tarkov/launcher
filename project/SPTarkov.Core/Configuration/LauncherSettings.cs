@@ -38,9 +38,6 @@ public record LauncherSettings
 
     public LinuxSettings LinuxSettings { get; set; } = new();
 
-    /// <summary>Tracked mods, keyed by mod GUID.</summary>
-    public Dictionary<string, ConfigMod> Mods { get; set; } = new();
-
     public bool DebugLogging { get; set; }
 
     [JsonConverter(typeof(JsonStringEnumConverter<UpdateChannel>))]
