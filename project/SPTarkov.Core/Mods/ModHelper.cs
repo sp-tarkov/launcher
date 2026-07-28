@@ -54,14 +54,9 @@ public class ModHelper
             Error = null,
         };
 
-        if (!_modDict.TryAdd(mod.GUID, downloadTask))
+        if (!TryAddModTask(mod.GUID, mod.Name, downloadTask))
         {
-            _modDict.Remove(mod.GUID, out _);
-            if (!_modDict.TryAdd(mod.GUID, downloadTask))
-            {
-                _logger.LogError("Something seriously went wrong adding this download task: {name}:{guid}", mod.Name, mod.GUID);
-                return null;
-            }
+            return null;
         }
 
         var modFilePath = Path.Join(Paths.ModCache, mod.GUID);
@@ -120,6 +115,23 @@ public class ModHelper
 
         downloadTask.Complete = true;
         return downloadTask;
+    }
+
+    // Registers a task for the mod, replacing any finished task. Fails while a task is still active.
+    private bool TryAddModTask(string guid, string name, IModTask task)
+    {
+        while (!_modDict.TryAdd(guid, task))
+        {
+            if (_modDict.TryGetValue(guid, out var existing) && existing.Error is null && !existing.Complete)
+            {
+                _logger.LogWarning("A task is already running for {name}:{guid}", name, guid);
+                return false;
+            }
+
+            _modDict.TryRemove(guid, out _);
+        }
+
+        return true;
     }
 
     public void RemoveModTask(IModTask task)
@@ -243,14 +255,9 @@ public class ModHelper
             Error = null,
         };
 
-        if (!_modDict.TryAdd(updateTask.GUID, updateTask))
+        if (!TryAddModTask(updateTask.GUID, updateTask.Name, updateTask))
         {
-            _modDict.Remove(updateTask.GUID, out _);
-            if (!_modDict.TryAdd(updateTask.GUID, updateTask))
-            {
-                _logger.LogError("Something seriously went wrong adding this update task: {name}:{guid}", updateTask.Name, updateTask.GUID);
-                return null;
-            }
+            return null;
         }
 
         var modFilePath = Path.Join(Paths.ModCache, updateTask.GUID);
@@ -324,18 +331,9 @@ public class ModHelper
             Error = null,
         };
 
-        if (!_modDict.TryAdd(installTask.ForgeMod.GUID, installTask))
+        if (!TryAddModTask(installTask.ForgeMod.GUID, installTask.ForgeMod.Name, installTask))
         {
-            _modDict.Remove(installTask.ForgeMod.GUID, out _);
-            if (!_modDict.TryAdd(installTask.ForgeMod.GUID, installTask))
-            {
-                _logger.LogError(
-                    "Something seriously went wrong adding this install task: {name}:{guid}",
-                    installTask.ForgeMod.Name,
-                    installTask.ForgeMod.GUID
-                );
-                return null;
-            }
+            return null;
         }
 
         var modFilePath = Path.Join(Paths.ModCache, mod.GUID);
