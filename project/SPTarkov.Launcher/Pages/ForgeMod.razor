@@ -22,13 +22,13 @@
                 </MudPaper>
             </MudItem>
         }
-        else if (SearchResponse is null || SearchInProgress || VersionResponse is null)
+        else if (!SearchInProgress && SearchResponse?.Data is { } mod && VersionResponse?.Data?.FirstOrDefault() is { } version)
+        {
+            <DetailedModComponent ForgeMod="@mod" ForgeModVersion="@version" ForgeModAddons="@(AddonResponse?.Data ?? [])"/>
+        }
+        else
         {
             <DetailedModComponent IsSkeleton="true"/>
-        }
-        else if (SearchResponse.Data is not null && VersionResponse.Data?.FirstOrDefault() is { } version)
-        {
-            <DetailedModComponent ForgeMod="@SearchResponse.Data" ForgeModVersion="@version" ForgeModAddons="@(AddonResponse?.Data ?? [])"/>
         }
     </MudGrid>
 </MudContainer>
@@ -82,7 +82,7 @@
             return;
         }
 
-        if (VersionResponse is null)
+        if (VersionResponse?.Data?.FirstOrDefault() is null)
         {
             SearchFailed = true;
             return;
