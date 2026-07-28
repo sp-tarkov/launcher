@@ -1,0 +1,68 @@
+@* Turns completed mod operations into snackbar toasts. Rendered once from the main layout. *@
+
+@implements IDisposable
+
+@inject ISnackbar Snackbar
+@inject ModManager ModManager
+@inject LocaleHelper LocaleHelper
+
+@code {
+    protected override void OnInitialized()
+    {
+        ModManager.OnModNotification += OnModNotification;
+    }
+
+    public void Dispose()
+    {
+        ModManager.OnModNotification -= OnModNotification;
+    }
+
+    private void OnModNotification(ModNotification notification)
+    {
+        InvokeAsync(() => ShowToast(notification));
+    }
+
+    private void ShowToast(ModNotification notification)
+    {
+        var message = string.Format(LocaleHelper.Get(MessageKey(notification.Operation)), notification.Name);
+
+        if (notification.Operation == ModOperation.Downloaded)
+        {
+            Snackbar.Add(message, Severity.Success, config =>
+            {
+                config.Action = LocaleHelper.Get("toast_install_action");
+                config.OnClick = snackbar =>
+                {
+                    _ = ModManager.InstallMod(notification.GUID);
+                    return Task.CompletedTask;
+                };
+            });
+            return;
+        }
+
+        Snackbar.Add(message, ToastSeverity(notification.Operation));
+    }
+
+    private static string MessageKey(ModOperation operation)
+    {
+        return operation switch
+        {
+            ModOperation.Downloaded => "toast_mod_downloaded",
+            ModOperation.Installed => "toast_mod_installed",
+            ModOperation.Uninstalled => "toast_mod_uninstalled",
+            ModOperation.Updated => "toast_mod_updated",
+            ModOperation.Deleted => "toast_mod_deleted",
+            _ => "toast_mod_downloaded",
+        };
+    }
+
+    private static Severity ToastSeverity(ModOperation operation)
+    {
+        return operation switch
+        {
+            ModOperation.Uninstalled => Severity.Info,
+            ModOperation.Deleted => Severity.Info,
+            _ => Severity.Success,
+        };
+    }
+}

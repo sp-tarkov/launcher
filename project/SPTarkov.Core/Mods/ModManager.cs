@@ -21,11 +21,19 @@ public class ModManager(
         ? StringComparer.OrdinalIgnoreCase
         : StringComparer.Ordinal;
 
+    public event Action<ModNotification>? OnModNotification;
+
+    private void Notify(ModOperation operation, string guid, string name)
+    {
+        OnModNotification?.Invoke(new ModNotification(operation, guid, name));
+    }
+
     public async Task DownloadMod(
         ForgeBase forgeMod,
         ForgeModVersion version,
         CancellationToken cancellationToken = default,
-        Dictionary<string, Version>? dictOfDeps = null
+        Dictionary<string, Version>? dictOfDeps = null,
+        bool notify = true
     )
     {
         dictOfDeps ??= new Dictionary<string, Version>();
@@ -75,6 +83,11 @@ public class ModManager(
             configMod.Dependencies = dictOfDeps.Count > 0 ? dictOfDeps : existing?.Dependencies ?? dictOfDeps;
             configMod.IsInstalled = existing is { IsInstalled: true };
             modStore.AddMod(configMod);
+
+            if (notify && !configMod.IsInstalled)
+            {
+                Notify(ModOperation.Downloaded, configMod.GUID, configMod.Name);
+            }
         }
         catch (Exception e) // callers fire-and-forget this task, errors must catch here for display/logging
         {
@@ -245,7 +258,7 @@ public class ModManager(
                 ContentLength = depVersion.ContentLength,
             };
 
-            await DownloadMod(forgeBase, forgeVersion, cancellationToken, BuildDependencyDict(dep.Dependencies));
+            await DownloadMod(forgeBase, forgeVersion, cancellationToken, BuildDependencyDict(dep.Dependencies), notify: false);
         }
     }
 
@@ -292,7 +305,7 @@ public class ModManager(
         return modStore.GetMods();
     }
 
-    public async Task<bool> InstallMod(string guid, CancellationToken cancellationToken = default)
+    public async Task<bool> InstallMod(string guid, CancellationToken cancellationToken = default, bool notify = true)
     {
         var modFilePath = Path.Join(Paths.ModCache, guid);
         if (!File.Exists(modFilePath))
@@ -329,6 +342,11 @@ public class ModManager(
         configMod.IsInstalled = true;
         modStore.AddMod(configMod);
 
+        if (notify)
+        {
+            Notify(ModOperation.Installed, configMod.GUID, configMod.Name);
+        }
+
         await InstallModDependencies(guid);
 
         return true;
@@ -358,7 +376,7 @@ public class ModManager(
             // Install it if it isn't
             if (!depAsMod.IsInstalled)
             {
-                await InstallMod(depGuid);
+                await InstallMod(depGuid, notify: false);
             }
         }
     }
@@ -404,13 +422,13 @@ public class ModManager(
 
                 if (!check)
                 {
-                    await UninstallMod(depGuid);
+                    await UninstallMod(depGuid, notify: false);
                 }
             }
         }
     }
 
-    public async Task<bool> UninstallMod(string guid)
+    public async Task<bool> UninstallMod(string guid, bool notify = true)
     {
         if (!GetMods().ContainsKey(guid))
         {
@@ -447,6 +465,12 @@ public class ModManager(
         configMod.IsInstalled = false;
 
         modStore.AddMod(configMod);
+
+        if (notify)
+        {
+            Notify(ModOperation.Uninstalled, configMod.GUID, configMod.Name);
+        }
+
         await UninstallModDependencies(guid);
 
         return true;
@@ -498,6 +522,7 @@ public class ModManager(
         }
 
         modStore.RemoveMod(guid);
+        Notify(ModOperation.Deleted, mod.GUID, mod.Name);
     }
 
     public async Task UpdateMod(ForgeModUpdate mod, CancellationToken cancellationToken = default)
@@ -628,10 +653,13 @@ public class ModManager(
         await DownloadResolvedDependencies(resolution, cancellationToken);
 
         // Install the new version when the previous one was installed
-        if (wasInstalled && !await InstallMod(configMod.GUID, cancellationToken))
+        if (wasInstalled && !await InstallMod(configMod.GUID, cancellationToken, notify: false))
         {
             logger.LogError("Unable to install the updated version of mod {guid}", configMod.GUID);
+            return;
         }
+
+        Notify(ModOperation.Updated, configMod.GUID, configMod.Name);
     }
 
     // Builds an update request that moves an installed mod to the given version.
