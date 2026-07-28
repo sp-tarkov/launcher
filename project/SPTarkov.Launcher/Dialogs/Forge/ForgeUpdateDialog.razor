@@ -32,7 +32,7 @@
                     }
                 </MudPaper>
                 <MudContainer Class="mb-4 pa-0">
-                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunUpdates" Disabled="@_requestInProgress">@(LocaleHelper.Get("forge_update_check"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="Color.Success" OnClick="RunUpdates" Disabled="@_requestInProgress">@(LocaleHelper.Get("forge_update_run"))</MudButton>
                     <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" OnClick="UserCancelled">@(LocaleHelper.Get("forge_update_cancel"))</MudButton>
                 </MudContainer>
             </MudContainer>
