@@ -27,7 +27,7 @@ public class SemVerVersionDictConverter : JsonConverter<Dictionary<string, Versi
             throw new JsonException("Expected StartObject");
         }
 
-        var result = new Dictionary<string, Version>();
+        var result = new Dictionary<string, Version>(StringComparer.OrdinalIgnoreCase);
 
         while (reader.Read())
         {

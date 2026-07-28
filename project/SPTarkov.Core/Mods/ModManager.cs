@@ -36,7 +36,7 @@ public class ModManager(
         bool notify = true
     )
     {
-        dictOfDeps ??= new Dictionary<string, Version>();
+        dictOfDeps ??= new Dictionary<string, Version>(StringComparer.OrdinalIgnoreCase);
 
         ConfigMod? existing = null;
         if (forgeMod.GUID is not null)
@@ -265,7 +265,7 @@ public class ModManager(
     // Maps immediate dependency nodes to their resolved versions.
     public static Dictionary<string, Version> BuildDependencyDict(List<ForgeDependencyNode>? nodes)
     {
-        var dependencies = new Dictionary<string, Version>();
+        var dependencies = new Dictionary<string, Version>(StringComparer.OrdinalIgnoreCase);
         foreach (var node in nodes ?? [])
         {
             if (node.GUID is not null && node.LatestCompatibleVersion?.Version is { } nodeVersion)

@@ -18,7 +18,7 @@ public class ModTrackingStore
 
     private readonly ILogger<ModTrackingStore> _logger;
     private readonly Lock _lock = new();
-    private Dictionary<string, ConfigMod> _mods = new();
+    private Dictionary<string, ConfigMod> _mods = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Loads the tracked mods from the data file on construction.</summary>
     public ModTrackingStore(ILogger<ModTrackingStore> logger)
@@ -32,7 +32,7 @@ public class ModTrackingStore
     {
         lock (_lock)
         {
-            return new Dictionary<string, ConfigMod>(_mods);
+            return new Dictionary<string, ConfigMod>(_mods, StringComparer.OrdinalIgnoreCase);
         }
     }
 
@@ -75,12 +75,15 @@ public class ModTrackingStore
             try
             {
                 var payload = Decrypt(File.ReadAllBytes(Paths.ModsDataPath));
-                _mods = JsonSerializer.Deserialize<Dictionary<string, ConfigMod>>(payload) ?? new Dictionary<string, ConfigMod>();
+                var loaded = JsonSerializer.Deserialize<Dictionary<string, ConfigMod>>(payload);
+                _mods = loaded is null
+                    ? new Dictionary<string, ConfigMod>(StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, ConfigMod>(loaded, StringComparer.OrdinalIgnoreCase);
             }
             catch (Exception e)
             {
                 _logger.LogWarning("Unable to read the mods data file, starting with an empty mod list: {message}", e.Message);
-                _mods = new Dictionary<string, ConfigMod>();
+                _mods = new Dictionary<string, ConfigMod>(StringComparer.OrdinalIgnoreCase);
             }
         }
     }

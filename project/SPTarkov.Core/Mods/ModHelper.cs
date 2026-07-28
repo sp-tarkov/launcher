@@ -11,7 +11,7 @@ public class ModHelper
     private readonly ILogger<ModHelper> _logger;
     private readonly HttpClient _httpClient;
     private readonly ConfigHelper _configHelper;
-    private readonly ConcurrentDictionary<string, IModTask> _modDict = new();
+    private readonly ConcurrentDictionary<string, IModTask> _modDict = new(StringComparer.OrdinalIgnoreCase);
     private readonly SevenZip.SevenZip _sevenZip;
 
     public bool HasActiveTasks

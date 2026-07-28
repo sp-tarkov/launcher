@@ -206,7 +206,7 @@ public class ModReconciler(
         var configMod = new ConfigMod
         {
             Name = forgeMod.Name,
-            GUID = disk.Guid,
+            GUID = forgeMod.GUID ?? disk.Guid,
             ModVersion = disk.Version ?? forgeVersion?.Version ?? new Version(0, 0, 0),
             ModId = forgeMod.Id,
             VersionId = forgeVersion?.Id,
@@ -364,7 +364,7 @@ public class ModReconciler(
     /// <summary>Builds the dependency map from a Forge version's dependency list.</summary>
     private static Dictionary<string, Version> BuildDependencies(ForgeModVersion? forgeVersion)
     {
-        var dependencies = new Dictionary<string, Version>();
+        var dependencies = new Dictionary<string, Version>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var dep in forgeVersion?.Dependencies ?? [])
         {
