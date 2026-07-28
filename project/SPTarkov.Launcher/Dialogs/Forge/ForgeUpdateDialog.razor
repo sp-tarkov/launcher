@@ -77,7 +77,7 @@
         StateHasChanged();
         await Task.Delay(20);
 
-        var listOfModsToCheck = ModManager.GetMods().Where(w => !w.Value.IsInstalled).Select(x => $"{x.Key}:{x.Value.ModVersion}").ToList();
+        var listOfModsToCheck = ModManager.GetMods().Select(x => $"{x.Key}:{x.Value.ModVersion}").ToList();
 
         if (!listOfModsToCheck.Any())
         {

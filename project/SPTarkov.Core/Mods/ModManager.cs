@@ -150,8 +150,6 @@ public class ModManager(
         var configMod = GetMods().FirstOrDefault(x => x.Key == guid).Value;
         logger.LogInformation("Installing mod: {guid}", guid);
 
-        configMod.PreexistingFiles = SnapshotPreexistingFiles(configMod);
-
         try
         {
             var installTask = await modHelper.StartInstallTask(configMod, cts);
@@ -357,6 +355,7 @@ public class ModManager(
             return;
         }
 
+        var wasInstalled = configMod.IsInstalled;
         var ogPath = Path.Join(Paths.ModCache, mod.CurrentVersion.GUID);
         var bakPath = ogPath + ".bak";
 
@@ -410,7 +409,16 @@ public class ModManager(
                 return;
             }
 
+            // Remove the previous version's files while the manifest still describes them
+            if (wasInstalled && !RemoveInstalledFiles(configMod))
+            {
+                updateTask.Error = new Exception("Unable to remove the previous version's files.");
+                RestoreCacheBackup(bakPath, ogPath);
+                return;
+            }
+
             // Update config for latest version
+            configMod.IsInstalled = false;
             configMod.ModVersion = mod.RecommendedVersion.Version;
             configMod.ModId = mod.RecommendedVersion.ModId ?? configMod.ModId;
             configMod.VersionId = mod.RecommendedVersion.Id ?? configMod.VersionId;
@@ -436,6 +444,12 @@ public class ModManager(
         }
 
         modHelper.RemoveModTask(updateTask);
+
+        // Install the new version when the previous one was installed
+        if (wasInstalled && !await InstallMod(configMod.GUID, cancellationToken))
+        {
+            logger.LogError("Unable to install the updated version of mod {guid}", configMod.GUID);
+        }
     }
 
     // Moves the cache backup back over the original zip.
@@ -512,34 +526,7 @@ public class ModManager(
         return null;
     }
 
-    // Records which manifest paths already exist on disk before extraction.
-    private List<string> SnapshotPreexistingFiles(ConfigMod mod)
-    {
-        var preexisting = new List<string>();
-
-        if (mod.Files == null)
-        {
-            return preexisting;
-        }
-
-        foreach (var file in mod.Files)
-        {
-            var fullPath = ResolveInstalledFilePath(file);
-            if (fullPath is null)
-            {
-                continue;
-            }
-
-            if (File.Exists(fullPath) || Directory.Exists(fullPath))
-            {
-                preexisting.Add(file);
-            }
-        }
-
-        return preexisting;
-    }
-
-    // Deletes the manifest files the installation created, then prunes manifest directories left empty.
+    // Deletes the manifest files, then prunes manifest directories left empty.
     private bool RemoveInstalledFiles(ConfigMod mod)
     {
         if (mod.Files == null)
@@ -547,17 +534,11 @@ public class ModManager(
             return true;
         }
 
-        var preexisting = new HashSet<string>(mod.PreexistingFiles ?? [], _pathComparer);
         var directories = new List<string>();
         var failures = 0;
 
         foreach (var file in mod.Files)
         {
-            if (preexisting.Contains(file))
-            {
-                continue;
-            }
-
             var fullPath = ResolveInstalledFilePath(file);
             if (fullPath is null)
             {
@@ -600,13 +581,13 @@ public class ModManager(
             }
         }
 
-        PruneEmptyParentDirectories(mod.Files, preexisting);
+        PruneEmptyParentDirectories(mod.Files);
 
         return failures == 0;
     }
 
     // Removes directories the mod's files left empty, walking each parent chain up to the protected base directories.
-    private void PruneEmptyParentDirectories(List<string> files, HashSet<string> preexisting)
+    private void PruneEmptyParentDirectories(List<string> files)
     {
         var gameRoot = Path.GetFullPath(configHelper.GetConfig().GamePath);
         var protectedRoots = new HashSet<string>(_pathComparer) { gameRoot };
@@ -619,11 +600,6 @@ public class ModManager(
 
         foreach (var file in files)
         {
-            if (preexisting.Contains(file))
-            {
-                continue;
-            }
-
             var fullPath = ResolveInstalledFilePath(file);
             var parent = fullPath is null ? null : Path.GetDirectoryName(fullPath);
 
@@ -636,11 +612,6 @@ public class ModManager(
 
         foreach (var directory in candidates.OrderByDescending(x => x.Length))
         {
-            if (preexisting.Contains(Path.GetRelativePath(gameRoot, directory)))
-            {
-                continue;
-            }
-
             try
             {
                 if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())

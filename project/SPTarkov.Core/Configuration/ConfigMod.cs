@@ -13,7 +13,6 @@ public class ConfigMod
     public bool IsInstalled { get; set; }
     public bool CanBeUpdated { get; set; }
     public List<string>? Files { get; set; } = [];
-    public List<string>? PreexistingFiles { get; set; }
 
     [JsonConverter(typeof(SemVerVersionConverter))]
     public Version? ModVersion { get; set; } = new(0, 0, 0);
