@@ -27,12 +27,12 @@ public class ModTrackingStore
         Load();
     }
 
-    /// <summary>Gets the tracked mods, keyed by mod GUID.</summary>
+    /// <summary>Gets a snapshot of the tracked mods, keyed by mod GUID.</summary>
     public Dictionary<string, ConfigMod> GetMods()
     {
         lock (_lock)
         {
-            return _mods;
+            return new Dictionary<string, ConfigMod>(_mods);
         }
     }
 
