@@ -119,7 +119,7 @@ public record ForgeBase
 
     public string? GetAdditionalAuthors()
     {
-        return AdditionalAuthors!.Any() ? AdditionalAuthors!.Select(x => x.Name).Aggregate((i, j) => i + ", " + j) : "None";
+        return AdditionalAuthors is { Count: > 0 } authors ? string.Join(", ", authors.Select(x => x.Name)) : null;
     }
 
     public string GetThumbnail()

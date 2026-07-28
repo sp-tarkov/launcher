@@ -142,7 +142,7 @@
 
 
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_additional_authors"))</MudText>
-                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.GetAdditionalAuthors())</MudText>
+                        <MudText Typo="Typo.caption" Class="pb-2 text-overflow">@(ForgeMod.GetAdditionalAuthors() ?? LocaleHelper.Get("mod_none"))</MudText>
 
                         <MudText Typo="Typo.body1" Class="no-pointers no-select">@(LocaleHelper.Get("mod_license"))</MudText>
                         <MudText Typo="Typo.caption" Class="pb-2 text-overflow">
