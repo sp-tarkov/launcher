@@ -1,4 +1,5 @@
 using SPTarkov.Core.Forge;
+using Version = SemanticVersioning.Version;
 
 namespace SPTarkov.Core.Mods;
 
@@ -17,6 +18,12 @@ public class DependencyResolution
     /// <summary>Dependencies with no compatible version or no usable identity.</summary>
     public List<ForgeDependencyNode> Unresolvable { get; } = [];
 
+    /// <summary>Installed mods whose dependency constraints the target version does not satisfy.</summary>
+    public List<DependentViolation> DependentViolations { get; } = [];
+
     /// <summary>Whether the tree contains problems that must block the operation.</summary>
-    public bool IsBlocked => Conflicted.Count > 0 || Unresolvable.Count > 0;
+    public bool IsBlocked => Conflicted.Count > 0 || Unresolvable.Count > 0 || DependentViolations.Count > 0;
 }
+
+/// <summary>A dependent constraint the target version does not satisfy.</summary>
+public record DependentViolation(string GUID, string Name, Version TargetVersion, Version? RequiredVersion, List<string> Dependents);

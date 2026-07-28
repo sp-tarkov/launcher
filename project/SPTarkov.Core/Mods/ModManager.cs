@@ -158,17 +158,34 @@ public class ModManager(
         return null;
     }
 
-    // Resolves the full dependency tree for a mod version through the Forge. Null when the request fails.
+    // Resolves the dependency trees for a mod version and the installed mods against the current SPT version. The
+    // target's own tree drives its dependencies; the installed trees surface conflicts and dependents the target
+    // version does not satisfy. Null when the request fails or the target version is not published.
     public async Task<DependencyResolution?> ResolveDependencies(
         string identifier,
         Version version,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        bool checkInstalledSet = true
     )
     {
+        var targetPair = $"{identifier}:{version}";
+        var pairs = new List<string> { targetPair };
+
+        if (checkInstalledSet)
+        {
+            pairs.AddRange(
+                GetMods()
+                    .Values.Where(x =>
+                        x.IsInstalled && x.ModVersion is not null && !string.Equals(x.GUID, identifier, StringComparison.OrdinalIgnoreCase)
+                    )
+                    .Select(x => $"{x.GUID}:{x.ModVersion}")
+            );
+        }
+
         ForgeDependencyResponse? response;
         try
         {
-            response = await httpHelper.ForgeGetModDependencies([$"{identifier}:{version}"], cancellationToken);
+            response = await httpHelper.ForgeGetModDependencies(pairs, cancellationToken);
         }
         catch (Exception e)
         {
@@ -181,9 +198,26 @@ public class ModManager(
             return null;
         }
 
-        var resolution = new DependencyResolution { DirectDependencies = response.Data };
+        if (!response.Data.TryGetValue(targetPair, out var targetTree))
+        {
+            logger.LogWarning("Dependency resolution returned no tree for {pair}; the version is not published", targetPair);
+            return null;
+        }
+
+        var resolution = new DependencyResolution { DirectDependencies = targetTree };
+
+        var conflictKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        void AddConflict(ForgeDependencyNode node)
+        {
+            if (conflictKeys.Add($"{node.GUID}:{node.LatestCompatibleVersion?.Version}"))
+            {
+                resolution.Conflicted.Add(node);
+            }
+        }
+
+        // Walk the target's own tree for the dependencies its operations act on
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var queue = new Queue<ForgeDependencyNode>(response.Data);
+        var queue = new Queue<ForgeDependencyNode>(targetTree);
 
         while (queue.TryDequeue(out var node))
         {
@@ -197,7 +231,7 @@ public class ModManager(
 
             if (node.Conflict)
             {
-                resolution.Conflicted.Add(node);
+                AddConflict(node);
             }
             else if (firstVisit && node.LatestCompatibleVersion is { Link: not null, Version: not null })
             {
@@ -213,6 +247,65 @@ public class ModManager(
                 foreach (var child in node.Dependencies ?? [])
                 {
                     queue.Enqueue(child);
+                }
+            }
+        }
+
+        // Scan the installed mods' trees for the target appearing as a dependency they constrain
+        var mods = GetMods();
+        var violationsByVersion = new Dictionary<string, DependentViolation>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (pair, tree) in response.Data)
+        {
+            if (string.Equals(pair, targetPair, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var separator = pair.LastIndexOf(':');
+            var ownerGuid = separator > 0 ? pair[..separator] : pair;
+            var ownerName = mods.TryGetValue(ownerGuid, out var owner) ? owner.Name : ownerGuid;
+
+            var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var scan = new Queue<ForgeDependencyNode>(tree);
+
+            while (scan.TryDequeue(out var node))
+            {
+                if (node.GUID is null || !visited.Add(node.GUID))
+                {
+                    continue;
+                }
+
+                if (string.Equals(node.GUID, identifier, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (node.Conflict)
+                    {
+                        AddConflict(node);
+                    }
+                    else
+                    {
+                        var required = node.LatestCompatibleVersion?.Version;
+                        if (required is null || version > required)
+                        {
+                            var key = required?.ToString() ?? "none";
+                            if (!violationsByVersion.TryGetValue(key, out var violation))
+                            {
+                                violation = new DependentViolation(node.GUID, node.Name, version, required, []);
+                                violationsByVersion[key] = violation;
+                                resolution.DependentViolations.Add(violation);
+                            }
+
+                            if (!violation.Dependents.Contains(ownerName))
+                            {
+                                violation.Dependents.Add(ownerName);
+                            }
+                        }
+                    }
+                }
+
+                foreach (var child in node.Dependencies ?? [])
+                {
+                    scan.Enqueue(child);
                 }
             }
         }
@@ -295,6 +388,14 @@ public class ModManager(
         if (resolution.Unresolvable.Count > 0)
         {
             parts.Add($"no compatible dependency version: {string.Join("; ", resolution.Unresolvable.Select(x => x.Name).Distinct())}");
+        }
+
+        if (resolution.DependentViolations.Count > 0)
+        {
+            var violations = resolution.DependentViolations.Select(x =>
+                $"{x.Name} {x.RequiredVersion?.ToString() ?? "(none)"} required by {string.Join(", ", x.Dependents)}"
+            );
+            parts.Add($"installed mods require: {string.Join("; ", violations)}");
         }
 
         return string.Join(" | ", parts);

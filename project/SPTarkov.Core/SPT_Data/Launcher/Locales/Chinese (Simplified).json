@@ -271,6 +271,7 @@
   "download_deps_blocked_title": "This mod cannot be downloaded due to dependency problems:",
   "download_deps_conflict_detail": "Conflicting required versions: {0}",
   "download_deps_unresolvable_detail": "No compatible version found",
+  "download_deps_dependent_detail": "Version {0} is required by {1}",
   "mod_deps_checking": "Checking dependencies",
   "mod_deps_blocked": "This mod has dependency problems",
   "toast_mod_downloaded": "{0} downloaded",

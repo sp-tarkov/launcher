@@ -253,7 +253,7 @@ public class ModReconciler(
             return null;
         }
 
-        var resolution = await modManager.ResolveDependencies(guid, version, token);
+        var resolution = await modManager.ResolveDependencies(guid, version, token, checkInstalledSet: false);
         return resolution is null ? null : ModManager.BuildDependencyDict(resolution.DirectDependencies);
     }
 

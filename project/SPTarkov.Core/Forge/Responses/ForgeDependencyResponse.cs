@@ -8,5 +8,5 @@ public record ForgeDependencyResponse
     public bool Success { get; init; }
 
     [JsonPropertyName("data")]
-    public List<ForgeDependencyNode>? Data { get; init; }
+    public Dictionary<string, List<ForgeDependencyNode>>? Data { get; init; }
 }

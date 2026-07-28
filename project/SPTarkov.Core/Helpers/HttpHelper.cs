@@ -161,11 +161,13 @@ public class HttpHelper
         return await ForgeGet<ForgeVersionResponse>($"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}", token);
     }
 
-    // Resolves the full recursive dependency tree for identifier:version pairs, where identifier is a mod GUID or ID.
+    // Resolves the dependency tree per identifier:version pair against the current SPT version, where identifier is a
+    // mod GUID or ID.
     public async Task<ForgeDependencyResponse?> ForgeGetModDependencies(List<string> modVersionPairs, CancellationToken token)
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         queryString.Add("mods", string.Join(',', modVersionPairs));
+        queryString.Add("spt_version", ProgramStatics.SptVersionCompiledFor.ToString());
         return await ForgeGet<ForgeDependencyResponse>($"{Urls.ForgeDependencies}?{queryString}", token);
     }
 

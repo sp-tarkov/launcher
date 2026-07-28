@@ -341,12 +341,6 @@
         _blockedDependencyItems = null;
         _dependencyCheckFailed = false;
 
-        if (ForgeModVersion.Dependencies is not { Count: > 0 })
-        {
-            _dependencyResolution = new DependencyResolution();
-            return;
-        }
-
         var resolution = await ModManager.ResolveDependencies(ForgeMod.GUID ?? ForgeMod.Id.ToString(), ForgeModVersion.Version);
 
         if (resolution is null)
