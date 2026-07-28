@@ -98,7 +98,7 @@ public class ModHelper
 
                 var now = DateTime.UtcNow;
 
-                if ((now - lastReportTime).TotalSeconds >= 1 || totalRead == downloadTask.TotalToDownload)
+                if (downloadTask.TotalToDownload > 0 && ((now - lastReportTime).TotalSeconds >= 1 || totalRead == downloadTask.TotalToDownload))
                 {
                     downloadTask.Progress = (float)totalRead / downloadTask.TotalToDownload * 100;
                     lastReportTime = now;
@@ -113,6 +113,7 @@ public class ModHelper
             return downloadTask;
         }
 
+        downloadTask.Progress = 100;
         downloadTask.Complete = true;
         return downloadTask;
     }
@@ -300,7 +301,7 @@ public class ModHelper
 
                 var now = DateTime.UtcNow;
 
-                if ((now - lastReportTime).TotalSeconds >= 1 || totalRead == updateTask.TotalToDownload)
+                if (updateTask.TotalToDownload > 0 && ((now - lastReportTime).TotalSeconds >= 1 || totalRead == updateTask.TotalToDownload))
                 {
                     updateTask.Progress = (float)totalRead / updateTask.TotalToDownload * 100;
                     lastReportTime = now;
@@ -315,6 +316,7 @@ public class ModHelper
             return updateTask;
         }
 
+        updateTask.Progress = 100;
         updateTask.Complete = true;
         return updateTask;
     }

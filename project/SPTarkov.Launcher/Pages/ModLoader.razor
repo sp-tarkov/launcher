@@ -56,9 +56,16 @@
                                     <MudText HtmlTag="span">
                                         @($"{downloadTask2.ForgeMod.Name} - {downloadTask2.Version.Version}")
                                     </MudText>
-                                    <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
+                                    <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Indeterminate="@(downloadTask2.TotalToDownload <= 0)" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
                                         <ChildContent>
-                                            <MudText Color="Color.Default" Class="progress-bar">@item.Progress.ToString("F2")%</MudText>
+                                            @if (downloadTask2.TotalToDownload > 0)
+                                            {
+                                                <MudText Color="Color.Default" Class="progress-bar">@item.Progress.ToString("F2")%</MudText>
+                                            }
+                                            else
+                                            {
+                                                <MudText Color="Color.Default" Class="progress-bar">Downloading</MudText>
+                                            }
                                         </ChildContent>
                                     </MudProgressLinear>
                                 </MudContainer>
@@ -78,9 +85,16 @@
                                     <MudText HtmlTag="span">
                                         @($"{updateTask.Name} - {updateTask.Version}")
                                     </MudText>
-                                    <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
+                                    <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Indeterminate="@(updateTask.TotalToDownload <= 0)" Value="@item.Progress" Min="0" Max="100" Class="mt-2">
                                         <ChildContent>
-                                            <MudText Color="Color.Default" Class="progress-bar">@item.Progress.ToString("F2")%</MudText>
+                                            @if (updateTask.TotalToDownload > 0)
+                                            {
+                                                <MudText Color="Color.Default" Class="progress-bar">@item.Progress.ToString("F2")%</MudText>
+                                            }
+                                            else
+                                            {
+                                                <MudText Color="Color.Default" Class="progress-bar">Downloading</MudText>
+                                            }
                                         </ChildContent>
                                     </MudProgressLinear>
                                 </MudContainer>
@@ -102,7 +116,7 @@
                                     </MudText>
                                     <MudProgressLinear Rounded="true" Color="Color.Info" Size="Size.Small" Indeterminate="true" Class="mt-2">
                                         <ChildContent>
-                                            <MudText Color="Color.Default" Class="progress-bar">Unpacking, please wait!</MudText>
+                                            <MudText Color="Color.Default" Class="progress-bar">Decompressing</MudText>
                                         </ChildContent>
                                     </MudProgressLinear>
                                 </MudContainer>
