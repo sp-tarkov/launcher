@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Forge;
+using SPTarkov.Core.Forge.Responses;
 using SPTarkov.Core.Helpers;
 using SPTarkov.Core.SPT;
 using Version = SemanticVersioning.Version;
@@ -142,6 +143,148 @@ public class ModManager(
         downloadTask.Error = new Exception("Archive does not contain a BepInEx or SPT_Runtime folder. Unsupported structure.");
         await downloadTask.CancellationTokenSource.CancelAsync();
         return null;
+    }
+
+    // Resolves the full dependency tree for a mod version through the Forge. Null when the request fails.
+    public async Task<DependencyResolution?> ResolveDependencies(
+        string identifier,
+        Version version,
+        CancellationToken cancellationToken = default
+    )
+    {
+        ForgeDependencyResponse? response;
+        try
+        {
+            response = await httpHelper.ForgeGetModDependencies([$"{identifier}:{version}"], cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("Dependency resolution request failed for {identifier}: {message}", identifier, e.Message);
+            return null;
+        }
+
+        if (response is not { Success: true, Data: not null })
+        {
+            return null;
+        }
+
+        var resolution = new DependencyResolution { DirectDependencies = response.Data };
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var queue = new Queue<ForgeDependencyNode>(response.Data);
+
+        while (queue.TryDequeue(out var node))
+        {
+            if (node.GUID is null)
+            {
+                resolution.Unresolvable.Add(node);
+                continue;
+            }
+
+            var firstVisit = seen.Add(node.GUID);
+
+            if (node.Conflict)
+            {
+                resolution.Conflicted.Add(node);
+            }
+            else if (firstVisit && node.LatestCompatibleVersion is { Link: not null, Version: not null })
+            {
+                resolution.Resolved.Add(node);
+            }
+            else if (firstVisit)
+            {
+                resolution.Unresolvable.Add(node);
+            }
+
+            if (firstVisit)
+            {
+                foreach (var child in node.Dependencies ?? [])
+                {
+                    queue.Enqueue(child);
+                }
+            }
+        }
+
+        return resolution;
+    }
+
+    // Downloads every resolved dependency and then the mod itself.
+    public async Task DownloadModWithDependencies(
+        ForgeBase forgeMod,
+        ForgeModVersion version,
+        DependencyResolution resolution,
+        CancellationToken cancellationToken = default
+    )
+    {
+        await DownloadResolvedDependencies(resolution, cancellationToken);
+        await DownloadMod(forgeMod, version, cancellationToken, BuildDependencyDict(resolution.DirectDependencies));
+    }
+
+    // Downloads each resolved dependency that is not already tracked at its resolved version.
+    private async Task DownloadResolvedDependencies(DependencyResolution resolution, CancellationToken cancellationToken)
+    {
+        foreach (var dep in resolution.Resolved)
+        {
+            var depVersion = dep.LatestCompatibleVersion!;
+            if (GetMods().TryGetValue(dep.GUID!, out var tracked) && Equals(tracked.ModVersion, depVersion.Version))
+            {
+                continue;
+            }
+
+            var forgeBase = new ForgeBase
+            {
+                Id = dep.Id,
+                GUID = dep.GUID,
+                Name = dep.Name,
+                Slug = dep.Slug,
+            };
+            var forgeVersion = new ForgeModVersion
+            {
+                Id = depVersion.Id,
+                Link = depVersion.Link!,
+                Version = depVersion.Version!,
+                ContentLength = depVersion.ContentLength,
+            };
+
+            await DownloadMod(forgeBase, forgeVersion, cancellationToken, BuildDependencyDict(dep.Dependencies));
+        }
+    }
+
+    // Maps immediate dependency nodes to their resolved versions.
+    private static Dictionary<string, Version> BuildDependencyDict(List<ForgeDependencyNode>? nodes)
+    {
+        var dependencies = new Dictionary<string, Version>();
+        foreach (var node in nodes ?? [])
+        {
+            if (node.GUID is not null && node.LatestCompatibleVersion?.Version is { } nodeVersion)
+            {
+                dependencies.TryAdd(node.GUID, nodeVersion);
+            }
+        }
+
+        return dependencies;
+    }
+
+    // Builds a message listing the conflicted and unresolvable dependencies.
+    public static string DescribeBlockedDependencies(DependencyResolution resolution)
+    {
+        var parts = new List<string>();
+
+        if (resolution.Conflicted.Count > 0)
+        {
+            var conflicts = resolution
+                .Conflicted.GroupBy(x => x.GUID ?? x.Name)
+                .Select(g =>
+                    $"{g.First().Name} ({string.Join(", ", g.Select(x => x.LatestCompatibleVersion?.Version?.ToString() ?? "?").Distinct())})"
+                );
+            parts.Add($"conflicting dependency versions: {string.Join("; ", conflicts)}");
+        }
+
+        if (resolution.Unresolvable.Count > 0)
+        {
+            parts.Add($"no compatible dependency version: {string.Join("; ", resolution.Unresolvable.Select(x => x.Name).Distinct())}");
+        }
+
+        return string.Join(" | ", parts);
     }
 
     public Dictionary<string, ConfigMod> GetMods()
@@ -395,6 +538,8 @@ public class ModManager(
             return;
         }
 
+        DependencyResolution? resolution;
+
         try
         {
             var entries = await GetArchiveEntries(
@@ -425,6 +570,24 @@ public class ModManager(
                 return;
             }
 
+            resolution = mod.RecommendedVersion.Version is { } newVersion
+                ? await ResolveDependencies(configMod.GUID, newVersion, cts.Token)
+                : null;
+
+            if (resolution is null)
+            {
+                updateTask.Error = new Exception("Unable to resolve the mod's dependencies.");
+                RestoreCacheBackup(bakPath, ogPath);
+                return;
+            }
+
+            if (resolution.IsBlocked)
+            {
+                updateTask.Error = new Exception(DescribeBlockedDependencies(resolution));
+                RestoreCacheBackup(bakPath, ogPath);
+                return;
+            }
+
             // Remove the previous version's files while the manifest still describes them
             if (wasInstalled && !RemoveInstalledFiles(configMod))
             {
@@ -439,6 +602,7 @@ public class ModManager(
             configMod.ModId = mod.RecommendedVersion.ModId ?? configMod.ModId;
             configMod.VersionId = mod.RecommendedVersion.Id ?? configMod.VersionId;
             configMod.Files = RemoveBasePaths(entries);
+            configMod.Dependencies = BuildDependencyDict(resolution.DirectDependencies);
             modStore.AddMod(configMod);
         }
         catch (Exception e)
@@ -460,6 +624,8 @@ public class ModManager(
         }
 
         modHelper.RemoveModTask(updateTask);
+
+        await DownloadResolvedDependencies(resolution, cancellationToken);
 
         // Install the new version when the previous one was installed
         if (wasInstalled && !await InstallMod(configMod.GUID, cancellationToken))

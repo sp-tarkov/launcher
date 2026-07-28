@@ -4,6 +4,7 @@
 @inject ConfigHelper ConfigHelper
 @inject ILogger<DetailedModComponent> Logger
 @inject NavigationManager NavigationManager
+@inject ModManager ModManager
 
 <MudItem sm="12">
     @if (IsSkeleton)
@@ -29,10 +30,10 @@
                     @(LocaleHelper.Get("mod_navigate_back"))
                 </MudButton>
                 <MudSpacer/>
-                <MudTooltip Arrow="false" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" RootClass="mr-3" Text="@CompatibilityTooltip">
-                    <MudIcon Icon="@CompatibilityIcon" Color="@CompatibilityColor" Class="d-block"/>
+                <MudTooltip Arrow="false" Placement="Placement.Bottom" Color="Color.Default" ShowOnHover="true" ShowOnClick="false" ShowOnFocus="false" RootClass="mr-3" Text="@StatusTooltip">
+                    <MudIcon Icon="@StatusIcon" Color="@StatusColor" Class="d-block"/>
                 </MudTooltip>
-                <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="@CompatibilityColor" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@(!IsVersionCompatible)" OnClick="StartDownloadModTask">
+                <MudButton Color="Color.Dark" StartIcon="@Icons.Material.Filled.Download" IconColor="@StatusColor" Variant="Variant.Filled" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@(!CanDownload)" OnClick="StartDownloadModTask">
                     @DownloadLatestLabel
                 </MudButton>
             </MudItem>
@@ -75,10 +76,36 @@
                 }
                 @if (!IsVersionCompatible)
                 {
-                    <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
+                    <MudCard Class="border-2 border-solid mud-alert-outlined-error mb-4">
                         <MudCardContent>
                             <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_notice_title"))</MudText>
                             <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_spt_incompatible_notice"))</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                }
+                @if (_blockedDependencyItems is not null)
+                {
+                    <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
+                        <MudCardContent Class="d-flex flex-column">
+                            <MudText Typo="Typo.caption" Class="pb-2">@(LocaleHelper.Get("download_deps_blocked_title"))</MudText>
+                            <ul class="blocked-deps-list">
+                                @foreach (var item in _blockedDependencyItems)
+                                {
+                                    <li>
+                                        <MudText Typo="Typo.caption" Class="d-block">@item.Name</MudText>
+                                        <MudText Typo="Typo.caption" Class="d-block mud-text-secondary">@item.Detail</MudText>
+                                    </li>
+                                }
+                            </ul>
+                        </MudCardContent>
+                    </MudCard>
+                }
+                @if (_dependencyCheckFailed)
+                {
+                    <MudCard Class="border-2 border-solid mud-alert-outlined-warning mb-4">
+                        <MudCardContent>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("mod_notice_title"))</MudText>
+                            <MudText Typo="Typo.caption" Inline="true">@(LocaleHelper.Get("download_deps_resolve_failed"))</MudText>
                         </MudCardContent>
                     </MudCard>
                 }
@@ -237,13 +264,39 @@
     [Parameter] public ForgeModVersion ForgeModVersion { get; set; } = default!;
     [Parameter] public List<ForgeBase> ForgeModAddons { get; set; } = [];
 
+    private DependencyResolution? _dependencyResolution;
+    private List<BlockedDependency>? _blockedDependencyItems;
+    private bool _dependencyCheckFailed;
+    private int? _checkedVersionId;
+
     private bool IsVersionCompatible => ForgeModVersion?.SptVersionConstraint?.IsSatisfied(ProgramStatics.SptVersionCompiledFor, true) ?? false;
 
-    private string CompatibilityIcon => IsVersionCompatible ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.Warning;
+    private bool DependencyCheckPending => _dependencyResolution is null && !_dependencyCheckFailed;
 
-    private Color CompatibilityColor => IsVersionCompatible ? Color.Success : Color.Warning;
+    private bool CanDownload => IsVersionCompatible && _dependencyResolution is not null && _blockedDependencyItems is null;
+
+    private Color CompatibilityColor => IsVersionCompatible ? Color.Success : Color.Error;
 
     private string CompatibilityTooltip => LocaleHelper.Get(IsVersionCompatible ? "mod_spt_compatible" : "mod_spt_incompatible");
+
+    private string StatusIcon =>
+        !IsVersionCompatible ? Icons.Material.Filled.Error
+        : _dependencyCheckFailed || _blockedDependencyItems is not null ? Icons.Material.Filled.Warning
+        : DependencyCheckPending ? Icons.Material.Filled.HourglassTop
+        : Icons.Material.Filled.CheckCircle;
+
+    private Color StatusColor =>
+        !IsVersionCompatible ? Color.Error
+        : _dependencyCheckFailed || _blockedDependencyItems is not null ? Color.Warning
+        : DependencyCheckPending ? Color.Default
+        : Color.Success;
+
+    private string StatusTooltip =>
+        !IsVersionCompatible ? LocaleHelper.Get("mod_spt_incompatible")
+        : _dependencyCheckFailed ? LocaleHelper.Get("download_deps_resolve_failed")
+        : _blockedDependencyItems is not null ? LocaleHelper.Get("mod_deps_blocked")
+        : DependencyCheckPending ? LocaleHelper.Get("mod_deps_checking")
+        : LocaleHelper.Get("mod_spt_compatible");
 
     private string DownloadLatestLabel =>
         ForgeModVersion is null
@@ -276,6 +329,39 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsSkeleton || ForgeModVersion is null || _checkedVersionId == ForgeModVersion.Id)
+        {
+            return;
+        }
+
+        _checkedVersionId = ForgeModVersion.Id;
+        _dependencyResolution = null;
+        _blockedDependencyItems = null;
+        _dependencyCheckFailed = false;
+
+        if (ForgeModVersion.Dependencies is not { Count: > 0 })
+        {
+            _dependencyResolution = new DependencyResolution();
+            return;
+        }
+
+        var resolution = await ModManager.ResolveDependencies(ForgeMod.GUID ?? ForgeMod.Id.ToString(), ForgeModVersion.Version);
+
+        if (resolution is null)
+        {
+            _dependencyCheckFailed = true;
+            return;
+        }
+
+        _dependencyResolution = resolution;
+        if (resolution.IsBlocked)
+        {
+            _blockedDependencyItems = DependencyDisplay.BuildBlockedItems(resolution, LocaleHelper);
+        }
+    }
+
     private async Task StartDownloadModTask()
     {
         var param = new DialogParameters
@@ -285,6 +371,9 @@
             },
             {
                 "Version", ForgeModVersion
+            },
+            {
+                "Resolution", _dependencyResolution
             }
         };
 

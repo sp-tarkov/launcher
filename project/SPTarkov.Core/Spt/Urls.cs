@@ -16,6 +16,7 @@ public class Urls
 
     public const string ForgeMods = "https://forge.sp-tarkov.com/api/v0/mods";
     public const string ForgeUpdate = "https://forge.sp-tarkov.com/api/v0/mods/updates";
+    public const string ForgeDependencies = "https://forge.sp-tarkov.com/api/v0/mods/dependencies";
     public const string ForgeMod = "https://forge.sp-tarkov.com/api/v0/mod";
     public const string ForgeAddons = "https://forge.sp-tarkov.com/api/v0/addons";
     public const string ForgeAddonDetails = "https://forge.sp-tarkov.com/api/v0/addon";

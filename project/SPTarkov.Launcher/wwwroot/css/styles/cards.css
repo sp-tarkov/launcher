@@ -120,3 +120,13 @@
     0%, 100% { opacity: 0.3; transform: scale(0.85); }
     50% { opacity: 1; transform: scale(1); }
 }
+
+.blocked-deps-list {
+    list-style: disc;
+    margin: 0;
+    padding-left: 1.5rem;
+
+    li:not(:last-child) {
+        padding-bottom: 8px;
+    }
+}

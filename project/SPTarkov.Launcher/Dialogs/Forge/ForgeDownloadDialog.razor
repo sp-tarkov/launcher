@@ -1,7 +1,6 @@
 @inject ISnackbar Snackbar
 @inject IJSRuntime JsRuntime
 @inject ModManager ModManager
-@inject ILogger<ForgeDownloadDialog> Logger
 @inject LocaleHelper LocaleHelper
 
 <MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
@@ -57,6 +56,7 @@
     [CascadingParameter] private IMudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public ForgeBase Mod { get; set; } = default!;
     [Parameter] public ForgeModVersion Version { get; set; } = default!;
+    [Parameter] public DependencyResolution? Resolution { get; set; }
     private bool _requestInProgress;
     private CancellationTokenSource Token { get; set; } = new();
     private bool UserCancel { get; set; }
@@ -73,39 +73,19 @@
         return base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task RunDownloadTask()
+    private void RunDownloadTask()
     {
         _requestInProgress = true;
         Token = new CancellationTokenSource(); // Dont give a timeout, some people might just have shit internet
-        var dictOfDeps = new Dictionary<string, Version>();
         try
         {
-            if (Version.Dependencies != null && Version.Dependencies.Any())
+            if (Resolution is null || Resolution.IsBlocked)
             {
-                foreach (var dep in Version.Dependencies)
-                {
-                    var depVersion = dep.Versions?.FirstOrDefault();
-                    if (dep.GUID is null || depVersion is null)
-                    {
-                        Logger.LogWarning("Dependency {name} has no GUID or versions, skipping", dep.Name);
-                        continue;
-                    }
-
-                    dictOfDeps.Add(dep.GUID, depVersion.Version);
-                    if (ModManager.GetMods().TryGetValue(dep.GUID, out var mod) && mod.ModVersion < depVersion.Version)
-                    {
-                        // check if mod exists, if it does, check version, if its newer, download it
-                        _ = ModManager.DownloadMod(dep, depVersion, Token.Token);
-                    }
-                    else if (mod is null)
-                    {
-                        // check if mod exists, if it doesnt, download it
-                        _ = ModManager.DownloadMod(dep, depVersion, Token.Token);
-                    }
-                }
+                AbortOrFail(LocaleHelper.Get("download_deps_resolve_failed"));
+                return;
             }
 
-            _ = ModManager.DownloadMod(Mod, Version, Token.Token, dictOfDeps);
+            _ = ModManager.DownloadModWithDependencies(Mod, Version, Resolution, Token.Token);
         }
         catch (Exception)
         {
@@ -113,11 +93,8 @@
             return;
         }
 
-        if (true)
-        {
-            _requestInProgress = false;
-            Submit();
-        }
+        _requestInProgress = false;
+        Submit();
     }
 
     private void Submit()

@@ -161,6 +161,14 @@ public class HttpHelper
         return await ForgeGet<ForgeVersionResponse>($"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}", token);
     }
 
+    // Resolves the full recursive dependency tree for identifier:version pairs, where identifier is a mod GUID or ID.
+    public async Task<ForgeDependencyResponse?> ForgeGetModDependencies(List<string> modVersionPairs, CancellationToken token)
+    {
+        var queryString = HttpUtility.ParseQueryString(string.Empty);
+        queryString.Add("mods", string.Join(',', modVersionPairs));
+        return await ForgeGet<ForgeDependencyResponse>($"{Urls.ForgeDependencies}?{queryString}", token);
+    }
+
     public async Task<ForgeUpdateResponse?> ForgeGetUpdate(List<string> modGuidsWithVersions, string sptVersion, CancellationToken token)
     {
         var paramsToUse = ParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
