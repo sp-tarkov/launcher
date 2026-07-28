@@ -18,6 +18,7 @@ public class ModReconciler(
     ConfigHelper configHelper,
     ModTrackingStore modStore,
     ModHelper modHelper,
+    ModManager modManager,
     HttpHelper httpHelper,
     SevenZip.SevenZip sevenZip
 )
@@ -200,6 +201,7 @@ public class ModReconciler(
         var forgeVersion = await MatchForgeVersion(forgeMod, disk.Version, token);
         var manifest =
             await GetManifestFromCache(disk.Guid, token) ?? await GetManifestFromFileTree(forgeMod, forgeVersion, token) ?? disk.Files;
+        var dependencies = await ResolveDependencyMap(disk.Guid, forgeVersion, token) ?? BuildDependencies(forgeVersion);
 
         var configMod = new ConfigMod
         {
@@ -210,7 +212,7 @@ public class ModReconciler(
             VersionId = forgeVersion?.Id,
             IsInstalled = true,
             Files = manifest,
-            Dependencies = BuildDependencies(forgeVersion),
+            Dependencies = dependencies,
         };
 
         logger.LogInformation("Tracking manually installed mod {name} ({guid})", configMod.Name, configMod.GUID);
@@ -224,6 +226,7 @@ public class ModReconciler(
 
         var forgeVersion = await MatchForgeVersion(forgeMod, disk.Version, token);
         var manifest = await GetManifestFromFileTree(forgeMod, forgeVersion, token);
+        var dependencies = await ResolveDependencyMap(tracked.GUID, forgeVersion, token);
 
         tracked.ModVersion = disk.Version;
         tracked.ModId = forgeMod?.Id ?? tracked.ModId;
@@ -234,7 +237,24 @@ public class ModReconciler(
             tracked.Files = manifest;
         }
 
+        if (dependencies != null)
+        {
+            tracked.Dependencies = dependencies;
+        }
+
         modStore.AddMod(tracked);
+    }
+
+    /// <summary>Resolves a mod version's immediate dependencies through the Forge. Null when resolution fails.</summary>
+    private async Task<Dictionary<string, Version>?> ResolveDependencyMap(string guid, ForgeModVersion? forgeVersion, CancellationToken token)
+    {
+        if (forgeVersion?.Version is not { } version)
+        {
+            return null;
+        }
+
+        var resolution = await modManager.ResolveDependencies(guid, version, token);
+        return resolution is null ? null : ModManager.BuildDependencyDict(resolution.DirectDependencies);
     }
 
     /// <summary>Looks up Forge mods for the given GUIDs in chunks. Failures degrade to an empty result.</summary>

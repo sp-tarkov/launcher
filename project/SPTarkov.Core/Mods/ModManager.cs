@@ -263,7 +263,7 @@ public class ModManager(
     }
 
     // Maps immediate dependency nodes to their resolved versions.
-    private static Dictionary<string, Version> BuildDependencyDict(List<ForgeDependencyNode>? nodes)
+    public static Dictionary<string, Version> BuildDependencyDict(List<ForgeDependencyNode>? nodes)
     {
         var dependencies = new Dictionary<string, Version>();
         foreach (var node in nodes ?? [])
