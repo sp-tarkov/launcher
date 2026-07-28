@@ -77,6 +77,7 @@ public class Launcher
             .AddSingleton<ModManager>()
             .AddSingleton<ModHelper>()
             .AddSingleton<ModTrackingStore>()
+            .AddSingleton<ModReconciler>()
             .AddSingleton<StateHelper>()
             .AddSingleton<TitleHelper>()
             .AddSingleton<TrayHelper>()
@@ -128,6 +129,9 @@ public class Launcher
         // TODO: Testing server load. Should be removed before release.
         var httpHelper = App.Services.GetRequiredService<HttpHelper>();
         _ = httpHelper.ForgePing();
+
+        // Picks up manually installed, updated, or removed mods in the background.
+        _ = App.Services.GetRequiredService<ModReconciler>().ReconcileAsync();
 
         CustomizeComponent();
 

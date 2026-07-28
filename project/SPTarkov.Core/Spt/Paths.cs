@@ -41,6 +41,9 @@ public class Paths
     {
         "BepInEx",
         Path.Join("BepInEx", "plugins"),
+        Path.Join("BepInEx", "patchers"),
+        Path.Join("BepInEx", "config"),
+        Path.Join("BepInEx", "core"),
         "SPT_Runtime",
         Path.Join("SPT_Runtime", "user"),
         Path.Join("SPT_Runtime", "user", "mods"),

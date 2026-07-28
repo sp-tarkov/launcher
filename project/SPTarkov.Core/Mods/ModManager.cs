@@ -600,7 +600,59 @@ public class ModManager(
             }
         }
 
+        PruneEmptyParentDirectories(mod.Files, preexisting);
+
         return failures == 0;
+    }
+
+    // Removes directories the mod's files left empty, walking each parent chain up to the protected base directories.
+    private void PruneEmptyParentDirectories(List<string> files, HashSet<string> preexisting)
+    {
+        var gameRoot = Path.GetFullPath(configHelper.GetConfig().GamePath);
+        var protectedRoots = new HashSet<string>(_pathComparer) { gameRoot };
+        foreach (var basePath in Paths.ArchiveFileInfoToIgnore)
+        {
+            protectedRoots.Add(Path.GetFullPath(Path.Join(gameRoot, basePath)));
+        }
+
+        var candidates = new HashSet<string>(_pathComparer);
+
+        foreach (var file in files)
+        {
+            if (preexisting.Contains(file))
+            {
+                continue;
+            }
+
+            var fullPath = ResolveInstalledFilePath(file);
+            var parent = fullPath is null ? null : Path.GetDirectoryName(fullPath);
+
+            while (parent != null && parent.Length > gameRoot.Length && !protectedRoots.Contains(parent))
+            {
+                candidates.Add(parent);
+                parent = Path.GetDirectoryName(parent);
+            }
+        }
+
+        foreach (var directory in candidates.OrderByDescending(x => x.Length))
+        {
+            if (preexisting.Contains(Path.GetRelativePath(gameRoot, directory)))
+            {
+                continue;
+            }
+
+            try
+            {
+                if (Directory.Exists(directory) && !Directory.EnumerateFileSystemEntries(directory).Any())
+                {
+                    Directory.Delete(directory);
+                }
+            }
+            catch (Exception e)
+            {
+                logger.LogDebug("Unable to prune directory {directory}: {message}", directory, e.Message);
+            }
+        }
     }
 
     // Resolves a stored mod file path against the game directory.

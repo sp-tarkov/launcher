@@ -145,6 +145,22 @@ public class HttpHelper
         return await ForgeGet<ForgeModsResponse>($"{Urls.ForgeMods}?page={page}&{paramsToUse}", token);
     }
 
+    // Gets mods by their GUIDs. Matching is case-insensitive; only the latest few versions are embedded.
+    public async Task<ForgeModsResponse?> ForgeGetModsByGuids(List<string> guids, CancellationToken token)
+    {
+        var queryString = HttpUtility.ParseQueryString(string.Empty);
+        queryString.Add("include", "versions");
+        queryString.Add("filter[guid]", string.Join(',', guids));
+        return await ForgeGet<ForgeModsResponse>($"{Urls.ForgeMods}?{queryString}", token);
+    }
+
+    // Gets a mod's versions filtered to an exact version number.
+    public async Task<ForgeVersionResponse?> ForgeGetModVersionExact(string modId, string version, CancellationToken token)
+    {
+        var paramsToUse = ParamsCollectionForVersions(version: version);
+        return await ForgeGet<ForgeVersionResponse>($"{Urls.ForgeMod}/{modId}/versions?{paramsToUse}", token);
+    }
+
     public async Task<ForgeUpdateResponse?> ForgeGetUpdate(List<string> modGuidsWithVersions, string sptVersion, CancellationToken token)
     {
         var paramsToUse = ParamsCollectionForUpdates(modGuidsWithVersions, sptVersion);
@@ -312,7 +328,12 @@ public class HttpHelper
         return queryString;
     }
 
-    private NameValueCollection ParamsCollectionForVersions(string? versionId = null, string? sptVersion = null, string? sort = null)
+    private NameValueCollection ParamsCollectionForVersions(
+        string? versionId = null,
+        string? sptVersion = null,
+        string? sort = null,
+        string? version = null
+    )
     {
         var queryString = HttpUtility.ParseQueryString(string.Empty);
         queryString.Add("include", "dependencies,virus_total_links");
@@ -320,6 +341,11 @@ public class HttpHelper
         if (!string.IsNullOrEmpty(versionId))
         {
             queryString.Add("filter[id]", versionId);
+        }
+
+        if (!string.IsNullOrEmpty(version))
+        {
+            queryString.Add("filter[version]", version);
         }
 
         if (!string.IsNullOrEmpty(sptVersion))
