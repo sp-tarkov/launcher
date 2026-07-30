@@ -8,19 +8,10 @@ public class Urls
     public const string Register = "/launcher/v2/register";
     public const string Remove = "/launcher/v2/remove";
     public const string Version = "/launcher/v2/version";
-    public const string Mods = "/launcher/v2/mods";
     public const string ModPages = "/launcher/v2/mod-pages";
     public const string Profiles = "/launcher/v2/profiles";
     public const string Profile = "/launcher/v2/profile";
     public const string Wipe = "/launcher/v2/wipe";
-
-    public const string ForgeMods = "https://forge.sp-tarkov.com/api/v0/mods";
-    public const string ForgeUpdate = "https://forge.sp-tarkov.com/api/v0/mods/updates";
-    public const string ForgeMod = "https://forge.sp-tarkov.com/api/v0/mod";
-    public const string ForgeAddons = "https://forge.sp-tarkov.com/api/v0/addons";
-    public const string ForgeAddonDetails = "https://forge.sp-tarkov.com/api/v0/addon";
-    public const string ForgeCategories = "https://forge.sp-tarkov.com/api/v0/mod-categories";
-    public const string ForgePing = "https://forge.sp-tarkov.com/api/v0/ping";
 
     public const string UpdateManifestStable = "https://launcher-auto-update.sp-tarkov.com/stable.json";
     public const string UpdateManifestStableSignature = "https://launcher-auto-update.sp-tarkov.com/stable.json.sig";

@@ -17,7 +17,6 @@ public enum UpdateFailure
 {
     None,
     AlreadyRunning,
-    ModTaskInProgress,
     InsufficientSpace,
     NotWritable,
     Download,

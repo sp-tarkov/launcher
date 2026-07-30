@@ -1,18 +1,12 @@
 using Microsoft.Extensions.Logging;
-using SPTarkov.Core.Mods;
 
 namespace SPTarkov.Core.Update;
 
 /// <summary>Checks that an update can be applied. <see cref="Check"/> returns <see cref="UpdateFailure.None"/> when it can.</summary>
-public class UpdatePreflight(ILogger<UpdatePreflight> logger, ModHelper modHelper)
+public class UpdatePreflight(ILogger<UpdatePreflight> logger)
 {
     public UpdateFailure Check(long payloadSize)
     {
-        if (modHelper.HasActiveTasks)
-        {
-            return UpdateFailure.ModTaskInProgress;
-        }
-
         if (!HasFreeSpace(payloadSize))
         {
             return UpdateFailure.InsufficientSpace;

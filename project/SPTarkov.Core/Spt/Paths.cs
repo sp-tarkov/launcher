@@ -12,7 +12,6 @@ public class Paths
     private static readonly string _userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static readonly string _applicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-    public static readonly string ModCache = Path.Join(_runtimeRoot, "user", "Launcher", "ModCache");
     public static readonly string ProtonPath = Path.Join(_userProfile, ".local", "share", "Steam", "compatibilitytools.d");
     public static readonly string SevenZip = Path.Join(_runtimeRoot, "SPT_Data", "Launcher", "Dependency");
     public static readonly string PatchPath = Path.Join(_runtimeRoot, "SPT_Data", "Launcher", "Patches");
@@ -28,13 +27,4 @@ public class Paths
     public static readonly string LogsFolder = Path.Join(_runtimeRoot, "user", "logs");
     public static readonly string LauncherLog = Path.Join(_runtimeRoot, "user", "logs", "Launcher.log");
     public static readonly string ProfilesFolder = Path.Join(_runtimeRoot, "user", "profiles");
-
-    public static readonly HashSet<string> ArchiveFileInfoToIgnore = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "BepInEx",
-        Path.Join("BepInEx", "plugins"),
-        "SPT_Runtime",
-        Path.Join("SPT_Runtime", "user"),
-        Path.Join("SPT_Runtime", "user", "mods"),
-    };
 }

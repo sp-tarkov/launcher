@@ -8,9 +8,7 @@ using MudBlazor.Services;
 using Photino.Blazor;
 using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
-using SPTarkov.Core.Forge;
 using SPTarkov.Core.Helpers;
-using SPTarkov.Core.Mods;
 using SPTarkov.Core.Patching;
 using SPTarkov.Core.SevenZip;
 using SPTarkov.Core.Update;
@@ -73,9 +71,6 @@ public class Launcher
             .Services.AddSingleton<ConfigHelper>()
             .AddSingleton<GameHelper>()
             .AddSingleton<HttpHelper>()
-            .AddSingleton<ForgeRateLimiter>()
-            .AddSingleton<ModManager>()
-            .AddSingleton<ModHelper>()
             .AddSingleton<StateHelper>()
             .AddSingleton<TitleHelper>()
             .AddSingleton<TrayHelper>()
@@ -123,10 +118,6 @@ public class Launcher
         // Recovers any interrupted auto-update before the UI starts.
         var appliedUpdateVersion = App.Services.GetRequiredService<UpdateRecovery>().Run();
         App.Services.GetRequiredService<UpdateNotice>().JustUpdatedVersion = appliedUpdateVersion;
-
-        // TODO: Testing server load. Should be removed before release.
-        var httpHelper = App.Services.GetRequiredService<HttpHelper>();
-        _ = httpHelper.ForgePing();
 
         CustomizeComponent();
 

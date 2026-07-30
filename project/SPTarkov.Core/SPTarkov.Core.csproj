@@ -21,7 +21,6 @@
     <PackageReference Include="SharpHDiffPatch.Core" Version="2.3.0" />
     <!-- Used the same as the installer does -->
     <PackageReference Include="SemanticVersioning" Version="3.0.0" />
-    <PackageReference Include="System.Threading.RateLimiting" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>

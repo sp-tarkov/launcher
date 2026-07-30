@@ -195,7 +195,6 @@
     private string FailureMessage(UpdateFailure failure) =>
         failure switch
         {
-            UpdateFailure.ModTaskInProgress => LocaleHelper.Get("update_install_mods_active"),
             UpdateFailure.InsufficientSpace => LocaleHelper.Get("update_install_no_space"),
             UpdateFailure.NotWritable => LocaleHelper.Get("update_install_not_writable"),
             UpdateFailure.Download => LocaleHelper.Get("update_install_download_failed"),

@@ -48,17 +48,6 @@ public class TitleHelper(LocaleHelper localeHelper, StateHelper stateHelper)
 
             case "info":
                 return [localeHelper.Get("info")];
-
-            case "forge":
-                return ["Forge"];
-
-            case "modloader":
-                return [localeHelper.Get("mod_loader")];
-        }
-
-        if (key.StartsWith("forgemod"))
-        {
-            return dynamicLeaf is { Length: > 0 } ? ["Forge", dynamicLeaf] : ["Forge"];
         }
 
         return null;
