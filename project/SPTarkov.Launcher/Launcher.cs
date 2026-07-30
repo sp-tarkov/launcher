@@ -50,11 +50,6 @@ public class Launcher
         EmbedProvider = new ManifestEmbeddedFileProvider(typeof(Launcher).Assembly, "wwwroot");
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(EmbedProvider, args);
 
-        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux())
-        {
-            throw new PlatformNotSupportedException();
-        }
-
         appBuilder
             .Services.AddSingleton<ConfigHelper>()
             .AddSingleton<GameHelper>()
@@ -67,7 +62,6 @@ public class Launcher
             .AddSingleton<FilePatcher>()
             .AddSingleton<WindowsClipboard>()
             .AddSingleton<LinuxHelper>()
-            .AddSingleton<ValidationUtil>()
             .AddSingleton<BrowserBridge>()
             .AddLogging(builder =>
             {
