@@ -1,0 +1,152 @@
+﻿@inject ISnackbar Snackbar
+@inject StateHelper StateHelper
+@inject HttpHelper HttpHelper
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            @if (_requestInProgress)
+            {
+                <MudContainer Class="d-flex flex-column align-center gap-4">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                    <MudText>@_taskText</MudText>
+                </MudContainer>
+            }
+            else
+            {
+                <MudText>@(LocaleHelper.Get("profile_remove_text"))</MudText>
+
+                <div class="mt-3 pa-3 border-2 border-solid mud-border-lines-default rounded dialog-detail-list">
+                    <MudText Typo="Typo.caption">@(LocaleHelper.Get("profile_card_name"))</MudText>
+                    <MudText Typo="Typo.body2">@MiniProfile.Username</MudText>
+                    <MudText Typo="Typo.caption">@(LocaleHelper.Get("profile_card_level"))</MudText>
+                    <MudText Typo="Typo.body2">@MiniProfile.CurrentLevel</MudText>
+                    <MudText Typo="Typo.caption">@(LocaleHelper.Get("profile_card_id"))</MudText>
+                    <MudText Typo="Typo.body2" Class="card-mono">@MiniProfile.ProfileId</MudText>
+                </div>
+
+                <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy danger-button ml-auto" Variant="Variant.Filled" Color="Color.Default" @onclick="RunDeleteTask">@(LocaleHelper.Get("profile_remove_confirm"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" @onclick="UserCancelled">@(LocaleHelper.Get("profile_remove_cancel"))</MudButton>
+                </MudContainer>
+            }
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public MiniProfile MiniProfile { get; set; } = default!;
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private bool _requestInProgress;
+    private string _taskText = "";
+    private SPTLoginRequest Request { get; } = new();
+    private CancellationTokenSource Token { get; set; } = new();
+    private bool UserCancel { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Request.Username = MiniProfile.Username;
+        base.OnInitialized();
+    }
+
+    private async Task RunDeleteTask()
+    {
+        bool result;
+        _requestInProgress = true;
+        try
+        {
+            result = await CallServer(LocaleHelper.Get("profile_remove_task_1"), LocaleHelper.Get("profile_remove_task_fail"));
+        }
+        catch (TaskCanceledException) when (Token.IsCancellationRequested)
+        {
+            AbortOrFail(LocaleHelper.Get("request_timed_out"));
+            return;
+        }
+        catch (HttpRequestException)
+        {
+            AbortOrFail();
+            return;
+        }
+        catch (Exception)
+        {
+            AbortOrFail();
+            return;
+        }
+
+        if (result)
+        {
+            Submit();
+            _requestInProgress = false;
+        }
+    }
+
+    private async Task<bool> CallServer(string taskText = "", string failString = "")
+    {
+        try
+        {
+            Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            _taskText = taskText;
+            StateHasChanged();
+            await Task.Delay(20);
+
+            var returnResult = await HttpHelper.GameServerPut<SPTRemoveResponse>(Urls.Remove, Request, Token.Token);
+
+            if (returnResult is null)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
+            StateHelper.ProfileList = returnResult.Profiles;
+            var result = returnResult.Response;
+
+            if (!result)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
+            Token.Dispose();
+            return true;
+        }
+        catch (Exception)
+        {
+            AbortOrFail();
+            return false;
+        }
+    }
+
+    private void Submit()
+    {
+        Snackbar.Add($"{LocaleHelper.Get("profile_remove_task_success")}: {MiniProfile.Username}!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(MiniProfile));
+    }
+
+    private void AbortOrFail(string? message = null)
+    {
+        message ??= LocaleHelper.Get("profile_remove_task_default");
+
+        if (!UserCancel)
+        {
+            Snackbar.Add(message, Severity.Error);
+        }
+
+        Token.Cancel();
+        MudDialog.Cancel();
+        _requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        _requestInProgress = false;
+        Token.Cancel();
+        MudDialog.Cancel();
+    }
+
+}

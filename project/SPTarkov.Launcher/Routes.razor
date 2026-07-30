@@ -1,0 +1,15 @@
+﻿@inject LocaleHelper LocaleHelper
+
+<Router AppAssembly="@typeof(Launcher).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+    </Found>
+    <NotFound>
+        <div>
+            <span>
+                @(LocaleHelper.Get("page_not_found"))
+            </span>
+        </div>
+    </NotFound>
+</Router>

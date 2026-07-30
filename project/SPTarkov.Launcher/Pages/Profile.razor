@@ -1,0 +1,331 @@
+﻿@page "/Profile"
+
+@inject StateHelper StateHelper
+@inject GameHelper GameHelper
+@inject ILogger<Profile> Logger
+@inject NavigationManager NavigationManager
+@inject LocaleHelper LocaleHelper
+@inject ConfigHelper ConfigHelper
+@inject ISnackbar Snackbar
+@inject HttpHelper HttpHelper
+@inject IDialogService DialogService
+
+<MudContainer Class="px-4 my-2" MaxWidth="MaxWidth.Large">
+    <MudContainer Class="pa-0 mb-4 d-flex flex-row justify-space-between relative">
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
+        <div class="profile-name-overlay d-flex flex-row align-center gap-2 no-pointers no-select">
+            <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" Style="@ProfileIconStyle"/>
+            <MudText Typo="Typo.h5">@(SelectedMiniProfile.Nickname == "unknown" ? "No character created yet" : SelectedMiniProfile.Nickname)</MudText>
+        </div>
+        <MudSpacer/>
+        @if (ShowWipeCheckbox)
+        {
+            <MudPaper Elevation="2" Class="px-2 py-0 d-flex flex-row justify-center align-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container mr-2 wipe-control">
+                <MudCheckBox T="bool" Value="CheckboxForWipe" ValueChanged="OnWipeCheckboxChanged" Class="wipe-checkbox" Disabled="@_buttonDisabled">@(LocaleHelper.Get("profile_wipe_checkbox"))</MudCheckBox>
+            </MudPaper>
+        }
+        <MudButton Class="@($"mud-button-border-copy border-2 border-solid mud-button-inner-text-copy{(CheckboxForWipe ? " danger-button" : "")}")" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="StartGameTask" EndIcon="@Icons.Material.Filled.ArrowForward" Size="Size.Medium" IconColor="@(CheckboxForWipe ? Color.Inherit : Color.Success)">@(CheckboxForWipe ? LocaleHelper.Get("profile_wipe_and_start") : LocaleHelper.Get("profile_start_game"))</MudButton>
+    </MudContainer>
+    <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
+        <ProfileCardComponent MiniProfile="SelectedMiniProfile" HideDeleteButton="true"/>
+        <ProfileStatsComponent MiniProfile="SelectedMiniProfile"/>
+    </MudContainer>
+    <MudContainer Class="pa-0 mb-4">
+        <MudPaper Elevation="2" Class="pa-2 px-2 d-flex flex-row justify-center gap-8 mud-background-gray border-2 border-solid mud-border-lines-default card-container">
+            <MudText Typo="Typo.h6">₽: @SelectedMiniProfile.ProfileCurrency.Roubles</MudText>
+            <MudText Typo="Typo.h6">$: @SelectedMiniProfile.ProfileCurrency.Dollars</MudText>
+            <MudText Typo="Typo.h6">€: @SelectedMiniProfile.ProfileCurrency.Euros</MudText>
+            <MudText Typo="Typo.h6">GP: @SelectedMiniProfile.ProfileCurrency.GP</MudText>
+        </MudPaper>
+    </MudContainer>
+    <MudContainer Class="pa-0 mb-4 d-flex flex-row gap-4 justify-center">
+        <ProfileLevelComponent CurrentExp="SelectedMiniProfile.CurrentExp" CurrentLevel="SelectedMiniProfile.CurrentLevel" NeededExp="SelectedMiniProfile.NextLevel"/>
+    </MudContainer>
+</MudContainer>
+
+@code {
+    private bool CheckboxForWipe { get; set; }
+    private MiniProfile SelectedMiniProfile { get; set; } = default!;
+    private bool _buttonDisabled;
+    private bool ShowWipeCheckbox => !SelectedMiniProfile.Wipe;
+
+    // Deterministic per-profile tint for the name glyph, hashed from the username.
+    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor(SelectedMiniProfile.Username)};";
+
+    protected override void OnInitialized()
+    {
+        if (StateHelper.SelectedProfile is null)
+        {
+            NavigationManager.NavigateTo("/ServerPageWrapper/false");
+            return;
+        }
+
+        SelectedMiniProfile = StateHelper.SelectedProfile;
+        Logger.LogDebug("Selected profile: {Username}", SelectedMiniProfile?.Username);
+
+        base.OnInitialized();
+    }
+
+    private async Task OnWipeCheckboxChanged(bool value)
+    {
+        if (!value)
+        {
+            CheckboxForWipe = false;
+            return;
+        }
+
+        var dialogParams = new DialogParameters
+        {
+            {
+                "MiniProfile", SelectedMiniProfile
+            }
+        };
+
+        var dialog = await DialogService.ShowAsync<ProfileWipeDialog>(LocaleHelper.Get("profile_wipe_confirm_title"), dialogParams, ConfigHelper.DialogOptions);
+        var result = await dialog.Result;
+
+        CheckboxForWipe = result?.Canceled is false;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Wrap the StartGame method to easily control navigation.
+    /// </summary>
+    private async Task StartGameTask()
+    {
+        _buttonDisabled = true;
+        StateHelper.SetAllowNavigation(false);
+
+        await StartGame();
+        await RefreshProfiles();
+
+        CheckboxForWipe = false;
+
+        _buttonDisabled = false;
+
+        // This is currently not working on Linux - Photino Bug
+        if (ConfigHelper.GetConfig().MinimizeOnLaunch)
+        {
+            Launcher.App.MainWindow.SetMinimized(false);
+        }
+
+        StateHelper.SetAllowNavigation(true);
+    }
+
+    private async Task RefreshProfiles()
+    {
+        Snackbar.Add(LocaleHelper.Get("profile_update_request"));
+        if (await GetUpdatedProfiles())
+        {
+            // if this succeeded, we don't need to go further
+            StateHasChanged();
+            return;
+        }
+
+        if (await GetUpdatedProfile())
+        {
+            // if this succeeded, we don't need to go further
+            StateHasChanged();
+        }
+
+        // if we get here, something fucked up
+    }
+
+    private async Task<bool> GetUpdatedProfile()
+    {
+        var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        try
+        {
+            var requestObject = new SPTLoginRequest
+            {
+                Username = SelectedMiniProfile.Username
+            };
+
+            var returnResult = await HttpHelper.GameServerPut<SPTProfileResponse>(Urls.Profile, requestObject, token.Token);
+            var result = returnResult?.Response;
+
+            if (result is null)
+            {
+                return false;
+            }
+
+            StateHelper.SelectedProfile = result;
+            SelectedMiniProfile = StateHelper.SelectedProfile;
+
+            token.Dispose();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Exception occured in updating profile: {e}", e);
+            await token.CancelAsync();
+            return false;
+        }
+    }
+
+    private async Task<bool> GetUpdatedProfiles()
+    {
+        var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        try
+        {
+            var returnResult = await HttpHelper.GameServerGet<SPTProfilesResponse>(Urls.Profiles, token.Token);
+            StateHelper.ProfileList = returnResult?.Response!;
+            var result = returnResult?.Response;
+
+            if (result is null || !result.Any())
+            {
+                return false;
+            }
+
+            var updatedProfile = StateHelper.ProfileList?.FirstOrDefault(x => x.ProfileId == SelectedMiniProfile.ProfileId);
+
+            if (updatedProfile is null)
+            {
+                return false;
+            }
+
+            StateHelper.SelectedProfile = updatedProfile;
+            SelectedMiniProfile = updatedProfile;
+
+            token.Dispose();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Exception occured in updating profiles: {e}", e);
+            await token.CancelAsync();
+            return false;
+        }
+    }
+
+    private async Task StartGame()
+    {
+        Snackbar.Add(LocaleHelper.Get("profile_page_task_1"));
+        if (!await GameHelper.CheckGame())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"{LocaleHelper.Get("profile_page_task_1_fail")}: {message}", Severity.Error);
+            return;
+        }
+
+        // initial snackbar.add is inside wipeprofile for this one
+        if (CheckboxForWipe && !await WipeProfile())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"{LocaleHelper.Get("profile_unable_wipe")}: {message}", Severity.Error);
+            return;
+        }
+
+        if (ConfigHelper.GetConfig().ClearCacheOnLaunch && !await ClearCache())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"{LocaleHelper.Get("profile_unable_clear")}: {message}", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add(LocaleHelper.Get("profile_page_task_2"));
+        if (!await GameHelper.PatchGame())
+        {
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"{LocaleHelper.Get("profile_page_task_2_fail")}: {message}", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add(LocaleHelper.Get("profile_page_task_3"));
+        if (OperatingSystem.IsWindows())
+        {
+            if (!GameHelper.LaunchGame())
+            {
+                var message = GameHelper.ErrorMessage;
+                Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
+                return;
+            }
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            if (!GameHelper.LaunchGameLinux())
+            {
+                var message = GameHelper.ErrorMessage;
+                Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
+                return;
+            }
+        }
+
+        // If enabled, remember this server/profile so the next launcher startup can auto-connect straight to the profile page.
+        if (ConfigHelper.GetConfig().AutoConnectLastProfile && StateHelper.SelectedServer is not null && StateHelper.SelectedProfile is not null)
+        {
+            ConfigHelper.SetPreferredProfile(StateHelper.SelectedServer.ServerId, StateHelper.SelectedProfile.ProfileId);
+        }
+
+        if (ConfigHelper.GetConfig().MinimizeOnLaunch)
+        {
+            Launcher.App.MainWindow.SetMinimized(true);
+        }
+
+        if (!await GameHelper.MonitorGame())
+        {
+            Snackbar.Add(LocaleHelper.Get("profile_page_game_closed"), Severity.Info);
+        }
+    }
+
+    private void ReturnToProfiles()
+    {
+        StateHelper.SetSelectedProfile(null);
+        NavigationManager.NavigateTo("/ServerPageWrapper/false");
+    }
+
+    private async Task<bool> WipeProfile()
+    {
+        Snackbar.Add(LocaleHelper.Get("profile_wipe"));
+        var token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        try
+        {
+            var wipeRequest = new SPTRegisterRequest
+            {
+                Edition = SelectedMiniProfile.Edition,
+                Username = SelectedMiniProfile.Username
+            };
+
+            var returnResult = await HttpHelper.GameServerPut<SPTWipeResponse>(Urls.Wipe, wipeRequest, token.Token);
+
+            if (returnResult is null)
+            {
+                return false;
+            }
+
+            StateHelper.ProfileList = returnResult.Profiles;
+            var result = returnResult.Response;
+
+            if (!result)
+            {
+                return false;
+            }
+
+            token.Dispose();
+            return true;
+        }
+        catch (Exception)
+        {
+            await token.CancelAsync();
+            return false;
+        }
+    }
+
+    private async Task<bool> ClearCache()
+    {
+        Snackbar.Add(LocaleHelper.Get("profile_clear"));
+        if (Directory.Exists(Paths.SptAppDataFolder))
+        {
+            try
+            {
+                Directory.Delete(Paths.SptAppDataFolder, true);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("exception occured in clearing game cache: {e}", e);
+            }
+        }
+
+        return true;
+    }
+}

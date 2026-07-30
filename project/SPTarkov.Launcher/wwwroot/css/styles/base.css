@@ -1,0 +1,26 @@
+:root {
+    --launcher-font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    --mud-typography-default-family: var(--launcher-font-family) !important;
+    --mud-typography-h1-family: var(--launcher-font-family) !important;
+    --mud-typography-h2-family: var(--launcher-font-family) !important;
+    --mud-typography-h3-family: var(--launcher-font-family) !important;
+    --mud-typography-h4-family: var(--launcher-font-family) !important;
+    --mud-typography-h5-family: var(--launcher-font-family) !important;
+    --mud-typography-h6-family: var(--launcher-font-family) !important;
+    --mud-typography-subtitle1-family: var(--launcher-font-family) !important;
+    --mud-typography-subtitle2-family: var(--launcher-font-family) !important;
+    --mud-typography-body1-family: var(--launcher-font-family) !important;
+    --mud-typography-body2-family: var(--launcher-font-family) !important;
+    --mud-typography-button-family: var(--launcher-font-family) !important;
+    --mud-typography-caption-family: var(--launcher-font-family) !important;
+    --mud-typography-overline-family: var(--launcher-font-family) !important;
+
+    /* Hide the native scrollbar app-wide; wheel/drag scrolling still works. */
+    scrollbar-width: none !important;
+}
+
+html body {
+    /* noinspection CssNoGenericFontName */
+    font-family: var(--launcher-font-family);
+    background-color: rgba(39, 39, 47, 1) !important;
+}

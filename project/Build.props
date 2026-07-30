@@ -1,0 +1,25 @@
+<Project>
+    <PropertyGroup>
+        <!-- SPT specific  -->
+        <SptVersion Condition="'$(SptVersion)' == ''">4.1.0</SptVersion>
+        <SptCommitTag Condition="'$(SptCommitTag)' == ''">abc123a</SptCommitTag>
+
+        <!-- Launcher revision - Always 0 in source - Overridden by the release workflow. -->
+        <LauncherRevision Condition="'$(LauncherRevision)' == ''">0</LauncherRevision>
+
+        <Version>$(SptVersion).$(LauncherRevision)</Version>
+        <AssemblyVersion>$(SptVersion).$(LauncherRevision)</AssemblyVersion>
+        <FileVersion>$(SptVersion).$(LauncherRevision)</FileVersion>
+        <InformationalVersion>$(SptVersion).$(LauncherRevision)+$(SptCommitTag)</InformationalVersion>
+
+        <!-- Project settings -->
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!-- 1591 suppresses the missing-XML-comment warning for undocumented public members. -->
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <RepositoryType>Git</RepositoryType>
+        <CETCompat>false</CETCompat>
+    </PropertyGroup>
+</Project>

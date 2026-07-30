@@ -1,0 +1,7 @@
+Roboto (variable) font files in this folder are Copyright the Roboto Project Authors
+(https://github.com/googlefonts/roboto) and are licensed under the Apache License, Version 2.0:
+https://www.apache.org/licenses/LICENSE-2.0
+
+Bundled here (self-hosted) so the launcher renders with the same typography on every platform
+instead of relying on an OS fallback font. Files are the latin, latin-ext, and cyrillic subsets
+of the weight-variable (wght 100-900) Roboto, sourced from @fontsource-variable/roboto.

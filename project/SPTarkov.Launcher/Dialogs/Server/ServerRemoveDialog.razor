@@ -1,0 +1,42 @@
+﻿@inject ISnackbar Snackbar
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            <MudText>@(LocaleHelper.Get("server_remove_text"))</MudText>
+
+            <div class="mt-3 pa-3 border-2 border-solid mud-border-lines-default rounded dialog-detail-list">
+                <MudText Typo="Typo.caption">@(LocaleHelper.Get("server_add_name"))</MudText>
+                <MudText Typo="Typo.body2">@Server.Name</MudText>
+                <MudText Typo="Typo.caption">@(LocaleHelper.Get("server_add_address"))</MudText>
+                <MudText Typo="Typo.body2" Class="card-mono">@Server.IpAddress</MudText>
+            </div>
+
+            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy danger-button ml-auto" Variant="Variant.Filled" Color="Color.Default" OnClick="Submit">@(LocaleHelper.Get("server_remove_confirm"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">@(LocaleHelper.Get("server_remove_cancel"))</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public Server Server { get; set; } = default!;
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private void Submit()
+    {
+        Snackbar.Add(LocaleHelper.Get("server_remove_submit"));
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+}

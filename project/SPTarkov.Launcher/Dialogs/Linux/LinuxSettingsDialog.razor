@@ -1,0 +1,100 @@
+@inject ISnackbar Snackbar
+@inject LocaleHelper LocaleHelper
+@inject ConfigHelper ConfigHelper
+@inject LinuxHelper LinuxHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            <MudAlert Variant="Variant.Outlined" Severity="Severity.Warning">@(LocaleHelper.Get("linux_add_warning"))</MudAlert>
+            <MudForm Model="LinuxSettings" @bind-IsValid="@_success" Class="gap-2 mt-3">
+
+                <MudTextField Immediate="true" @bind-Value="LinuxSettings!.PrefixPath" Label="@(LocaleHelper.Get("linux_add_prefix"))"
+                              Required="true" RequiredError="@(LocaleHelper.Get("linux_add_prefix_required"))" Variant="Variant.Outlined"
+                              Margin="Margin.Dense" HelperText="/home/cwx/Games/tarkov" HelperTextOnFocus="true" Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Default"
+                              OnAdornmentClick="SetPrefixPath"/>
+
+                <MudTextField Immediate="true" @bind-Value="LinuxSettings!.UmuPath" Label="@(LocaleHelper.Get("linux_add_umu"))"
+                              Required="true" RequiredError="@(LocaleHelper.Get("linux_add_umu_required"))" Variant="Variant.Outlined"
+                              Margin="Margin.Dense" HelperText="/home/cwx/.local/share/spt-additions/runtime/umu-run"
+                              HelperTextOnFocus="true" AdornmentIcon="@Icons.Material.Filled.Folder" Adornment="Adornment.End"
+                              AdornmentColor="Color.Default" OnAdornmentClick="SetUmuPath"/>
+
+                <MudTextField Immediate="true" @bind-Value="LinuxSettings!.LaunchSettings"
+                              Label="@(LocaleHelper.Get("linux_add_launch_settings"))"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Placeholder="@(LocaleHelper.Get("linux_add_launch_settings_placeholder"))"/>
+
+                <MudSelect T="string" @bind-Value="LinuxSettings!.ProtonVersion" Clearable="false"
+                           Label="@(LocaleHelper.Get("linux_add_proton"))" Required="true"
+                           RequiredError="@(LocaleHelper.Get("linux_add_proton_required"))" Variant="Variant.Outlined"
+                           Margin="Margin.Dense" Placeholder="@(LocaleHelper.Get("linux_add_proton_placeholder"))">
+                    @foreach (var item in ProtonList)
+                    {
+                        <MudSelectItem Value="@item">@item</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudForm>
+            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled"
+                           Color="Color.Primary" Disabled="@(!_success)"
+                           OnClick="Submit">@(LocaleHelper.Get("linux_add_confirm"))</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+
+    private bool _success;
+    private List<string> ProtonList { get; set; } = [];
+
+    public LinuxSettings? LinuxSettings { get; set; } = new();
+
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ProtonList = await LinuxHelper.GetProtonVersions();
+        LinuxSettings!.ProtonVersion = ProtonList.FirstOrDefault("GE-Proton11-1");
+
+        await base.OnParametersSetAsync();
+    }
+
+    private void Submit()
+    {
+        ConfigHelper.SetLinuxSettings(LinuxSettings!);
+
+        Snackbar.Add(LocaleHelper.Get("linux_add_success"), Severity.Success);
+        MudDialog!.Close(DialogResult.Ok(true));
+    }
+
+    private async Task SetUmuPath()
+    {
+        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+
+        // no folder was selected
+        if (!folder.Any())
+        {
+            return;
+        }
+
+        LinuxSettings!.UmuPath = folder.FirstOrDefault()!;
+    }
+
+    private async Task SetPrefixPath()
+    {
+        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+
+        // no folder was selected
+        if (!folder.Any())
+        {
+            return;
+        }
+
+        LinuxSettings!.PrefixPath = folder.FirstOrDefault()!;
+    }
+
+}

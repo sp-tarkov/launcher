@@ -1,0 +1,363 @@
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using SPTarkov.Core.Configuration;
+using SPTarkov.Core.SPT;
+
+namespace SPTarkov.Core.Helpers;
+
+public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
+{
+    private const string KeyStartingCharacter = "[";
+
+    public string? FindWineRegValue(string key, string valueName)
+    {
+        var reader = new StreamReader(Path.Join(configHelper.GetConfig().LinuxSettings.PrefixPath, "system.reg"));
+        string? line;
+        string? secondLine;
+        var foundIt = false;
+
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = line.Trim();
+
+            if (line.StartsWith(KeyStartingCharacter))
+            {
+                foundIt = line.Contains(key);
+            }
+
+            if (foundIt)
+            {
+                while ((secondLine = reader.ReadLine()) != null)
+                {
+                    if (secondLine.Contains(valueName))
+                    {
+                        // Example value to get "InstallLocation"="C:\\Battlestate Games\\Escape from Tarkov"
+                        var keyWrapped = $"\"{valueName}\"=\""; // example: "InstallLocation"=" which is 19
+
+                        // remove the keyWrapped and the ending "
+                        return secondLine.Substring(keyWrapped.Length, secondLine.Length - keyWrapped.Length - 1); // -1 is for the ending "
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public string? GetOriginalGamePath()
+    {
+        var prefixPath = configHelper.GetConfig().LinuxSettings.PrefixPath;
+        if (string.IsNullOrEmpty(prefixPath))
+        {
+            logger.LogError("Prefix path is required");
+            return null;
+        }
+
+        var RegValueToLookFor = "InstallLocation";
+
+        try
+        {
+            var windowsLikePath = FindWineRegValue(Paths.UninstallEftRegKey, RegValueToLookFor);
+            return FixWithPrefix(windowsLikePath);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Failed to get EFT game path: {ex}");
+            return null;
+        }
+    }
+
+    private string FixWithPrefix(string? windowsLikePath)
+    {
+        var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
+        logger.LogDebug("pathWithoutDrive: {0}", pathWithoutDrive);
+        return string.Concat(configHelper.GetConfig().LinuxSettings.PrefixPath, pathWithoutDrive);
+    }
+
+    /// <summary>
+    /// reconstruct path used when installing EFT on linux to work on linux, using symlinks in dosdevice in the winePrefix
+    /// </summary>
+    /// <param name="windowsLikePath"></param>
+    /// <returns></returns>
+    public string FixWithPrefixValidation(string? windowsLikePath)
+    {
+        var pathAndDrive = windowsLikePath?.Replace(@"\\", "/").Split(":");
+        var s = Path.Join(
+            configHelper.GetConfig().LinuxSettings.PrefixPath,
+            "dosdevices",
+            $"{pathAndDrive![0].ToLower()}:", // [0] is drive letter.
+            pathAndDrive[1] // [1] path to game on that drive
+        );
+        return s;
+    }
+
+    /// <summary>
+    /// Runs an executable or Wine tool (<c>winecfg</c>, <c>winetricks</c>, <c>regedit</c>, etc.) inside the configured Wine/Proton
+    /// prefix via <c>umu-run</c>.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// RunInPrefix("EscapeFromTarkov.exe", args);           // launch any executable in the current working dir
+    /// RunInPrefix("winecfg");                              // open the winecfg menu
+    /// RunInPrefix("winetricks", ["-q", "win11"]);          // set the prefix's Windows version to Windows 11
+    /// RunInPrefix("winetricks", ["-q", "dotnetdesktop9"]); // install .NET Desktop 9
+    /// RunInPrefix("regedit");                              // open the regedit tool
+    /// </code>
+    /// </example>
+    public bool RunInPrefix(string cmd = "", List<string>? args = null)
+    {
+        // This looks something like: "/home/{username}/Games/tarkov"
+        // However this could be anything the user sets it too when they use MadBytes script.
+        var prefixPath = configHelper.GetConfig().LinuxSettings.PrefixPath;
+
+        // This looks something like this: "/home/{username}/.local/bin/umu-run"
+        var umuPath = configHelper.GetConfig().LinuxSettings.UmuPath;
+
+        // this looks something like this: "GE-Proton10-24"
+        var proton = configHelper.GetConfig().LinuxSettings.ProtonVersion;
+
+        if (string.IsNullOrEmpty(prefixPath) || string.IsNullOrEmpty(umuPath) || string.IsNullOrEmpty(proton))
+        {
+            logger.LogError("Prefix path or umu path or proton version are required");
+            return false;
+        }
+
+        // this looks something like: "/home/{username}/Games/tarkov/drive_c/SPTarkov"
+        var sptPath = configHelper.GetConfig().GamePath;
+
+        ProcessStartInfo? process;
+
+        // This is what needs to be done for GameScope to work.
+        // I don't know if this is used as much, so leave for now and implement a way later if needed/wanting
+        // var process = new ProcessStartInfo
+        // {
+        //     FileName = "gamescope",
+        //     UseShellExecute = false,
+        //     CreateNoWindow = false,
+        //     WorkingDirectory = sptPath,
+        //     Environment =
+        //     {
+        //         { "WINEPREFIX", prefixPath },
+        //         { "PROTONPATH", proton }
+        //     },
+        //     ArgumentList =
+        //     {
+        //         "-W2560",
+        //         "-H1440",
+        //         "--mangoapp",
+        //         "--",
+        //         umuPath,
+        //         cmd
+        //     }
+        // };
+
+        // I don't know if this actually helps in any way, but some use it
+        // User must install gamemode from package manager, try catch below will log it
+        if (configHelper.GetConfig().LinuxSettings.GameMode)
+        {
+            process = new ProcessStartInfo
+            {
+                FileName = "gamemoderun",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = sptPath,
+                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", proton } },
+                ArgumentList = { umuPath, cmd },
+            };
+        }
+        else
+        {
+            process = new ProcessStartInfo
+            {
+                FileName = "python3",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = sptPath,
+                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", proton } },
+                ArgumentList = { umuPath, cmd },
+            };
+        }
+
+        // Add these individually so they are not wrapped in ""
+        if (args != null)
+        {
+            foreach (var arg in args)
+            {
+                process.ArgumentList.Add(arg);
+            }
+        }
+
+        var launchSettings = ParseLaunchSettings();
+        foreach (var launchSetting in launchSettings)
+        {
+            if (launchSetting.Key.StartsWith("-"))
+            {
+                // this should be an arg
+                process.ArgumentList.Add($"{launchSetting.Key}={launchSetting.Value}");
+            }
+            else
+            {
+                // this should be an env
+                process.Environment.Add(launchSetting.Key, launchSetting.Value);
+            }
+        }
+
+        try
+        {
+            Process.Start(process);
+            logger.LogInformation("Game process started on linux");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError("Starting game process failed: {Exception}", ex);
+            return false;
+        }
+
+        return true;
+    }
+
+    // TODO: Maybe some Regex Guru can make this simpler
+    private Dictionary<string, string> ParseLaunchSettings()
+    {
+        var launchSettings = configHelper.GetConfig().LinuxSettings.LaunchSettings;
+        var result = new Dictionary<string, string>();
+
+        if (string.IsNullOrEmpty(launchSettings))
+        {
+            return result;
+        }
+
+        // So parsing this string into usable EnvVar's and Arguments might be a bit weird
+        // Most of the time I'd expect no spaces:
+        // EnvironmentVariableName=EnvironmentVariableValue
+        // -ArgumentName=ArgumentValue
+        // The - is the diff between them and EnvVar's afaik are all uppercase
+        // The only Edge Case I can think of is using a path as a variable in either. which would mean " " wrap the variable
+        // -ArgWantingPath="/path/to/something with a space"
+        // And because of this means I cant just split on whitespace.
+
+        // Trim outer edge
+        // MANGOHUD=1 -arg1=testing -arg2="some path with spaces/in it"
+        launchSettings = launchSettings.Trim();
+
+        var stringBuilder = new StringBuilder();
+        var name = string.Empty;
+        var value = string.Empty;
+        var isName = true; // Start as true as this comes first
+        var isValue = false;
+        var valueHasQuotes = false;
+        var checkedForQuotes = false;
+        var reset = false;
+
+        try
+        {
+            foreach (var charFromStr in launchSettings)
+            {
+                // Go through the string till we hit a =
+                // we now want to deal with the value
+                if (isName && charFromStr == '=')
+                {
+                    isName = false;
+                    isValue = true;
+                    name = stringBuilder.ToString();
+                    stringBuilder.Clear();
+                    continue;
+                }
+
+                if (isValue && checkedForQuotes && !valueHasQuotes && charFromStr == ' ')
+                {
+                    // end of Value, wasnt quotes so is whitespace
+                    // dont append and reset trackers and continue;
+                    value = stringBuilder.ToString();
+                    reset = true;
+                }
+
+                if (isValue && valueHasQuotes && charFromStr == '"')
+                {
+                    // this should be the end of the quoted string
+                    stringBuilder.Append("\"");
+                    value = stringBuilder.ToString();
+                    reset = true;
+                }
+
+                // the value could start with quotes " - this means we have to handle this variable slightly differently
+                if (isValue && !checkedForQuotes)
+                {
+                    // check to see if the first char is a "
+                    valueHasQuotes = charFromStr == '"';
+                    checkedForQuotes = true;
+                }
+
+                if (isValue && reset)
+                {
+                    result.Add((string)name.Clone(), (string)value.Clone());
+                    name = string.Empty;
+                    value = string.Empty;
+                    isName = true;
+                    isValue = false;
+                    valueHasQuotes = false;
+                    checkedForQuotes = false;
+                    stringBuilder.Clear();
+                    reset = false;
+                    continue;
+                }
+
+                // At the end of the value, there should be a space between envs and args
+                if (isName && charFromStr == ' ')
+                {
+                    // We should be able to skip this
+                    continue;
+                }
+
+                stringBuilder.Append(charFromStr);
+            }
+
+            // check if the name and value have anything at the end, if so, last arg/env had no space or " so add whats there
+            if (!string.IsNullOrEmpty(name))
+            {
+                value = stringBuilder.ToString();
+                result.Add((string)name.Clone(), (string)value.Clone());
+            }
+        }
+        catch (Exception e)
+        {
+            logger.LogWarning("unable to parse launch Settings of: {setting}, please format correctly: {e}", launchSettings, e);
+            return new Dictionary<string, string>();
+        }
+
+        return result;
+    }
+
+    public Task<List<string>> GetProtonVersions()
+    {
+        // Should contain things like "GE-Proton10-24" or "GE-Proton10-21"
+        // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
+        if (!Directory.Exists(Paths.ProtonPath))
+        {
+            logger.LogError("Proton path not found, make sure to run lutris or steam first");
+            // we want this to throw an exception, so just log this
+        }
+
+        var directoryContents = Directory.GetDirectories(Paths.ProtonPath);
+        var listStripped = new List<string>();
+
+        foreach (var directory in directoryContents)
+        {
+            // remove LegacyRuntime
+            if (directory.Contains("LegacyRuntime"))
+            {
+                continue;
+            }
+
+            // split on / and get last
+            listStripped.Add(directory.Split("/").Last());
+        }
+
+        return Task.FromResult(listStripped);
+    }
+
+    [DllImport("libc", EntryPoint = "setenv", SetLastError = true)]
+    public static extern int SetEnvironmentVariableNative(string name, string value, int overwrite);
+}

@@ -1,0 +1,20 @@
+@inject LocaleHelper LocaleHelper
+
+<MudItem sm="8">
+    <MudTabs Centered="true" Color="Color.Dark" Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2" Class="mud-background-gray border-2 border-solid mud-border-lines-default card-container info-card-height">
+        <MudTabPanel Text="@(LocaleHelper.Get("profile_stats_overall"))">
+            <ProfileStatsPanelComponent Stats="@MiniProfile.ProfileStats.Overall"/>
+        </MudTabPanel>
+        <MudTabPanel Text="@(LocaleHelper.Get("profile_stats_pmc"))">
+            <ProfileStatsPanelComponent Stats="@MiniProfile.ProfileStats.Pmc"/>
+        </MudTabPanel>
+        <MudTabPanel Text="@(LocaleHelper.Get("profile_stats_scav"))">
+            <ProfileStatsPanelComponent Stats="@MiniProfile.ProfileStats.Scav"/>
+        </MudTabPanel>
+    </MudTabs>
+</MudItem>
+
+@code {
+    [Parameter]
+    public MiniProfile MiniProfile { get; set; } = default!;
+}

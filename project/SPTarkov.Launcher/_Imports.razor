@@ -1,0 +1,41 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.Extensions.Logging
+@using Microsoft.JSInterop
+@using System.Diagnostics
+@using System.Reflection
+@using System.IO
+@using System.Collections.Specialized
+
+@using MudBlazor
+@using MudBlazor.Components.Snackbar.InternalComponents
+@using MudBlazor.Utilities
+
+@using SPTarkov.Core
+@using SPTarkov.Core.Helpers
+@using SPTarkov.Core.Configuration
+@using SPTarkov.Core.SPT
+@using SPTarkov.Core.SPT.Requests
+@using SPTarkov.Core.SPT.Responses
+
+@using SPTarkov.Launcher.Helpers
+@using SPTarkov.Launcher.Platform
+@using SPTarkov.Launcher.Shared
+@using SPTarkov.Launcher.Dialogs.Profile
+@using SPTarkov.Launcher.Dialogs.Server
+@using SPTarkov.Launcher.Pages
+@using SPTarkov.Launcher.Components
+@using SPTarkov.Launcher.Components.Home
+@using SPTarkov.Launcher.Components.Navigation
+@using SPTarkov.Launcher.Components.Profiles
+@using SPTarkov.Launcher.Components.Profiles.Profile
+@using SPTarkov.Launcher.Components.Settings
+@using SPTarkov.Launcher.Components.Info
+
+@using Size = MudBlazor.Size
+@using Version = SemanticVersioning.Version;

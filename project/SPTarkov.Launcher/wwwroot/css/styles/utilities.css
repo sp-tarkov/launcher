@@ -1,0 +1,74 @@
+.no-pointers {
+    pointer-events: none;
+}
+
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.text-overflow {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.unset {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.disabled-switch {
+    opacity: 50%;
+}
+
+.edition-text {
+    background-color: #303038;
+}
+
+.mod-thumbnail {
+    max-width: 144px;
+    max-height: 144px;
+    border-radius: 3px;
+}
+
+/* Row hover-highlight, used on settings rows and mod download rows. */
+a.setting-on-hover {
+    border-radius: 5px;
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+        background-color: rgba(170, 170, 170, 0.2);
+    }
+}
+
+a.download-on-hover {
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+        background-color: rgba(170, 170, 170, 0.2);
+    }
+}
+
+.setting-on-hover-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.mud-button-border-copy {
+    border-color: rgba(255, 255, 255, 0.118) !important;
+}
+
+.mud-button-inner-text-copy {
+    color: rgba(255, 255, 255, 0.698) !important;
+}
+
+/* Compound .mud-button selector keeps the red fill ahead of the frosted .mud-button surface override. */
+.mud-button.danger-button {
+    background-color: #c62828 !important;
+    color: #000 !important;
+    border-color: #7f1d1d !important;
+    white-space: nowrap;
+    box-shadow: none !important;
+}

@@ -1,0 +1,122 @@
+@inject ISnackbar Snackbar
+@inject SessionHelper SessionHelper
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            @if (_requestInProgress)
+            {
+                <MudContainer Class="d-flex flex-column align-center gap-4">
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                    <MudText>@_taskText</MudText>
+                </MudContainer>
+            }
+            else
+            {
+                <MudForm Model="Request" @bind-IsValid="@_success" Class="gap-2 mt-3">
+                    <MudTextField Immediate="true" @bind-Value="Request.Username" Label="@(LocaleHelper.Get("profile_login_username"))" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="false" Required="true"/>
+                </MudForm>
+            }
+
+            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                @if (MiniProfile is null && !_requestInProgress)
+                {
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" StartIcon="@Icons.Material.Filled.Login" IconColor="Color.Success" Variant="Variant.Filled" Color="Color.Dark" Size="Size.Medium" @onclick="RunLoginTask">@(LocaleHelper.Get("profile_login_confirm"))</MudButton>
+                }
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Dark" @onclick="UserCancelled">@(LocaleHelper.Get("profile_login_cancel"))</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public MiniProfile? MiniProfile { get; set; }
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private bool _success;
+    private bool _requestInProgress;
+    private string _taskText = "";
+    private SPTLoginRequest Request { get; } = new();
+    private CancellationTokenSource Token { get; } = new();
+    private bool UserCancel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (MiniProfile is null)
+        {
+            return;
+        }
+
+        // A profile passed in runs immediately.
+        Request.Username = MiniProfile.Username;
+        await RunLoginTask();
+    }
+
+    private async Task RunLoginTask()
+    {
+        _requestInProgress = true;
+        _taskText = LocaleHelper.Get("profile_login_task_1");
+        StateHasChanged();
+
+        await Task.Delay(250); // Prevents dialogue flash.
+
+        var success = MiniProfile is not null
+            ? await SessionHelper.LoginToProfileAsync(MiniProfile, Token.Token)
+            : await LoginWithDetails();
+
+        if (success)
+        {
+            Submit();
+            _requestInProgress = false;
+        }
+        else
+        {
+            AbortOrFail(LocaleHelper.Get("profile_login_task_fail"));
+        }
+    }
+
+    private async Task<bool> LoginWithDetails()
+    {
+        var profile = await SessionHelper.LoginWithDetailsAsync(Request.Username, Token.Token);
+        if (profile is null)
+        {
+            return false;
+        }
+
+        MiniProfile = profile;
+        return true;
+    }
+
+    private void Submit()
+    {
+        Snackbar.Add($"{LocaleHelper.Get("profile_login_task_success")} {MiniProfile?.Username}!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(MiniProfile));
+    }
+
+    private void AbortOrFail(string? message = null)
+    {
+        message ??= LocaleHelper.Get("profile_login_task_default");
+
+        if (!UserCancel)
+        {
+            Snackbar.Add(message, Severity.Error);
+        }
+
+        Token.Cancel();
+        MudDialog.Cancel();
+        _requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        _requestInProgress = false;
+        Token.Cancel();
+        MudDialog.Cancel();
+    }
+}

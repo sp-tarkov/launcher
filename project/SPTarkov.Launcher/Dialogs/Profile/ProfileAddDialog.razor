@@ -1,0 +1,180 @@
+﻿@inject ISnackbar Snackbar
+@inject StateHelper StateHelper
+@inject HttpHelper HttpHelper
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="form-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        @if (_requestInProgress)
+        {
+            <div class="d-flex flex-column align-center gap-4 py-4">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                <MudText>@_taskText</MudText>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-center gap-3">
+                    <div class="dialog-header-icon" style="@ProfileIconStyle">
+                        <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Inherit"/>
+                    </div>
+                    <MudText Typo="Typo.h6">@(LocaleHelper.Get("profile_add_title"))</MudText>
+                </div>
+
+                <MudText>@(LocaleHelper.Get("profile_add_text"))</MudText>
+
+                <MudForm Model="Request" Class="gap-3">
+                    <MudSelect T="string" @bind-Value="Request.Edition" Variant="Variant.Outlined" Label="@(LocaleHelper.Get("profile_add_edition"))" ShrinkLabel="true" Margin="Margin.Dense" Dense="true" Required="true" MaxHeight="200">
+                        @foreach (var edition in ServerEditions)
+                        {
+                            <MudSelectItem Value="@edition"/>
+                        }
+                    </MudSelect>
+
+                    @if (EditionDescription(Request.Edition) != "")
+                    {
+                        <MudCard Class="pa-2 edition-text" Outlined="true">
+                            <MudText>@EditionDescription(Request.Edition)</MudText>
+                        </MudCard>
+                    }
+
+                    <MudTextField Immediate="true" @bind-Value="Request.Username" Label="@(LocaleHelper.Get("profile_add_name"))" HelperText="@(LocaleHelper.Get("profile_add_name_help"))" ShrinkLabel="true" Variant="Variant.Outlined" Margin="Margin.Dense" Required="true" OnKeyDown="SubmitOnEnter"/>
+                </MudForm>
+
+                <div class="mt-2 d-flex justify-end gap-2">
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!CanSubmit)" OnClick="RunAddTask">@(LocaleHelper.Get("profile_add_confirm"))</MudButton>
+                    <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="UserCancelled">@(LocaleHelper.Get("profile_add_cancel"))</MudButton>
+                </div>
+            </div>
+        }
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private bool _requestInProgress;
+    private string _taskText = "";
+    public SPTRegisterRequest Request = new();
+    private List<string> ServerEditions { get; set; } = [];
+    private CancellationTokenSource Token { get; set; } = new();
+    private bool UserCancel { get; set; }
+    private bool CanSubmit => !string.IsNullOrWhiteSpace(Request.Edition) && !string.IsNullOrWhiteSpace(Request.Username);
+
+    private string EditionDescription(string edition) => StateHelper.ProfileTypes.GetValueOrDefault(edition, "");
+
+    // Matches the tint the profile card icon gets in the listing.
+    private string ProfileIconStyle => $"color: {ModPageVisual.GetColor(Request.Username)};";
+
+    private async Task SubmitOnEnter(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter" && CanSubmit)
+        {
+            await RunAddTask();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ServerEditions = StateHelper.ProfileTypes.Keys.ToList();
+        base.OnInitialized();
+    }
+
+    private async Task RunAddTask()
+    {
+        bool result;
+        _requestInProgress = true;
+        try
+        {
+            result = await CallServer(LocaleHelper.Get("profile_add_task_1"), LocaleHelper.Get("profile_add_task_fail"));
+        }
+        catch (TaskCanceledException) when (Token.IsCancellationRequested)
+        {
+            AbortOrFail(LocaleHelper.Get("request_timed_out"));
+            return;
+        }
+        catch (HttpRequestException)
+        {
+            AbortOrFail();
+            return;
+        }
+        catch (Exception)
+        {
+            AbortOrFail();
+            return;
+        }
+
+        if (result)
+        {
+            Submit();
+            _requestInProgress = false;
+        }
+    }
+
+    private async Task<bool> CallServer(string taskText = "", string failString = "")
+    {
+        try
+        {
+            Token = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            _taskText = taskText;
+            StateHasChanged();
+            await Task.Delay(20);
+
+            var returnResult = await HttpHelper.GameServerPut<SPTRegisterResponse>(Urls.Register, Request, Token.Token);
+
+            if (returnResult is null)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
+            StateHelper.ProfileList = returnResult.Profiles;
+            var result = returnResult.Response;
+
+            if (!result)
+            {
+                AbortOrFail(failString);
+                return false;
+            }
+
+            Token.Dispose();
+            return true;
+        }
+        catch (Exception)
+        {
+            AbortOrFail();
+            return false;
+        }
+    }
+
+    private void Submit()
+    {
+        Snackbar.Add($"{LocaleHelper.Get("profile_add_task_success")}: {Request.Username}!", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    private void AbortOrFail(string? message = null)
+    {
+        message ??= LocaleHelper.Get("profile_add_task_default");
+
+        if (!UserCancel)
+        {
+            Snackbar.Add(message, Severity.Error);
+        }
+
+        Token.Cancel();
+        MudDialog.Cancel();
+        _requestInProgress = false;
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        _requestInProgress = false;
+        Token.Cancel();
+        MudDialog.Cancel();
+    }
+
+}

@@ -1,0 +1,115 @@
+@inject ISnackbar Snackbar
+@inject StateHelper StateHelper
+@inject SessionHelper SessionHelper
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <MudContainer Class="py-4">
+            <MudContainer Class="d-flex flex-column align-center gap-4">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large"/>
+                <MudText>@_taskText</MudText>
+            </MudContainer>
+            <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled" Color="Color.Error" OnClick="UserCancelled">@(LocaleHelper.Get("server_login_cancel"))</MudButton>
+            </MudContainer>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    private string _taskText = "";
+
+    [Parameter]
+    public Server Server { get; set; } = default!;
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private CancellationTokenSource Token { get; } = new();
+    private bool UserCancel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await StartLoginTasks();
+    }
+
+    private async Task StartLoginTasks()
+    {
+        await Task.Delay(250); // Prevents dialogue flash.
+
+        var progress = new Progress<ConnectStep>(step =>
+        {
+            _taskText = StepText(step);
+            InvokeAsync(StateHasChanged);
+        });
+
+        var result = await SessionHelper.ConnectToServerAsync(Server, progress, Token.Token);
+
+        if (result.Success)
+        {
+            Submit();
+        }
+        else
+        {
+            AbortOrFail(MapFailure(result));
+        }
+    }
+
+    private string StepText(ConnectStep step)
+    {
+        return step switch
+        {
+            ConnectStep.Ping => LocaleHelper.Get("server_login_task_1"),
+            ConnectStep.Profiles => LocaleHelper.Get("server_login_task_2"),
+            ConnectStep.Types => LocaleHelper.Get("server_login_task_3"),
+            ConnectStep.ModPages => LocaleHelper.Get("server_login_task_4"),
+            _ => ""
+        };
+    }
+
+    private string MapFailure(ConnectResult result)
+    {
+        if (result.TimedOut)
+        {
+            return LocaleHelper.Get("request_timed_out");
+        }
+
+        return result.FailedStep switch
+        {
+            ConnectStep.Profiles => LocaleHelper.Get("server_login_task_fail_1"),
+            ConnectStep.Types => LocaleHelper.Get("server_login_task_fail_2"),
+            ConnectStep.ModPages => LocaleHelper.Get("server_login_task_fail_3"),
+            _ => LocaleHelper.Get("server_login_default")
+        };
+    }
+
+    private void AbortOrFail(string? message = null)
+    {
+        message ??= LocaleHelper.Get("server_login_default");
+
+        if (!UserCancel)
+        {
+            Snackbar.Add(message, Severity.Error);
+        }
+
+        StateHelper.LogoutAndDispose();
+        Token.Cancel();
+        MudDialog.Cancel();
+    }
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(Server));
+        StateHelper.SetAllowServerPage(true);
+        Snackbar.Add(LocaleHelper.Get("server_login_task_success"), Severity.Success);
+    }
+
+    private void UserCancelled()
+    {
+        UserCancel = true;
+        Token.Cancel();
+        MudDialog.Cancel();
+    }
+}

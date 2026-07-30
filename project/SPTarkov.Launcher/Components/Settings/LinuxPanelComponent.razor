@@ -1,0 +1,29 @@
+@inject ConfigHelper ConfigHelper
+@inject LocaleHelper LocaleHelper
+
+<SettingsSectionComponent Title="@(LocaleHelper.Get("setting_section_linux"))">
+    <SettingLinuxPrefixComponent Disabled="false" AddDiv="false"/>
+    <SettingLinuxUmuComponent Disabled="false" AddDiv="false" />
+    <SettingLinuxLaunchComponent Disabled="false" AddDiv="false"/>
+    <SettingLinuxProtonComponent Disabled="false" AddDiv="false"/>
+    <SettingSwitchComponent AddDiv="false" Disabled="true" OptionName="GameMode" Switch="@GameModeSwitch" SwitchFunc="SetGameMode"/>
+</SettingsSectionComponent>
+
+@code
+{
+    private bool GameModeSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        GameModeSwitch = ConfigHelper.GetConfig().LinuxSettings.GameMode;
+        base.OnInitialized();
+    }
+
+    private Task SetGameMode()
+    {
+        GameModeSwitch = !GameModeSwitch;
+        ConfigHelper.SetLinuxGameMode(GameModeSwitch);
+
+        return Task.CompletedTask;
+    }
+}

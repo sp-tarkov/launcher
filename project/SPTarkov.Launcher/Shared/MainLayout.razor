@@ -1,0 +1,83 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+
+@inject StateHelper StateHelper
+@inject ConfigHelper ConfigHelper
+@inject NavigationManager NavigationManager
+@inject TitleHelper TitleHelper
+@inject BrowserBridge BrowserBridge
+@inject IJSRuntime JsRuntime
+
+<MudThemeProvider IsDarkMode="true"/>
+<MudPopoverProvider/>
+<MudSnackbarProvider/>
+<MudDialogProvider/>
+
+<MudScrollToTop>
+    <MudFab Color="Color.Dark" StartIcon="@Icons.Material.Filled.ArrowCircleUp" Size="Size.Small"/>
+</MudScrollToTop>
+
+<MudContainer Class="no-select overlay-container unset absolute">
+    @if (ConfigHelper.GetConfig().UseBackground)
+    {
+        <MudImage Src="/images/bg.jpg" Class="no-select fixed mud-height-full mud-width-full background-image-cover"/>
+    }
+    <div class="no-select fixed mud-height-full mud-width-full background-overlay"></div>
+</MudContainer>
+
+<MudLayout>
+    <MudDrawer Width="150px" ClipMode="DrawerClipMode.Never" Elevation="5" Variant="@DrawerVariant.Mini" OpenMiniOnHover="false" Breakpoint="Breakpoint.None" Class="mud-background-gray border-r-2 border-solid mud-border-lines-default">
+        <NavMenu/>
+    </MudDrawer>
+    <ModPagesPanel/>
+    <MudMainContent Class="pt-1 pb-2">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private DotNetObjectReference<BrowserBridge>? _bridgeRef;
+
+    protected override void OnInitialized()
+    {
+        StateHelper.OnStateChanged += HandleStateChanged;
+        NavigationManager.LocationChanged += HandleLocationChanged;
+
+        RefreshTitle();
+
+        base.OnInitialized();
+    }
+
+    // Hand app.js a reference to the .NET BrowserBridge so intercepted external anchor clicks can open in the system browser.
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _bridgeRef = DotNetObjectReference.Create(BrowserBridge);
+            await JsRuntime.InvokeVoidAsync("registerBrowserBridge", _bridgeRef);
+        }
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        RefreshTitle();
+    }
+
+    private void HandleStateChanged()
+    {
+        RefreshTitle();
+        StateHasChanged();
+    }
+
+    private void RefreshTitle()
+    {
+        TitleHelper.Apply(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
+    }
+
+    public void Dispose()
+    {
+        StateHelper.OnStateChanged -= HandleStateChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+        _bridgeRef?.Dispose();
+    }
+}

@@ -1,0 +1,60 @@
+@* A square left-rail tile with a rich hover card. Hovering it dismisses the mod-pages panel. *@
+
+@inject BrowserBridge Bridge
+@inject StateHelper StateHelper
+
+<MudTooltip Color="Color.Dark" Arrow="false" Placement="Placement.Right" ShowOnHover="true" ShowOnClick="false" Inline="false" @bind-Visible="_visible">
+    <ChildContent>
+        <div class="nav-tile-link" @onclick="OpenExternal" @onpointerenter="CloseModPagesPanel">
+            <div class="nav-tile @TileClass" style="@TileStyle">@ChildContent</div>
+        </div>
+    </ChildContent>
+    <TooltipContent>
+        <NavItemTooltip Name="@Name" Url="@Url" Description="@Description"/>
+    </TooltipContent>
+</MudTooltip>
+
+@code {
+    private bool _visible;
+
+    [Parameter]
+    [EditorRequired]
+    public string Name { get; set; } = "";
+
+    [Parameter]
+    [EditorRequired]
+    public string Url { get; set; } = "";
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string? TileClass { get; set; }
+
+    [Parameter]
+    public string? TileStyle { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    // Open the page in the system browser and dismiss the tooltip. The tile is a plain element with no href, so the webview can never
+    // navigate to the URL; BrowserBridge opens it in the OS browser instead.
+    private void OpenExternal()
+    {
+        if (Disabled)
+        {
+            return;
+        }
+
+        _visible = false;
+        Bridge.OpenExternal(Url);
+    }
+
+    private void CloseModPagesPanel()
+    {
+        StateHelper.SetModPagesPanelOpen(false);
+    }
+}

@@ -1,0 +1,201 @@
+@inject ILogger<TroubleshootingPanelComponent> Logger
+@inject ConfigHelper ConfigHelper
+@inject StateHelper StateHelper
+@inject ISnackbar Snackbar
+@inject LocaleHelper LocaleHelper
+@inject WindowsClipboard Clipboard
+
+<SettingsSectionComponent Title="@(LocaleHelper.Get("setting_section_troubleshooting"))">
+    <SettingSwitchComponent Switch="@DebugLogging" OptionName="@(LocaleHelper.Get("setting_debug_logging"))" SwitchFunc="SetDebugLogging"/>
+    <MudDivider Class="ma-0 flex-grow-0"/>
+    <MudContainer Class="pa-0 d-flex flex-wrap justify-start gap-2">
+        @* TODO: Disabled inline with Master Branch will come back to this *@
+        <MudButton Disabled="true" Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="LoadLiveSettings">@(LocaleHelper.Get("setting_load_live"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="ClearGameSettings">@(LocaleHelper.Get("setting_clear_game"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CleanTempFiles">@(LocaleHelper.Get("setting_clean_temp"))</MudButton>
+        <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="!IsWindows" Color="Color.Dark" Size="Size.Medium" Variant="Variant.Filled" OnClick="CopyLogs">@(LocaleHelper.Get("setting_copy_logs"))</MudButton>
+    </MudContainer>
+</SettingsSectionComponent>
+
+@code {
+
+    private bool DebugLogging { get; set; }
+
+    private bool IsWindows => OperatingSystem.IsWindows();
+
+    protected override void OnInitialized()
+    {
+        DebugLogging = ConfigHelper.GetConfig().DebugLogging;
+
+        base.OnInitialized();
+    }
+
+    private Task SetDebugLogging()
+    {
+        DebugLogging = !DebugLogging;
+        ConfigHelper.SetDebugLogging(DebugLogging);
+
+        return Task.CompletedTask;
+    }
+
+    private void LoadLiveSettings()
+    {
+        Logger.LogInformation("Loading Live Settings");
+        var sptSettingsFolder = Paths.SptSettingsFolder;
+
+        if (!Directory.Exists(Paths.EftSettingsFolder))
+        {
+            Logger.LogWarning("Settings can not be loaded from live, path given: {EftSettingsFolder}", Paths.EftSettingsFolder);
+            Snackbar.Add(LocaleHelper.Get("setting_load_live_error_1"), Severity.Error);
+            return;
+        }
+
+        try
+        {
+            Directory.CreateDirectory(sptSettingsFolder);
+
+            foreach (var path in Directory.GetDirectories(Paths.EftSettingsFolder, "*", SearchOption.AllDirectories))
+            {
+                Directory.CreateDirectory(path.Replace(Paths.EftSettingsFolder, sptSettingsFolder));
+            }
+
+            foreach (var file in Directory.GetFiles(Paths.EftSettingsFolder, "*.*", SearchOption.AllDirectories))
+            {
+                File.Copy(file, file.Replace(Paths.EftSettingsFolder, sptSettingsFolder), true);
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.LogWarning("Unable to load live settings {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_load_live_error_2"), Severity.Error);
+            return;
+        }
+
+        Logger.LogInformation("Loaded live settings to SPTsettings folder");
+        Snackbar.Add(LocaleHelper.Get("setting_load_live_success"), Severity.Success);
+    }
+
+    private void ClearGameSettings()
+    {
+        var sptSettings = new DirectoryInfo(Paths.SptSettingsFolder);
+
+        try
+        {
+            sptSettings.Delete(true);
+
+            Directory.CreateDirectory(sptSettings.FullName);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            Logger.LogError("Unable to clean game settings, UnauthorizedAccessException or IOException: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clear_game_error_1"), Severity.Error);
+            return;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Clearing game settings failed: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clear_game_error_2"), Severity.Error);
+            return;
+        }
+
+        Logger.LogInformation("Cleared game settings");
+        Snackbar.Add(LocaleHelper.Get("setting_clear_game_success"), Severity.Success);
+    }
+
+    private void CleanTempFiles()
+    {
+        try
+        {
+            var tempFolder = new DirectoryInfo(Paths.SptAppDataFolder);
+            tempFolder.Delete(true);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            Logger.LogError("Unable to clean temp files, UnauthorizedAccessException or IOException: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clean_temp_error_1"), Severity.Warning);
+            return;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Unable to clean temp files: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_clean_temp_error_2"), Severity.Error);
+            return;
+        }
+
+        Logger.LogInformation("Cleaned temp files");
+        Snackbar.Add(LocaleHelper.Get("setting_clean_temp_success"), Severity.Success);
+    }
+
+    private void CopyLogs()
+    {
+        var filesToCopy = new List<string>();
+        var path = ConfigHelper.GetConfig().GamePath;
+        var bepinPath = Path.Join(path, "BepInEx", "LogOutput.log");
+        var serverPath = Path.Join(Paths.LogsFolder, $"spt{DateTime.Now:yyyy-MM-dd}.log");
+        var launcherPath = Paths.LauncherLog;
+        var tracePath = Path.Join(path, "Logs");
+
+        if (StateHelper.SelectedProfile is not null)
+        {
+            var profilePath = Path.Join(Paths.ProfilesFolder, $"{StateHelper.SelectedProfile.ProfileId}.json");
+
+            if (File.Exists(profilePath))
+            {
+                filesToCopy.Add(profilePath);
+            }
+        }
+
+        if (File.Exists(bepinPath))
+        {
+            filesToCopy.Add(bepinPath);
+        }
+
+        if (File.Exists(serverPath))
+        {
+            filesToCopy.Add(serverPath);
+        }
+
+        if (File.Exists(launcherPath))
+        {
+            filesToCopy.Add(launcherPath);
+        }
+
+        if (Directory.Exists(tracePath))
+        {
+            var logs = Directory.GetFiles(tracePath, $"{DateTime.Now:yyyy.MM.dd}_* traces.log", SearchOption.AllDirectories);
+
+            var log = logs.Length > 0 ? logs.FirstOrDefault() : "";
+
+            if (!string.IsNullOrWhiteSpace(log))
+            {
+                filesToCopy.Add(log);
+            }
+        }
+
+        try
+        {
+            CopyFilePathsToClipboard(filesToCopy);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Unable to set clipboard with logs: {Exception}", e);
+            Snackbar.Add(LocaleHelper.Get("setting_copy_logs_error_1"), Severity.Error);
+            return;
+        }
+
+        Logger.LogInformation("Copied {Count} log/s to clipboard", filesToCopy.Count);
+        Snackbar.Add(LocaleHelper.Get("setting_copy_logs_success"), Severity.Success);
+    }
+
+    private void CopyFilePathsToClipboard(List<string> filePaths)
+    {
+        if (!IsWindows)
+        {
+            // added this just in case for whatever reason disabling the button doesnt work.
+            Logger.LogWarning("Clipboard.CopyFiles is not supported on this platform");
+            return;
+        }
+
+        Clipboard.CopyFiles(filePaths.ToArray());
+    }
+}

@@ -1,0 +1,39 @@
+@inject ConfigHelper ConfigHelper
+@inject LocaleHelper LocaleHelper
+
+<SettingsSectionComponent Title="@(LocaleHelper.Get("setting_section_game"))">
+    <SettingSwitchComponent Switch="@AutoConnectSwitch" OptionName="@(LocaleHelper.Get("setting_auto_connect"))" SwitchFunc="SetAutoConnect"/>
+    <SettingSwitchComponent Switch="@ClearCacheOnLaunchSwitch" OptionName="@(LocaleHelper.Get("setting_option_clear_cache"))" SwitchFunc="SetClearCacheOnLaunch"/>
+    <SettingGamePath/>
+</SettingsSectionComponent>
+
+@code
+{
+    private bool AutoConnectSwitch { get; set; }
+    private bool ClearCacheOnLaunchSwitch { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var settings = ConfigHelper.GetConfig();
+        AutoConnectSwitch = settings.AutoConnectLastProfile;
+        ClearCacheOnLaunchSwitch = settings.ClearCacheOnLaunch;
+
+        base.OnInitialized();
+    }
+
+    private Task SetAutoConnect()
+    {
+        AutoConnectSwitch = !AutoConnectSwitch;
+        ConfigHelper.SetAutoConnectLastProfile(AutoConnectSwitch);
+
+        return Task.CompletedTask;
+    }
+
+    private Task SetClearCacheOnLaunch()
+    {
+        ClearCacheOnLaunchSwitch = !ClearCacheOnLaunchSwitch;
+        ConfigHelper.SetClearCacheOnLaunch(ClearCacheOnLaunchSwitch);
+
+        return Task.CompletedTask;
+    }
+}

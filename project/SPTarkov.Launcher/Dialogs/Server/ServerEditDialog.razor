@@ -1,0 +1,63 @@
+@inject ISnackbar Snackbar
+@inject LocaleHelper LocaleHelper
+
+<MudDialog Class="form-dialog mud-background-gray border-2 border-solid mud-border-lines-default">
+    <DialogContent>
+        <div class="d-flex flex-column gap-3">
+            <div class="d-flex align-center gap-3">
+                <div class="dialog-header-icon" style="@ServerIconStyle">
+                    <MudIcon Icon="@Icons.Material.Filled.Dns" Color="Color.Inherit"/>
+                </div>
+                <MudText Typo="Typo.h6">@(LocaleHelper.Get("server_edit_title"))</MudText>
+            </div>
+
+            <MudText>@(LocaleHelper.Get("server_edit_text"))</MudText>
+
+            <MudForm Model="Server" Class="gap-3">
+                <MudTextField Immediate="true" @bind-Value="Server.Name" Label="@(LocaleHelper.Get("server_edit_name"))" HelperText="@(LocaleHelper.Get("server_add_name_help"))" ShrinkLabel="true" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required_name"))" Variant="Variant.Outlined" Margin="Margin.Dense" OnKeyDown="SubmitOnEnter"/>
+                <MudTextField Immediate="true" @bind-Value="Server.IpAddress" Label="@(LocaleHelper.Get("server_edit_address"))" HelperText="@(LocaleHelper.Get("server_add_address_help"))" ShrinkLabel="true" Placeholder="127.0.0.1:6969" Required="true" RequiredError="@(LocaleHelper.Get("server_edit_required"))" Variant="Variant.Outlined" Margin="Margin.Dense" OnKeyDown="SubmitOnEnter"/>
+            </MudForm>
+
+            <div class="mt-2 d-flex justify-end gap-2">
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!CanSubmit)" OnClick="Submit">@(LocaleHelper.Get("server_edit_confirm"))</MudButton>
+                <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Variant="Variant.Filled" Color="Color.Default" OnClick="Cancel">@(LocaleHelper.Get("server_edit_cancel"))</MudButton>
+            </div>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public Server Server { get; set; } = default!;
+
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private bool CanSubmit => !string.IsNullOrWhiteSpace(Server.Name) && !string.IsNullOrWhiteSpace(Server.IpAddress);
+
+    // Matches the tint the server card icon gets in the listing.
+    private string ServerIconStyle => $"color: {ModPageVisual.GetColor($"{Server.Name}|{Server.IpAddress}")};";
+
+    private void SubmitOnEnter(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter" && CanSubmit)
+        {
+            Submit();
+        }
+    }
+
+    private void Submit()
+    {
+        Server.IpAddress = Server.IpAddress.Replace("https://", "");
+        Server.IpAddress = Server.IpAddress.Trim();
+
+        Snackbar.Add(LocaleHelper.Get("server_edit_success"), Severity.Success);
+        MudDialog.Close(DialogResult.Ok(Server));
+    }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+}

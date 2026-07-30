@@ -1,0 +1,50 @@
+@implements IDisposable
+
+@inject LocaleHelper LocaleHelper
+@inject StateHelper StateHelper
+
+<MudNavMenu Class="mud-typography-nowrap nav-top">
+    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.ConnectedTv" Href="/ServerPageWrapper/false" Text="@(LocaleHelper.Get("home"))"/>
+</MudNavMenu>
+@if (StateHelper.AllowServerPage)
+{
+    <div class="nav-tiles nav-scroll">
+        <NavTile Name="@(LocaleHelper.Get("tray_sic_homepage"))" Url="@SicUrl" Description="@(LocaleHelper.Get("sic_description"))" Disabled="!StateHelper.AllowServerPage" TileClass="sic-tile">
+            SIC
+        </NavTile>
+        @if (StateHelper.ModPages.Count > 0)
+        {
+            <div class="nav-tiles-divider"></div>
+            <div class="nav-tile-link" @onpointerenter="StateHelper.HoldModPagesPanel" @onpointerleave="StateHelper.ReleaseModPagesPanel">
+                <div class="nav-tile mod-pages-tile">
+                    <MudIcon Icon="@Icons.Material.Filled.Extension" Size="Size.Small"/>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <MudSpacer/>
+}
+<MudNavMenu Class="mud-typography-nowrap nav-bottom">
+    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Settings" Href="/Settings" Text="@(LocaleHelper.Get("settings"))"/>
+    <NavIcon Disabled="!StateHelper.AllowNavigation" Icon="@Icons.Material.Filled.Info" Href="/Info" Text="@(LocaleHelper.Get("info"))"/>
+</MudNavMenu>
+
+@code
+{
+    private string ServerAddress => StateHelper.SelectedServer?.IpAddress ?? "";
+    private string SicUrl => $"https://{ServerAddress}/";
+
+    protected override void OnInitialized()
+    {
+        StateHelper.OnStateChanged += StateHasChanged;
+        base.OnInitialized();
+    }
+
+    public void Dispose()
+    {
+        StateHelper.OnStateChanged -= StateHasChanged;
+    }
+}

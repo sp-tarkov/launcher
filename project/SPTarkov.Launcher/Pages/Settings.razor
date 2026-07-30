@@ -1,0 +1,24 @@
+@page "/Settings"
+
+<MudContainer Class="px-4 pb-4 my-2" MaxWidth="MaxWidth.Large">
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <WindowPanelComponent/>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <InterfacePanelComponent/>
+        </MudItem>
+        <MudItem xs="12" sm="6">
+            <GamePanelComponent/>
+        </MudItem>
+        @if (OperatingSystem.IsLinux())
+        {
+            <MudItem xs="12">
+                <LinuxPanelComponent/>
+            </MudItem>
+        }
+        <MudItem xs="12">
+            <TroubleshootingPanelComponent/>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
