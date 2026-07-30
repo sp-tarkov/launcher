@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using MudBlazor;
 using SPTarkov.Core.Logging;
 using SPTarkov.Core.SPT;
-using SPTarkov.Core.Update;
 
 namespace SPTarkov.Core.Configuration;
 
@@ -309,50 +308,6 @@ public class ConfigHelper
         {
             _logger.LogDebug("SetLinuxSettings: {Settings}", linuxSettings);
             _settings!.LinuxSettings = linuxSettings;
-            SaveConfig();
-        }
-    }
-
-    public void SetUpdateChannel(UpdateChannel channel)
-    {
-        lock (_lock)
-        {
-            _logger.LogDebug("SetUpdateChannel: {Channel}", channel);
-            _settings!.UpdateChannel = channel;
-            SaveConfig();
-        }
-    }
-
-    public void SetCheckForUpdatesOnStartup(bool checkForUpdatesOnStartup)
-    {
-        lock (_lock)
-        {
-            _logger.LogDebug("SetCheckForUpdatesOnStartup: {CheckForUpdatesOnStartup}", checkForUpdatesOnStartup);
-            _settings!.CheckForUpdatesOnStartup = checkForUpdatesOnStartup;
-            SaveConfig();
-        }
-    }
-
-    public DateTimeOffset? GetLastSeenManifestUtc(UpdateChannel channel)
-    {
-        lock (_lock)
-        {
-            return _settings!.LastSeenManifests.TryGetValue(channel.ToString(), out var seen) ? seen : null;
-        }
-    }
-
-    public void SetLastSeenManifestUtc(UpdateChannel channel, DateTimeOffset generatedUtc)
-    {
-        lock (_lock)
-        {
-            var key = channel.ToString();
-
-            if (_settings!.LastSeenManifests.TryGetValue(key, out var existing) && existing == generatedUtc)
-            {
-                return;
-            }
-
-            _settings.LastSeenManifests[key] = generatedUtc;
             SaveConfig();
         }
     }

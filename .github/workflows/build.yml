@@ -26,7 +26,3 @@ jobs:
 
       - name: Build launcher
         run: dotnet build project/SPTarkov.Launcher.slnx -c Release
-
-      # The tool compiles SPTarkov.Core source files on its own and is otherwise only built by a release tag.
-      - name: Build manifest tool
-        run: dotnet build tools/LauncherManifest -c Release

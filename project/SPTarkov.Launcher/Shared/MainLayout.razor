@@ -7,12 +7,6 @@
 @inject TitleHelper TitleHelper
 @inject BrowserBridge BrowserBridge
 @inject IJSRuntime JsRuntime
-@inject LocaleHelper LocaleHelper
-@inject ISnackbar Snackbar
-@inject IDialogService DialogService
-@inject UpdateClient UpdateClient
-@inject UpdateNotice UpdateNotice
-@inject ILogger<MainLayout> Logger
 
 <MudThemeProvider IsDarkMode="true"/>
 <MudPopoverProvider/>
@@ -61,53 +55,6 @@
         {
             _bridgeRef = DotNetObjectReference.Create(BrowserBridge);
             await JsRuntime.InvokeVoidAsync("registerBrowserBridge", _bridgeRef);
-
-            if (UpdateNotice.JustUpdatedVersion is { } updatedVersion)
-            {
-                Snackbar.Add(LocaleHelper.Get("update_success").Replace("{version}", updatedVersion), Severity.Success);
-                UpdateNotice.JustUpdatedVersion = null;
-            }
-
-            if (ConfigHelper.GetConfig().CheckForUpdatesOnStartup)
-            {
-                _ = CheckForUpdateOnStartupAsync();
-            }
-        }
-    }
-
-    private async Task CheckForUpdateOnStartupAsync()
-    {
-        try
-        {
-            var update = await UpdateClient.CheckAsync(CancellationToken.None);
-            if (update is null)
-            {
-                return;
-            }
-
-            await InvokeAsync(() =>
-            {
-                Snackbar.Add(
-                    LocaleHelper.Get("update_available_toast").Replace("{version}", update.Release.LauncherVersion),
-                    Severity.Info,
-                    options =>
-                    {
-                        options.RequireInteraction = true;
-                        options.Action = LocaleHelper.Get("update_available_toast_action");
-                        options.ActionColor = Color.Primary;
-                        options.OnClick = _ =>
-                            DialogService.ShowAsync<UpdateCheckDialog>(
-                                LocaleHelper.Get("update_check_title"),
-                                new DialogParameters { { "Update", update } },
-                                ConfigHelper.DialogOptions
-                            );
-                    }
-                );
-            });
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError("Startup update check failed: {Exception}", ex);
         }
     }
 

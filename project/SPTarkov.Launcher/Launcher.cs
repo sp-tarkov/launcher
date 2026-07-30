@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -10,8 +9,6 @@ using SPTarkov.Core.Configuration;
 using SPTarkov.Core.Extensions;
 using SPTarkov.Core.Helpers;
 using SPTarkov.Core.Patching;
-using SPTarkov.Core.SevenZip;
-using SPTarkov.Core.Update;
 using SPTarkov.Launcher.Helpers;
 using SPTarkov.Launcher.Platform;
 
@@ -52,17 +49,8 @@ public class Launcher
 
         EmbedProvider = new ManifestEmbeddedFileProvider(typeof(Launcher).Assembly, "wwwroot");
         var appBuilder = PhotinoBlazorAppBuilder.CreateDefault(EmbedProvider, args);
-        SevenZip? sevenZip;
 
-        if (OperatingSystem.IsWindows())
-        {
-            sevenZip = new WindowsSevenZip();
-        }
-        else if (OperatingSystem.IsLinux())
-        {
-            sevenZip = new LinuxSevenZip();
-        }
-        else
+        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux())
         {
             throw new PlatformNotSupportedException();
         }
@@ -81,13 +69,6 @@ public class Launcher
             .AddSingleton<LinuxHelper>()
             .AddSingleton<ValidationUtil>()
             .AddSingleton<BrowserBridge>()
-            .AddSingleton<UpdateClient>()
-            .AddSingleton<UpdatePreflight>()
-            .AddSingleton<UpdateTransaction>()
-            .AddSingleton<UpdateRecovery>()
-            .AddSingleton<UpdateInstaller>()
-            .AddSingleton<UpdateNotice>()
-            .AddSingleton(sevenZip)
             .AddLogging(builder =>
             {
                 builder.ClearProviders();
@@ -109,15 +90,9 @@ public class Launcher
 
         App = appBuilder.Build();
 
-        sevenZip.Logger = App.Services.GetRequiredService<ILogger<SevenZip>>();
         _logger = App.Services.GetRequiredService<ILogger<Launcher>>();
         ConfigHelper = App.Services.GetRequiredService<ConfigHelper>();
         _trayHelper = App.Services.GetRequiredService<TrayHelper>();
-        App.Services.GetRequiredService<UpdateInstaller>().SetRelaunchHandler(RelaunchAfterUpdate);
-
-        // Recovers any interrupted auto-update before the UI starts.
-        var appliedUpdateVersion = App.Services.GetRequiredService<UpdateRecovery>().Run();
-        App.Services.GetRequiredService<UpdateNotice>().JustUpdatedVersion = appliedUpdateVersion;
 
         CustomizeComponent();
 
@@ -279,31 +254,6 @@ public class Launcher
     {
         _exitRequested = true;
         App.MainWindow.Close();
-    }
-
-    // Starts the freshly installed build and closes this one. The new process finishes the swap on launch.
-    private static void RelaunchAfterUpdate()
-    {
-        var exePath = Environment.ProcessPath ?? throw new InvalidOperationException("The running executable's path is unknown.");
-
-        // Releases the single-instance lock before starting the new build.
-        _singleInstanceGuard.Dispose();
-
-        try
-        {
-            Process.Start(new ProcessStartInfo { FileName = exePath, UseShellExecute = false });
-        }
-        catch
-        {
-            // Reclaims the single-instance lock; this build stays the running instance.
-            _singleInstanceGuard = new SingleInstanceGuard();
-            _singleInstanceGuard.TryClaimPrimary();
-            _singleInstanceGuard.StartActivationListener(SurfaceMainWindow, _logger);
-            throw;
-        }
-
-        _exitRequested = true;
-        App.MainWindow.Invoke(() => App.MainWindow.Close());
     }
 
     private static string ExtractTrayIcon()

@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using SPTarkov.Core.Update;
-
-namespace SPTarkov.Core.Configuration;
+﻿namespace SPTarkov.Core.Configuration;
 
 public record LauncherSettings
 {
@@ -39,12 +36,4 @@ public record LauncherSettings
     public LinuxSettings LinuxSettings { get; set; } = new();
 
     public bool DebugLogging { get; set; }
-
-    [JsonConverter(typeof(JsonStringEnumConverter<UpdateChannel>))]
-    public UpdateChannel UpdateChannel { get; set; } = UpdateChannel.Stable;
-
-    public bool CheckForUpdatesOnStartup { get; set; } = true;
-
-    /// <summary>Newest manifest <c>generatedUtc</c> seen per update channel, keyed by channel name.</summary>
-    public Dictionary<string, DateTimeOffset> LastSeenManifests { get; set; } = new();
 }

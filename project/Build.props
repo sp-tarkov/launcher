@@ -7,9 +7,6 @@
         <!-- Launcher revision - Always 0 in source - Overridden by the release workflow. -->
         <LauncherRevision Condition="'$(LauncherRevision)' == ''">0</LauncherRevision>
 
-        <!-- UTC build stamp - Overridden by the release workflow. -->
-        <LauncherBuildDate Condition="'$(LauncherBuildDate)' == ''">0001-01-01T00:00:00Z</LauncherBuildDate>
-
         <Version>$(SptVersion).$(LauncherRevision)</Version>
         <AssemblyVersion>$(SptVersion).$(LauncherRevision)</AssemblyVersion>
         <FileVersion>$(SptVersion).$(LauncherRevision)</FileVersion>
