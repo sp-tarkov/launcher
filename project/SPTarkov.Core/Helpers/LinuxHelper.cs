@@ -9,73 +9,6 @@ namespace SPTarkov.Core.Helpers;
 
 public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
 {
-    private const string KeyStartingCharacter = "[";
-
-    public string? FindWineRegValue(string key, string valueName)
-    {
-        var reader = new StreamReader(Path.Join(configHelper.GetConfig().LinuxSettings.PrefixPath, "system.reg"));
-        string? line;
-        string? secondLine;
-        var foundIt = false;
-
-        while ((line = reader.ReadLine()) != null)
-        {
-            line = line.Trim();
-
-            if (line.StartsWith(KeyStartingCharacter))
-            {
-                foundIt = line.Contains(key);
-            }
-
-            if (foundIt)
-            {
-                while ((secondLine = reader.ReadLine()) != null)
-                {
-                    if (secondLine.Contains(valueName))
-                    {
-                        // Example value to get "InstallLocation"="C:\\Battlestate Games\\Escape from Tarkov"
-                        var keyWrapped = $"\"{valueName}\"=\""; // example: "InstallLocation"=" which is 19
-
-                        // remove the keyWrapped and the ending "
-                        return secondLine.Substring(keyWrapped.Length, secondLine.Length - keyWrapped.Length - 1); // -1 is for the ending "
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public string? GetOriginalGamePath()
-    {
-        var prefixPath = configHelper.GetConfig().LinuxSettings.PrefixPath;
-        if (string.IsNullOrEmpty(prefixPath))
-        {
-            logger.LogError("Prefix path is required");
-            return null;
-        }
-
-        var RegValueToLookFor = "InstallLocation";
-
-        try
-        {
-            var windowsLikePath = FindWineRegValue(Paths.UninstallEftRegKey, RegValueToLookFor);
-            return FixWithPrefix(windowsLikePath);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError($"Failed to get EFT game path: {ex}");
-            return null;
-        }
-    }
-
-    private string FixWithPrefix(string? windowsLikePath)
-    {
-        var pathWithoutDrive = windowsLikePath?.Replace("\\\\", "/").Substring(2);
-        logger.LogDebug("pathWithoutDrive: {0}", pathWithoutDrive);
-        return string.Concat(configHelper.GetConfig().LinuxSettings.PrefixPath, pathWithoutDrive);
-    }
-
     /// <summary>
     /// reconstruct path used when installing EFT on linux to work on linux, using symlinks in dosdevice in the winePrefix
     /// </summary>
@@ -128,30 +61,6 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         var sptPath = configHelper.GetConfig().GamePath;
 
         ProcessStartInfo? process;
-
-        // This is what needs to be done for GameScope to work.
-        // I don't know if this is used as much, so leave for now and implement a way later if needed/wanting
-        // var process = new ProcessStartInfo
-        // {
-        //     FileName = "gamescope",
-        //     UseShellExecute = false,
-        //     CreateNoWindow = false,
-        //     WorkingDirectory = sptPath,
-        //     Environment =
-        //     {
-        //         { "WINEPREFIX", prefixPath },
-        //         { "PROTONPATH", proton }
-        //     },
-        //     ArgumentList =
-        //     {
-        //         "-W2560",
-        //         "-H1440",
-        //         "--mangoapp",
-        //         "--",
-        //         umuPath,
-        //         cmd
-        //     }
-        // };
 
         // I don't know if this actually helps in any way, but some use it
         // User must install gamemode from package manager, try catch below will log it

@@ -19,9 +19,7 @@ public class GameHelper
     private readonly FilePatcher _filePatcher;
     private readonly LocaleHelper _localeHelper;
     private readonly LinuxHelper _linuxHelper;
-    private readonly ValidationUtil _validationUtil;
 
-    private string? _originalGamePath;
     public string? ErrorMessage;
 
     private List<string> Patches
@@ -36,8 +34,7 @@ public class GameHelper
         FilePatcher filePatcher,
         HttpHelper httpHelper,
         LocaleHelper localeHelper,
-        LinuxHelper linuxHelper,
-        ValidationUtil validationUtil
+        LinuxHelper linuxHelper
     )
     {
         _stateHelper = stateHelper;
@@ -47,55 +44,10 @@ public class GameHelper
         _httpHelper = httpHelper;
         _localeHelper = localeHelper;
         _linuxHelper = linuxHelper;
-        _validationUtil = validationUtil;
-        _originalGamePath = DetectOriginalGamePath();
-    }
-
-    public string? DetectOriginalGamePath()
-    {
-        if (OperatingSystem.IsWindows())
-        {
-            // We prioritize the Steam version, as the Steam CDN is faster for updates, and if someone
-            // owns it on both platforms, there's a better chance their Steam version is up to date
-            var steamInstallPath = _validationUtil.a();
-            if (steamInstallPath != null && Path.Exists(Path.Join(steamInstallPath, "build")))
-            {
-                var steamBuildDir = Path.Join(steamInstallPath, "build");
-                return Path.TrimEndingDirectorySeparator(steamBuildDir);
-            }
-
-            // Fall back to the BSG Launcher registry key if Steam isn't being used
-            var uninstallStringValue = Registry.LocalMachine.OpenSubKey(Paths.UninstallEftRegKey, false)?.GetValue("InstallLocation");
-            var info = (uninstallStringValue is string key) ? new DirectoryInfo(key) : null;
-
-            if (info == null)
-            {
-                return null;
-            }
-
-            return Path.TrimEndingDirectorySeparator(info.FullName);
-        }
-
-        // as running with linux requires wine, we can now
-        if (OperatingSystem.IsLinux())
-        {
-            return _linuxHelper.GetOriginalGamePath();
-        }
-
-        throw new Exception("Unsupported operating system");
     }
 
     public async Task<bool> CheckGame()
     {
-        if (IsInstalledInLive())
-        {
-            _logger.LogError("SPT is installed in Live");
-            ErrorMessage = _localeHelper.Get("game_helper_error_1");
-            return false;
-        }
-
-        _logger.LogInformation("SPT is not installed in Live");
-
         if (await IsCoreDllVersionMismatched())
         {
             return false;
@@ -104,15 +56,6 @@ public class GameHelper
         _logger.LogInformation("Core dll matches");
 
         SetupGameFiles();
-
-        if (!_validationUtil.Validate())
-        {
-            _logger.LogError("Game Validation Failed");
-            ErrorMessage = _localeHelper.Get("game_helper_error_3");
-            return false;
-        }
-
-        _logger.LogInformation("Game Validation passed");
 
         return true;
     }
@@ -159,7 +102,7 @@ public class GameHelper
             $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config="
             + $"{{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}";
 
-        _logger.LogInformation($"args: {args}");
+        _logger.LogInformation("args: {Args}", args);
 
         var clientProcess = new ProcessStartInfo(clientExecutable)
         {
@@ -301,61 +244,6 @@ public class GameHelper
         return true;
     }
 
-    private bool IsInstalledInLive()
-    {
-        var isInstalledInLive = false;
-
-        try
-        {
-            List<FileInfo> files =
-            [
-                // SPT files
-                new(Path.Join(_originalGamePath!, "SPT.Launcher.exe")),
-                new(Path.Join(_originalGamePath!, "SPT.Server.exe")),
-                new(Path.Join(_originalGamePath!, "SPT.Server.linux")),
-                // bepinex files
-                new(Path.Join(_originalGamePath!, "doorstep_config.ini")),
-                new(Path.Join(_originalGamePath!, "winhttp.dll")),
-                // licenses
-                new(Path.Join(_originalGamePath!, "LICENSE-BEPINEX.txt")),
-                new(Path.Join(_originalGamePath!, "LICENSE-ConfigurationManager.txt")),
-                new(Path.Join(_originalGamePath!, "LICENSE-Launcher.txt")),
-                new(Path.Join(_originalGamePath!, "LICENSE-Modules.txt")),
-                new(Path.Join(_originalGamePath!, "LICENSE-Server.txt")),
-            ];
-
-            List<DirectoryInfo> directories =
-            [
-                new(Path.Join(_originalGamePath!, "SPT_Runtime")),
-                new(Path.Join(_originalGamePath!, "BepInEx")),
-            ];
-
-            foreach (var file in files.Where(file => File.Exists(file.FullName)))
-            {
-                File.Delete(file.FullName);
-                _logger.LogWarning("File removed - found in live dir: {FileFullName}", file.FullName);
-                isInstalledInLive = true;
-            }
-
-            foreach (var directory in directories.Where(directory => Directory.Exists(directory.FullName)))
-            {
-                if (!TryRemoveFilesRecursively(directory))
-                {
-                    _logger.LogWarning("Directory removal failed - found in live dir: {DirectoryFullName}", directory.FullName);
-                }
-
-                _logger.LogWarning("Directory removed - found in live dir: {DirectoryFullName}", directory.FullName);
-                isInstalledInLive = true;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("Exception occured: {ex}", ex);
-        }
-
-        return isInstalledInLive;
-    }
-
     private void SetupGameFiles()
     {
         var files = new[]
@@ -402,27 +290,6 @@ public class GameHelper
         return Path.Join(_configHelper.GetConfig().GamePath, fileName);
     }
 
-    /// <summary>
-    /// Remove the SPT JSON-based registry keys associated with the given profile ID
-    /// </summary>
-    public void RemoveProfileRegistryKeys(string profileId)
-    {
-        var registryFile = new FileInfo(Paths.SptRegJson);
-
-        if (!registryFile.Exists)
-        {
-            return;
-        }
-
-        var registryData = JsonSerializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(registryFile.FullName));
-
-        // Find any property that has a key containing the profileId, and remove it
-        var propsToRemove = registryData?.Where(prop => prop.Key.Contains(profileId, StringComparison.CurrentCultureIgnoreCase)).ToList();
-        propsToRemove?.ForEach(prop => registryData?.Remove(prop.Key));
-
-        File.WriteAllText(registryFile.FullName, registryData?.ToString());
-    }
-
     private bool TryRemoveFilesRecursively(DirectoryInfo basedir)
     {
         _logger.LogInformation("Recursive Removal: {DirectoryInfo}", basedir);
@@ -466,11 +333,6 @@ public class GameHelper
     /// <returns></returns>
     public async Task<bool> MonitorGame()
     {
-        // if (!OperatingSystem.IsWindows())
-        // {
-        //     return false;
-        // }
-
         // As wine can take some time to start the game, we'll just delay 12seconds,
         // needs to search for EscapeFromTarkov for windows
         // TODO: this might not work for linux
