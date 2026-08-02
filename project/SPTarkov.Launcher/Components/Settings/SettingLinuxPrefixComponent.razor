@@ -6,8 +6,8 @@
         <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("linux_wine_prefix"))"
                       Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info" OnAdornmentClick="SetPrefixPath"/>
-        <MudIconButton Color="@(NewValue == OldValue ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
-                       Disabled="@(NewValue == OldValue)" OnClick="Save"/>
+        <MudIconButton Color="@(IsSaved ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
+                       Disabled="IsSaved" OnClick="Save"/>
     </MudLink>
 </MudContainer>
 @if (AddDiv)
@@ -23,13 +23,14 @@
     [Parameter]
     public bool AddDiv { get; set; }
 
-    private string OldValue { get; set; } = "";
     private string NewValue { get; set; } = "";
+
+    // Compared against the config rather than a cached copy, so the button cant claim unsaved edits that arent there.
+    private bool IsSaved => NewValue == ConfigHelper.GetConfig().LinuxSettings.PrefixPath;
 
     protected override void OnInitialized()
     {
-        OldValue = ConfigHelper.GetConfig().LinuxSettings.PrefixPath;
-        NewValue = OldValue;
+        NewValue = ConfigHelper.GetConfig().LinuxSettings.PrefixPath;
 
         base.OnInitialized();
     }
@@ -67,7 +68,6 @@
 
     private void Save()
     {
-        OldValue = NewValue;
         ConfigHelper.SetLinuxPrefixPath(NewValue);
         StateHasChanged();
     }
