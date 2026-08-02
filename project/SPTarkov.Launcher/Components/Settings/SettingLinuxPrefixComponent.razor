@@ -3,9 +3,11 @@
 
 <MudContainer Class="pa-0">
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
-        <MudTextField Value="@ConfigHelper.GetConfig().LinuxSettings.PrefixPath" Label="@(LocaleHelper.Get("linux_wine_prefix"))"
+        <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("linux_wine_prefix"))"
                       Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info" OnAdornmentClick="SetPrefixPath"/>
+        <MudIconButton Color="@(NewValue == OldValue ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
+                       Disabled="@(NewValue == OldValue)" OnClick="Save"/>
     </MudLink>
 </MudContainer>
 @if (AddDiv)
@@ -21,6 +23,17 @@
     [Parameter]
     public bool AddDiv { get; set; }
 
+    private string OldValue { get; set; } = "";
+    private string NewValue { get; set; } = "";
+
+    protected override void OnInitialized()
+    {
+        OldValue = ConfigHelper.GetConfig().LinuxSettings.PrefixPath;
+        NewValue = OldValue;
+
+        base.OnInitialized();
+    }
+
     private string GetLinkClasses()
     {
         var classes = new CssBuilder()
@@ -28,7 +41,7 @@
             .AddClass("justify-center")
             .AddClass("align-center")
             .AddClass("py-2")
-            .AddClass("px-5");
+            .AddClass("pl-5");
 
         if (!Disabled)
         {
@@ -40,7 +53,7 @@
 
     private async Task SetPrefixPath()
     {
-        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder", defaultPath: FilePickerHelper.StartDirectory(NewValue));
 
         // no folder was selected
         if (!folder.Any())
@@ -48,7 +61,14 @@
             return;
         }
 
-        ConfigHelper.SetLinuxPrefixPath(folder.FirstOrDefault()!);
+        NewValue = folder.FirstOrDefault()!;
+        Save();
+    }
+
+    private void Save()
+    {
+        OldValue = NewValue;
+        ConfigHelper.SetLinuxPrefixPath(NewValue);
         StateHasChanged();
     }
 

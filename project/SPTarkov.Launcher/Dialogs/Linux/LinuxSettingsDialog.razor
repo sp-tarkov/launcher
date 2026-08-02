@@ -7,7 +7,7 @@
     <DialogContent>
         <MudContainer Class="py-4">
             <MudAlert Variant="Variant.Outlined" Severity="Severity.Warning">@(LocaleHelper.Get("linux_add_warning"))</MudAlert>
-            <MudForm Model="LinuxSettings" @bind-IsValid="@_success" Class="gap-2 mt-3">
+            <MudForm @ref="_form" Model="LinuxSettings" @bind-IsValid="@_success" Class="gap-2 mt-3">
 
                 <MudTextField Immediate="true" @bind-Value="LinuxSettings!.PrefixPath" Label="@(LocaleHelper.Get("linux_add_prefix"))"
                               Required="true" RequiredError="@(LocaleHelper.Get("linux_add_prefix_required"))" Variant="Variant.Outlined"
@@ -49,6 +49,7 @@
 @code {
 
     private bool _success;
+    private MudForm? _form;
     private List<string> ProtonList { get; set; } = [];
 
     public LinuxSettings? LinuxSettings { get; set; } = new();
@@ -73,20 +74,26 @@
 
     private async Task SetUmuPath()
     {
-        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+        // umu-run is a file, a folder dialog cant select it
+        var file = await Launcher.App.MainWindow.ShowOpenFileAsync(title: "Choose umu-run",
+            defaultPath: FilePickerHelper.StartDirectory(LinuxSettings!.UmuPath));
 
-        // no folder was selected
-        if (!folder.Any())
+        // no file was selected
+        if (!file.Any())
         {
             return;
         }
 
-        LinuxSettings!.UmuPath = folder.FirstOrDefault()!;
+        LinuxSettings!.UmuPath = file.FirstOrDefault()!;
+
+        // the picker sets the model directly, so the form doesnt know its fields changed
+        await _form!.Validate();
     }
 
     private async Task SetPrefixPath()
     {
-        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder");
+        var folder = await Launcher.App.MainWindow.ShowOpenFolderAsync(title: "Choose Folder",
+            defaultPath: FilePickerHelper.StartDirectory(LinuxSettings!.PrefixPath));
 
         // no folder was selected
         if (!folder.Any())
@@ -95,6 +102,8 @@
         }
 
         LinuxSettings!.PrefixPath = folder.FirstOrDefault()!;
+
+        await _form!.Validate();
     }
 
 }

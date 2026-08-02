@@ -98,19 +98,19 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
             }
         }
 
-        var launchSettings = ParseLaunchSettings();
-        foreach (var launchSetting in launchSettings)
+        foreach (var token in TokenizeLaunchSettings(configHelper.GetConfig().LinuxSettings.LaunchSettings))
         {
-            if (launchSetting.Key.StartsWith("-"))
+            var separator = token.IndexOf('=');
+
+            // args start with a -, so does anything thats not NAME=VALUE
+            if (token.StartsWith('-') || separator <= 0)
             {
-                // this should be an arg
-                process.ArgumentList.Add($"{launchSetting.Key}={launchSetting.Value}");
+                process.ArgumentList.Add(token);
+                continue;
             }
-            else
-            {
-                // this should be an env
-                process.Environment.Add(launchSetting.Key, launchSetting.Value);
-            }
+
+            // indexer not Add, a repeated name should overwrite instead of throwing
+            process.Environment[token[..separator]] = token[(separator + 1)..];
         }
 
         try
@@ -127,116 +127,83 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         return true;
     }
 
-    // TODO: Maybe some Regex Guru can make this simpler
-    private Dictionary<string, string> ParseLaunchSettings()
+    /// <summary>
+    /// Splits launch options on whitespace, keeping quoted runs together so values with spaces survive, e.g.
+    /// <c>MANGOHUD=1 -arg="/path with spaces" WINEDLLOVERRIDES="d3d11=n,b"</c>.
+    /// </summary>
+    /// <remarks>
+    /// Quotes are stripped, as they only group the value - use <c>\"</c> for a literal one. Single quotes work too, and
+    /// an unterminated quote just runs to the end rather than throwing.
+    /// </remarks>
+    internal static List<string> TokenizeLaunchSettings(string? launchSettings)
     {
-        var launchSettings = configHelper.GetConfig().LinuxSettings.LaunchSettings;
-        var result = new Dictionary<string, string>();
+        var tokens = new List<string>();
 
-        if (string.IsNullOrEmpty(launchSettings))
+        if (string.IsNullOrWhiteSpace(launchSettings))
         {
-            return result;
+            return tokens;
         }
 
-        // So parsing this string into usable EnvVar's and Arguments might be a bit weird
-        // Most of the time I'd expect no spaces:
-        // EnvironmentVariableName=EnvironmentVariableValue
-        // -ArgumentName=ArgumentValue
-        // The - is the diff between them and EnvVar's afaik are all uppercase
-        // The only Edge Case I can think of is using a path as a variable in either. which would mean " " wrap the variable
-        // -ArgWantingPath="/path/to/something with a space"
-        // And because of this means I cant just split on whitespace.
+        var current = new StringBuilder();
+        var quote = '\0';
 
-        // Trim outer edge
-        // MANGOHUD=1 -arg1=testing -arg2="some path with spaces/in it"
-        launchSettings = launchSettings.Trim();
+        // not just a length check on the builder, so an empty quoted value ("") still gives a token
+        var started = false;
 
-        var stringBuilder = new StringBuilder();
-        var name = string.Empty;
-        var value = string.Empty;
-        var isName = true; // Start as true as this comes first
-        var isValue = false;
-        var valueHasQuotes = false;
-        var checkedForQuotes = false;
-        var reset = false;
-
-        try
+        for (var index = 0; index < launchSettings.Length; index++)
         {
-            foreach (var charFromStr in launchSettings)
+            var character = launchSettings[index];
+
+            if (character == '\\' && index + 1 < launchSettings.Length && launchSettings[index + 1] is '"' or '\'')
             {
-                // Go through the string till we hit a =
-                // we now want to deal with the value
-                if (isName && charFromStr == '=')
-                {
-                    isName = false;
-                    isValue = true;
-                    name = stringBuilder.ToString();
-                    stringBuilder.Clear();
-                    continue;
-                }
-
-                if (isValue && checkedForQuotes && !valueHasQuotes && charFromStr == ' ')
-                {
-                    // end of Value, wasnt quotes so is whitespace
-                    // dont append and reset trackers and continue;
-                    value = stringBuilder.ToString();
-                    reset = true;
-                }
-
-                if (isValue && valueHasQuotes && charFromStr == '"')
-                {
-                    // this should be the end of the quoted string
-                    stringBuilder.Append("\"");
-                    value = stringBuilder.ToString();
-                    reset = true;
-                }
-
-                // the value could start with quotes " - this means we have to handle this variable slightly differently
-                if (isValue && !checkedForQuotes)
-                {
-                    // check to see if the first char is a "
-                    valueHasQuotes = charFromStr == '"';
-                    checkedForQuotes = true;
-                }
-
-                if (isValue && reset)
-                {
-                    result.Add((string)name.Clone(), (string)value.Clone());
-                    name = string.Empty;
-                    value = string.Empty;
-                    isName = true;
-                    isValue = false;
-                    valueHasQuotes = false;
-                    checkedForQuotes = false;
-                    stringBuilder.Clear();
-                    reset = false;
-                    continue;
-                }
-
-                // At the end of the value, there should be a space between envs and args
-                if (isName && charFromStr == ' ')
-                {
-                    // We should be able to skip this
-                    continue;
-                }
-
-                stringBuilder.Append(charFromStr);
+                current.Append(launchSettings[++index]);
+                started = true;
+                continue;
             }
 
-            // check if the name and value have anything at the end, if so, last arg/env had no space or " so add whats there
-            if (!string.IsNullOrEmpty(name))
+            if (quote != '\0')
             {
-                value = stringBuilder.ToString();
-                result.Add((string)name.Clone(), (string)value.Clone());
+                if (character == quote)
+                {
+                    quote = '\0';
+                }
+                else
+                {
+                    current.Append(character);
+                }
+
+                continue;
             }
-        }
-        catch (Exception e)
-        {
-            logger.LogWarning("unable to parse launch Settings of: {setting}, please format correctly: {e}", launchSettings, e);
-            return new Dictionary<string, string>();
+
+            if (character is '"' or '\'')
+            {
+                quote = character;
+                started = true;
+                continue;
+            }
+
+            if (char.IsWhiteSpace(character))
+            {
+                if (started)
+                {
+                    tokens.Add(current.ToString());
+                    current.Clear();
+                    started = false;
+                }
+
+                continue;
+            }
+
+            current.Append(character);
+            started = true;
         }
 
-        return result;
+        if (started)
+        {
+            tokens.Add(current.ToString());
+        }
+
+        return tokens;
     }
 
     public Task<List<string>> GetProtonVersions()
