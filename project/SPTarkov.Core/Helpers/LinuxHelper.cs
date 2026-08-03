@@ -80,12 +80,12 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         {
             process = new ProcessStartInfo
             {
-                FileName = "python3",
+                FileName = umuPath,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = sptPath,
                 Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", proton } },
-                ArgumentList = { umuPath, cmd },
+                ArgumentList = { cmd },
             };
         }
 
