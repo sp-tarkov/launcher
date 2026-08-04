@@ -51,6 +51,9 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         // this looks something like this: "GE-Proton10-24"
         var proton = configHelper.GetConfig().LinuxSettings.ProtonVersion;
 
+        // This looks something like this: "WINEDLLOVERRIDES="winhttp=n,b" ENV2=2"
+        var DefaultEnv = configHelper.GetConfig().LinuxSettings.DefaultEnv;
+
         if (string.IsNullOrEmpty(prefixPath) || string.IsNullOrEmpty(umuPath) || string.IsNullOrEmpty(proton))
         {
             logger.LogError("Prefix path or umu path or proton version are required");
@@ -98,7 +101,18 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
             }
         }
 
-        foreach (var token in TokenizeLaunchSettings(configHelper.GetConfig().LinuxSettings.LaunchSettings))
+        // Combine DefaultEnv with LaunchSettings tokens
+        var tokens = new List<string>();
+
+        if (!string.IsNullOrEmpty(DefaultEnv))
+        {
+            tokens.Add(DefaultEnv);
+        }
+
+        tokens.AddRange(TokenizeLaunchSettings(configHelper.GetConfig().LinuxSettings.LaunchSettings));
+
+        // Process all tokens with the same logic
+        foreach (var token in tokens)
         {
             var separator = token.IndexOf('=');
 
@@ -110,7 +124,9 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
             }
 
             // indexer not Add, a repeated name should overwrite instead of throwing
-            process.Environment[token[..separator]] = token[(separator + 1)..];
+            // Remove quotes from value if present
+            var value = token[(separator + 1)..].Trim('"');
+            process.Environment[token[..separator]] = value;
         }
 
         try

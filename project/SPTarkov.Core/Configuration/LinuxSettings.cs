@@ -18,4 +18,7 @@ public record LinuxSettings
     public string ProtonVersion { get; set; } = "GE-Proton11-1";
 
     public bool GameMode { get; set; }
+
+    /// <summary>Default environment variables required to run the client.</summary>
+    public string DefaultEnv { get; set; } = @"WINEDLLOVERRIDES=""winhttp=n,b""";
 }
