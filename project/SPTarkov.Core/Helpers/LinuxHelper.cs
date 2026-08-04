@@ -52,7 +52,7 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         var proton = configHelper.GetConfig().LinuxSettings.ProtonVersion;
 
         // This looks something like this: "WINEDLLOVERRIDES="winhttp=n,b" ENV2=2"
-        var DefaultEnv = configHelper.GetConfig().LinuxSettings.DefaultEnv;
+        var defaultEnv = configHelper.GetConfig().LinuxSettings.DefaultEnv;
 
         if (string.IsNullOrEmpty(prefixPath) || string.IsNullOrEmpty(umuPath) || string.IsNullOrEmpty(proton))
         {
@@ -104,9 +104,9 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         // Combine DefaultEnv with LaunchSettings tokens
         var tokens = new List<string>();
 
-        if (!string.IsNullOrEmpty(DefaultEnv))
+        if (!string.IsNullOrEmpty(defaultEnv))
         {
-            tokens.Add(DefaultEnv);
+            tokens.Add(defaultEnv);
         }
 
         tokens.AddRange(TokenizeLaunchSettings(configHelper.GetConfig().LinuxSettings.LaunchSettings));
