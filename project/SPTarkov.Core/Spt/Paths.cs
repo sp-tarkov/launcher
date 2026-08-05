@@ -12,7 +12,8 @@ public class Paths
     private static readonly string _userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static readonly string _applicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-    public static readonly string ProtonPath = Path.Join(_userProfile, ".local", "share", "Steam", "compatibilitytools.d");
+    public static readonly string ProtonPathUser = Path.Join(_userProfile, ".local", "share", "Steam", "compatibilitytools.d");
+    public static readonly string ProtonPathSystem = Path.Join("/", "usr", "share", "steam", "compatibilitytools.d");
     public static readonly string PatchPath = Path.Join(_runtimeRoot, "SPT_Data", "Launcher", "Patches");
     public static readonly string CoreDllPath = Path.Join("BepInEx", "plugins", "spt", "spt-core.dll");
     public static readonly string HwechoDllPath = Path.Join("EscapeFromTarkov_Data", "Plugins", "x86_64", "hwecho.dll");

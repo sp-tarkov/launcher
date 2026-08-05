@@ -226,25 +226,44 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
     {
         // Should contain things like "GE-Proton10-24" or "GE-Proton10-21"
         // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
-        if (!Directory.Exists(Paths.ProtonPath))
+        if (!Directory.Exists(Paths.ProtonPathUser) && !Directory.Exists(Paths.ProtonPathSystem))
         {
             logger.LogError("Proton path not found, make sure to run lutris or steam first");
             // we want this to throw an exception, so just log this
         }
-
-        var directoryContents = Directory.GetDirectories(Paths.ProtonPath);
+        
         var listStripped = new List<string>();
 
-        foreach (var directory in directoryContents)
+        if (Directory.Exists(Paths.ProtonPathUser))
         {
-            // remove LegacyRuntime
-            if (directory.Contains("LegacyRuntime"))
+            var directoryContentsUser = Directory.GetDirectories(Paths.ProtonPathUser);
+            foreach (var directory in directoryContentsUser)
             {
-                continue;
-            }
+                // remove LegacyRuntime
+                if (directory.Contains("LegacyRuntime"))
+                {
+                    continue;
+                }
 
-            // split on / and get last
-            listStripped.Add(directory.Split("/").Last());
+                // split on / and get last
+                listStripped.Add(directory.Split("/").Last());
+            }
+        }
+
+        if (Directory.Exists(Paths.ProtonPathSystem))
+        {
+            var directoryContentsSystem = Directory.GetDirectories(Paths.ProtonPathSystem);
+            foreach (var directory in directoryContentsSystem)
+            {
+                // remove LegacyRuntime
+                if (directory.Contains("LegacyRuntime"))
+                {
+                    continue;
+                }
+
+                // split on / and get last
+                listStripped.Add(directory.Split("/").Last());
+            }
         }
 
         return Task.FromResult(listStripped);
