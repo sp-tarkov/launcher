@@ -175,21 +175,20 @@ public class Launcher
         App.MainWindow.Topmost = ConfigHelper.GetConfig().AlwaysTop;
         App.MainWindow.MinHeight = 560;
         App.MainWindow.MinWidth = 1070;
+
+        // Changing monitors ends up breaking position restore for some users, so we are going to skip that
         App.MainWindow.SetUseOsDefaultLocation(false);
+        App.MainWindow.Center();
 
         if (ConfigHelper.GetConfig().FirstRun)
         {
             App.MainWindow.Width = 1070;
             App.MainWindow.Height = 560;
-            App.MainWindow.Center();
         }
         else
         {
             App.MainWindow.Width = ConfigHelper.GetConfig().StartSize.Width;
             App.MainWindow.Height = ConfigHelper.GetConfig().StartSize.Height;
-
-            App.MainWindow.Top = ConfigHelper.GetConfig().StartLocation.X;
-            App.MainWindow.Left = ConfigHelper.GetConfig().StartLocation.Y;
         }
 
         App.MainWindow.RegisterWindowClosingHandler(OnExit);
