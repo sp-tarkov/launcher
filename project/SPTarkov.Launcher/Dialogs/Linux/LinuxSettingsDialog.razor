@@ -13,13 +13,15 @@
                               Required="true" RequiredError="@(LocaleHelper.Get("linux_add_prefix_required"))" Variant="Variant.Outlined"
                               Margin="Margin.Dense" HelperText="/home/cwx/Games/tarkov" HelperTextOnFocus="true" Adornment="Adornment.End"
                               AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Default"
-                              OnAdornmentClick="SetPrefixPath"/>
+                              OnAdornmentClick="SetPrefixPath" 
+                              Error="@(PrefixError)" ErrorText="@(LocaleHelper.Get("setting_set_path_error_1"))"/>
 
                 <MudTextField Immediate="true" @bind-Value="LinuxSettings!.UmuPath" Label="@(LocaleHelper.Get("linux_add_umu"))"
                               Required="true" RequiredError="@(LocaleHelper.Get("linux_add_umu_required"))" Variant="Variant.Outlined"
                               Margin="Margin.Dense" HelperText="/home/cwx/.local/share/spt-additions/runtime/umu-run"
                               HelperTextOnFocus="true" AdornmentIcon="@Icons.Material.Filled.Folder" Adornment="Adornment.End"
-                              AdornmentColor="Color.Default" OnAdornmentClick="SetUmuPath"/>
+                              AdornmentColor="Color.Default" OnAdornmentClick="SetUmuPath"
+                              Error="@(UmuError)" ErrorText="@(LocaleHelper.Get("setting_set_path_error_1"))"/>
 
                 <MudTextField Immediate="true" @bind-Value="LinuxSettings!.LaunchSettings"
                               Label="@(LocaleHelper.Get("linux_add_launch_settings"))"
@@ -39,7 +41,7 @@
             </MudForm>
             <MudContainer Class="mt-3 d-flex justify-end pa-0 gap-2">
                 <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy ml-auto" Variant="Variant.Filled"
-                           Color="Color.Primary" Disabled="@(!_success)"
+                           Color="Color.Primary" Disabled="@(!_success || UmuError || PrefixError)"
                            OnClick="Submit">@(LocaleHelper.Get("linux_add_confirm"))</MudButton>
             </MudContainer>
         </MudContainer>
@@ -56,6 +58,15 @@
 
     [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
 
+    private bool UmuError => string.IsNullOrEmpty(LinuxSettings!.UmuPath) || 
+                            !System.IO.File.Exists(LinuxSettings.UmuPath) || 
+                            System.IO.Path.GetFileName(LinuxSettings.UmuPath) != "umu-run";
+
+    private bool PrefixError => string.IsNullOrEmpty(LinuxSettings!.PrefixPath) || 
+                                !System.IO.Directory.Exists(LinuxSettings.PrefixPath);
+
+    private bool PathsAreValid => !UmuError && !PrefixError;
+
     protected override async Task OnParametersSetAsync()
     {
         ProtonList = await LinuxHelper.GetProtonVersions();
@@ -66,6 +77,12 @@
 
     private void Submit()
     {
+        if (!PathsAreValid)
+        {
+            Snackbar.Add(LocaleHelper.Get("setting_set_path_error_2"), Severity.Error);
+            return;
+        }
+
         ConfigHelper.SetLinuxSettings(LinuxSettings!);
 
         Snackbar.Add(LocaleHelper.Get("linux_add_success"), Severity.Success);
