@@ -2,12 +2,13 @@
 @inject LocaleHelper LocaleHelper
 
 <MudContainer Class="pa-0">
-    <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
+    <SettingSwitchComponent Switch="@Enabled" OptionName="@(LocaleHelper.Get("setting_set_game_path"))" SwitchFunc="SetEnabled" />
+    <MudLink Color="Color.Default" Underline="Underline.None" Disabled="!Enabled" Class="@(GetLinkClasses())">
         <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("setting_game_path"))" Variant="Variant.Outlined" Immediate="true"
                       Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info"
-                      OnAdornmentClick="SetGamePath"/>
+                      OnAdornmentClick="SetGamePath" Disabled="!Enabled" />
         <MudIconButton Color="@(IsSaved ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
-                       Disabled="IsSaved" OnClick="Save"/>
+                       Disabled="IsSaved || !Enabled" OnClick="Save"/>
     </MudLink>
 </MudContainer>
 @if (AddDiv)
@@ -18,7 +19,7 @@
 @code {
 
     [Parameter]
-    public bool Disabled { get; set; }
+    public bool Enabled { get; set; }
 
     [Parameter]
     public bool AddDiv { get; set; }
@@ -30,7 +31,8 @@
 
     protected override void OnInitialized()
     {
-        NewValue = ConfigHelper.GetConfig().GamePath;
+        Enabled = ConfigHelper.GetConfig().EnableGamePath;
+        NewValue = NewValue = ConfigHelper.GetGamePath(); 
 
         base.OnInitialized();
     }
@@ -44,7 +46,7 @@
             .AddClass("py-2")
             .AddClass("pl-5");
 
-        if (!Disabled)
+        if (!Enabled)
         {
             classes.AddClass("cursor-pointer").AddClass("setting-on-hover");
         }
@@ -64,6 +66,16 @@
 
         NewValue = folder.FirstOrDefault()!;
         Save();
+    }
+
+    private Task SetEnabled()
+    {
+        Enabled = !Enabled;
+
+        ConfigHelper.SetEnableGamePath(Enabled);
+        NewValue = ConfigHelper.GetGamePath();
+
+        return Task.CompletedTask;
     }
 
     private void Save()

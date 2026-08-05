@@ -11,6 +11,8 @@ public record LauncherSettings
 
     public bool FirstRun { get; set; } = true;
 
+    public bool EnableGamePath { get; set; } = false;
+
     /// <summary>The SPT install directory: the parent of the launcher's working directory.</summary>
     public string GamePath { get; set; } = Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
 

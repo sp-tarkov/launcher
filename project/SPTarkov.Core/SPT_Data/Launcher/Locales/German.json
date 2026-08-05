@@ -207,6 +207,7 @@
   "profile_copy_id_error": "Profil-ID konnte nicht in die Zwischenablage kopiert werden",
   "info_spt_desc": "Deine von der Community betriebene Ressource für alles rund um SPT. Egal ob du neu bei SPT bist oder ein erfahrener Modder, dieses Wiki soll dein zentrales Informationszentrum sein.",
   "server_edit_required_name": "Name ist erforderlich!",
+  "setting_set_game_path": "Set Game Path",
   "setting_game_path": "Spielpfad",
   "linux_add_warning": "Bitte bestätige, dass diese korrekt sind! Sie können später im Einstellungsmenü geändert werden",
   "linux_add_prefix": "Prefix-Pfad",
