@@ -207,6 +207,7 @@
   "profile_copy_id_error": "Unable to copy profile ID to clipboard",
   "info_spt_desc": "Your community-driven resource for everything related to SPT. Whether you’re new to SPT or a seasoned modder, this wiki aims to be your central hub for information.",
   "server_edit_required_name": "Name is required!",
+  "setting_set_game_path": "Set Game Path",
   "setting_game_path": "Game Path",
   "linux_add_warning": "Please confirm these are correct! they can be changed in the settings menu later",
   "linux_add_prefix": "Prefix Path",

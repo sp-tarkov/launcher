@@ -80,6 +80,21 @@ public class ConfigHelper
         }
     }
 
+    public string GetGamePath()
+    {
+        lock (_lock)
+        {
+            if (_settings!.EnableGamePath)
+            {
+                return _settings.GamePath;
+            }
+            else
+            {
+                return Directory.GetParent(Directory.GetCurrentDirectory())!.FullName;
+            }
+        }
+    }
+
     private void SaveConfig()
     {
         lock (_lock)
@@ -258,6 +273,16 @@ public class ConfigHelper
         {
             _logger.LogDebug("SetClearCacheOnLaunch: {ClearCacheOnLaunch}", clearCacheOnLaunch);
             _settings!.ClearCacheOnLaunch = clearCacheOnLaunch;
+            SaveConfig();
+        }
+    }
+
+    public void SetEnableGamePath(bool enableGamePath)
+    {
+        lock (_lock)
+        {
+            _logger.LogDebug("SetEnableGamePath: {EnableGamePath}", enableGamePath);
+            _settings!.EnableGamePath = enableGamePath;
             SaveConfig();
         }
     }

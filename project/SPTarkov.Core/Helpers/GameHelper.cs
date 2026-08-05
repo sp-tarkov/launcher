@@ -86,7 +86,7 @@ public class GameHelper
         _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
 
         // check game path
-        var clientExecutable = Path.Join(_configHelper.GetConfig().GamePath, "EscapeFromTarkov.exe");
+        var clientExecutable = Path.Join(_configHelper.GetGamePath(), "EscapeFromTarkov.exe");
 
         if (!File.Exists(clientExecutable))
         {
@@ -108,7 +108,7 @@ public class GameHelper
         {
             Arguments = args,
             UseShellExecute = false,
-            WorkingDirectory = _configHelper.GetConfig().GamePath,
+            WorkingDirectory = _configHelper.GetGamePath(),
         };
 
         try
@@ -171,14 +171,14 @@ public class GameHelper
 
     private async IAsyncEnumerable<PatchResultInfo> TryPatchFiles(bool ignoreInputHashMismatch)
     {
-        _filePatcher.Restore(_configHelper.GetConfig().GamePath);
+        _filePatcher.Restore(_configHelper.GetGamePath());
 
         var processed = 0;
         var countpatches = Patches.Count;
 
         foreach (var patch in Patches)
         {
-            var result = await _filePatcher.Run(_configHelper.GetConfig().GamePath, patch, ignoreInputHashMismatch);
+            var result = await _filePatcher.Run(_configHelper.GetGamePath(), patch, ignoreInputHashMismatch);
             if (!result.Ok)
             {
                 yield return new PatchResultInfo(result.Status, processed, countpatches);
@@ -199,7 +199,7 @@ public class GameHelper
 
             // Server returns "X.Y.Z" (release) or "X.Y.Z - <bleeding edge text>" (dev build); take the numeric core.
             var serverVersion = new Version(call?.Response!.Split('-')[0].Trim());
-            var coreDllPath = Path.Join(_configHelper.GetConfig().GamePath, Paths.CoreDllPath);
+            var coreDllPath = Path.Join(_configHelper.GetGamePath(), Paths.CoreDllPath);
             if (!File.Exists(coreDllPath))
             {
                 _logger.LogError("spt-core.dll missing: {coreDllPath}", coreDllPath);
@@ -256,7 +256,7 @@ public class GameHelper
             GetFileForCleanup("UnityCrashHandler64.exe"),
             GetFileForCleanup("WinPixEventRuntime.dll"),
             // Don't allow excluding this from cleanup ever
-            Path.Join(_configHelper.GetConfig().GamePath, Paths.HwechoDllPath),
+            Path.Join(_configHelper.GetGamePath(), Paths.HwechoDllPath),
         };
 
         foreach (var file in files)
@@ -287,7 +287,7 @@ public class GameHelper
             return null;
         }
 
-        return Path.Join(_configHelper.GetConfig().GamePath, fileName);
+        return Path.Join(_configHelper.GetGamePath(), fileName);
     }
 
     private bool TryRemoveFilesRecursively(DirectoryInfo basedir)

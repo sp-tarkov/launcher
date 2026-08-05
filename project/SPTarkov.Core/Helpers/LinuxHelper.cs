@@ -61,7 +61,7 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         }
 
         // this looks something like: "/home/{username}/Games/tarkov/drive_c/SPTarkov"
-        var sptPath = configHelper.GetConfig().GamePath;
+        var sptPath = configHelper.GetGamePath();
 
         ProcessStartInfo? process;
 

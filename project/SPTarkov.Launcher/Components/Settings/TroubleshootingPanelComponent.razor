@@ -129,7 +129,7 @@
     private void CopyLogs()
     {
         var filesToCopy = new List<string>();
-        var path = ConfigHelper.GetConfig().GamePath;
+        var path = ConfigHelper.GetGamePath();
         var bepinPath = Path.Join(path, "BepInEx", "LogOutput.log");
         var serverPath = Path.Join(Paths.LogsFolder, $"spt{DateTime.Now:yyyy-MM-dd}.log");
         var launcherPath = Paths.LauncherLog;
