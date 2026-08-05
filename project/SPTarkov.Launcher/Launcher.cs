@@ -173,21 +173,20 @@ public class Launcher
         App.MainWindow.ContextMenuEnabled = true;
 #endif
         App.MainWindow.Topmost = ConfigHelper.GetConfig().AlwaysTop;
-        App.MainWindow.MinHeight = 550;
+        App.MainWindow.MinHeight = 560;
         App.MainWindow.MinWidth = 1070;
+        App.MainWindow.SetUseOsDefaultLocation(false);
 
         if (ConfigHelper.GetConfig().FirstRun)
         {
             App.MainWindow.Width = 1070;
-            App.MainWindow.Height = 550;
-            App.MainWindow.SetUseOsDefaultLocation(true);
+            App.MainWindow.Height = 560;
+            App.MainWindow.Center();
         }
         else
         {
             App.MainWindow.Width = ConfigHelper.GetConfig().StartSize.Width;
             App.MainWindow.Height = ConfigHelper.GetConfig().StartSize.Height;
-
-            App.MainWindow.SetUseOsDefaultLocation(false);
 
             App.MainWindow.Top = ConfigHelper.GetConfig().StartLocation.X;
             App.MainWindow.Left = ConfigHelper.GetConfig().StartLocation.Y;
