@@ -26,6 +26,7 @@ public class Paths
         Path.Join(_userProfile, ".config", "heroic", "tools", "wine"),
         Path.Join(_userProfile, ".var", "app", "com.heroicgameslauncher.hgl", "config", "heroic", "tools", "proton"),
         Path.Join(_userProfile, ".var", "app", "com.heroicgameslauncher.hgl", "config", "heroic", "tools", "wine"),
+        Path.Join("usr", "share", "Steam", "compatibilitytools.d"),
     };
 
     public static readonly string PatchPath = Path.Join(_runtimeRoot, "SPT_Data", "Launcher", "Patches");
