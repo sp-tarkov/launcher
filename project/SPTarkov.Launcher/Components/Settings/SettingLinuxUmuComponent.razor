@@ -6,7 +6,7 @@
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
         <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("linux_add_umu"))" Variant="Variant.Outlined" Immediate="true"
                       Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Folder"
-                      AdornmentColor="Color.Info" OnAdornmentClick="SetUmuPath" Error="@(HasError)" ErrorText="@(LocaleHelper.Get("setting_save_path_error_1"))"/>
+                      AdornmentColor="Color.Info" OnAdornmentClick="SetUmuPath" Error="@(!IsSaved && HasError)"/>
         <MudIconButton Color="@(IsSaved ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
                        Disabled="IsSaved" OnClick="Save"/>
     </MudLink>
@@ -75,7 +75,7 @@
         if (!System.IO.File.Exists(NewValue) || System.IO.Path.GetFileName(NewValue) != "umu-run")
         {
             HasError = true;
-            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_2"), Severity.Error);
+            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_1"), Severity.Error);
             return;
         }
 
