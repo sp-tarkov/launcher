@@ -7,7 +7,7 @@
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="!Enabled" Class="@(GetLinkClasses())">
         <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("setting_game_path"))" Variant="Variant.Outlined" Immediate="true"
                       Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info"
-                      OnAdornmentClick="SetGamePath" Error="@(HasError)" ErrorText="@(LocaleHelper.Get("setting_save_path_error_1"))" Disabled="!Enabled" />
+                      OnAdornmentClick="SetGamePath" Error="@(!IsSaved && HasError)" Disabled="!Enabled" />
         <MudIconButton Color="@(IsSaved ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
                        Disabled="IsSaved || !Enabled" OnClick="Save"/>
     </MudLink>
@@ -87,7 +87,7 @@
         if (!System.IO.Directory.Exists(NewValue))
         {
             HasError = true;
-            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_2"), Severity.Error);
+            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_1"), Severity.Error);
             return;
         }
 

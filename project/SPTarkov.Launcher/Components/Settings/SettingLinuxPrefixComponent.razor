@@ -7,7 +7,7 @@
         <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("linux_wine_prefix"))"
                       Variant="Variant.Outlined" Immediate="true" Margin="Margin.Dense" Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info" OnAdornmentClick="SetPrefixPath"
-                      Error="@(HasError)" ErrorText="@(LocaleHelper.Get("setting_save_path_error_1"))"/>
+                      Error="@(!IsSaved && HasError)"/>
         <MudIconButton Color="@(IsSaved ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
                        Disabled="IsSaved" OnClick="Save"/>
     </MudLink>
@@ -76,7 +76,7 @@
         if (!System.IO.Directory.Exists(NewValue))
         {
             HasError = true;
-            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_2"), Severity.Error);
+            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_1"), Severity.Error);
             return;
         }
 

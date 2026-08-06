@@ -85,6 +85,7 @@
   "setting_clean_temp_success": "一時ファイルを削除しました",
   "setting_copy_logs_error_1": "ログをクリップボードにコピーできません",
   "setting_copy_logs_success": "ログをクリップボードにコピーしました",
+  "setting_save_path_error_1": "指定されたパスが無効であるか、ファイル／ディレクトリが存在しません",
   "profile_add_title": "Create Profile",
   "profile_add_text": "Create a new profile on this server.",
   "profile_add_edition": "エディション",
