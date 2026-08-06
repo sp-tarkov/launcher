@@ -4,9 +4,7 @@
 
 <MudContainer Class="pa-0">
     <a class="d-flex justify-center align-center @(Disabled ? "" : "cursor-pointer setting-on-hover") py-2 px-5">
-        <MudText Class="no-select">@OptionName</MudText>
-        <MudSpacer/>
-        <MudSelect T="string" Value="_selectedOption" Disabled="@Disabled" Clearable="false" ValueChanged="v => OnValueChanged(v)">
+        <MudSelect T="string" Label="@(LocaleHelper.Get("linux_proton_version"))" Value="_selectedOption" Disabled="@Disabled" Clearable="false" ValueChanged="v => OnValueChanged(v)">
             @foreach (var item in Options)
             {
                 <MudSelectItem Value="@item">@item</MudSelectItem>
@@ -24,7 +22,6 @@
     protected override async Task OnInitializedAsync()
     {
         _selectedOption = ConfigHelper.GetConfig().LinuxSettings.ProtonVersion;
-        OptionName = LocaleHelper.Get("linux_proton_version");
         Options = await LinuxHelper.GetProtonVersions();
         await base.OnInitializedAsync();
     }
@@ -35,7 +32,6 @@
     public bool AddDiv { get; set; }
 
     private List<string> Options { get; set; } = [];
-    private string OptionName { get; set; } = "";
     private string _selectedOption = "";
 
     private void OnValueChanged(string value)

@@ -12,7 +12,23 @@ public class Paths
     private static readonly string _userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
     private static readonly string _applicationData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-    public static readonly string ProtonPath = Path.Join(_userProfile, ".local", "share", "Steam", "compatibilitytools.d");
+    // Listing the common directories in which Protons are installed.
+    // Could also add Bottles runner directories but I don't know those.
+    // We should also add a way to add a path manually in case it's a custom one.
+    public static readonly string[] ProtonPaths = {
+        Path.Join(_userProfile, ".local", "share", "Steam", "compatibilitytools.d"),
+        Path.Join(_userProfile, ".steam", "steam", "compatibilitytools.d"),
+        Path.Join("usr", "share", "Steam", "compatibilitytools.d"),
+        Path.Join(_userProfile, ".local", "share", "lutris", "runners", "proton"),
+        Path.Join(_userProfile, ".local", "share", "lutris", "runners", "wine"),
+        Path.Join(_userProfile, ".var", "app", "net.lutris.Lutris", "data", "lutris", "runners", "proton"),
+        Path.Join(_userProfile, ".var", "app", "net.lutris.Lutris", "data", "lutris", "runners", "wine"),
+        Path.Join(_userProfile, ".config", "heroic", "tools", "proton"),
+        Path.Join(_userProfile, ".config", "heroic", "tools", "wine"),
+        Path.Join(_userProfile, ".var", "app", "com.heroicgameslauncher.hgl", "config", "heroic", "tools", "proton"),
+        Path.Join(_userProfile, ".var", "app", "com.heroicgameslauncher.hgl", "config", "heroic", "tools", "wine"),
+    };
+
     public static readonly string PatchPath = Path.Join(_runtimeRoot, "SPT_Data", "Launcher", "Patches");
     public static readonly string CoreDllPath = Path.Join("BepInEx", "plugins", "spt", "spt-core.dll");
     public static readonly string HwechoDllPath = Path.Join("EscapeFromTarkov_Data", "Plugins", "x86_64", "hwecho.dll");
