@@ -162,6 +162,7 @@
   "profile_page_task_3": "正在啟動遊戲",
   "profile_page_task_3_fail": "遊戲啟動失敗",
   "profile_page_game_closed": "遊戲已關閉",
+  "profile_no_character": "尚未創建角色",
   "profile_level": "Your Level",
   "profile_needed_exp": "Needed EXP",
   "profile_next_level": "Next Level",

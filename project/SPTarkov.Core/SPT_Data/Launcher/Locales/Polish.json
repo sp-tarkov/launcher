@@ -162,6 +162,7 @@
   "profile_page_task_3": "Uruchamianie gry",
   "profile_page_task_3_fail": "Nie udało się uruchomić gry",
   "profile_page_game_closed": "Gra została zamknięta",
+  "profile_no_character": "Jeszcze nie stworzono żadnej postaci",
   "profile_level": "Your Level",
   "profile_needed_exp": "Needed EXP",
   "profile_next_level": "Next Level",

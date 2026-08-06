@@ -160,6 +160,7 @@
   "profile_page_task_3": "ゲームを起動中",
   "profile_page_task_3_fail": "ゲームの起動に失敗",
   "profile_page_game_closed": "ゲームが終了しました",
+  "profile_no_character": "キャラクターがまだ作成されていません",
   "profile_level": "Your Level",
   "profile_needed_exp": "Needed EXP",
   "profile_next_level": "Next Level",

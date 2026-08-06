@@ -162,6 +162,7 @@
   "profile_page_task_3": "Запуск игры",
   "profile_page_task_3_fail": "Не удалось запустить игру",
   "profile_page_game_closed": "Игра закрыта",
+  "profile_no_character": "Персонаж ещё не создан",
   "profile_level": "Your Level",
   "profile_needed_exp": "Needed EXP",
   "profile_next_level": "Next Level",
