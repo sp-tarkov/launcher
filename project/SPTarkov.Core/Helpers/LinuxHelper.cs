@@ -226,28 +226,28 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
     {
         // Should contain things like "GE-Proton10-24" or "GE-Proton10-21"
         // Could be named slightly different if user downloads "custom" ones like "EM-10.0-30"
-        if (!Directory.Exists(Paths.ProtonPath))
+        var protons = new List<string>();
+        foreach (var pathWithProtons in Paths.ProtonPaths)
         {
-            logger.LogError("Proton path not found, make sure to run lutris or steam first");
-            // we want this to throw an exception, so just log this
-        }
-
-        var directoryContents = Directory.GetDirectories(Paths.ProtonPath);
-        var listStripped = new List<string>();
-
-        foreach (var directory in directoryContents)
-        {
-            // remove LegacyRuntime
-            if (directory.Contains("LegacyRuntime"))
+            if (!Directory.Exists(pathWithProtons))
             {
                 continue;
             }
 
-            // split on / and get last
-            listStripped.Add(directory.Split("/").Last());
+            var directoryContents = Directory.GetDirectories(pathWithProtons);
+            foreach (var directory in directoryContents)
+            {
+                // remove LegacyRuntime
+                if (directory.Contains("LegacyRuntime"))
+                {
+                    continue;
+                }
+
+                protons.Add(directory.ToString());
+            }
         }
 
-        return Task.FromResult(listStripped);
+        return Task.FromResult(protons);
     }
 
     [DllImport("libc", EntryPoint = "setenv", SetLastError = true)]
