@@ -1,11 +1,12 @@
 @inject ConfigHelper ConfigHelper
 @inject LocaleHelper LocaleHelper
+@inject ISnackbar Snackbar
 
 <MudContainer Class="pa-0">
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="Disabled" Class="@(GetLinkClasses())">
         <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("linux_add_umu"))" Variant="Variant.Outlined" Immediate="true"
                       Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Folder"
-                      AdornmentColor="Color.Info" OnAdornmentClick="SetUmuPath"/>
+                      AdornmentColor="Color.Info" OnAdornmentClick="SetUmuPath" Error="@(HasError)" ErrorText="@(LocaleHelper.Get("setting_save_path_error_1"))"/>
         <MudIconButton Color="@(IsSaved ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
                        Disabled="IsSaved" OnClick="Save"/>
     </MudLink>
@@ -23,6 +24,8 @@
     public bool AddDiv { get; set; }
 
     private string NewValue { get; set; } = "";
+
+    private bool HasError = false;
 
     // Compared against the config rather than a cached copy, so the button cant claim unsaved edits that arent there.
     private bool IsSaved => NewValue == ConfigHelper.GetConfig().LinuxSettings.UmuPath;
@@ -63,11 +66,19 @@
         }
 
         NewValue = file.FirstOrDefault()!;
+        HasError = false;
         Save();
     }
 
     private void Save()
     {
+        if (!System.IO.File.Exists(NewValue) || System.IO.Path.GetFileName(NewValue) != "umu-run")
+        {
+            HasError = true;
+            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_2"), Severity.Error);
+            return;
+        }
+
         ConfigHelper.SetLinuxUmuPath(NewValue);
         StateHasChanged();
     }

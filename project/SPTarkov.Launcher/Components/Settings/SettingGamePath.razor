@@ -1,12 +1,13 @@
 @inject ConfigHelper ConfigHelper
 @inject LocaleHelper LocaleHelper
+@inject ISnackbar Snackbar
 
 <MudContainer Class="pa-0">
     <SettingSwitchComponent Switch="@Enabled" OptionName="@(LocaleHelper.Get("setting_set_game_path"))" SwitchFunc="SetEnabled" />
     <MudLink Color="Color.Default" Underline="Underline.None" Disabled="!Enabled" Class="@(GetLinkClasses())">
         <MudTextField @bind-Value="NewValue" Label="@(LocaleHelper.Get("setting_game_path"))" Variant="Variant.Outlined" Immediate="true"
                       Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Folder" AdornmentColor="Color.Info"
-                      OnAdornmentClick="SetGamePath" Disabled="!Enabled" />
+                      OnAdornmentClick="SetGamePath" Error="@(HasError)" ErrorText="@(LocaleHelper.Get("setting_save_path_error_1"))" Disabled="!Enabled" />
         <MudIconButton Color="@(IsSaved ? Color.Default : Color.Success)" Icon="@Icons.Material.Filled.Save"
                        Disabled="IsSaved || !Enabled" OnClick="Save"/>
     </MudLink>
@@ -25,6 +26,8 @@
     public bool AddDiv { get; set; }
 
     private string NewValue { get; set; } = "";
+
+    private bool HasError = false;
 
     // Compared against the config rather than a cached copy, so the button cant claim unsaved edits that arent there.
     private bool IsSaved => NewValue == ConfigHelper.GetConfig().GamePath;
@@ -65,6 +68,7 @@
         }
 
         NewValue = folder.FirstOrDefault()!;
+        HasError = false;
         Save();
     }
 
@@ -80,6 +84,13 @@
 
     private void Save()
     {
+        if (!System.IO.Directory.Exists(NewValue))
+        {
+            HasError = true;
+            Snackbar.Add(LocaleHelper.Get("setting_save_path_error_2"), Severity.Error);
+            return;
+        }
+
         ConfigHelper.SetGamePath(NewValue);
         StateHasChanged();
     }

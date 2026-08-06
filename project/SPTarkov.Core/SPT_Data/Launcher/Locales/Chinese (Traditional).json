@@ -85,6 +85,8 @@
   "setting_clean_temp_success": "已清理臨時檔案",
   "setting_copy_logs_error_1": "無法將日誌複製到剪貼簿",
   "setting_copy_logs_success": "已將日誌複製到剪貼簿",
+  "setting_save_path_error_1": "路徑無效",
+  "setting_save_path_error_2": "指定的路徑無效，或者文件/目錄不存在",
   "profile_add_title": "Create Profile",
   "profile_add_text": "Create a new profile on this server.",
   "profile_add_edition": "版本",
