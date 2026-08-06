@@ -18,6 +18,7 @@ public class Paths
     public static readonly string[] ProtonPaths = {
         Path.Join(_userProfile, ".local", "share", "Steam", "compatibilitytools.d"),
         Path.Join(_userProfile, ".steam", "steam", "compatibilitytools.d"),
+        Path.Join("usr", "share", "Steam", "compatibilitytools.d"),
         Path.Join(_userProfile, ".local", "share", "lutris", "runners", "proton"),
         Path.Join(_userProfile, ".local", "share", "lutris", "runners", "wine"),
         Path.Join(_userProfile, ".var", "app", "net.lutris.Lutris", "data", "lutris", "runners", "proton"),
@@ -26,7 +27,6 @@ public class Paths
         Path.Join(_userProfile, ".config", "heroic", "tools", "wine"),
         Path.Join(_userProfile, ".var", "app", "com.heroicgameslauncher.hgl", "config", "heroic", "tools", "proton"),
         Path.Join(_userProfile, ".var", "app", "com.heroicgameslauncher.hgl", "config", "heroic", "tools", "wine"),
-        Path.Join("usr", "share", "Steam", "compatibilitytools.d"),
     };
 
     public static readonly string PatchPath = Path.Join(_runtimeRoot, "SPT_Data", "Launcher", "Patches");
