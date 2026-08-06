@@ -50,11 +50,17 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
 
         // this looks something like this: "GE-Proton10-24"
         var proton = configHelper.GetConfig().LinuxSettings.ProtonVersion;
+        var protonPath = GetProtonPath(proton);
 
         // This looks something like this: "WINEDLLOVERRIDES="winhttp=n,b" ENV2=2"
         var defaultEnv = configHelper.GetConfig().LinuxSettings.DefaultEnv;
 
-        if (string.IsNullOrEmpty(prefixPath) || string.IsNullOrEmpty(umuPath) || string.IsNullOrEmpty(proton))
+        if (
+            string.IsNullOrEmpty(prefixPath)
+            || string.IsNullOrEmpty(umuPath)
+            || string.IsNullOrEmpty(proton)
+            || string.IsNullOrEmpty(protonPath)
+        )
         {
             logger.LogError("Prefix path or umu path or proton version are required");
             return false;
@@ -75,7 +81,7 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = sptPath,
-                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", proton } },
+                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", protonPath } },
                 ArgumentList = { umuPath, cmd },
             };
         }
@@ -87,7 +93,7 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = sptPath,
-                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", proton } },
+                Environment = { { "WINEPREFIX", prefixPath }, { "PROTONPATH", protonPath } },
                 ArgumentList = { cmd },
             };
         }
@@ -231,7 +237,7 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
             logger.LogError("Proton path not found, make sure to run lutris or steam first");
             // we want this to throw an exception, so just log this
         }
-        
+
         var listStripped = new List<string>();
 
         if (Directory.Exists(Paths.ProtonPathUser))
@@ -267,6 +273,23 @@ public class LinuxHelper(ILogger<LinuxHelper> logger, ConfigHelper configHelper)
         }
 
         return Task.FromResult(listStripped);
+    }
+
+    public string? GetProtonPath(string name)
+    {
+        string[] searchPaths = { Paths.ProtonPathUser, Paths.ProtonPathSystem };
+
+        foreach (var dir in searchPaths)
+        {
+            var fullPath = Path.Combine(dir, name);
+            if (Directory.Exists(fullPath))
+            {
+                return fullPath;
+            }
+        }
+
+        logger.LogWarning("Proton version {ProtonVersion} not found", name);
+        return null;
     }
 
     [DllImport("libc", EntryPoint = "setenv", SetLastError = true)]
