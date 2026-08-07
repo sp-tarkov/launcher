@@ -6,16 +6,19 @@
     <SettingLinuxUmuComponent Disabled="false" AddDiv="false" />
     <SettingLinuxLaunchComponent Disabled="false" AddDiv="false"/>
     <SettingLinuxProtonComponent Disabled="false" AddDiv="false"/>
-    <SettingSwitchComponent AddDiv="false" Disabled="true" OptionName="GameMode" Switch="@GameModeSwitch" SwitchFunc="SetGameMode"/>
+    <SettingSwitchComponent AddDiv="false" Disabled="@(!GameModeIsInstalled)" OptionName="GameMode" Switch="@GameModeSwitch" SwitchFunc="SetGameMode"/>
 </SettingsSectionComponent>
 
 @code
 {
     private bool GameModeSwitch { get; set; }
 
+    private bool GameModeIsInstalled { get; set; } = false;
+
     protected override void OnInitialized()
     {
         GameModeSwitch = ConfigHelper.GetConfig().LinuxSettings.GameMode;
+        CheckForGameMode();
         base.OnInitialized();
     }
 
@@ -25,5 +28,39 @@
         ConfigHelper.SetLinuxGameMode(GameModeSwitch);
 
         return Task.CompletedTask;
+    }
+
+    private void CheckForGameMode()
+    {
+        // TODO: Ideally this method should be asynchronous
+        // not to block the entire UI if that process takes longer for some reason.
+
+        var processInfo = new ProcessStartInfo("gamemoded", "-version")
+        {
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+
+        Process? process = null;
+        try
+        {
+            process = Process.Start(processInfo);
+            process?.WaitForExit();
+        }
+        catch (Exception)
+        {
+            process = null;
+        }
+
+        if (process == null || process.ExitCode != 0)
+        {
+            GameModeIsInstalled = false;
+            GameModeSwitch = false;
+            ConfigHelper.SetLinuxGameMode(GameModeSwitch);
+            return;
+        }
+        
+        GameModeIsInstalled = true;
     }
 }
