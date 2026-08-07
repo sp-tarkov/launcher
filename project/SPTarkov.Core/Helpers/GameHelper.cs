@@ -97,15 +97,12 @@ public class GameHelper
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
 
-        Func<bool> launchGame =
-            OperatingSystem.IsWindows() ? () => LaunchGameWindows(clientExecutable)
-            : OperatingSystem.IsLinux() ? () => LaunchGameLinux(clientExecutable)
-            : () =>
-            {
-                return false;
-            };
+        bool success =
+            OperatingSystem.IsWindows() ? LaunchGameWindows(clientExecutable)
+            : OperatingSystem.IsLinux() ? LaunchGameLinux(clientExecutable)
+            : false;
 
-        if (!launchGame())
+        if (!success)
         {
             return false;
         }
