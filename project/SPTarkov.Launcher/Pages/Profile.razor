@@ -232,23 +232,12 @@
         }
 
         Snackbar.Add(LocaleHelper.Get("profile_page_task_3"));
-        if (OperatingSystem.IsWindows())
+
+        if (!GameHelper.LaunchGame())
         {
-            if (!GameHelper.LaunchGame())
-            {
-                var message = GameHelper.ErrorMessage;
-                Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
-                return;
-            }
-        }
-        else if (OperatingSystem.IsLinux())
-        {
-            if (!GameHelper.LaunchGameLinux())
-            {
-                var message = GameHelper.ErrorMessage;
-                Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
-                return;
-            }
+            var message = GameHelper.ErrorMessage;
+            Snackbar.Add($"{LocaleHelper.Get("profile_page_task_3_fail")}: {message}", Severity.Error);
+            return;
         }
 
         // If enabled, remember this server/profile so the next launcher startup can auto-connect straight to the profile page.

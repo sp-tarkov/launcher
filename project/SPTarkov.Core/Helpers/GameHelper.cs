@@ -97,6 +97,21 @@ public class GameHelper
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
 
+        bool success =
+            OperatingSystem.IsWindows() ? LaunchGameWindows(clientExecutable)
+            : OperatingSystem.IsLinux() ? LaunchGameLinux(clientExecutable)
+            : false;
+
+        if (!success)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool LaunchGameWindows(string clientExecutable)
+    {
         // Start game
         var args =
             $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config="
@@ -126,12 +141,8 @@ public class GameHelper
         return true;
     }
 
-    public bool LaunchGameLinux()
+    private bool LaunchGameLinux(string clientExecutable)
     {
-        _logger.LogInformation("Launching game on linux");
-        _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
-        _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
-
         List<string> argsList =
         [
             "-force-gfx-jobs",
@@ -140,7 +151,9 @@ public class GameHelper
             $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}",
         ];
 
-        if (!_linuxHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
+        _logger.LogInformation("args: {Args}", string.Join(" ", argsList));
+
+        if (!_linuxHelper.RunInPrefix(clientExecutable, argsList))
         {
             return false;
         }
@@ -333,11 +346,12 @@ public class GameHelper
     /// <returns></returns>
     public async Task<bool> MonitorGame()
     {
-        // As wine can take some time to start the game, we'll just delay 12seconds,
-        // needs to search for EscapeFromTarkov for windows
-        // TODO: this might not work for linux
+        // On Linux the process name is cut off - We need to account for that
+        string processName = OperatingSystem.IsWindows() ? "EscapeFromTarkov" : "EscapeFromTarko";
+
+        // Proton can take some time to launch the game, so we'll delay a bit
         await Task.Delay(12000);
-        var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
+        var process = Process.GetProcessesByName(processName).FirstOrDefault();
 
         if (process != null)
         {
