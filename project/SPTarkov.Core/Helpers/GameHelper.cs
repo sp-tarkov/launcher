@@ -97,6 +97,24 @@ public class GameHelper
 
         _logger.LogInformation("Valid game path: {ClientExecutable}", clientExecutable);
 
+        Func<bool> launchGame =
+            OperatingSystem.IsWindows() ? () => LaunchGameWindows(clientExecutable)
+            : OperatingSystem.IsLinux() ? () => LaunchGameLinux(clientExecutable)
+            : () =>
+            {
+                return false;
+            };
+
+        if (!launchGame())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool LaunchGameWindows(string clientExecutable)
+    {
         // Start game
         var args =
             $"-force-gfx-jobs native -token={_stateHelper.SelectedProfile?.ProfileId} -config="
@@ -126,12 +144,8 @@ public class GameHelper
         return true;
     }
 
-    public bool LaunchGameLinux()
+    private bool LaunchGameLinux(string clientExecutable)
     {
-        _logger.LogInformation("Launching game on linux");
-        _logger.LogInformation("account name: {acc}", _stateHelper.SelectedProfile?.Username);
-        _logger.LogInformation("Server: {server}", _stateHelper.SelectedServer?.IpAddress);
-
         List<string> argsList =
         [
             "-force-gfx-jobs",
@@ -140,7 +154,7 @@ public class GameHelper
             $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}",
         ];
 
-        if (!_linuxHelper.RunInPrefix("EscapeFromTarkov.exe", argsList))
+        if (!_linuxHelper.RunInPrefix(clientExecutable, argsList))
         {
             return false;
         }
