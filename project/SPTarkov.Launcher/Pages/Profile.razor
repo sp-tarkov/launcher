@@ -15,7 +15,7 @@
         <MudButton Class="mud-button-border-copy border-2 border-solid mud-button-inner-text-copy" Disabled="@_buttonDisabled" Variant="Variant.Filled" Color="Color.Dark" OnClick="ReturnToProfiles" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Medium" IconColor="Color.Error">@(LocaleHelper.Get("profile_logout"))</MudButton>
         <div class="profile-name-overlay d-flex flex-row align-center gap-2 no-pointers no-select">
             <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" Style="@ProfileIconStyle"/>
-            <MudText Typo="Typo.h5">@(SelectedMiniProfile.Nickname == "unknown" ? "No character created yet" : SelectedMiniProfile.Nickname)</MudText>
+            <MudText Typo="Typo.h5">@(SelectedMiniProfile.Nickname == "unknown" ? LocaleHelper.Get("profile_no_character") : SelectedMiniProfile.Nickname)</MudText>
         </div>
         <MudSpacer/>
         @if (ShowWipeCheckbox)

@@ -162,6 +162,7 @@
   "profile_page_task_3": "Launching Game",
   "profile_page_task_3_fail": "Game Failed to start",
   "profile_page_game_closed": "Game has closed",
+  "profile_no_character": "No character created yet",
   "profile_level": "Your Level",
   "profile_needed_exp": "Needed EXP",
   "profile_next_level": "Next Level",

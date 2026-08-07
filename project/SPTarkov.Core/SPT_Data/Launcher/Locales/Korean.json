@@ -162,6 +162,7 @@
   "profile_page_task_3": "게임 실행 중",
   "profile_page_task_3_fail": "게임 시작 실패",
   "profile_page_game_closed": "게임이 종료되었습니다",
+  "profile_no_character": "아직 생성된 캐릭터가 없습니다",
   "profile_level": "Your Level",
   "profile_needed_exp": "Needed EXP",
   "profile_next_level": "Next Level",
