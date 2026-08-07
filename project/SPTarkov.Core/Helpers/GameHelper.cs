@@ -347,11 +347,12 @@ public class GameHelper
     /// <returns></returns>
     public async Task<bool> MonitorGame()
     {
-        // As wine can take some time to start the game, we'll just delay 12seconds,
-        // needs to search for EscapeFromTarkov for windows
-        // TODO: this might not work for linux
+        // On Linux the process name is cut off - We need to account for that
+        string processName = OperatingSystem.IsWindows() ? "EscapeFromTarkov" : "EscapeFromTarko";
+
+        // Proton can take some time to launch the game, so we'll delay a bit
         await Task.Delay(12000);
-        var process = Process.GetProcessesByName("EscapeFromTarkov").FirstOrDefault();
+        var process = Process.GetProcessesByName(processName).FirstOrDefault();
 
         if (process != null)
         {
