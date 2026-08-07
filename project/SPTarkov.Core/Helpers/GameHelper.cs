@@ -151,6 +151,8 @@ public class GameHelper
             $"-config={{'BackendUrl':'https://{_stateHelper.SelectedServer?.IpAddress}','Version':'live','MatchingVersion':'live'}}",
         ];
 
+        _logger.LogInformation("args: {Args}", string.Join(" ", argsList));
+
         if (!_linuxHelper.RunInPrefix(clientExecutable, argsList))
         {
             return false;
